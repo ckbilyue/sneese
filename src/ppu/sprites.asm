@@ -67,15 +67,17 @@ palette_obj:
  dd 0xCFCFCFCF, 0xDFDFDFDF, 0xEFEFEFEF, 0xFFFFFFFF
 
 ; Sprite offset tables moved to ScreenL.S
+; abc - a = X or Y, b = s(ize) or l(imit), c = s(mall) or l(arge)
+; Xss, Xls, Xsl, Xll, Yss, Yls, Ysl, Yll
 Sprite_Size_Table:
-db  1, -7,  2,-15
-db  1, -7,  4,-31
-db  1, -7,  8,-63
-db  2,-15,  4,-31
-db  2,-15,  8,-63
-db  4,-31,  8,-63
-db  0,  0,  0,  0
-db  0,  0,  0,  0
+db  1, -7,  2,-15,  1, -7,  2,-15   ;   8x8, 16x16
+db  1, -7,  4,-31,  1, -7,  4,-31   ;   8x8, 32x32
+db  1, -7,  8,-63,  1, -7,  8,-63   ;   8x8, 64x64
+db  2,-15,  4,-31,  2,-15,  4,-31   ; 16x16, 32x32
+db  2,-15,  8,-63,  2,-15,  8,-63   ; 16x16, 64x64
+db  4,-31,  8,-63,  4,-31,  8,-63   ; 32x32, 64x64
+db  2,-15,  4,-31,  4,-31,  8,-63   ; 16x32, 32x64
+db  2,-15,  4,-31,  4,-31,  4,-31   ; 16x32, 32x32
 
 section .bss
 ALIGNB
@@ -115,11 +117,16 @@ EXPORT_C OAMAddress_VBL,skipl   ; Restore this at VBL
 EXPORT_C HiSpriteAddr,skipl     ; OAM address of sprite in 512b table
 EXPORT_C HiSpriteBits,skipl     ; OAM address of sprite in 32b table
 ALIGNB
-EXPORT Sprite_Size_Current,skipl
-EXPORT_EQU sprsize_small,Sprite_Size_Current
-EXPORT_EQU sprlim_small,Sprite_Size_Current+1
-EXPORT_EQU sprsize_large,Sprite_Size_Current+2
-EXPORT_EQU sprlim_large,Sprite_Size_Current+3
+EXPORT Sprite_Size_Current_X,skipl
+EXPORT_EQU sprsize_small_x,Sprite_Size_Current_X
+EXPORT_EQU sprlim_small_x,Sprite_Size_Current_X+1
+EXPORT_EQU sprsize_large_x,Sprite_Size_Current_X+2
+EXPORT_EQU sprlim_large_x,Sprite_Size_Current_X+3
+EXPORT Sprite_Size_Current_Y,skipl
+EXPORT_EQU sprsize_small_y,Sprite_Size_Current_Y
+EXPORT_EQU sprlim_small_y,Sprite_Size_Current_Y+1
+EXPORT_EQU sprsize_large_y,Sprite_Size_Current_Y+2
+EXPORT_EQU sprlim_large_y,Sprite_Size_Current_Y+3
 EXPORT Redo_OAM,skipb
 EXPORT SPRLatch   ,skipb    ; Sprite Priority Rotation latch flag
 EXPORT_C OBSEL    ,skipb    ; sssnnxbb  sss=sprite size,nn=upper 4k address,bb=offset
@@ -733,15 +740,15 @@ ALIGNC
 ;
 %macro Add_Sprite_Y_Check 0
  ; Check if sprite entirely offscreen
- mov al,dl
- mov bl,[esi+1]
- shl al,3
- cmp bl,239
+ mov cl,[esi+1]
+ lea eax,[edx*8]
+ cmp cl,239
  jb %%on_screen_y
- add al,bl
+ add al,cl
  dec al
  jns %%on_screen_y
 %%off_screen:
+ pop ecx
  ret
 %%on_screen_y:
 %endmacro
@@ -764,9 +771,10 @@ EXPORT_C Add_Sprite_X_Positive
 ;esi = OAM 512 byte subtable address
 ;edi = OAM 32 byte subtable address
 ;ecx, esi, edi must be preserved!
- Add_Sprite_Y_Check
- ; Save visible width and total size, these won't be changing
  push ecx
+ Add_Sprite_Y_Check
+ lea ecx,[ebx*8]    ; Convert tiles to lines
+ ; Save visible width and total size, these won't be changing
  push edi
  push edx
 
@@ -775,7 +783,6 @@ EXPORT_C Add_Sprite_X_Positive
  xor ebx,ebx
  shr ebp,16
  mov al,[esi+3]
- mov cl,dl
  and eax,byte 0x40
  jnz .flip_x
 
@@ -789,7 +796,6 @@ EXPORT_C Add_Sprite_X_Positive
  sub dl,dh
 
 .adjust_x_done:
- shl cl,3       ; Convert tiles to lines
  and edx,byte 0x7F      ; Size will always be less than this
  add ebp,edx
  mov bl,[esi+1] ; Get first line
@@ -961,9 +967,10 @@ EXPORT_C Add_Sprite_X_Negative
 ;esi = OAM 512 byte subtable address
 ;edi = OAM 32 byte subtable address
 ;ecx, esi, edi must be preserved!
- Add_Sprite_Y_Check
- ; Save visible width and total size, these won't be changing
  push ecx
+ Add_Sprite_Y_Check
+ lea ecx,[ebx*8]    ; Convert tiles to lines
+ ; Save visible width and total size, these won't be changing
  push edi
  push edx
 
@@ -972,7 +979,6 @@ EXPORT_C Add_Sprite_X_Negative
  xor ebx,ebx
  shr ebp,16
  mov al,[esi+3]
- mov cl,dl
  and eax,byte 0x40
  jnz .flip_x
 
@@ -982,7 +988,6 @@ EXPORT_C Add_Sprite_X_Negative
  add ebp,edx
 
 .flip_x:
- shl cl,3       ; Convert tiles to lines
  mov bl,[esi+1] ; Get first line
  shl ebp,3          ; tile # * 8 lines
  push ecx
@@ -1413,7 +1418,8 @@ ALIGNC
 ;Perform clipping & determine visible range
 ;Get size
  mov ah,[edi]
- mov edx,[Sprite_Size_Current]
+ mov edx,[Sprite_Size_Current_X]
+ mov ebx,[Sprite_Size_Current_Y]
 
  ;Shift size bit into carry
  shl ah,cl
@@ -1422,18 +1428,8 @@ ALIGNC
  ;dl = sprite size in tiles
  ;dh = lower limit for negative X position
  shr edx,16
- mov al,[esi]   ; ax = X
+ shr ebx,16
 
- ;Get X sign bit
- shr ah,8
- jnc .do_positive
-
- ;Determine if sprite is entirely offscreen
- cmp al,dh
- jnb .do_negative
- jmp short .off_screen
-
-ALIGNC
 .do_small:
  ;dl = sprite size in tiles
  ;dh = lower limit for negative X position
@@ -1471,10 +1467,12 @@ ALIGNC
 ;max visible count in al
 
 ;dl = min(max count(al), total count(dl))
+ push ebx
  sub al,dl
  sbb bl,bl
  and bl,al
  add dh,bl
+ pop ebx
 ;visible width count in dh, total count in dl
 ;esi = OAM 512 byte subtable address
 ;edi = OAM 32 byte subtable address
@@ -1518,10 +1516,10 @@ EXPORT_C Reset_Sprites
  mov dword [C_LABEL(HiSpriteCnt1)],0x8007
  mov dword [C_LABEL(HiSpriteCnt2)],0x0007
  mov byte [Redo_OAM],-1
- mov byte [sprsize_small],1
- mov byte [sprsize_large],2
- mov byte [sprlim_small],-7
- mov byte [sprlim_large],-15
+ mov ecx,[Sprite_Size_Table]
+ mov edx,[Sprite_Size_Table+4]
+ mov [Sprite_Size_Current_X],ecx
+ mov [Sprite_Size_Current_Y],edx
  mov byte [Pixel_Allocation_Tag],1
  mov [C_LABEL(OBBASE)],eax
  mov [C_LABEL(OBNAME)],eax
@@ -1580,8 +1578,10 @@ EXPORT SNES_W2101 ; OBSEL
  mov ebx,eax
  shr eax,5
  and eax,byte 7
- mov edx,[Sprite_Size_Table+eax*4]
- mov [Sprite_Size_Current],edx
+ mov edx,[Sprite_Size_Table+eax*8]
+ mov eax,[Sprite_Size_Table+eax*8+4]
+ mov [Sprite_Size_Current_X],edx
+ mov [Sprite_Size_Current_Y],eax
  mov eax,ebx
  mov edx,eax
  and ebx,byte 3<<3  ; Name address 0000 0000 000n n000

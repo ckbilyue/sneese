@@ -449,9 +449,9 @@ Emulation details:
  - Full mosaic effect in BG modes 0-7, with correct countdown register
     support.
  - Screen sizes 32x32, 64x32, 32x64, and 64x64 supported.
- - Sprites are supported in all sizes (8x8, 16x16, 32x32, 64x64), with
-    name and base select, priority rotation, correct sprite-to-sprite
-    priorities, and correct time/range limitation.
+ - Sprites are supported in all sizes (8x8, 16x16, 16x32, 32x32, 32x64,
+    64x64), with name and base select, priority rotation, correct
+    sprite-to-sprite priorities, and correct time/range limitation.
 
 Extras:
  - Independent optional stretching of screen in horizontal and vertical
@@ -497,7 +497,8 @@ it may not be complete!
 TO DO:
 ~~~~~~
  Screen rendering
-  OBJ limitations: Time/range over flag emulation
+  OBJ limitations: Time/range over flag emulation, proper handling in
+   half-height mode
   Performance: Improve tile-based rendering + more
   Window clipping: Used to cut holes in layers; not yet supported on OBJ
    and BG mode 7; support limited in other BG modes

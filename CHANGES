@@ -47,6 +47,8 @@ Changes
    and MKendora for informing me of the findings [TRAC]
   DMA: Corrected behavior of HDMA mode 5, thanks to anomie for the
    information [TRAC]
+  Render: Added support for the undocumented OBJ size settings,
+   thanks to Charles MacDonald for research [TRAC]
  0.80
   Misc: Fixed a flaw where divide result registers were not changed
    by division-by-zero [TRAC]
