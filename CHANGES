@@ -21,6 +21,14 @@ Changes
   DBJH          Daniel Horchner
 
 
+ 0.833
+  SPC700: Fixed timing of MOVW da,YA opcode, thanks to anomie for research
+   [TRAC]
+  SPC700: Added a brief delay before code execution begins approximating
+   the time taken by reset [TRAC]
+  5A22: Added DMA setup delay of two slow bus-cycles [TRAC]
+  Timing: Mostly corrected H-IRQ and H-counter timing for positions
+   after the 'long' dots near the end of scanlines [TRAC]
  0.832
   Documentation: Updated grossly insufficient copyright attributations
    [TRAC]

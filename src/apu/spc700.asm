@@ -819,7 +819,7 @@ db 2,8,4,5,4,5,5,6,5,5,5,5,2,2,12,5 ; 90
 db 3,8,4,5,3,4,3,6,2,6,4,4,5,2,4,4  ; A0
 db 2,8,4,5,4,5,5,6,5,5,5,5,2,2,3,4  ; B0
 db 3,8,4,5,4,5,4,7,2,5,6,4,5,2,4,9  ; C0
-db 2,8,4,5,5,6,6,7,4,5,4,5,2,2,6,3  ; D0
+db 2,8,4,5,5,6,6,7,4,5,5,5,2,2,6,3  ; D0
 db 2,8,4,5,3,4,3,6,2,4,5,3,4,3,4,3  ; E0
 db 2,8,4,5,4,5,5,6,3,4,5,4,2,2,4,3  ; F0
 
@@ -1061,12 +1061,15 @@ EXPORT_C Reset_SPC
  movzx eax,word [C_LABEL(SPC_ROM_CODE)+(0xFFFE-0xFFC0)]
  mov [_PC],eax
 
+ ; Reset Cycle Counts
+ mov eax,6      ;5-7 cycles before execution begins
+ mov [C_LABEL(TotalCycles)],eax
+
  mov eax,0  ;[C_LABEL(SNES_Cycles)]
+ mov [C_LABEL(SPC_Cycles)],eax
  mov [SPC_last_cycles],eax
 
  ; Reset the sound DSP registers
- mov [C_LABEL(SPC_Cycles)],eax  ; Clear Cycle Count
- mov [C_LABEL(TotalCycles)],eax
  mov [SPC_PAGE],eax     ; Used to save looking up P flag for Direct page stuff!
  mov dword [_SP],0x01EF ; Reset registers
  mov [_YA],eax

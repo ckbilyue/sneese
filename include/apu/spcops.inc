@@ -265,7 +265,7 @@ You must read and accept the license prior to use.
 ;    D7: MOV (dp)+Y,A    2,7
 ;    D8: MOV dp,X        2,4
 ;    D9: MOV dp+Y,X      2,5
-;    DA: MOVW dp,YA      2,4
+;    DA: MOVW dp,YA      2,5
 ;    DB: MOV dp+X,Y      2,5
 ;    DC: DEC Y           1,2
 ;    DD: MOV A,Y         1,2

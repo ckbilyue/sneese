@@ -458,6 +458,9 @@ section .text
 
  mov byte [CPU_Execution_Mode],CEM_In_DMA
 
+ ;2 slow bus cycle setup period
+ add dword [C_LABEL(SNES_Cycles)],byte (2 * _5A22_SLOW_CYCLE)
+
  mov eax,[DMA_Next_Event]
  mov [Fixed_Event],eax
  mov eax,[DMA_Next_Trip]
@@ -1291,25 +1294,35 @@ EXPORT SNES_R2137 ; SLHV  ; This latches the counter for horizontal/vertical dat
 
  ; Set up H counters to cycles executed / 4, V counter to current scanline
 
- ; All this below ensures bits 9-15 to be same as bits 1-7
- ; (open bus kludge)
+ ;Fixup for 'long' dots
+ cmp ebx,LONG_DOT_1_START
+ jbe .before_long_dots
+ sub ebx,CYCLES_HALF_DOT
+ cmp ebx,LONG_DOT_2_START
+ jbe .before_long_dots
+ sub ebx,CYCLES_HALF_DOT
+.before_long_dots:
+
  shr ebx,2
- mov al,0xFE
  cmp ebx,DOTS_BEFORE_REFRESH
  jb .before_refresh
  add ebx,DOTS_IN_REFRESH        ; Adjust for memory refresh cycles
 .before_refresh:
 
- cmp ebx,DOTS_PER_SCANLINE
+ ; All this below ensures bits 9-15 to be same as bits 1-7
+ ; (open bus kludge)
+ mov al,0xFE
+
+ cmp ebx,DOTS_PER_SCANLINE_REPORTED
  jb .before_next_line
- sub ebx,DOTS_PER_SCANLINE
+ sub ebx,DOTS_PER_SCANLINE_REPORTED
  inc edx            ; Adjust if we're on the next line
 .before_next_line:
 
  and bh,1
  and al,bl
  or bh,al
- mov [Latched_H],ebx    ; Cycles / 4 = rough H counter
+ mov [Latched_H],ebx    ; H counter
 
  mov ebx,[C_LABEL(Current_Line_Timing)]
  mov al,0xFE
@@ -1802,22 +1815,29 @@ EXPORT SNES_W4206 ; WRDIVB
  ret
 
 Update_HTimer:
- cmp edx,DOTS_PER_SCANLINE
+ cmp edx,DOTS_PER_SCANLINE_REPORTED
  jae .Invalid_HTimer
 
  shl edx,2
 
  ; Do some magic for the memory refresh 'missing' cycles
  cmp edx,CYCLES_REFRESH_START   ; Before memory refresh
- jb .not_in_refresh
- cmp edx,CYCLES_REFRESH_END     ; During memory refresh
- jb .in_refresh
- sub edx,byte CYCLES_IN_REFRESH
- jmp .not_in_refresh
-ALIGNC
-.in_refresh:
+ jb .got_timer
+ cmp edx,CYCLES_REFRESH_END
+ jae .after_refresh
  mov edx,CYCLES_REFRESH_START   ; During memory refresh
-.not_in_refresh:
+ jmp .got_timer
+ALIGNC
+.after_refresh:
+ sub edx,byte CYCLES_IN_REFRESH ; After memory refresh
+ ;Fixup for 'long' dots
+ cmp edx,LONG_DOT_1_START
+ jbe .got_timer
+ add edx,CYCLES_HALF_DOT
+ cmp edx,LONG_DOT_2_START
+ jbe .got_timer
+ add edx,CYCLES_HALF_DOT
+.got_timer:
  mov [HTimer_Set],edx
  test byte [C_LABEL(NMITIMEN)],0x10
  jz .no_change
@@ -1831,7 +1851,7 @@ ALIGNC
 ALIGNC
 .Invalid_HTimer:
  mov edx,-1
- jmp .not_in_refresh
+ jmp .got_timer
 
 ALIGNC
 EXPORT SNES_W4207 ; HTIMEL
@@ -1895,9 +1915,9 @@ EXPORT SNES_W420A ; VTIMEH   ; Handled in screen core!
 
 ALIGNC
 EXPORT SNES_W420B ; MDMAEN
- mov [C_LABEL(MDMAEN)],al
+ or [C_LABEL(MDMAEN)],al
 
- test al,al
+ test al,al     ;don't repeat setup if no new channels
  jz .no_dma
 
  push ebx
@@ -1907,6 +1927,9 @@ EXPORT SNES_W420B ; MDMAEN
  ;setup event chain for DMA
  mov edx,[FixedTrip]
 
+ ;next line is correct - but causes problems without cycle-based
+ ; event-handling (as opposed to opcode-based)
+;add ebx,byte _5A22_FAST_CYCLE  ;delay of 1 bus cycle
  mov [FixedTrip],ebx
  mov [C_LABEL(EventTrip)],ebx
 
