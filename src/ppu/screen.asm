@@ -577,10 +577,7 @@ EXTERN_C BreaksLast
 
  test byte [Tile_Layers_Enabled],0x10
  jz .no_oam_recache_needed
- mov al,[Redo_OAM]
- test al,al
- jz .no_oam_recache_needed
- call C_LABEL(Recache_OAM)
+ call C_LABEL(Check_OAM_Recache)
 .no_oam_recache_needed:
 
  SORT_OFFSET_CHANGE

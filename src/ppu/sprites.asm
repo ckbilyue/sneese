@@ -1331,6 +1331,51 @@ EXPORT_C Add_Sprite_X_Negative_Flip_X
  ret
 
 ALIGNC
+EXPORT_C Check_OAM_Recache
+ ;if priority rotation is off, treat OAM address as 0
+ xor eax,eax
+ mov al,[SPRLatch]
+ mov ebx,[C_LABEL(OAMAddress)]
+ sar al,7
+ and ebx,eax
+
+ ;convert address to OBJ #
+ shr ebx,byte 1
+ cmp [C_LABEL(HiSprite)],bl
+ jne .priority_update
+
+ mov al,[Redo_OAM]
+ test al,al
+ jnz C_LABEL(Recache_OAM)
+
+ ret
+
+.priority_update:
+ mov [C_LABEL(HiSprite)],bl
+ shl ebx,2
+;sub ebx,byte 4
+;and ebx,0x1FC
+ mov [C_LABEL(HiSpriteAddr)],ebx
+ shr ebx,4
+ add ebx,0x200
+ mov [C_LABEL(HiSpriteBits)],ebx
+ mov bl,[C_LABEL(HiSprite)]
+ mov bh,128
+ mov [C_LABEL(HiSpriteCnt2)+1],bl   ;
+ sub bh,bl
+ mov [C_LABEL(HiSpriteCnt1)+1],bh   ;
+ mov bh,7
+ add bl,bl
+ sub bh,bl
+ and bh,7
+ mov [C_LABEL(HiSpriteCnt1)],bh ;
+
+ mov ebx,C_LABEL(OAM)
+ add [C_LABEL(HiSpriteAddr)],ebx
+ add [C_LABEL(HiSpriteBits)],ebx
+ jmp C_LABEL(Recache_OAM)
+
+ALIGNC
 EXPORT_C Recache_OAM
 
 %ifdef Profile_Recache_OAM
@@ -1631,42 +1676,8 @@ EXPORT SNES_W2102 ; OAMADDL
  push ebx
  xor ebx,ebx
  mov [OAMHigh],bh
- mov bl,al
- mov [C_LABEL(OAMAddress)],ebx
- mov [C_LABEL(OAMAddress_VBL)],ebx
-
- cmp byte [SPRLatch],0
- ;if priority latch is off, do we ignore write or reset priority?
- jz near .priority_no_change
-
-.priority_update:
- shr ebx,byte 1     ;convert address to OBJ #
- cmp [C_LABEL(HiSprite)],bl
- je .priority_no_change
- mov [C_LABEL(HiSprite)],bl
- shl ebx,2
- mov byte [Redo_OAM],-1
-;sub ebx,byte 4
-;and ebx,0x1FC
- mov [C_LABEL(HiSpriteAddr)],ebx
- shr ebx,4
- add ebx,0x200
- mov [C_LABEL(HiSpriteBits)],ebx
- mov bl,[C_LABEL(HiSprite)]
- mov bh,128
- mov [C_LABEL(HiSpriteCnt2)+1],bl   ;
- sub bh,bl
- mov [C_LABEL(HiSpriteCnt1)+1],bh   ;
- mov bh,7
- add bl,bl
- sub bh,bl
- and bh,7
- mov [C_LABEL(HiSpriteCnt1)],bh ;
-
- mov ebx,C_LABEL(OAM)
- add [C_LABEL(HiSpriteAddr)],ebx
- add [C_LABEL(HiSpriteBits)],ebx
-.priority_no_change:
+ mov [C_LABEL(OAMAddress)],al
+ mov [C_LABEL(OAMAddress_VBL)],al
  pop ebx
  ret
 
@@ -1674,23 +1685,18 @@ ALIGNC
 EXPORT SNES_W2103 ; OAMADDH
  UpdateDisplay  ;*
  push ebx
- xor ebx,ebx
- mov [OAMHigh],bl
+ mov ebx,[C_LABEL(OAMAddress_VBL)]
+ xor edx,edx
  mov bh,1
+ mov [OAMHigh],dl
  and bh,al      ; Only want MSB of address
+ mov dl,0x80
  mov [C_LABEL(OAMAddress_VBL)+1],bh
- mov [C_LABEL(OAMAddress)+1],bh
- test al,al     ; Is priority rotation bit set?
- js .latch_priority_rotation
- mov [SPRLatch],bl
+ and dl,al      ; Is priority rotation bit set?
+ mov [C_LABEL(OAMAddress)],ebx
+ mov [SPRLatch],dl
  pop ebx
  ret
-
-ALIGNC
-.latch_priority_rotation:
- mov byte [SPRLatch],-1
- mov ebx,[C_LABEL(OAMAddress)]
- jmp SNES_W2102.priority_update
 
 ALIGNC
 EXPORT SNES_W2104 ; OAMDATA

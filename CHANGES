@@ -22,6 +22,8 @@ Changes
 
 
  0.801
+  Render: Improved emulation of sprite priority rotation, thanks to
+   anomie for research [TRAC]
   5A22: Improved RDIO emulation [TRAC]
   Source: Moved emulation code for registers internal to the main CPU
    ($4xxx) to main CPU source files [TRAC]
@@ -36,7 +38,7 @@ Changes
   Render: Fixed a register corruption bug in mosaic effect in mode 4 on
    BG2 with 16x16 tiles enabled [TRAC]
   SRAM: Fixed a problem where SRAMs smaller than 64kbit would not be
-   mirrored on load
+   mirrored on load [TRAC]
   Render: Fixed an off-by-6 bug in mode 7 vertical flip [TRAC]
   Input: Fixed a few bugs related to multiple 'sticks' in
    joystick/joypad code, thanks to Harekiet for reporting [TRAC]
