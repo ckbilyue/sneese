@@ -483,11 +483,9 @@ EXPORT_C E1_PHP
  E1_PUSH_B
  OPCODE_EPILOG
 
-; 10
-BFC BPL,SNES_FLAG_N
-
-; 18
-_CLx C,ALL_CLC          ; Clear Carry flag
+OPCODE_PROLOG(0x18) ; CLC i
+ _CLx C         ; Clear Carry flag
+OPCODE_EPILOG
 
 ; 20
 
@@ -716,11 +714,9 @@ EXPORT_C E1_PLP
 .no_irq_enable:
  OPCODE_EPILOG
 
-; 30
-BFS BMI,SNES_FLAG_N
-
-; 38
-_SEx C,ALL_SEC          ; Set Carry flag
+OPCODE_PROLOG(0x38) ; SEC i
+ _SEx C         ; Set Carry flag
+OPCODE_EPILOG
 
 OPCODE_PROLOG(0x3B) ; TSC i
  _TxC B_S
@@ -902,9 +898,6 @@ EXPORT_C ALL_JMP_a
  jmp short .read_direct
 %endif
 
-; 50
-BFC BVC,SNES_FLAG_V
-
 ; 54
 
 ALIGNC
@@ -915,15 +908,11 @@ ALIGNC
 EXPORT_C EX_MVN
  ALL_MVX 1,MVN
 
-; 58
+OPCODE_PROLOG(0x58) ; CLI i
+ mov cl,B_I_flag
+ _CLx I         ; Clear Interrupt disable flag
 
-ALIGNC
-EXPORT_C ALL_CLI
- ADDR_Implied
- mov bl,B_I_flag
- STORE_FLAGS_I ah
-
- test bl,bl
+ test cl,cl
  jz .no_irq_enable
  mov al,CEM_Instruction_After_IRQ_Enable
  mov [CPU_Execution_Mode],al
@@ -935,7 +924,7 @@ EXPORT_C ALL_CLI
  mov [Event_Handler],edx
 
 .no_irq_enable:
- OPCODE_EPILOG
+OPCODE_EPILOG
 
 OPCODE_PROLOG(0x5B) ; TCD i
  _TCD
@@ -1063,28 +1052,6 @@ EXPORT_C E1_RTS
  mov eax,C_LABEL(Blank)
  jmp short .read_direct
 %endif
-
-; 62
-
-ALIGNC
-EXPORT_C E0_PER
- mov al,[1+R_NativePC]
- mov ah,[2+R_NativePC]
- add R_NativePC,byte 3
- GET_PC ebx
- add eax,ebx
- E0_PUSH_W
- OPCODE_EPILOG
-
-ALIGNC
-EXPORT_C E1_PER
- mov al,[1+R_NativePC]
- mov ah,[2+R_NativePC]
- add R_NativePC,byte 3
- GET_PC ebx
- add eax,ebx
- E1_PUSH_W
- OPCODE_EPILOG
 
 ; 6B
 
@@ -1225,11 +1192,9 @@ EXPORT_C ALL_JMP_OaO
  jmp short .read_direct
 %endif
 
-; 70
-BFS BVS,SNES_FLAG_V
-
-; 78
-_SEx I,ALL_SEI          ; Set Interrupt disable flag
+OPCODE_PROLOG(0x78) ; SEI i
+ _SEx I         ; Set Interrupt disable flag
+OPCODE_EPILOG
 
 OPCODE_PROLOG(0x7B) ; TDC i
  _TxC B_D
@@ -1271,15 +1236,6 @@ EXPORT_C ALL_JMP_Oa_xO
  mov eax,C_LABEL(Blank)
  jmp short .read_direct
 %endif
-
-; 80
-
-ALIGNC
-EXPORT_C ALL_BRA
- movsx eax,byte [1+R_NativePC]
- add R_NativePC,byte 2
- add R_NativePC,eax
- OPCODE_EPILOG
 
 ; 82
                                  
@@ -1339,14 +1295,9 @@ EXPORT_C E0_BIT_i
  STORE_FLAGS_Z al
  OPCODE_EPILOG
 
-; 90
-BFC BCC,SNES_FLAG_C
-
-; B0
-BFS BCS,SNES_FLAG_C
-
-; B8
-_CLx V,ALL_CLV          ; Clear oVerflow flag
+OPCODE_PROLOG(0xB8) ; CLV i
+ _CLx V         ; Clear oVerflow flag
+OPCODE_EPILOG
 
 ; C2
 
@@ -1495,25 +1446,9 @@ ALIGNC
 
  OPCODE_EPILOG
 
-; D0
-BFC BNE,SNES_FLAG_Z
-
-; D4
-
-ALIGNC
-EXPORT_C E0_PEI
- READ16_Direct
- E0_PUSH_W
- OPCODE_EPILOG
-
-ALIGNC
-EXPORT_C E1_PEI
- READ16_Direct
- E1_PUSH_W
- OPCODE_EPILOG
-
-; D8
-_CLx D,ALL_CLD          ; Clear Decimal mode flag
+OPCODE_PROLOG(0xD8) ; CLC i
+ _CLx D         ; Clear Decimal mode flag
+OPCODE_EPILOG
 
 ; DB
 ALIGNC
@@ -1675,44 +1610,21 @@ EXPORT_C E1_SEP
 
  OPCODE_EPILOG
 
-OPCODE_PROLOG(0xEA)
+OPCODE_PROLOG(0xEA) ; NOP i
  ADDR_Implied
 OPCODE_EPILOG
 
-; EB
-
-ALIGNC
-EXPORT_C ALL_XBA
+OPCODE_PROLOG(0xEB) ; XBA i
  ADDR_Implied
  mov ah,B_A
  mov al,B_B
  STORE_FLAGS_NZ al
  mov B_A,eax
- OPCODE_EPILOG
+OPCODE_EPILOG
 
-; F0
-BFS BEQ,SNES_FLAG_Z
-
-; F4
-
-ALIGNC
-EXPORT_C E0_PEA
- mov al,[1+R_NativePC]
- mov ah,[2+R_NativePC]
- add R_NativePC,byte 3
- E0_PUSH_W
- OPCODE_EPILOG
-
-ALIGNC
-EXPORT_C E1_PEA
- mov al,[1+R_NativePC]
- mov ah,[2+R_NativePC]
- add R_NativePC,byte 3
- E1_PUSH_W
- OPCODE_EPILOG
-
-; F8
-_SEx D,ALL_SED          ; Set Decimal mode flag
+OPCODE_PROLOG(0xF8) ; SED i
+ _SEx D         ; Set Decimal mode flag
+OPCODE_EPILOG
 
 ; FB
 

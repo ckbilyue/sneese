@@ -141,28 +141,29 @@ ALIGNC
 %endif
 %endmacro
 
-;%1 = label, %2 = flag
-%macro BFC 2
-ALIGNC
-EXPORT_C ALL_%1
+;%1 = flag
+%macro _BFC 1
  add R_NativePC,byte 2
- JUMP_FLAG %2,C_LABEL(CPU_RETURN),near  ; flag set
+ JUMP_FLAG %1,C_LABEL(CPU_RETURN),near  ; flag set
  movsx eax,byte [R_NativePC - 1]    ; sign extend for addition
  add R_Cycles,byte 6            ; branch taken
  add R_NativePC,eax
- OPCODE_EPILOG
 %endmacro
 
-;%1 = label, %2 = flag
-%macro BFS 2
-ALIGNC
-EXPORT_C ALL_%1
+;%1 = flag
+%macro _BFS 1
  add R_NativePC,byte 2
- JUMP_NOT_FLAG %2,C_LABEL(CPU_RETURN),near  ; flag clear
+ JUMP_NOT_FLAG %1,C_LABEL(CPU_RETURN),near  ; flag clear
  movsx eax,byte [R_NativePC - 1]    ; sign extend for addition
  add R_Cycles,byte 6            ; branch taken
  add R_NativePC,eax
- OPCODE_EPILOG
+%endmacro
+
+%macro _BRA 0
+ add R_NativePC,byte 2
+ movsx eax,byte [R_NativePC - 1]    ; sign extend for addition
+;add R_Cycles,byte 6            ; branch taken
+ add R_NativePC,eax
 %endmacro
 
 ;%1 = addr
@@ -779,20 +780,14 @@ EXPORT_C %2
  _Txx B_A,B_D,16
 %endmacro
 
-;flag,label
-%macro _CLx 2
-ALIGNC
-EXPORT_C %2     ; Set flag
+;flag
+%macro _CLx 1   ;clear flag
  ADDR_Implied
  STORE_FLAGS_%1 0
- OPCODE_EPILOG
 %endmacro
 
-;flag,label
-%macro _SEx 2
-ALIGNC
-EXPORT_C %2     ; Set flag
+;flag
+%macro _SEx 1   ;set flag
  ADDR_Implied
  STORE_FLAGS_%1 1
- OPCODE_EPILOG
 %endmacro
