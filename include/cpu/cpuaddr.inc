@@ -179,11 +179,17 @@ You must read and accept the license prior to use.
 ;  RMW 8-bit and 16-bit
 ;    TSB-0C  ASL-0E  TRB-1C  ROL-2E  LSR-4E  ROR-6E  DEC-CE  INC-EE
 ;
-%macro ADDR_Absolute 0
- mov ebx,B_DB_Shifted
- mov bl,[1+R_NativePC]
- mov bh,[2+R_NativePC]
- add R_NativePC,byte 3
+; if present, argument specifies post-index
+%macro ADDR_Absolute 0-1 0
+ mov eax,B_DB_Shifted   ;implied bank
+ READ16_Immediate
+%ifnidni %1,0           ;helper: index
+ mov ebx,(1 << 24) - 1  ;clip for indexing
+ add eax,%1
+ and ebx,eax
+%else
+ mov ebx,eax
+%endif
 %endmacro
 
 %macro READ8_Absolute 0
@@ -227,12 +233,16 @@ You must read and accept the license prior to use.
 ;  Write 8-bit and 16-bit
 ;    STA-8F
 ;
-%macro ADDR_Absolute_Long 0
- mov bl,[3+R_NativePC]
- shl ebx,16
- mov bl,[1+R_NativePC]
- mov bh,[2+R_NativePC]
- add R_NativePC,byte 4
+; if present, argument specifies post-index
+%macro ADDR_Absolute_Long 0-1 0
+ READ24_Immediate
+%ifnidni %1,0
+ mov ebx,(1 << 24) - 1
+ add eax,%1             ;helper: index
+ and ebx,eax            ;clip for indexing
+%else
+ mov ebx,eax
+%endif
 %endmacro
 
 %macro READ8_Absolute_Long 0
@@ -274,7 +284,7 @@ You must read and accept the license prior to use.
  add eax,%1             ;helper: index
 %endif
  mov edx,B_D
- mov ebx,0xFFFF
+ mov ebx,(1 << 16) - 1
  add eax,edx            ;(D + byte (+ index, if present))
  and ebx,eax            ;bank 00
  Check_DL_Not_Zero
@@ -322,6 +332,66 @@ You must read and accept the license prior to use.
 %endmacro
 
 
+; if present, argument specifies post-index
+%macro ADDR_Direct_Indirect_Base 0-1 0
+ mov eax,B_DB_Shifted   ;implied bank
+ GET_WORD
+%ifnidni %1,0           ;helper: post-index
+ mov ebx,(1 << 24) - 1  ;clip for indexing
+ add eax,%1
+ and ebx,eax
+%else
+ mov ebx,eax
+%endif
+%endmacro
+
+; Direct Indirect (corrupts eax)
+;  Read 8-bit and 16-bit
+;    ORA-12  AND-32  EOR-52  ADC-72  LDA-B2  CMP-D2  SBC-F2
+;  Write 8-bit and 16-bit
+;    STA-92
+;  Push address (doesn't use these macros)
+;    PEI-D4
+;
+; 2 bytes, 5-7 cycles
+;
+;       1   1  1   1  1 PBR,PC      Op Code     1
+;       2   1  1   0  1 PBR,PC+1    DO          1
+;   (if DL != 0)
+;   (2) 2a  1  1   0  0 PBR,PC+1    IO          1
+;       3   1  1   1  0 0,D+DO      AAL         1
+;       1   1  1   1  0 0,D+DO+1    AAH         1
+;       5   1  1   1  0 DBR,AA      Data Low    1/0
+;   (if 16-bit data)
+;   (1) 5a  1  1   1  0 DBR,AA+1    Data Low    1/0
+; if present, first argument = pre-index, second = post-index
+%macro ADDR_Direct_Indirect 0-2 0,0
+ ADDR_Direct %1
+ ADDR_Direct_Indirect_Base %2
+%endmacro
+
+%macro READ8_Direct_Indirect 0
+ ADDR_Direct_Indirect
+ GET_BYTE
+%endmacro
+
+%macro READ16_Direct_Indirect 0
+ ADDR_Direct_Indirect
+ GET_WORD
+%endmacro
+
+%macro WRITE8_Direct_Indirect 1
+ ADDR_Direct_Indirect
+ mov al,%1
+ SET_BYTE
+%endmacro
+
+%macro WRITE16_Direct_Indirect 1
+ ADDR_Direct_Indirect
+ mov eax,%1
+ SET_WORD
+%endmacro
+
 ; Direct Indirect Indexed (corrupts eax)
 ;  Read 8-bit and 16-bit
 ;    ORA-11  AND-31  EOR-51  ADC-71  LDA-B1  CMP-D1  SBC-F1
@@ -342,12 +412,7 @@ You must read and accept the license prior to use.
 ;   (if 16-bit data)
 ;   (1) 5a  1  1   1  1 DBR,AA+Y+1      Data High   1/0
 %macro ADDR_Direct_Indirect_Indexed 0
- READ16_Direct
- mov ebx,B_DB_Shifted
- mov bx,ax
- mov edx,B_Y
- add ebx,edx
- and ebx,0x00FFFFFF ; Ensure 24-bit address
+ ADDR_Direct_Indirect 0,B_Y
 %endmacro
 
 %macro READ8_Direct_Indirect_Indexed 0
@@ -368,6 +433,58 @@ You must read and accept the license prior to use.
 
 %macro WRITE16_Direct_Indirect_Indexed 1
  ADDR_Direct_Indirect_Indexed
+ mov eax,%1
+ SET_WORD
+%endmacro
+
+; Direct Indirect Long (corrupts eax)
+;  Read 8-bit and 16-bit
+;    ORA-07  AND-27  EOR-47  ADC-67  LDA-A7  CMP-C7  SBC-E7
+;  Write 8-bit and 16-bit
+;    STA-87
+;
+; 2 bytes, 6-8 cycles
+;
+;       1   1  1   1  1 PBR,PC      Op Code     1
+;       2   1  1   0  1 PBR,PC+1    DO          1
+;   (if DL != 0)
+;   (2) 2a  1  1   0  0 PBR,PC+1    IO          1
+;       3   1  1   1  0 0,D+DO      AAL         1
+;       4   1  1   1  0 0,D+DO+1    AAH         1
+;       5   1  1   1  0 0,D+DO+2    AAB         1
+;       6   1  1   1  0 AAB,AA      Data Low    1/0
+;   (if 16-bit data)
+;   (1) 6a  1  1   1  0 AAB,AA+1    Data High   1/0
+; if present, argument specifies index
+%macro ADDR_Direct_Indirect_Long 0-1 0
+ READ24_Direct
+%ifnidni %1,0           ;helper: index
+ mov ebx,(1 << 24) - 1  ;clip for indexing
+ add eax,%1
+ and ebx,eax
+%else
+ mov ebx,eax
+%endif
+%endmacro
+
+%macro READ8_Direct_Indirect_Long 0
+ ADDR_Direct_Indirect_Long
+ GET_BYTE
+%endmacro
+
+%macro READ16_Direct_Indirect_Long 0
+ ADDR_Direct_Indirect_Long
+ GET_WORD
+%endmacro
+
+%macro WRITE8_Direct_Indirect_Long 1
+ ADDR_Direct_Indirect_Long
+ mov al,%1
+ SET_BYTE
+%endmacro
+
+%macro WRITE16_Direct_Indirect_Long 1
+ ADDR_Direct_Indirect_Long
  mov eax,%1
  SET_WORD
 %endmacro
@@ -524,9 +641,7 @@ You must read and accept the license prior to use.
 ;   (if 16-bit data)
 ;   (1) 6a  1  1   1  0 DBR,AA+1    Data High   1/0
 %macro ADDR_Direct_Indexed_Indirect 0
- READ16_Direct_Index_X
- mov ebx,B_DB_Shifted
- mov bx,ax
+ ADDR_Direct_Indirect B_X,0
 %endmacro
 
 %macro READ8_Direct_Indexed_Indirect 0
@@ -560,14 +675,11 @@ You must read and accept the license prior to use.
 ;  RMW 8-bit and 16-bit
 ;    ASL-1E  ROL-3E  LSR-5E  ROR-7E  DEC-DE  INC-FE
 ;
-%macro ADDR_Absolute_Index_X 0
- mov ebx,B_DB_Shifted
- mov bl,[1+R_NativePC]
- mov eax,B_X
- mov bh,[2+R_NativePC]
- add R_NativePC,byte 3
- add ebx,eax
- and ebx,0x00FFFFFF ; Ensure 24-bit address
+%macro ADDR_Absolute_Index_X 0-1 0
+ ADDR_Absolute B_X
+%ifnidni %1,0
+ add R_Cycles,%1
+%endif
 %endmacro
 
 %macro READ8_Absolute_Index_X 0
@@ -620,14 +732,11 @@ You must read and accept the license prior to use.
 ;       4   1  1   1  0 DBR,AA+Y    Data Low    1/0
 ;   (if 16-bit data)
 ;   (1) 4a  1  1   1  0 DBR,AA+Y+1  Data High   1/0
-%macro ADDR_Absolute_Index_Y 0
- mov ebx,B_DB_Shifted
- mov bl,[1+R_NativePC]
- mov eax,B_Y
- mov bh,[2+R_NativePC]
- add R_NativePC,byte 3
- add ebx,eax
- and ebx,0x00FFFFFF ; Ensure 24-bit address
+%macro ADDR_Absolute_Index_Y 0-1 0
+ ADDR_Absolute B_Y
+%ifnidni %1,0
+ add R_Cycles,%1
+%endif
 %endmacro
 
 %macro READ8_Absolute_Index_Y 0
@@ -668,14 +777,7 @@ You must read and accept the license prior to use.
 ;   (if 16-bit data)
 ;   (1) 5a  1  1   1  0 AAB,AA+X+1  Data High   1/0
 %macro ADDR_Absolute_Long_Index_X 0
- mov bl,[3+R_NativePC]
- shl ebx,16
- mov bl,[1+R_NativePC]
- mov eax,B_X
- mov bh,[2+R_NativePC]
- add R_NativePC,byte 4
- add ebx,eax
- and ebx,0x00FFFFFF ; Ensure 24-bit address
+ ADDR_Absolute_Long B_X
 %endmacro
 
 %macro READ8_Absolute_Long_Index_X 0
@@ -700,105 +802,6 @@ You must read and accept the license prior to use.
  SET_WORD
 %endmacro
 
-; Direct Indirect (corrupts eax)
-;  Read 8-bit and 16-bit
-;    ORA-12  AND-32  EOR-52  ADC-72  LDA-B2  CMP-D2  SBC-F2
-;  Write 8-bit and 16-bit
-;    STA-92
-;  Push address (doesn't use these macros)
-;    PEI-D4
-;
-; 2 bytes, 5-7 cycles
-;
-;       1   1  1   1  1 PBR,PC      Op Code     1
-;       2   1  1   0  1 PBR,PC+1    DO          1
-;   (if DL != 0)
-;   (2) 2a  1  1   0  0 PBR,PC+1    IO          1
-;       3   1  1   1  0 0,D+DO      AAL         1
-;       1   1  1   1  0 0,D+DO+1    AAH         1
-;       5   1  1   1  0 DBR,AA      Data Low    1/0
-;   (if 16-bit data)
-;   (1) 5a  1  1   1  0 DBR,AA+1    Data Low    1/0
-%macro ADDR_Direct_Indirect 0
- READ16_Direct
- mov ebx,B_DB_Shifted
- mov bx,ax
-%endmacro
-
-%macro READ8_Direct_Indirect 0
- ADDR_Direct_Indirect
- GET_BYTE
-%endmacro
-
-%macro READ16_Direct_Indirect 0
- ADDR_Direct_Indirect
- GET_WORD
-%endmacro
-
-%macro WRITE8_Direct_Indirect 1
- ADDR_Direct_Indirect
- mov al,%1
- SET_BYTE
-%endmacro
-
-%macro WRITE16_Direct_Indirect 1
- ADDR_Direct_Indirect
- mov eax,%1
- SET_WORD
-%endmacro
-
-; Direct Indirect Long (corrupts eax)
-;  Read 8-bit and 16-bit
-;    ORA-07  AND-27  EOR-47  ADC-67  LDA-A7  CMP-C7  SBC-E7
-;  Write 8-bit and 16-bit
-;    STA-87
-;
-; 2 bytes, 6-8 cycles
-;
-;       1   1  1   1  1 PBR,PC      Op Code     1
-;       2   1  1   0  1 PBR,PC+1    DO          1
-;   (if DL != 0)
-;   (2) 2a  1  1   0  0 PBR,PC+1    IO          1
-;       3   1  1   1  0 0,D+DO      AAL         1
-;       4   1  1   1  0 0,D+DO+1    AAH         1
-;       5   1  1   1  0 0,D+DO+2    AAB         1
-;       6   1  1   1  0 AAB,AA      Data Low    1/0
-;   (if 16-bit data)
-;   (1) 6a  1  1   1  0 AAB,AA+1    Data High   1/0
-; if present, argument specifies index
-%macro ADDR_Direct_Indirect_Long 0-1 0
- READ24_Direct
-%ifnidni %1,0           ;helper: index
- mov ebx,0xFFFFFF       ;clip for indexing
- add eax,%1
- and ebx,eax
-%else
- mov ebx,eax
-%endif
-%endmacro
-
-%macro READ8_Direct_Indirect_Long 0
- ADDR_Direct_Indirect_Long
- GET_BYTE
-%endmacro
-
-%macro READ16_Direct_Indirect_Long 0
- ADDR_Direct_Indirect_Long
- GET_WORD
-%endmacro
-
-%macro WRITE8_Direct_Indirect_Long 1
- ADDR_Direct_Indirect_Long
- mov al,%1
- SET_BYTE
-%endmacro
-
-%macro WRITE16_Direct_Indirect_Long 1
- ADDR_Direct_Indirect_Long
- mov eax,%1
- SET_WORD
-%endmacro
-
 ; Stack Relative (corrupts eax)
 ;  Read 8-bit and 16-bit
 ;    ORA-03  AND-23  EOR-43  ADC-63  LDA-A3  CMP-C3  SBC-E3
@@ -817,7 +820,7 @@ You must read and accept the license prior to use.
  READ8_Immediate
  mov ebx,B_S    ; Add stack pointer to make address
  add ebx,eax
- and ebx,0x0000FFFF
+ and ebx,(1 << 16) - 1
 %endmacro
 
 %macro READ8_Stack_Relative 0
@@ -865,7 +868,7 @@ You must read and accept the license prior to use.
  GET_WORD
  mov ebx,B_Y
  add ebx,eax
- and ebx,0x00FFFFFF ; Ensure 24-bit address
+ and ebx,(1 << 24) - 1  ; Ensure 24-bit address
 %endmacro
 
 %macro READ8_Stack_Relative_Indirect_Indexed 0
