@@ -455,7 +455,7 @@ inline void map_rom_32k_lorom(int bank)
 {
  int needed_bank;
 
- needed_bank = rmd_32k.bank_lookup [(bank & 0x7F) & rmd_32k.overflow_mask];
+ needed_bank = rmd_32k.bank_lookup [(bank ^ 0x80) & rmd_32k.overflow_mask];
 
  for (int i = 4; i < 8; i++)
  {
@@ -467,7 +467,7 @@ inline void map_rom_32k_lorom_40_C0(int bank)
 {
  int needed_bank;
 
- needed_bank = rmd_32k.bank_lookup [(bank & 0x3F) & rmd_32k.overflow_mask];
+ needed_bank = rmd_32k.bank_lookup [(bank ^ 0x80) & rmd_32k.overflow_mask];
 
  for (int i = 0; i < 4; i++)
  {
@@ -481,7 +481,8 @@ inline void map_rom_32k_hirom(int bank)
 {
  int needed_bank;
 
- needed_bank = rmd_64k.bank_lookup [(bank & 0x3F) & rmd_64k.overflow_mask];
+ needed_bank = rmd_64k.bank_lookup [
+  ((bank & 0x80 ? 0 : 0x40) + (bank & 0x3F)) & rmd_64k.overflow_mask];
 
  for (int i = 4; i < 8; i++)
  {
@@ -493,7 +494,8 @@ inline void map_rom_64k(int bank)
 {
  int needed_bank;
 
- needed_bank = rmd_64k.bank_lookup [(bank & 0x3F) & rmd_64k.overflow_mask];
+ needed_bank = rmd_64k.bank_lookup [
+  ((bank & 0x80 ? 0 : 0x40) + (bank & 0x3F)) & rmd_64k.overflow_mask];
 
  for (int i = 0; i < 8; i++)
  {
@@ -944,11 +946,11 @@ static bool open_rom_normal(const char *Filename)
  rmd_32k.bank_count = (((infilesize - ROM_start) + (32 << 10) - 1)
   / (32 << 10));
 
- // Maximum 32Mbit ROM size for LoROM
- if (rmd_64k.bank_count > 64)
+ // Maximum 64Mbit ROM size for LoROM
+ if (rmd_64k.bank_count > 128)
  {
-  rmd_64k.bank_count = 64;
-  rmd_32k.bank_count = 128;
+  rmd_64k.bank_count = 128;
+  rmd_32k.bank_count = 256;
  }
 
  if (Allocate_ROM())   // Dynamic allocation of ROM
@@ -1200,11 +1202,11 @@ static bool open_rom_split(const char *Filename)
  rmd_64k.bank_count = ((total_size + (64 << 10) - 1) / (64 << 10));
  rmd_32k.bank_count = ((total_size + (32 << 10) - 1) / (32 << 10));
 
- // Maximum 32Mbit ROM size for LoROM
- if (rmd_64k.bank_count > 64)
+ // Maximum 64Mbit ROM size for LoROM
+ if (rmd_64k.bank_count > 128)
  {
-  rmd_64k.bank_count = 64;
-  rmd_32k.bank_count = 128;
+  rmd_64k.bank_count = 128;
+  rmd_32k.bank_count = 256;
  }
 
  if (Allocate_ROM())   // Dynamic allocation of ROM
