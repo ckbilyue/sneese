@@ -51,6 +51,21 @@ unsigned OLD_SPC_ADDRESS;
 unsigned Map_Address;
 unsigned Map_Byte;
 
+void print_str(const char *s)
+{
+ printf("%s", s);
+}
+
+void print_decnum(unsigned u)
+{
+ printf("%u", u);
+}
+
+void print_hexnum(unsigned u, int width)
+{
+ printf("%0*X", width, u);
+}
+
 void InvalidDMAMode()
 {
  set_gfx_mode(GFX_TEXT,0,0,0,0);
