@@ -951,3 +951,60 @@ EXPORT_C %2
  STORE_FLAGS_Z al
  OPCODE_EPILOG
 %endmacro
+
+;src,size,label
+%macro _TxS 3
+ALIGNC
+EXPORT_C %3
+ mov eax,%1
+ inc R_NativePC
+%if (%2) == 8
+ mov B_S,al
+%else
+ mov B_S,eax
+%endif
+ OPCODE_EPILOG
+%endmacro
+
+;src,dest,size,label
+%macro _Txx 4
+ALIGNC
+EXPORT_C %4
+ mov eax,%1
+ inc R_NativePC
+%if (%3) == 8
+ mov %2,al
+ STORE_FLAGS_NZ al
+%else
+ mov %2,eax
+ or al,ah
+ STORE_FLAGS_N ah
+ STORE_FLAGS_Z al
+%endif
+ OPCODE_EPILOG
+%endmacro
+
+;src,size,label
+%macro _TxA 3
+ _Txx %1,B_A,%2,%3
+%endmacro
+
+;src,size,label
+%macro _TxX 3
+ _Txx %1,B_X,%2,%3
+%endmacro
+
+;src,size,label
+%macro _TxY 3
+ _Txx %1,B_Y,%2,%3
+%endmacro
+
+;src,label
+%macro _TxC 2
+ _Txx %1,B_A,16,%2
+%endmacro
+
+;label
+%macro _TCD 1
+ _Txx B_A,B_D,16,%1
+%endmacro
