@@ -91,6 +91,8 @@ src/debug.c
 src/dos.c
 src/helper.c
 src/apu/sound.c
+src/input.c
+include/input.h
 nasmming/nasmming.txt
 nasmming/outcoff.c.diff
 nasmming/outform.h.diff
