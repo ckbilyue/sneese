@@ -4731,15 +4731,8 @@ EXPORT_C CPU_RETURN
  test R_Cycles,R_Cycles
 %endif
 
-%ifdef TRACKERS
-%if TRACKERS >= 16
- jge near HANDLE_EVENT
-%else
  jge HANDLE_EVENT
-%endif
-%else
- jge HANDLE_EVENT
-%endif
+
 EXPORT_C CPU_START_NEXT
 ; This code is for a CPU-tracker dump... #define TRACKERS to make a dump
 ; of the CPU state before each instruction - uncomment the ret to
@@ -4780,12 +4773,12 @@ EXPORT_C CPU_START_NEXT
  mov [12+edx],al        ;
  mov al,[CPU_LABEL(DL)] ;
  mov [13+edx],al        ;
- mov al,[_P+1]          ;
- and al,1               ;
+ mov al,[_E_flag]       ;
  mov [15+edx],al        ;
+ test al,al             ;
  jnz .track_e1_flags    ;
  E0_SETUPFLAGS          ;
- jmp short.track_e0_flags   ;
+ jmp short .track_e0_flags  ;
 .track_e1_flags:        ;
  E1_SETUPFLAGS          ;
 .track_e0_flags:        ;
