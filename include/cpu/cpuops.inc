@@ -524,10 +524,6 @@ _TxS B_A,8,E1_TCS
 EM_ORA a_x,Absolute_Index_X
 E0_ORA a_x,Absolute_Index_X
 
-; 1F
-EM_ORA al_x,Absolute_Long_Index_X
-E0_ORA al_x,Absolute_Long_Index_X
-
 ; 20
 
 ALIGNC
@@ -811,10 +807,6 @@ E0_BIT a_x,Absolute_Index_X
 ; 3D
 EM_AND a_x,Absolute_Index_X
 E0_AND a_x,Absolute_Index_X
-
-; 3F
-EM_AND al_x,Absolute_Long_Index_X
-E0_AND al_x,Absolute_Long_Index_X
 
 ; 40
 
@@ -1124,10 +1116,6 @@ EXPORT_C ALL_JML_al
 ; 5D
 EM_EOR a_x,Absolute_Index_X
 E0_EOR a_x,Absolute_Index_X
-
-; 5F
-EM_EOR al_x,Absolute_Long_Index_X
-E0_EOR al_x,Absolute_Long_Index_X
 
 ; 60
 
@@ -1452,10 +1440,6 @@ EXPORT_C ALL_JMP_Oa_xO
 EM_ADC a_x,Absolute_Index_X
 E0_ADC a_x,Absolute_Index_X
 
-; 7F
-EM_ADC al_x,Absolute_Long_Index_X
-E0_ADC al_x,Absolute_Long_Index_X
-
 ; 80
 
 ALIGNC
@@ -1627,10 +1611,6 @@ E0_LDA a_x,Absolute_Index_X
 ; BE
 EX_LDX a_y,Absolute_Index_Y
 E0_LDX a_y,Absolute_Index_Y
-
-; BF
-EM_LDA al_x,Absolute_Long_Index_X
-E0_LDA al_x,Absolute_Long_Index_X
 
 ; C1
 EM_CMP Od_xO,Direct_Indexed_Indirect
@@ -1913,10 +1893,6 @@ EXPORT_C ALL_JML_OaO
 EM_CMP a_x,Absolute_Index_X
 E0_CMP a_x,Absolute_Index_X
 
-; DF
-EM_CMP al_x,Absolute_Long_Index_X
-E0_CMP al_x,Absolute_Long_Index_X
-
 ; E1
 EM_SBC Od_xO,Direct_Indexed_Indirect
 E0_SBC Od_xO,Direct_Indexed_Indirect
@@ -2194,7 +2170,3 @@ EXPORT_C E1_JSR_Oa_xO
 ; FD
 EM_SBC a_x,Absolute_Index_X
 E0_SBC a_x,Absolute_Index_X
-
-; FF
-EM_SBC al_x,Absolute_Long_Index_X
-E0_SBC al_x,Absolute_Long_Index_X

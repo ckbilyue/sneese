@@ -45,6 +45,10 @@ OPCODE_PROLOG(0x1E) ; ASL a,x
  RMW _ASL,Absolute_Index_X
 OPCODE_EPILOG
 
+OPCODE_PROLOG(0x1F) ; ORA al,x
+ _ORA Absolute_Long_Index_X
+OPCODE_EPILOG
+
 OPCODE_PROLOG(0x23) ; AND d,s
  _AND Stack_Relative
 OPCODE_EPILOG
@@ -85,6 +89,10 @@ OPCODE_PROLOG(0x3E) ; ROL a,x
  RMW _ROL,Absolute_Index_X
 OPCODE_EPILOG
 
+OPCODE_PROLOG(0x3F) ; AND al,x
+ _AND Absolute_Long_Index_X
+OPCODE_EPILOG
+
 OPCODE_PROLOG(0x43) ; EOR d,s
  _EOR Stack_Relative
 OPCODE_EPILOG
@@ -117,6 +125,10 @@ OPCODE_PROLOG(0x5E) ; LSR a,x
  RMW _LSR,Absolute_Index_X
 OPCODE_EPILOG
 
+OPCODE_PROLOG(0x5F) ; EOR al,x
+ _EOR Absolute_Long_Index_X
+OPCODE_EPILOG
+
 OPCODE_PROLOG(0x63) ; ADC d,s
  _ADC Stack_Relative
 OPCODE_EPILOG
@@ -147,6 +159,10 @@ OPCODE_EPILOG
 
 OPCODE_PROLOG(0x7E) ; ROR a,x
  RMW _ROR,Absolute_Index_X
+OPCODE_EPILOG
+
+OPCODE_PROLOG(0x7F) ; ADC al,x
+ _ADC Absolute_Long_Index_X
 OPCODE_EPILOG
 
 OPCODE_PROLOG(0x83) ; STA d,s
@@ -205,6 +221,10 @@ OPCODE_PROLOG(0xB3) ; LDA (d,s),y
  _LDA Stack_Relative_Indirect_Indexed
 OPCODE_EPILOG
 
+OPCODE_PROLOG(0xBF) ; LDA al,x
+ _LDA Absolute_Long_Index_X
+OPCODE_EPILOG
+
 OPCODE_PROLOG(0xC3) ; CMP d,s
  _CMP Stack_Relative
 OPCODE_EPILOG
@@ -233,6 +253,10 @@ OPCODE_PROLOG(0xDE) ; DEC a,x
  RMW _DEC_M,Absolute_Index_X
 OPCODE_EPILOG
 
+OPCODE_PROLOG(0xDF) ; CMP al,x
+ _CMP Absolute_Long_Index_X
+OPCODE_EPILOG
+
 OPCODE_PROLOG(0xE3) ; SBC d,s
  _SBC Stack_Relative
 OPCODE_EPILOG
@@ -259,6 +283,10 @@ OPCODE_EPILOG
 
 OPCODE_PROLOG(0xFE) ; INC a,x
  RMW _INC_M,Absolute_Index_X
+OPCODE_EPILOG
+
+OPCODE_PROLOG(0xFF) ; SBC al,x
+ _SBC Absolute_Long_Index_X
 OPCODE_EPILOG
 
 %undef OPCODE_PROLOG
