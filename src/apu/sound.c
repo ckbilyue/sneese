@@ -1523,7 +1523,7 @@ void update_sound(void)
          {
           /* If voice was on, and is still on */
           SPC_DSP[(voice << 4) + DSP_VOICE_OUTX] =
-           SNDvoices[voice].outx;
+           SNDvoices[voice].outx >> 8;
          }
         }
     }
