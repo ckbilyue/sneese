@@ -499,6 +499,8 @@ TO DO:
  Screen rendering
   OBJ limitations: Time/range over flag emulation, proper handling in
    half-height mode
+  Sprite priority rotation: Emulation of the quirky behavior when
+   (OAM byte address & 3) == 3
   Performance: Improve tile-based rendering + more
   Window clipping: Used to cut holes in layers; not yet supported on OBJ
    and BG mode 7; support limited in other BG modes
