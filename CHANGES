@@ -22,6 +22,9 @@ Changes
 
 
  0.811
+  Sound: Fixed a bug in envelope height reading of channels that weren't
+   playing; value to be read wasn't being updated, fixes Secret of
+   Evermore [TRAC]
  0.81
   PPU: Greatly simplied VRAM read/write handling and readded VRAM read
    buffering, thanks to anomie for convincing me to give it another
@@ -65,7 +68,8 @@ Changes
    fusion in Shin Megami Tensei [TRAC]
   5A22: Improved open bus behavior in several registers [TRAC]
   Source: Eliminated need for building with a patched NASM on Win32
-   port [TRAC]
+   port, thanks to Nach for getting me to write the object patcher
+   [TRAC]
   Source: Fixed object tree autogeneration [TRAC]
   Logo: Another completely new logo! [Siloh]
  0.80

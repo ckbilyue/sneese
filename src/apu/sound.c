@@ -396,6 +396,7 @@ static INLINE int validate_brr_address(int voice)
  SPC_DSP[(voice << 4) + DSP_VOICE_OUTX] = 0;
 #endif
 #ifdef ZERO_ENVX_ON_VOICE_OFF
+ SPC_DSP[(voice << 4) + DSP_VOICE_ENVX] = 0;
  SNDvoices[voice].envx = 0;
 #endif
 
@@ -436,6 +437,7 @@ static int get_brr_block(int voice, struct voice_state *pvs)
      SPC_DSP[(voice << 4) + DSP_VOICE_OUTX] = 0;
 #endif
 #ifdef ZERO_ENVX_ON_VOICE_OFF
+     SPC_DSP[(voice << 4) + DSP_VOICE_ENVX] = 0;
      SNDvoices[voice].envx = 0;
 #endif
     }
@@ -595,6 +597,7 @@ INLINE static unsigned UpdateEnvelopeHeight(int voice)
 #ifdef ZERO_OUTX_ON_VOICE_OFF
                 SPC_DSP[(voice << 4) + DSP_VOICE_OUTX] = 0;
 #endif
+                SPC_DSP[(voice << 4) + DSP_VOICE_ENVX] = 0;
                 envx = 0;
                 break;
             }
@@ -617,6 +620,7 @@ INLINE static unsigned UpdateEnvelopeHeight(int voice)
             if (envx == 0 || envx > ENVX_MAX)    //underflow
             {
                 pvs->env_cycle_latch = voice_cycle_latch;
+                SPC_DSP[(voice << 4) + DSP_VOICE_ENVX] = 0;
                 envx = 0;
                 break;
             }
@@ -629,6 +633,7 @@ INLINE static unsigned UpdateEnvelopeHeight(int voice)
             if (envx == 0 || envx > ENVX_MAX)   //underflow
             {
                 pvs->env_cycle_latch = voice_cycle_latch;
+                SPC_DSP[(voice << 4) + DSP_VOICE_ENVX] = 0;
                 envx = 0;
                 break;
             }
@@ -654,6 +659,7 @@ INLINE static unsigned UpdateEnvelopeHeight(int voice)
         }
         break;
     }
+    SPC_DSP[(voice << 4) + DSP_VOICE_ENVX] = envx >> ENVX_DOWNSHIFT_BITS;
     pvs->envx = envx;
 
     return envx;
@@ -709,6 +715,7 @@ INLINE static void SPC_KeyOn(int voices)
    if (!(SNDkeys & (1 << voice)))
 #endif
    {
+    SPC_DSP[(voice << 4) + DSP_VOICE_ENVX] = 0;
     pvs->envx = 0;
     pvs->outx = 0;
    }
@@ -728,6 +735,7 @@ INLINE static void SPC_KeyOn(int voices)
     if (!(SNDkeys & (1 << voice)))
 #endif
     {
+     SPC_DSP[(voice << 4) + DSP_VOICE_ENVX] = 0;
      pvs->envx = 0;
      pvs->outx = 0;
     }
@@ -737,6 +745,7 @@ INLINE static void SPC_KeyOn(int voices)
    }
    else
    {
+    SPC_DSP[(voice << 4) + DSP_VOICE_ENVX] = (gain & 0x7F);
     pvs->envx = (gain & 0x7F) << ENVX_DOWNSHIFT_BITS;
     pvs->env_state = DIRECT;
    }
@@ -1583,6 +1592,7 @@ void update_sound(void)
      printf("Voice off: %d (?)\n", voice);
 #endif
 #ifdef ZERO_ENVX_ON_VOICE_OFF
+          SPC_DSP[(voice << 4) + DSP_VOICE_ENVX] = 0;
           SNDvoices[voice].envx = 0;
 #endif
 #ifdef ZERO_OUTX_ON_VOICE_OFF
@@ -1620,12 +1630,18 @@ void SPC_READ_DSP()
      {
       if (!(SNDkeys & (1 << addr_hi)))
       {
+#ifdef LOG_SOUND_DSP_READ
+       printf(" %02X", SPC_DSP[SPC_DSP_ADDR]);
+#endif
        return;
       }
      }
      else
      {
-       return;
+#ifdef LOG_SOUND_DSP_READ
+      printf(" %02X", SPC_DSP[SPC_DSP_ADDR]);
+#endif
+      return;
      }
     }
 #endif
@@ -1638,13 +1654,12 @@ void SPC_READ_DSP()
     {
     case DSP_VOICE_ENVX:
                 if (!sound_enabled) SNDvoices[addr_hi].voice_cycle_latch = TotalCycles;
-#ifdef ZERO_ENVX_ON_VOICE_OFF
+#if defined(ZERO_ENVX_ON_VOICE_OFF) && !defined(DSP_SPEED_HACK)
                 if (ENVX_ENABLED && (SNDkeys & (1 << addr_hi)))
 #else
                 if (ENVX_ENABLED)
 #endif
-                 SPC_DSP[SPC_DSP_ADDR] = UpdateEnvelopeHeight(addr_hi) >>
-                  ENVX_DOWNSHIFT_BITS;
+                 UpdateEnvelopeHeight(addr_hi) >> ENVX_DOWNSHIFT_BITS;
                 else
                  SPC_DSP[SPC_DSP_ADDR] = 0;
 
@@ -1775,6 +1790,7 @@ void SPC_WRITE_DSP()
    else
    {
     SNDvoices[addr_hi].env_state = DIRECT;
+    SPC_DSP[(addr_hi << 4) + DSP_VOICE_ENVX] = (i & 0x7F);
     SNDvoices[addr_hi].envx = (i & 0x7F) << ENVX_DOWNSHIFT_BITS;
    }
   }
@@ -1841,6 +1857,7 @@ void SPC_WRITE_DSP()
    else
    {
     SNDvoices[addr_hi].env_state = DIRECT;
+    SPC_DSP[(addr_hi << 4) + DSP_VOICE_ENVX] = (SPC_DSP_DATA & 0x7F);
     SNDvoices[addr_hi].envx = (SPC_DSP_DATA & 0x7F) << ENVX_DOWNSHIFT_BITS;
    }
   }
