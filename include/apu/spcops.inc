@@ -490,9 +490,7 @@ EXPORT_C SPC_CBNE_dp
  je near SPC_RETURN
 
  movsx eax,byte [R_NativePC-1]  ; sign extend for addition
- add R_Cycles,byte 2    ; Branch taken
- add R_NativePC,eax
-;add dword [_TotalCycles],byte 2    ; (0.32) Butcha - fix 'lost' SPC timer ticks!
+ short_branch
  OPCODE_EPILOG
 
 ; 2F
@@ -500,7 +498,7 @@ ALIGNC
 EXPORT_C SPC_BRA
  movsx eax,byte [1+R_NativePC]  ; sign extend for addition
  add R_NativePC,byte 2
- add R_NativePC,eax
+ short_branch
  OPCODE_EPILOG
 
 ; 30
@@ -781,9 +779,7 @@ EXPORT_C SPC_DBNZ_dp
  jz near SPC_RETURN
 
  movsx eax,byte [R_NativePC-1]  ; sign extend for addition
- add R_Cycles,byte 2    ; Branch taken
- add R_NativePC,eax
-;add dword [_TotalCycles],byte 2    ; (0.32) Butcha - fix 'lost' SPC timer ticks!
+ short_branch
  OPCODE_EPILOG
 
 ; 6F
@@ -1281,9 +1277,7 @@ EXPORT_C SPC_CBNE_Odp_XO
  je near SPC_RETURN
 
  movsx eax,byte [R_NativePC-1]  ; sign extend for addition
- add R_Cycles,byte 2    ; Branch taken
- add R_NativePC,eax
-;add dword [_TotalCycles],byte 2
+ short_branch
  OPCODE_EPILOG
 
 ; DF - DAA - not yet implemented
@@ -1389,9 +1383,7 @@ EXPORT_C SPC_DBNZ_Y
  jz near SPC_RETURN
 
  movsx eax,byte [R_NativePC-1]  ; sign extend for addition
- add R_Cycles,byte 2    ; Branch taken
- add R_NativePC,eax
-;add dword [_TotalCycles],byte 2    ; (0.32) Butcha - fix 'lost' SPC timer ticks!
+ short_branch
  OPCODE_EPILOG
 
 ; FF

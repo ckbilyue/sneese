@@ -36,6 +36,25 @@ EXPORT_C SPC_TCALL_%1
  OPCODE_EPILOG
 %endmacro
 
+;eax = sign-extended branch offset
+%macro short_branch 0
+%if 0
+ GET_PC ebx
+ mov edx,ebx
+ add R_NativePC,eax
+ inc R_Cycles   ; branch taken
+ add ebx,eax
+ xor edx,ebx
+ add dh,255
+ sbb edx,edx
+ and edx,1      ;address page wrap?
+ add R_Cycles,edx
+%else
+ add R_NativePC,eax
+ add R_Cycles,2 ; branch taken
+%endif
+%endmacro
+
 ;%1 = label, %2 = flag
 %macro SPC_BFC 2
 ALIGNC
@@ -43,9 +62,7 @@ EXPORT_C SPC_%1
  add R_NativePC,byte 2
  JUMP_FLAG_SPC %2,near SPC_RETURN   ; flag set
  movsx eax,byte [-1+R_NativePC]     ; sign extend for addition
- add R_Cycles,byte 2                ; Branch taken
-;add dword [_TotalCycles],byte 2    ; (0.32) Butcha - fix 'lost' SPC timer ticks!
- add R_NativePC,eax
+ short_branch
  OPCODE_EPILOG
 %endmacro
 
@@ -56,9 +73,7 @@ EXPORT_C SPC_%1
  add R_NativePC,byte 2
  JUMP_NOT_FLAG_SPC %2,near SPC_RETURN   ; flag set
  movsx eax,byte [-1+R_NativePC]     ; sign extend for addition
- add R_Cycles,byte 2                ; Branch taken
-;add dword [_TotalCycles],byte 2    ; (0.32) Butcha - fix 'lost' SPC timer ticks!
- add R_NativePC,eax
+ short_branch
  OPCODE_EPILOG
 %endmacro
 

@@ -799,7 +799,7 @@ ALIGND
 SPCCycleTable:
 db 2,8,4,5,3,4,3,6,2,6,5,4,5,4,6,8  ; 00
 db 2,8,4,5,4,5,5,6,5,5,6,5,2,2,4,6  ; 10
-db 2,8,4,5,3,4,3,6,2,6,5,4,5,4,5,4  ; 20
+db 2,8,4,5,3,4,3,6,2,6,5,4,5,4,5,2  ; 20
 db 2,8,4,5,4,5,5,6,5,5,6,5,2,2,3,8  ; 30
 db 2,8,4,5,3,4,3,6,2,6,4,4,5,4,6,6  ; 40
 db 2,8,4,5,4,5,5,6,5,5,4,5,2,2,4,3  ; 50
@@ -1293,15 +1293,13 @@ EXPORT_C SPC_BBS
  shr eax,5
  mov ebx,B_SPC_PAGE
  mov bl,[1+R_NativePC]
+ add R_NativePC,byte 3
  mov ah,[offset_to_bit+eax]
  GET_BYTE_SPC
  test al,ah
- jz .not_taken
- movsx eax,byte [2+R_NativePC]
- add R_NativePC,eax
- add R_Cycles,byte 2    ; branch taken
-.not_taken:
- add R_NativePC,byte 3
+ jz SPC_RETURN
+ movsx eax,byte [-1+R_NativePC]
+ short_branch
  OPCODE_EPILOG
 
 ALIGNC
@@ -1309,15 +1307,13 @@ EXPORT_C SPC_BBC
  shr eax,5
  mov ebx,B_SPC_PAGE
  mov bl,[1+R_NativePC]
+ add R_NativePC,byte 3
  mov ah,[offset_to_bit+eax]
  GET_BYTE_SPC         
  test al,ah
- jnz .not_taken
- movsx eax,byte [2+R_NativePC]
- add R_NativePC,eax
- add R_Cycles,byte 2    ; branch taken
-.not_taken:
- add R_NativePC,byte 3
+ jnz SPC_RETURN
+ movsx eax,byte [-1+R_NativePC]
+ short_branch
  OPCODE_EPILOG
 
 %include "apu/spcops.inc"   ; Include opcodes
