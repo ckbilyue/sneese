@@ -203,7 +203,7 @@ alternate macro does not support NoSave or Double.
  mov al,ah
 %endif
  inc ebx
- and ebx,0x00FFFFFF
+ and ebx,(1 << 24) - 1
  SET_BYTE
 %ifnidni %1,Double
 %ifnidni %1,NoSave
@@ -218,7 +218,7 @@ alternate macro does not support NoSave or Double.
  SET_BYTE
  pop eax
  dec ebx
- and ebx,0x00FFFFFF
+ and ebx,(1 << 24) - 1
  SET_BYTE
 %endmacro
 

@@ -126,11 +126,11 @@ ALIGNC
 %endif
 EXPORT_C Do_DMA_Channel
  mov ebx,[edi+A1T]      ; CPU address in ebx
- and ebx,0x00FFFFFF
+ and ebx,(1 << 24) - 1
 
  movzx ecx,word [edi+DAS]
  dec ecx
- and ecx,0xFFFF
+ and ecx,(1 << 16) - 1
  inc ecx
  mov [DMA_Transfer_Size],ecx
 
@@ -322,7 +322,7 @@ ALIGNC
 ALIGNC
 EXPORT_C Do_HDMA_Channel
  mov ebx,[edi+A2T]      ; Get table address
- and ebx,0x00FFFFFF
+ and ebx,(1 << 24) - 1
  mov al,[edi+DMAP]      ; Get HDMA control byte
  test al,0x40           ; Check for indirect addressing
  mov ecx,[edi+HDMA_Siz] ; Get HDMA transfer size
@@ -455,7 +455,7 @@ Do_HDMA_Indirect:
  mov [edi+A2T],ebx
 .Next_Transfer:
  mov ebx,[edi+DAS]
- and ebx,0x00FFFFFF
+ and ebx,(1 << 24) - 1
 
  GET_BYTE
 %ifdef LOG_HDMA_WRITES
@@ -656,7 +656,7 @@ EXPORT do_HDMA
 .no_hdma:
  ret
 
-; Requires %eax to be 0x00FFFFFF!
+; Requires %eax to be (1 << 24) - 1!
 ;%1 = num
 %macro Reset_DMA_Channel 1
  mov [C_LABEL(DMAP_%1)],al
@@ -692,8 +692,8 @@ EXPORT Reset_DMA
  mov [HDMAON],al
  mov [In_DMA],al
 
- ; Now 0x00FFFFFF...
- mov eax,0x00FFFFFF
+ ; Now (1 << 24) - 1...
+ mov eax,(1 << 24) - 1
  Reset_DMA_Channel 0
  Reset_DMA_Channel 1
  Reset_DMA_Channel 2

@@ -582,13 +582,6 @@ extern "C" void reset_bus_timings(void)
   BlockSpeed[(bank + 0x80) * 8 + 2] = 6;
  }
 
- FILE *out = fopen("memspeed.dmp", "wb");
- if (out)
- {
-  fwrite(BlockSpeed, 1, 256 * 8, out);
-  fclose(out);
- }
-
 }
 
 // SRAM is now dynamically allocated. This is to add large SRAM support
