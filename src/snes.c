@@ -46,6 +46,9 @@ signed char snes_rom_loaded = 0;
 
 unsigned SPC_CPU_cycle_divisor, SPC_CPU_cycle_multiplicand;
 
+/* Used to determine if APU emulation option change demands reset */
+static signed char SPC_SAFE = TRUE;
+
 
 #ifdef FAST_SPC
 signed char spc700_clockdoubled = TRUE;
@@ -118,6 +121,9 @@ void snes_reset(void)
  Reset_SPC();
  Reset_APU_Skipper();
  Reset_Sound_DSP();
+
+ /* APU reset, no need to check this in next call to snes_exec() */
+ SPC_SAFE = TRUE;
 }
 
 extern unsigned FPSMaxTicks;
@@ -154,6 +160,10 @@ void set_spc700_clockdouble(int new_state)
 void snes_exec(void)
 {
  if (SPC_ENABLED) Make_SPC(); else Make_APU_Skipper();
+
+ /* Reset the SNES if the SPC has been enabled, and it wasn't before */
+ if (SPC_ENABLED && !SPC_SAFE) snes_reset();
+ SPC_SAFE = SPC_ENABLED;
 
  if (sound_enabled) sound_resume();
 

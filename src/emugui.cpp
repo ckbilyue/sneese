@@ -1658,8 +1658,6 @@ extern volatile unsigned Timer_Counter_Profile;
 
 GUI_ERROR GUI()
 {
- unsigned char OLD_SPC_ENABLED=SPC_ENABLED;
-
  if (allocate_windows()) return GUI_EXIT;
 
 #ifndef NO_LOGO
@@ -1766,13 +1764,7 @@ GUI_ERROR GUI()
   }
  }
 
- resume_emulation:
-
- // Reset the SNES if the SPC has been enabled, and it wasn't before
- if(snes_rom_loaded && SPC_ENABLED && (SPC_ENABLED!=OLD_SPC_ENABLED))
- {
-  snes_reset();
- }
+resume_emulation:
 
  acquire_screen();
 
