@@ -373,15 +373,15 @@ EXTERN_C BreaksLast
  dec dh
  jnz .8bpl_line_loop
 
- add edi,byte 32+16
  sub esp,byte -128
-
+ add edi,byte 32+16
 %endif
 
  dec dword [esp]
  jnz .2bpl_tile_loop
 
  pop eax
+
 %endif
 
 %ifndef NO_RECACHE_4BPL
