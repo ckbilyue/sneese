@@ -107,6 +107,8 @@ DMA_DATA 5
 DMA_DATA 6
 DMA_DATA 7
 
+EXPORT_C DMA_Transfer_Size,skipl        ;Size for active DMA transfer
+
 EXPORT_C MDMAEN,skipb   ; DMA enable
 EXPORT_C HDMAEN,skipb   ; HDMA enable
 EXPORT HDMAON,skipb     ; HDMA enabled this refresh
@@ -119,18 +121,18 @@ ALIGNC
 %if 0
   al = data byte
   ebx = A-bus address
-  ebp = DAS (byte count)
+  [DMA_Transfer_Size] = DAS (byte count)
   esi = Address adjustment
 %endif
 EXPORT_C Do_DMA_Channel
  mov ebx,[edi+A1T]      ; CPU address in ebx
  and ebx,0x00FFFFFF
 
- xor ebp,ebp
- mov bp,[edi+DAS]
- dec ebp
- and ebp,0xFFFF
- inc ebp
+ movzx ecx,word [edi+DAS]
+ dec ecx
+ and ecx,0xFFFF
+ inc ecx
+ mov [DMA_Transfer_Size],ecx
 
 ;mov ecx,ebp
 ;shl ecx,3
@@ -164,7 +166,7 @@ EXPORT_C Do_DMA_Channel
  mov [edi+DMA_Rd3],edx
 ;mov edx,edi
 
- cmp ebp,byte 4
+ cmp dword [DMA_Transfer_Size],byte 4
  jb near .lpr_less_than_4
 
 .loop_ppu_read:
@@ -187,9 +189,9 @@ EXPORT_C Do_DMA_Channel
  SET_BYTE
 .ppu_read_check_3:
  add bx,si
- sub ebp,byte 4
+ sub dword [DMA_Transfer_Size],byte 4
  jz near .ppu_read_done
- cmp ebp,byte 4
+ cmp dword [DMA_Transfer_Size],byte 4
  jnb near .loop_ppu_read
 
 .lpr_less_than_4:
@@ -197,14 +199,14 @@ EXPORT_C Do_DMA_Channel
  SET_BYTE
 .ppu_read_lt4_check_0:
  add bx,si
- dec ebp
+ dec dword [DMA_Transfer_Size]
  jz near .ppu_read_done
 
  call [edi+DMA_Rd1]
  SET_BYTE
 .ppu_read_lt4_check_1:
  add bx,si
- dec ebp
+ dec dword [DMA_Transfer_Size]
  jz near .ppu_read_done
 ;jz .ppu_read_done ;*set_byte
 
@@ -212,14 +214,14 @@ EXPORT_C Do_DMA_Channel
  SET_BYTE
 .ppu_read_lt4_check_2:
  add bx,si
- dec ebp
+ dec dword [DMA_Transfer_Size]
  jz .ppu_read_done
 
  call [edi+DMA_Rd3]
  SET_BYTE
 .ppu_read_lt4_check_3:
  add bx,si
- dec ebp
+ dec dword [DMA_Transfer_Size]
  jnz near .loop_ppu_read
 
 .ppu_read_done:
@@ -251,7 +253,7 @@ ALIGNC
  mov [edi+DMA_Wr3],edx
 ;mov edx,edi
 
- cmp ebp,byte 4
+ cmp dword [DMA_Transfer_Size],byte 4
  jb near .lpw_less_than_4
 
 .loop_ppu_write:
@@ -275,9 +277,9 @@ ALIGNC
 .ppu_write_check_3:
  add bx,si
 
- sub ebp,byte 4
+ sub dword [DMA_Transfer_Size],byte 4
  jz near .ppu_write_done
- cmp ebp,byte 4
+ cmp dword [DMA_Transfer_Size],byte 4
  jnb near .loop_ppu_write
 
 .lpw_less_than_4:
@@ -285,28 +287,28 @@ ALIGNC
  call [edi+DMA_Wr0]
 .ppu_write_lt4_check_0:
  add bx,si
- dec ebp
+ dec dword [DMA_Transfer_Size]
  jz near .ppu_write_done
 
  GET_BYTE
  call [edi+DMA_Wr1]
 .ppu_write_lt4_check_1:
  add bx,si
- dec ebp
+ dec dword [DMA_Transfer_Size]
  jz .ppu_write_done
 
  GET_BYTE
  call [edi+DMA_Wr2]
 .ppu_write_lt4_check_2:
  add bx,si
- dec ebp
+ dec dword [DMA_Transfer_Size]
  jz .ppu_write_done
 
  GET_BYTE
  call [edi+DMA_Wr3]
 .ppu_write_lt4_check_3:
  add bx,si
- dec ebp
+ dec dword [DMA_Transfer_Size]
  jnz near .loop_ppu_write
 
 .ppu_write_done:
