@@ -494,10 +494,6 @@ EXPORT_C E1_PHP
 E0_PUSH16 B_D,E0_PHD,New
 E1_PUSH16 B_D,E1_PHD,New
 
-; 0F
-EM_ORA al,Absolute_Long
-E0_ORA al,Absolute_Long
-
 ; 10
 BFC BPL,SNES_FLAG_N
 
@@ -783,10 +779,6 @@ EXPORT_C E1_PLP
 E0_PULL16 B_D,E0_PLD
 E1_PULL16 B_D,E1_PLD
 
-; 2F
-EM_AND al,Absolute_Long
-E0_AND al,Absolute_Long
-
 ; 30
 BFS BMI,SNES_FLAG_N
 
@@ -1028,10 +1020,6 @@ EXPORT_C ALL_JMP_a
  mov eax,C_LABEL(Blank)
  jmp short .read_direct
 %endif
-
-; 4F
-EM_EOR al,Absolute_Long
-E0_EOR al,Absolute_Long
 
 ; 50
 BFC BVC,SNES_FLAG_V
@@ -1405,10 +1393,6 @@ EXPORT_C ALL_JMP_OaO
  jmp short .read_direct
 %endif
 
-; 6F
-EM_ADC al,Absolute_Long
-E0_ADC al,Absolute_Long
-
 ; 70
 BFS BVS,SNES_FLAG_V
 
@@ -1609,10 +1593,6 @@ _TxX B_A,16,E0_TAX
 ; AB
 E0_PULL8 B_DB,E0_PLB    ; Pull DB(B) from stack
 E1_PULL8 B_DB,E1_PLB
-
-; AF
-EM_LDA al,Absolute_Long
-E0_LDA al,Absolute_Long
 
 ; B0
 BFS BCS,SNES_FLAG_C
@@ -1835,10 +1815,6 @@ ALIGNC
 %endif
 
  OPCODE_EPILOG
-
-; CF
-EM_CMP al,Absolute_Long
-E0_CMP al,Absolute_Long
 
 ; D0
 BFC BNE,SNES_FLAG_Z
@@ -2086,10 +2062,6 @@ EXPORT_C ALL_XBA
  STORE_FLAGS_NZ al
  mov B_A,eax
  OPCODE_EPILOG
-
-; EF
-EM_SBC al,Absolute_Long
-E0_SBC al,Absolute_Long
 
 ; F0
 BFS BEQ,SNES_FLAG_Z
