@@ -1009,8 +1009,8 @@ HIRQ_Check:
  mov [C_LABEL(EventTrip)],edx
  mov [Event_Handler],ebx
 .no_irq:
- pop edx
- LOAD_CYCLES
+ add esp,4
+ LOAD_CYCLES edx
  ret
 
 ALIGNC

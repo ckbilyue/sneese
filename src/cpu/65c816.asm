@@ -4092,10 +4092,10 @@ section .text
 %endmacro
 
 ; Load cycle counter to register R_Cycles
-%macro LOAD_CYCLES 0
- mov eax,[C_LABEL(EventTrip)]
+%macro LOAD_CYCLES 0-1 eax
+ mov %1,[C_LABEL(EventTrip)]
  mov dword R_Cycles,[C_LABEL(SNES_Cycles)]
- sub dword R_Cycles,eax
+ sub dword R_Cycles,%1
 %endmacro
 
 ; Get cycle counter to register argument
