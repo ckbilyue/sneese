@@ -151,7 +151,7 @@ EXPORT_C Recalc_Window_Bands
 .not_flush_left:
  ; Window not flush left (1 inside, 1 or 2 outside)
  test cl,cl
- je .flush_one_side     ; if (Left && Right == 255) window flush right;
+ jz .flush_one_side     ; if (Left && Right == 255) window flush right;
  ; Window not flush left or right (1 inside, 2 outside)
  ; Inside range is (left,right)
  ; Outside range 1 is (0,left-1)
@@ -424,14 +424,7 @@ EXPORT_C Recalc_Window_Area_BG
 .or_win2_loop:
  mov bx,[esi+Win_Bands]
 
- ; compare left edges against right edges
- test bh,bh
- jz .or_win2right_edge
-
- cmp al,bh      ;win1left, win2right
- ja .or_no_intersect
-
-.or_win2right_edge:
+ ; compare window 2 left edge against window 1 right edge
  test ah,ah
  jz .or_win1right_edge
 
@@ -439,10 +432,6 @@ EXPORT_C Recalc_Window_Area_BG
  ja .or_no_intersect
 
 .or_win1right_edge:
- cmp al,bl
- jb .or_min_left
- mov al,bl
-.or_min_left:
 
  dec ah
  dec bh
@@ -463,15 +452,7 @@ EXPORT_C Recalc_Window_Area_BG
  mov bx,[edx+Win_Bands+2]
  add edx,byte 2
 
- ; compare left edges against right edges
-
- test bh,bh
- jz .or_win2right_edge2
-
- cmp al,bh      ;win1left, win2right
- ja .or_no_intersect2
-
-.or_win2right_edge2:
+ ; compare next band left edge against accumulated band right edge
  test ah,ah
  jz .or_win1right_edge2
 
@@ -479,10 +460,6 @@ EXPORT_C Recalc_Window_Area_BG
  ja .or_no_intersect2
 
 .or_win1right_edge2:
- cmp al,bl
- jb .or_min_left2
- mov al,bl
-.or_min_left2:
 
  dec ah
  dec bh
@@ -496,14 +473,6 @@ EXPORT_C Recalc_Window_Area_BG
  jnz .or_win2_loop
  jmp .or_no_intersect
 
-.or_swap_windows:
- rol cx,8
- mov ebx,edx
- mov edx,esi
- mov esi,ebx
- mov bx,[edx+Win_Bands]
- dec bh
-
 .or_no_intersect2:
  mov [edi+ebp*2+Win_Bands],al
  mov [edi+ebp*2+Win_Bands+1],ah
@@ -515,30 +484,25 @@ EXPORT_C Recalc_Window_Area_BG
  jmp .or_no_intersect
 
 .or_last_band:
- test ch,ch
- jnz .or_swap_windows
-
  mov [edi+ebp*2+Win_Bands],ax
  inc ebp
-
- mov eax,ebp
- mov [edi+Win_Count],al
-.or_done:
- ret
 
 .or_copy_win2:
  mov cl,ch
  mov edx,esi
 .or_copy_win1:
- mov [edi+Win_Count],cl
- dec cl
- js .or_done
+ test cl,cl
+ jz .or_done
 .or_copy_another:
- mov ax,[edx+ebp*2+Win_Bands]
+ mov ax,[edx+Win_Bands]
+ add edx,byte 2
  mov [edi+ebp*2+Win_Bands],ax
  inc ebp
  dec cl
- jns .or_copy_another
+ jnz .or_copy_another
+.or_done:
+ mov eax,ebp
+ mov [edi+Win_Count],al
  ret
 
 
