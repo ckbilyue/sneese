@@ -26,19 +26,21 @@ NOTE:
   not with APU skipper.
  This release also has sound, but the sound may be unstable.
   Send critical bug reports (this is, report only the ROMs that crash the
-  emulator) to: esaelon@users.sourceforge.net
+  emulator) to: esaelon* *at* *users.sf.net
  Please list the ROM, ROM filename, the settings you were using in the
   emulator, when it crashed, etc. Thanks for the help!
 
 Credits
 """""""
+(note - @ symbols have been replaced with "* *at* *" to deal with
+e-mail address sniffers)
 New development
 Core & DOS/Win32 Port Developer/Maintainer
- Charles Bilyue'    (TRAC)      esaelon@users.sourceforge.net
+ Charles Bilyue'    (TRAC)      esaelon* *at* *users.sf.net
 Unix/Linux/BeOS Port Developer/Maintainer
- Daniel Horchner                dbjh@gmx.net
+ Daniel Horchner                dbjh* *at* *gmx.net
 Assistant Developer (Sound system emulation)
- Brad Martin                    bmartin@umr.edu
+ Brad Martin                    bmartin* *at* *umr.edu
                                 http://home.gvi.net/~martin
 New logo
  stainless
@@ -361,7 +363,7 @@ send me some constructive comments or help (NOT - are you gonna have
 DSP/FX/better sound/better graphics/more speed/etc., when for the same)
 feel free to e-mail me at:
 
- esaelon@users.sourceforge.net
+ esaelon* *at* *users.sf.net
 
 Or you can visit the SNEeSe homepage at:
  http://sneese.n3.net/
