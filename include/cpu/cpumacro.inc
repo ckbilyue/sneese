@@ -1008,3 +1008,21 @@ EXPORT_C %4
 %macro _TCD 1
  _Txx B_A,B_D,16,%1
 %endmacro
+
+;flag,label
+%macro _CLx 2
+ALIGNC
+EXPORT_C %2     ; Set flag
+ inc R_NativePC
+ STORE_FLAGS_%1 0
+ OPCODE_EPILOG
+%endmacro
+
+;flag,label
+%macro _SEx 2
+ALIGNC
+EXPORT_C %2     ; Set flag
+ inc R_NativePC
+ STORE_FLAGS_%1 1
+ OPCODE_EPILOG
+%endmacro

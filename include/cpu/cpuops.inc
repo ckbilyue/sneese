@@ -494,12 +494,7 @@ EM_ORA IdI_y,Direct_Indirect_Indexed_Long
 E0_ORA IdI_y,Direct_Indirect_Indexed_Long
 
 ; 18
-
-ALIGNC
-EXPORT_C ALL_CLC
- inc R_NativePC
- STORE_FLAGS_C ah
- OPCODE_EPILOG
+_CLx C,ALL_CLC          ; Clear Carry flag
 
 ; 19
 EM_ORA a_y,Absolute_Index_Y
@@ -882,13 +877,7 @@ EM_AND IdI_y,Direct_Indirect_Indexed_Long
 E0_AND IdI_y,Direct_Indirect_Indexed_Long
 
 ; 38
-
-ALIGNC
-EXPORT_C ALL_SEC        ; Set Carry Flag
- mov al,1
- inc R_NativePC
- STORE_FLAGS_C al
- OPCODE_EPILOG
+_SEx C,ALL_SEC          ; Set Carry flag
 
 ; 39
 EM_AND a_y,Absolute_Index_Y
@@ -1219,27 +1208,7 @@ E0_EOR IdI_y,Direct_Indirect_Indexed_Long
 ; 58
 
 ALIGNC
-EXPORT_C E0_CLI
- inc R_NativePC
- mov bl,B_I_flag
- STORE_FLAGS_I ah
-
- test bl,bl
- jz .no_irq_enable
- mov al,CEM_Instruction_After_IRQ_Enable
- mov [CPU_Execution_Mode],al
- xor edx,edx
- SAVE_CYCLES
- mov [C_LABEL(EventTrip)],edx
- mov edx,Enabling_IRQ_Event
- LOAD_CYCLES
- mov [Event_Handler],edx
-
-.no_irq_enable:
- OPCODE_EPILOG
-
-ALIGNC
-EXPORT_C E1_CLI
+EXPORT_C ALL_CLI
  inc R_NativePC
  mov bl,B_I_flag
  STORE_FLAGS_I ah
@@ -1673,13 +1642,7 @@ EM_ADC IdI_y,Direct_Indirect_Indexed_Long
 E0_ADC IdI_y,Direct_Indirect_Indexed_Long
 
 ; 78
-
-ALIGNC
-EXPORT_C ALL_SEI
- mov al,1
- inc R_NativePC
- STORE_FLAGS_I al
- OPCODE_EPILOG
+_SEx I,ALL_SEI          ; Set Interrupt disable flag
 
 ; 79
 EM_ADC a_y,Absolute_Index_Y
@@ -2040,12 +2003,7 @@ EM_LDA IdI_y,Direct_Indirect_Indexed_Long
 E0_LDA IdI_y,Direct_Indirect_Indexed_Long
 
 ; B8
-
-ALIGNC
-EXPORT_C ALL_CLV
- inc R_NativePC
- STORE_FLAGS_V ah
- OPCODE_EPILOG
+_CLx V,ALL_CLV          ; Clear oVerflow flag
 
 ; B9
 EM_LDA a_y,Absolute_Index_Y
@@ -2354,12 +2312,7 @@ EM_CMP IdI_y,Direct_Indirect_Indexed_Long
 E0_CMP IdI_y,Direct_Indirect_Indexed_Long
 
 ; D8
-
-ALIGNC
-EXPORT_C ALL_CLD
- inc R_NativePC
- STORE_FLAGS_D ah
- OPCODE_EPILOG
+_CLx D,ALL_CLD          ; Clear Decimal mode flag
 
 ; D9
 EM_CMP a_y,Absolute_Index_Y
@@ -2675,13 +2628,7 @@ EM_SBC IdI_y,Direct_Indirect_Indexed_Long
 E0_SBC IdI_y,Direct_Indirect_Indexed_Long
 
 ; F8
-
-ALIGNC
-EXPORT_C ALL_SED
- mov al,1
- inc R_NativePC
- STORE_FLAGS_D al
- OPCODE_EPILOG
+_SEx D,ALL_SED          ; Set Decimal mode flag
 
 ; F9
 EM_SBC a_y,Absolute_Index_Y
