@@ -627,17 +627,6 @@ extern unsigned char FastROM_offset;
 void Set_SNES_Map()
 {
 
- if (!strcmp(rom_name, "FINAL FANTASY 3      ") ||
-  !strcmp(rom_name, "FINAL FANTASY 6      "))
- {
-  FastROM_offset = 4;
- }
- else
- {
-  FastROM_offset = 5;
- }
-
-
  int b;
 
  for (b = 0; b <= 0x3F; b++)
