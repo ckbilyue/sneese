@@ -22,6 +22,8 @@ Changes
 
 
  0.801
+  SRAM: Fixed a problem where SRAMs smaller than 64kbit would not be
+   mirrored on load
   Render: Fixed an off-by-6 bug in mode 7 vertical flip [TRAC]
   Input: Fixed a few bugs related to multiple 'sticks' in
    joystick/joypad code, thanks to Harekiet for reporting [TRAC]

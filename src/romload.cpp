@@ -151,6 +151,15 @@ int LoadSRAM(char *SRAM_filename)
 
  fread(SRAM, 1, SaveRamLength, Infile); // Read Save Ram
 
+ /* Apply mirroring for small SRAMs, for reads */
+ switch (SaveRamLength)
+ {
+  case (2 << 10):
+   memcpy(SRAM + (2 << 10), SRAM, (2 << 10));
+  case (4 << 10):
+   memcpy(SRAM + (4 << 10), SRAM, (4 << 10));
+ }
+
  fclose(Infile);
  return -1;
 }
