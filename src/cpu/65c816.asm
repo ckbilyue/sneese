@@ -192,21 +192,13 @@ REAL_SNES_FLAG_E equ 0x100
 section .bss
 ALIGNB
 %define B_IRQ_Nvector       [R_Base-CPU_Register_Base+C_LABEL(IRQ_Nvector)]
-%define B_IRQ_Noffset       [R_Base-CPU_Register_Base+C_LABEL(IRQ_Noffset)]
 %define B_NMI_Nvector       [R_Base-CPU_Register_Base+C_LABEL(NMI_Nvector)]
-%define B_NMI_Noffset       [R_Base-CPU_Register_Base+C_LABEL(NMI_Noffset)]
 %define B_BRK_Nvector       [R_Base-CPU_Register_Base+C_LABEL(BRK_Nvector)]
-%define B_BRK_Noffset       [R_Base-CPU_Register_Base+C_LABEL(BRK_Noffset)]
 %define B_COP_Nvector       [R_Base-CPU_Register_Base+C_LABEL(COP_Nvector)]
-%define B_COP_Noffset       [R_Base-CPU_Register_Base+C_LABEL(COP_Noffset)]
 %define B_IRQ_Evector       [R_Base-CPU_Register_Base+C_LABEL(IRQ_Evector)]
-%define B_IRQ_Eoffset       [R_Base-CPU_Register_Base+C_LABEL(IRQ_Eoffset)]
 %define B_NMI_Evector       [R_Base-CPU_Register_Base+C_LABEL(NMI_Evector)]
-%define B_NMI_Eoffset       [R_Base-CPU_Register_Base+C_LABEL(NMI_Eoffset)]
 %define B_COP_Evector       [R_Base-CPU_Register_Base+C_LABEL(COP_Evector)]
-%define B_COP_Eoffset       [R_Base-CPU_Register_Base+C_LABEL(COP_Eoffset)]
 %define B_RES_Evector       [R_Base-CPU_Register_Base+C_LABEL(RES_Evector)]
-%define B_RES_Eoffset       [R_Base-CPU_Register_Base+C_LABEL(RES_Eoffset)]
 %define B_PB_Shifted        [R_Base-CPU_Register_Base+CPU_LABEL(PB_Shifted)]
 %define B_PB                [R_Base-CPU_Register_Base+CPU_LABEL(PB)]
 %define B_PC                [R_Base-CPU_Register_Base+CPU_LABEL(PC)]
@@ -228,7 +220,6 @@ ALIGNB
 %define B_DB_Shifted        [R_Base-CPU_Register_Base+CPU_LABEL(DB_Shifted)]
 %define B_DB                [R_Base-CPU_Register_Base+CPU_LABEL(DB)]
 %define B_OpTable           [R_Base-CPU_Register_Base+OpTable]
-%define B_PBOffset          [R_Base-CPU_Register_Base+C_LABEL(PBOffset)]
 %define B_FixedTrip         [R_Base-CPU_Register_Base+FixedTrip]
 %define B_SPC_last_cycles   [R_Base-CPU_Register_Base+SPC_last_cycles]
 %define B_SPC_CPU_cycles    [R_Base-CPU_Register_Base+SPC_CPU_cycles]
@@ -313,9 +304,6 @@ EXPORT CPU_LABEL(DB_Shifted),skipl  ; Data Bank
 EXPORT_EQU CPU_LABEL(DB),CPU_LABEL(DB_Shifted) + 2
 
 OpTable:skipl
-
-; v0.25 - Holds memory mapper read handler for current program bank.
-EXPORT_C PBOffset   ,skipl
 
 EXPORT FixedTrip    ,skipl  ; Cycle of next fixed event on this scanline
 
@@ -4361,6 +4349,7 @@ section .text
  jnb %%not_within_wram
  mov byte [C_LABEL(WRAM)+ebx],%1
 %%not_within_wram:
+ add R_Cycles,8
 %endmacro
 
 %macro FAST_GET_BYTE_STACK_NATIVE_MODE 1
@@ -4368,14 +4357,17 @@ section .text
  jnb %%not_within_wram
  mov %1,byte [C_LABEL(WRAM)+ebx]
 %%not_within_wram:
+ add R_Cycles,8
 %endmacro
 
 %macro FAST_SET_BYTE_STACK_EMULATION_MODE 1
  mov byte [C_LABEL(WRAM)+ebx],%1
+ add R_Cycles,8
 %endmacro
 
 %macro FAST_GET_BYTE_STACK_EMULATION_MODE 1
  mov %1,byte [C_LABEL(WRAM)+ebx]
+ add R_Cycles,8
 %endmacro
 
 ; Native mode - push byte (S--)
@@ -4791,16 +4783,6 @@ EXPORT_C Reset_CPU
 %macro cache_interrupt_vector 3
  movzx eax,word [%1+%3]     ; Get interrupt vector
  mov [C_LABEL(%2vector)],eax    ; Cache vector
-
- shr eax,13
- mov eax,[C_LABEL(Read_Bank8Offset)+eax*4]
- test eax,eax
- jnz %%read_direct
-
- mov eax,C_LABEL(Blank) ;we should really trap this...
-%%read_direct:
-
- mov [C_LABEL(%2offset)],eax    ; Cache memory map offset
 %endmacro
 
  ; Get all interrupt vectors
@@ -4816,9 +4798,7 @@ EXPORT_C Reset_CPU
  cache_interrupt_vector 0xFFF4,COP_E,ebx    ; COP: Emulation mode
 
  mov eax,[C_LABEL(RES_Evector)] ; Get Reset vector
- mov edx,[C_LABEL(RES_Eoffset)]
  mov [CPU_LABEL(PC)],eax    ; Setup PC
- mov [C_LABEL(PBOffset)],edx
  mov [C_LABEL(OLD_PC)],eax
 
  call IRQNewFrameReset
@@ -5030,13 +5010,12 @@ EXPORT E1_IRQ
 ;SET_FLAG SNES_FLAG_B
  E1_PUSH_B
 
- mov eax,[C_LABEL(IRQ_Evector)] ; Get Emulation mode IRQ vector
- mov ebx,[C_LABEL(IRQ_Eoffset)]
-
 ;7.12.2 In the Emulation mode, the PBR and DBR registers are cleared to 00
 ;when a hardware interrupt, BRK or COP is executed. In this case, previous
 ;contents of the PBR are not automatically saved.
  mov byte [CPU_LABEL(DB)],0
+
+ mov ebx,0xFFFE         ; Get Emulation mode IRQ vector
 
  jmp IRQ_completion
 
@@ -5050,11 +5029,11 @@ EXPORT E0_IRQ
  E0_SETUPFLAGS          ; put flags into SNES packed flag format
  E0_PUSH_B
 
- mov eax,[C_LABEL(IRQ_Nvector)] ; Get Native mode IRQ vector
- mov ebx,[C_LABEL(IRQ_Noffset)]
+ mov ebx,0xFFEE         ; Get Native mode IRQ vector
 IRQ_completion:
+ xor eax,eax
+ GET_WORD
  mov [CPU_LABEL(PC)],eax    ; Setup PC vector
- mov [C_LABEL(PBOffset)],ebx
  mov byte [CPU_LABEL(PB)],0 ; Setup bank
 ;SET_FLAG SNES_FLAG_I   ; Disable IRQs
  STORE_FLAGS_I 1

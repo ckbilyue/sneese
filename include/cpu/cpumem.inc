@@ -28,6 +28,8 @@ EXTERN_C SRAM_READ,SRAM_WRITE
 EXTERN_C SRAM_WRITE_2k,SRAM_WRITE_4k
 %endif
 
+EXTERN_C BlockSpeed
+
 %if 0
 
 Macro's included in this ASM header
@@ -59,16 +61,20 @@ alternate macro does not support NoSave or Double.
 %macro GET_BYTE 0
  mov edx,ebx
  shr edx,13
+ push edx
  mov edx,[C_LABEL(Read_Bank8Offset)+edx*4]
  test edx,edx
  jnz %%read_direct
- mov edx,ebx
- shr edx,13
+
+ mov edx,[esp]
  call [C_LABEL(Read_Bank8Mapping)+edx*4]
  jmp short %%read_done
 %%read_direct:
  mov al,[edx+ebx]
 %%read_done:
+ pop edx
+ movzx edx,byte [C_LABEL(BlockSpeed)+edx]
+;add R_Cycles,edx
 %endmacro
 
 %macro GET_WORD 0-1 0
@@ -90,32 +96,40 @@ alternate macro does not support NoSave or Double.
 %%single_block:
  mov edx,ebx
  shr edx,13
+ push edx
  mov edx,[C_LABEL(Read_Bank8Offset)+edx*4]
  test edx,edx
  jnz %%read_direct
 
- mov edx,ebx
- shr edx,13
- push edx
+ mov edx,[esp]
+ push ecx
+ movzx ecx,byte [C_LABEL(BlockSpeed)+edx]
 %ifnidni %1,wrap
  dec ebx
 %else
  dec bx
 %endif
  call [C_LABEL(Read_Bank8Mapping)+edx*4]
+;add R_Cycles,ecx
+ mov edx,[esp+4]
  mov ah,al
 %ifnidni %1,wrap
  inc ebx
 %else
  inc bx
 %endif
- pop edx
  call [C_LABEL(Read_Bank8Mapping)+edx*4]
+;add R_Cycles,ecx
+ pop ecx
  ror ax,8
+ pop edx
  jmp short %%read_done
 
 %%read_direct:
  mov ax,[edx+ebx-1]
+ pop edx
+ movzx edx,byte [C_LABEL(BlockSpeed)+edx]
+;lea R_Cycles,[R_Cycles+edx*2]
 %%read_done:
 %endmacro
 
@@ -145,13 +159,16 @@ alternate macro does not support NoSave or Double.
  jnz %%read_direct
 
  mov edx,[esp]
+ push ecx
+ movzx ecx,byte [C_LABEL(BlockSpeed)+edx]
 %ifnidni %1,wrap
  sub ebx,2
 %else
  sub bx,2
 %endif
  call [C_LABEL(Read_Bank8Mapping)+edx*4]
- mov edx,[esp]
+;add R_Cycles,ecx
+ mov edx,[esp+4]
  mov ah,al
 %ifnidni %1,wrap
  inc ebx
@@ -159,7 +176,8 @@ alternate macro does not support NoSave or Double.
  inc bx
 %endif
  call [C_LABEL(Read_Bank8Mapping)+edx*4]
- pop edx
+;add R_Cycles,ecx
+ mov edx,[esp+4]
 %ifnidni %1,wrap
  inc ebx
 %else
@@ -167,7 +185,10 @@ alternate macro does not support NoSave or Double.
 %endif
  bswap eax
  call [C_LABEL(Read_Bank8Mapping)+edx*4]
+;add R_Cycles,ecx
+ pop ecx
  ror eax,16
+ pop edx
  jmp short %%read_done
 
 %%read_direct:
@@ -175,22 +196,29 @@ alternate macro does not support NoSave or Double.
  shl eax,16
  mov ax,[edx+ebx-2]
  pop edx
+ movzx edx,byte [C_LABEL(BlockSpeed)+edx]
+;add R_Cycles,edx
+ add edx,edx
+;add R_Cycles,edx
 %%read_done:
 %endmacro
 
 %macro SET_BYTE 0
  mov edx,ebx
  shr edx,13
+ push edx
  mov edx,[C_LABEL(Write_Bank8Offset)+edx*4]
  test edx,edx
  jnz %%write_direct
- mov edx,ebx
- shr edx,13
+ mov edx,[esp]
  call [C_LABEL(Write_Bank8Mapping)+edx*4]
  jmp short %%write_done
 %%write_direct:
  mov [edx+ebx],al
 %%write_done:
+ pop edx
+ movzx edx,byte [C_LABEL(BlockSpeed)+edx]
+;add R_Cycles,edx
 %endmacro
 
 ;%1 = NoSave/Double
