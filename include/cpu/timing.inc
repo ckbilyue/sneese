@@ -1081,10 +1081,7 @@ EXPORT SNES_R2137 ; SLHV  ; This latches the counter for horizontal/vertical dat
  or bh,al
  mov [Latched_V],ebx
 
- mov al,0
  pop ebx
- mov [OPHCT],al
- mov [OPVCT],al
 .no_change:
  mov al,0x21    ;open bus kludge
  ret
