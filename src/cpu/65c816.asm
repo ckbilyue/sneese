@@ -2113,8 +2113,11 @@ EXPORT E1_RESET
  add R_Cycles,_5A22_FAST_CYCLE * 2
  mov ebx,B_S
  GET_BYTE       ;dummy stack access
+ inc bl
  GET_BYTE       ;dummy stack access
+ inc bl
  GET_BYTE       ;dummy stack access
+ mov B_S,ebx
 
 ;7.12.2 In the Emulation mode, the PBR and DBR registers are cleared to 00
 ;when a hardware interrupt, BRK or COP is executed. In this case, previous
