@@ -162,13 +162,13 @@ $(OBJ)/%.s: $(SRC)/%.c
 	$(GCC) -S $(CFLAGS) $(DFLAGS) -o $@ $<
 
 $(OBJ)/%.s: $(SRC)/%.cpp
-        $(GCC) -S $(CPPFLAGS) $(DFLAGS) -o $@ $<
+	$(GCC) -S $(CPPFLAGS) $(DFLAGS) -o $@ $<
 
 $(OBJ)/%.o: $(SRC)/%.c
 	$(GCC) -c $(CFLAGS) $(DFLAGS) -o $@ $<
 
 $(OBJ)/%.o: $(SRC)/%.cpp
-        $(GCC) -c $(CPPFLAGS) $(DFLAGS) -o $@ $<
+	$(GCC) -c $(CPPFLAGS) $(DFLAGS) -o $@ $<
 
 $(EXE): $(addprefix $(OBJ)/, $(OBJS))
 	$(GXX) $(PFLAGS) $(DFLAGS) -o $(EXE) $(addprefix $(OBJ)/, $(OBJS)) $(MIOFLAGS) $(ALLEG)
