@@ -467,10 +467,6 @@ ALIGNC
 EXPORT_C E1_COP
  Emu6502Interrupt B_COP_Evector,B_COP_Eoffset
 
-; 05
-EM_ORA d,Direct
-E0_ORA d,Direct
-
 ; 07
 EM_ORA IdI,Direct_Indirect_Long
 E0_ORA IdI,Direct_Indirect_Long
@@ -702,14 +698,6 @@ EXPORT_C E1_JSL_al
  jmp short .read_direct
 %endif
 
-; 24
-EM_BIT d,Direct
-E0_BIT d,Direct
-
-; 25
-EM_AND d,Direct
-E0_AND d,Direct
-
 ; 27
 EM_AND IdI,Direct_Indirect_Long
 E0_AND IdI,Direct_Indirect_Long
@@ -930,10 +918,6 @@ EXPORT_C E0_MVP
 ALIGNC
 EXPORT_C EX_MVP
  ALL_MVX 1,MVP
-
-; 45
-EM_EOR d,Direct
-E0_EOR d,Direct
 
 ; 47
 EM_EOR IdI,Direct_Indirect_Long
@@ -1188,10 +1172,6 @@ EXPORT_C E1_PER
  add eax,ebx
  E1_PUSH_W
  OPCODE_EPILOG
-
-; 65
-EM_ADC d,Direct
-E0_ADC d,Direct
 
 ; 67
 EM_ADC IdI,Direct_Indirect_Long
@@ -1498,18 +1478,6 @@ _TxY B_X,16,E0_TXY
 EM_LDA Od_xO,Direct_Indexed_Indirect
 E0_LDA Od_xO,Direct_Indexed_Indirect
 
-; A4
-EX_LDY d,Direct
-E0_LDY d,Direct
-
-; A5
-EM_LDA d,Direct
-E0_LDA d,Direct
-
-; A6
-EX_LDX d,Direct
-E0_LDX d,Direct
-
 ; A7
 EM_LDA IdI,Direct_Indirect_Long
 E0_LDA IdI,Direct_Indirect_Long
@@ -1679,14 +1647,6 @@ EXPORT_C E1_REP
 
 .no_irq_enable:
  OPCODE_EPILOG
-
-; C4
-EX_CPY d,Direct
-E0_CPY d,Direct
-
-; C5
-EM_CMP d,Direct
-E0_CMP d,Direct
 
 ; C7
 EM_CMP IdI,Direct_Indirect_Long
@@ -1924,14 +1884,6 @@ EXPORT_C E1_SEP
  add R_NativePC,byte 2
 
  OPCODE_EPILOG
-
-; E4
-EX_CPX d,Direct
-E0_CPX d,Direct
-
-; E5
-EM_SBC d,Direct
-E0_SBC d,Direct
 
 ; E7
 EM_SBC IdI,Direct_Indirect_Long
