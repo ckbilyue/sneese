@@ -610,6 +610,8 @@ EXPORT Reset_Ports
  mov [C_LABEL(WOBJSEL)],al
  mov [C_LABEL(TM)],al
  mov [C_LABEL(TS)],al
+ mov [C_LABEL(TMW)],al
+ mov [C_LABEL(TSW)],al
  mov [C_LABEL(SETINI)],al
  mov byte [C_LABEL(EXTBG_Mask)],~2
 
