@@ -490,10 +490,6 @@ EXPORT_C E1_PHP
  E1_PUSH_B
  OPCODE_EPILOG
 
-; 09
-EM_ORA i,Immediate
-E0_ORA i,Immediate
-
 ; 0B
 E0_PUSH16 B_D,E0_PHD,New
 E1_PUSH16 B_D,E1_PHD,New
@@ -787,10 +783,6 @@ EXPORT_C E1_PLP
 .no_irq_enable:
  OPCODE_EPILOG
 
-; 29
-EM_AND i,Immediate
-E0_AND i,Immediate
-
 ; 2B
 E0_PULL16 B_D,E0_PLD
 E1_PULL16 B_D,E1_PLD
@@ -1007,10 +999,6 @@ E0_EOR IdI,Direct_Indirect_Long
 E0_PUSH16 B_A,E0_PHA
 E0_PUSH8 B_A,EM_PHA
 E1_PUSH8 B_A,E1_PHA
-
-; 49
-EM_EOR i,Immediate
-E0_EOR i,Immediate
 
 ; 4B
 E0_PUSH8 B_PB,E0_PHK    ; Push PB(K) onto stack
@@ -1293,10 +1281,6 @@ E0_ADC IdI,Direct_Indirect_Long
 E0_PULL16 B_A,E0_PLA
 E0_PULL8 B_A,EM_PLA
 E1_PULL8 B_A,E1_PLA
-
-; 69
-EM_ADC i,Immediate
-E0_ADC i,Immediate
 
 ; 6B
 
@@ -1614,17 +1598,9 @@ _TxS B_X,8,E1_TXS
 _TxY B_X,8,EX_TXY
 _TxY B_X,16,E0_TXY
 
-; A0
-EX_LDY i,Immediate
-E0_LDY i,Immediate
-
 ; A1
 EM_LDA Od_xO,Direct_Indexed_Indirect
 E0_LDA Od_xO,Direct_Indexed_Indirect
-
-; A2
-EX_LDX i,Immediate
-E0_LDX i,Immediate
 
 ; A4
 EX_LDY d,Direct
@@ -1645,10 +1621,6 @@ E0_LDA IdI,Direct_Indirect_Long
 ; A8
 _TxY B_A,8,EX_TAY
 _TxY B_A,16,E0_TAY
-
-; A9
-EM_LDA i,Immediate
-E0_LDA i,Immediate
 
 ; AA
 _TxX B_A,8,EX_TAX
@@ -1731,10 +1703,6 @@ E0_LDX a_y,Absolute_Index_Y
 ; BF
 EM_LDA al_x,Absolute_Long_Index_X
 E0_LDA al_x,Absolute_Long_Index_X
-
-; C0
-EX_CPY i,Immediate
-E0_CPY i,Immediate
 
 ; C1
 EM_CMP Od_xO,Direct_Indexed_Indirect
@@ -1868,10 +1836,6 @@ E0_CMP d,Direct
 EM_CMP IdI,Direct_Indirect_Long
 E0_CMP IdI,Direct_Indirect_Long
 
-
-; C9
-EM_CMP i,Immediate
-E0_CMP i,Immediate
 
 ; CB
 
@@ -2041,10 +2005,6 @@ E0_CMP a_x,Absolute_Index_X
 EM_CMP al_x,Absolute_Long_Index_X
 E0_CMP al_x,Absolute_Long_Index_X
 
-; E0
-EX_CPX i,Immediate
-E0_CPX i,Immediate
-
 ; E1
 EM_SBC Od_xO,Direct_Indexed_Indirect
 E0_SBC Od_xO,Direct_Indexed_Indirect
@@ -2148,10 +2108,6 @@ E0_SBC d,Direct
 ; E7
 EM_SBC IdI,Direct_Indirect_Long
 E0_SBC IdI,Direct_Indirect_Long
-
-; E9
-EM_SBC i,Immediate
-E0_SBC i,Immediate
 
 ; EA
 
