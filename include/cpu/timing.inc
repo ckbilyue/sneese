@@ -1715,7 +1715,7 @@ EXPORT SNES_W4200 ; NMITIMEN
  jz .no_irq_change
 
  mov edx,eax
- shr edx,4
+ shr edx,5  ;shift out bit 4
  sbb edx,edx
  and edx,[HTimer_Set]
  mov [HTimer],edx
