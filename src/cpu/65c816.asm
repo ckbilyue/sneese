@@ -323,6 +323,7 @@ _I_flag:skipb
 EXPORT CPU_Execution_Mode,skipb
 ;CPU executing instructions normally
 %define CEM_Normal_Execution 0
+
 ;CPU executing instruction immediately following one which
 ; caused an I-flag transition of high to low (CLI, PLP, RTI)
 ; The CPU will not acknowledge an IRQ until this instruction
@@ -342,6 +343,14 @@ _E_flag:skipb
 _Z_flag:skipb
 EXPORT In_CPU,skipb         ; nonzero if CPU is executing
 
+;NMI not raised
+%define NMI_None 0
+;NMI raised and acknowledged
+%define NMI_Acknowledged 1
+;NMI raised and not acknowledged
+%define NMI_Raised 2
+
+EXPORT NMI_pin      ,skipb
 EXPORT_C FPS_ENABLED            ,skipb
 _V_flag:skipb
 EXPORT_C BREAKS_ENABLED         ,skipb
@@ -4740,6 +4749,10 @@ EXPORT_C Reset_CPU
  mov [CPU_Execution_Mode],al ;CEM_Normal_Execution == 0
  mov dword [OpTable],OpTableE1  ; Set current opcode emulation table
 
+ ; clear interrupt inputs
+ mov [IRQ_pin],al
+ mov [NMI_pin],al
+
  ; Clear cycle counts
  mov [C_LABEL(SNES_Cycles)],eax
  mov [C_LABEL(EventTrip)],eax
@@ -4833,6 +4846,7 @@ CPU_START:
  LOAD_CYCLES
  test R_Cycles,R_Cycles
  jge .no_event_wait
+.execute_opcode:
  mov al,[CPU_Execution_Mode]
  test al,al
  jz .normal_execution
@@ -4846,15 +4860,15 @@ CPU_START:
 .no_event_wait:
  jmp dword [Event_Handler]
 
+
+
 ALIGNC
-%if 1
 .instruction_after_irq_enable:
 ;set up an event for immediately the next instruction
  mov eax,IRQ_Enabled_Event
  xor edx,edx
  mov [Event_Handler],eax
  mov [C_LABEL(EventTrip)],edx
-%endif
 .normal_execution:
  LOAD_PC
  LOAD_CYCLES

@@ -49,6 +49,8 @@ Changes
   Timing: Changed scanline length back to 341 dots after research on the
    hardware gave this number; still stumped about SGB and Shin Megami
    Tensei [TRAC]
+  Timing: Improved NMI emulation; now supports delayed NMI,
+   as well as re-acknowledgement of NMI [TRAC]
   Sound: Changed APU code to build with update-on-RAM-change by default
    [TRAC]
   ROM loader: Added support for loading ROMs up to 64Mbit (autodetection

@@ -29,6 +29,15 @@ You must read and accept the license prior to use.
 
 %define ZERO_TRIP_CYCLE_COUNTER
 
+
+%define JOYC1_OPEN_BUS_BITS (((1 << 6) - 1) << 2)
+%define JOYC2_OPEN_BUS_BITS (((1 << 3) - 1) << 5)
+%define JOYC2_ALWAYS_HIGH_BITS (((1 << 3) - 1) << 2)
+
+%define RDNMI_OPEN_BUS_BITS (((1 << 3) - 1) << 4)
+%define TIMEUP_OPEN_BUS_BITS ((1 << 7) - 1)
+%define HVBJOY_OPEN_BUS_BITS (((1 << 5) - 1) << 1)
+
 %define RDNMI_VBLANK_START (1 << 7)
 %define HVBJOY_IN_VBLANK (1 << 7)
 %define HVBJOY_IN_HBLANK (1 << 6)
@@ -108,12 +117,19 @@ EXPORT FrameCount       ,skipl  ; Used for frameskipping
 EXPORT Event_Handler    ,skipl  ; Used for render/HDMA timing/NMI/IRQ
 EXPORT Fixed_Event      ,skipl  ; Used for render/HDMA timing
 EXPORT Last_Trip        ,skipl  ; Clock cycle position of last scheduled event
+
 HDMA_Next_Event:    skipl   ; Fixed event following HDMA
+
 DMA_Next_Event:     skipl   ; Fixed event following DMA
-DMA_Next_Trip:      skipl   ; Fixed event following DMA
+DMA_Next_Trip:      skipl
+
 Render_Next_Event:  skipl   ; Fixed event following render
-Render_Next_Trip:   skipl   ; Fixed event following render
-NMI_Event_Handler:  skipl   ; Event handler for NMI
+Render_Next_Trip:   skipl
+
+NMI_Event_Handler:  skipl   ; Event handler for Vblank start
+NMI_Next_Event:     skipl   ; Fixed event following render
+NMI_Next_Trip:      skipl
+
 Vblank_Start:       skipl   ; Scanline of last Vblank start
 EXPORT HTimer           ,skipl  ; Clock cycle position of H-IRQ delay start
 
@@ -140,6 +156,11 @@ EXPORT_C FastROM_offset,skipb
 EXPORT OPHCT,skipb  ; Whether reading lo or high byte
 EXPORT OPVCT,skipb  ; Whether reading lo or high byte
 RDNMI:      skipb   ; x000vvvv  x=disable/enable NMI,vvvv=version
+
+;mask for RDNMI - (only) bit 7 cleared if NMI source raised and cleared
+; during this frame
+RDNMI_mask:skipb
+
 EXPORT_C NMITIMEN,skipb ; a0yx000b  a=NMI on/off,y=vert count,x=horiz count,b=joy read
 ; I/O port register - bit 7 affects H/V counter, all bits used for output
 EXPORT_C WRIO,skipb     ; lxxxxxxx  l=counter latched when set
@@ -434,7 +455,10 @@ EXTERN_C rest
  mov al,[HVBJOY]
  and al,~HVBJOY_IN_VBLANK   ; VBlank off
  mov [HVBJOY],al
+
+ mov byte [RDNMI_mask],0xFF
  mov byte [RDNMI],VERSION_NUMBER_5A22   ; Clear NMI enabled bit in 0x4210
+ mov byte [NMI_pin],NMI_None            ;clear NMI input
 
  mov al,[C_LABEL(INIDISP)]
  test al,al
@@ -772,7 +796,9 @@ EXPORT_C NMI_NoRender
  mov [HVBJOY],al
 
  mov al,RDNMI_VBLANK_START | VERSION_NUMBER_5A22
+ and al,[RDNMI_mask]    ; ensure only one vblank NMI per frame
  mov [RDNMI],al         ; Set NMI enabled bit in 0x4210
+ mov byte [NMI_pin],NMI_Raised          ;raise NMI input
 
  mov eax,[C_LABEL(Current_Line_Timing)]
  inc eax
@@ -785,26 +811,42 @@ CheckNMI:
  mov eax,[CPU_LABEL(PC)]
  mov [C_LABEL(OLD_PC)],eax  ; Save program counter
 %endif
+ test byte [RDNMI],RDNMI_VBLANK_START
+ jz .CHECK_KEYS
+
  test byte [C_LABEL(NMITIMEN)],0x80
  jz .CHECK_KEYS         ; NMI off? (via hardware register)
 
- ; Neill's timing doc: 19-23 clock delay
-;mov dword [C_LABEL(EventTrip)],CYCLES_NMI_DELAY
- mov dword [FixedTrip],CYCLES_NMI_DELAY
-;mov dword [Event_Handler],NMI_Event
- mov dword [Fixed_Event],NMI_Event
+
+ ;NMI executes after one opcode
+ mov eax,[C_LABEL(SNES_Cycles)]
+ inc eax
+ mov [FixedTrip],eax
+ mov [C_LABEL(EventTrip)],eax
+ mov eax,NMI_Event
+ mov [Fixed_Event],eax
+ mov [Event_Handler],eax
+
+ ;setup chain to next timing event
+ mov dword [NMI_Next_Event],VBL_Update_Controllers
+ mov dword [NMI_Next_Trip],CYCLES_NEW_SCANLINE
+
 
 .CHECK_KEYS:
  call C_LABEL(UPDATE_KEYS)
  test eax,eax
  jnz .break
 
+
+
 ; Return to emulation
+ cmp byte [NMI_pin],NMI_Raised
+ je CPU_START.execute_opcode
+
  mov eax,[C_LABEL(Current_Line_Timing)] ; Get current scanline
  jmp near CPU_START_IRQ ; Return to CPU
 
 .break:
-;pusha
  mov ebx,[CPU_LABEL(PB_Shifted)]
  mov bx,[CPU_LABEL(PC)]
 
@@ -812,21 +854,38 @@ CheckNMI:
  GET_BYTE
  mov [C_LABEL(Map_Byte)],al
 
-;popa
+
+ cmp byte [NMI_pin],NMI_Raised
+ je .no_irq_check
 
  mov eax,[C_LABEL(Current_Line_Timing)] ; Get current scanline
  CheckVIRQ
+.no_irq_check:
  ret
+
+
+ALIGNC
+NMI_Setup_Event:
+ ;NMI executes after one opcode
+ mov eax,[C_LABEL(SNES_Cycles)]
+ inc eax
+ mov [FixedTrip],eax
+ mov [C_LABEL(EventTrip)],eax
+ mov eax,NMI_Event
+ mov [Fixed_Event],eax
+ mov [Event_Handler],eax
+
+ jmp CPU_START.execute_opcode
+
 
 ALIGNC
 NMI_Event:
- mov eax,[C_LABEL(EventTrip)]
- mov [Last_Trip],eax
+ mov byte [NMI_pin],NMI_Acknowledged    ;acknowledge NMI input
 
-;mov dword [C_LABEL(EventTrip)],CYCLES_NEW_SCANLINE
- mov dword [FixedTrip],CYCLES_NEW_SCANLINE
-;mov dword [Event_Handler],VBL_Update_Controllers
- mov dword [Fixed_Event],VBL_Update_Controllers
+ mov eax,[NMI_Next_Event]
+ mov [Fixed_Event],eax
+ mov eax,[NMI_Next_Trip]
+ mov [FixedTrip],eax
 
  mov al,[CPU_Execution_Mode]
  cmp al,CEM_Clock_Stopped
@@ -921,14 +980,7 @@ HIRQ_Event:
  mov [Last_Trip],eax
 
  mov dh,0x40        ; H-IRQ
-;test dl,0x20      ; Vertical IRQ enabled?
-;jz .no_virq
-;mov dh,0xC0       ; H+V-IRQ
 .do_IRQ:
-;mov dh,[C_LABEL(NMITIMEN)]
-;and dh,0x30
-;shl dh,2
-;mov byte [TIMEUP],0x80 ; Set IRQ recv'd flag
  or [IRQ_pin],dh
 
  mov al,[CPU_Execution_Mode]
@@ -977,6 +1029,9 @@ ALIGNC
 ; This can only trash ebx/edx!
 HIRQ_Check:
  SAVE_CYCLES edx
+ cmp byte [NMI_pin],NMI_Raised
+ je .nmi_bypass
+
  push edx
  mov bl,[C_LABEL(NMITIMEN)]
  test bl,0x10       ; H-IRQ enabled?
@@ -1004,6 +1059,11 @@ HIRQ_Check:
  add esp,4
  LOAD_CYCLES edx
  ret
+
+.nmi_bypass:
+ mov [Last_Trip],edx
+ ret
+
 
 ALIGNC
 ; This can only trash ebx/edi!
@@ -1148,7 +1208,14 @@ EXPORT SNES_R4016 ; JOYC1
  test byte [JOYC1],1
  jz .read_enabled
  mov al,0
- or al,0x40     ;open bus kludge
+
+.fixup_read:
+ ;merge in open bus bits
+ mov dl,[C_LABEL(Last_Bus_Value_A)]
+ and dl,JOYC1_OPEN_BUS_BITS
+
+ or al,dl
+
  add R_65c816_Cycles,_5A22_LEGACY_CYCLE - _5A22_FAST_CYCLE
  ret
 
@@ -1167,18 +1234,14 @@ EXPORT SNES_R4016 ; JOYC1
  and al,bl
  pop ebx
  pop ecx
- or al,0x40     ;open bus kludge
- add R_65c816_Cycles,_5A22_LEGACY_CYCLE - _5A22_FAST_CYCLE
- ret
+ jmp .fixup_read
 
 .unused:
  mov byte [C_LABEL(Controller1_Pos)],16
  mov al,1           ; Joypad connected
  pop ebx
  pop ecx
- or al,0x40     ;open bus kludge
- add R_65c816_Cycles,_5A22_LEGACY_CYCLE - _5A22_FAST_CYCLE
- ret
+ jmp .fixup_read
 
 ALIGNC
 .do_mouse:
@@ -1192,16 +1255,23 @@ ALIGNC
  and al,bl
  pop ebx
  pop ecx
- or al,0x40     ;open bus kludge
- add R_65c816_Cycles,_5A22_LEGACY_CYCLE - _5A22_FAST_CYCLE
- ret
+ jmp .fixup_read
 
 ALIGNC
 EXPORT SNES_R4017 ; JOYC2
  test byte [JOYC1],1
  jz .read_enabled
  mov al,0
- or al,0x5C     ;open bus kludge
+
+.fixup_read:
+
+ ;merge in open bus bits
+ mov dl,[C_LABEL(Last_Bus_Value_A)]
+ or al,JOYC2_ALWAYS_HIGH_BITS
+ and dl,JOYC2_OPEN_BUS_BITS
+
+ or al,dl
+
  add R_65c816_Cycles,_5A22_LEGACY_CYCLE - _5A22_FAST_CYCLE
  ret
 
@@ -1220,18 +1290,14 @@ EXPORT SNES_R4017 ; JOYC2
  and al,1
  pop ebx
  pop ecx
- or al,0x5C     ;open bus kludge
- add R_65c816_Cycles,_5A22_LEGACY_CYCLE - _5A22_FAST_CYCLE
- ret
+ jmp .fixup_read
 
 .unused:
  mov byte [C_LABEL(Controller23_Pos)],16
  mov al,1           ; (???) Return 0 this bit is for mtap I think
  pop ebx
  pop ecx
- or al,0x5C     ;open bus kludge
- add R_65c816_Cycles,_5A22_LEGACY_CYCLE - _5A22_FAST_CYCLE
- ret
+ jmp .fixup_read
 
 ALIGNC
 .do_mouse:
@@ -1245,32 +1311,70 @@ ALIGNC
  and al,1
  pop ebx
  pop ecx
- or al,0x5C     ;open bus kludge
- add R_65c816_Cycles,_5A22_LEGACY_CYCLE - _5A22_FAST_CYCLE
- ret
+ jmp .fixup_read
 
 
 ; Read from 42xx handlers
 ALIGNC
 EXPORT SNES_R4210 ; RDNMI
  mov al,[RDNMI]
- or al,0x40     ;open bus kludge
- mov byte [RDNMI],VERSION_NUMBER_5A22   ; NMI on/off + version #
+ test al,al
+ js .got_nmi_source
+
+ mov edx,[C_LABEL(Current_Line_Timing)]
+ cmp edx,[C_LABEL(LastRenderLine)]
+ jb .got_nmi_source
+
+ test byte [RDNMI_mask],RDNMI_VBLANK_START
+ jns .got_nmi_source
+
+ GET_CYCLES edx
+
+ shr edx,2
+ cmp edx,128
+ jb .before_refresh
+ add edx,byte 10    ; Adjust for memory refresh cycles
+.before_refresh:
+
+ ;if we're on the next scanline, add 1 to the scanline count
+ cmp edx,DOTS_PER_SCANLINE
+ sbb edx,edx
+ inc edx
+
+ add edx,[C_LABEL(Current_Line_Timing)]
+
+ cmp edx,[C_LABEL(LastRenderLine)]
+ jb .got_nmi_source
+
+ or al,RDNMI_VBLANK_START
+
+.got_nmi_source:
+ ;merge in open bus bits
+ mov dl,[C_LABEL(Last_Bus_Value_A)]
+ and dl,RDNMI_OPEN_BUS_BITS
+
+ or al,dl
+ jns .no_reset  ;RDNMI_VBLANK_START not set
+
+ mov byte [RDNMI],VERSION_NUMBER_5A22   ; clear NMI source
+ mov byte [RDNMI_mask],0x7F
+.no_reset:
  ret
 
 ALIGNC
 EXPORT SNES_R4211 ; TIMEUP
- ; Should return bit 7 set if IRQ active, bit 6 set if cur line = V count
-;mov al,[TIMEUP]
-;mov byte [TIMEUP],0
  mov al,[IRQ_pin]
  test al,0xC0
  jz .no_irq
  mov al,0x80
- and byte [IRQ_pin],0x1F    ; Clear H/V IRQ
+ and byte [IRQ_pin],~0xC0   ; Clear H/V IRQ
 .no_irq:
 
- or al,0x42     ;open bus kludge
+ ;merge in open bus bits
+ mov dl,[C_LABEL(Last_Bus_Value_A)]
+ and dl,TIMEUP_OPEN_BUS_BITS
+
+ or al,dl
 
  ret
 
@@ -1296,7 +1400,11 @@ EXPORT SNES_R4212 ; HVBJOY
  or al,HVBJOY_IN_HBLANK ; We're in Hblank...
 .no_hblank:
 
- or al,0x02     ;open bus kludge
+ ;merge in open bus bits
+ mov dl,[C_LABEL(Last_Bus_Value_A)]
+ and dl,HVBJOY_OPEN_BUS_BITS
+
+ or al,dl
  ret
 
 ALIGNC
@@ -1385,11 +1493,41 @@ EXPORT SNES_W4200 ; NMITIMEN
 ; a0yx000b  a=NMI on/off,y=vert count,x=horiz count,b=joy read
  cmp [C_LABEL(NMITIMEN)],al
  je .no_change
+
  push ebx
  mov bl,[C_LABEL(NMITIMEN)]
- mov [C_LABEL(NMITIMEN)],al
  xor bl,al
- and bl,0x30
+ mov [C_LABEL(NMITIMEN)],al
+ jns .no_nmi_change
+
+ test byte [RDNMI],RDNMI_VBLANK_START
+ jz .no_nmi_change
+
+.nmi_change:
+ test al,0x80
+ jnz .nmi_on
+.nmi_off:
+ mov byte [NMI_pin],NMI_None
+ jmp .no_nmi_change
+
+.nmi_on:
+ mov byte [NMI_pin],NMI_Raised
+
+ ;setup NMI to execute after one opcode
+ mov edx,[FixedTrip]
+ mov [NMI_Next_Trip],edx
+ mov edx,[Fixed_Event]
+ mov [NMI_Next_Event],edx
+
+ mov edx,NMI_Setup_Event
+ mov [Fixed_Event],edx
+ mov [Event_Handler],edx
+ GET_CYCLES edx
+ mov [FixedTrip],edx
+ mov [C_LABEL(EventTrip)],edx
+
+.no_nmi_change:
+ test bl,0x30
  jz .no_irq_change
  call HIRQ_Check
 .no_irq_change:
@@ -1588,21 +1726,6 @@ EXPORT SNES_W420A ; VTIMEH   ; Handled in screen core!
 
 ALIGNC
 EXPORT SNES_W420D ; MEMSEL    ; FastROM switch
-%ifndef NO_FASTROM
- push eax
- and al,1
- shl al,7               ; Set bit 7 to switch flag
-
- test [CPU_LABEL(PB_Shifted)+2],al   ; Check bus speed against PB
- mov [MEMSEL],al
- mov al,[C_LABEL(FastROM_offset)]
- jnz .fastrom
- mov al,4
-.fastrom:
- mov [C_LABEL(CycleTable)],al   ; Update bus speed
-
- pop eax
-%endif
  push eax
  push ecx
  push edx
