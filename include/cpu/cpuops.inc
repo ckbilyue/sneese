@@ -1309,11 +1309,6 @@ EXPORT_C E1_PER
 EM_ADC d_s,Stack_Relative
 E0_ADC d_s,Stack_Relative
 
-; 64
-ALIGNC
-EM_STZ d,Direct
-E0_STZ d,Direct
-
 ; 65
 EM_ADC d,Direct
 E0_ADC d,Direct
@@ -1493,10 +1488,6 @@ E0_ADC OdO,Direct_Indirect
 EM_ADC Od_sO_y,Stack_Relative_Indirect_Indexed
 E0_ADC Od_sO_y,Stack_Relative_Indirect_Indexed
 
-; 74
-EM_STZ d_x,Direct_Index_X
-E0_STZ d_x,Direct_Index_X
-
 ; 75
 EM_ADC d_x,Direct_Index_X
 E0_ADC d_x,Direct_Index_X
@@ -1574,10 +1565,6 @@ EXPORT_C ALL_BRA
  add R_NativePC,eax
  OPCODE_EPILOG
 
-; 81
-EM_STA Od_xO,Direct_Indexed_Indirect
-E0_STA Od_xO,Direct_Indexed_Indirect
-
 ; 82
                                  
 ALIGNC
@@ -1618,18 +1605,6 @@ EXPORT_C ALL_BRL        ; Branch always long (-32768 to 32767)
  jmp short .read_direct
 %endif
 
-; 83
-EM_STA d_s,Stack_Relative
-E0_STA d_s,Stack_Relative
-
-; 85
-EM_STA d,Direct
-E0_STA d,Direct
-
-; 87
-EM_STA IdI,Direct_Indirect_Long
-E0_STA IdI,Direct_Indirect_Long
-
 ; 89    ; Differs from norm, only sets Z flag
 
 ALIGNC
@@ -1656,40 +1631,12 @@ _TxA B_X,16,E0_TXA
 E0_PUSH8 B_DB,E0_PHB    ; Push DB(B) onto stack
 E1_PUSH8 B_DB,E1_PHB
 
-; 8D
-EM_STA a,Absolute
-E0_STA a,Absolute
-
-; 8F
-EM_STA al,Absolute_Long
-E0_STA al,Absolute_Long
-
 ; 90
 BFC BCC,SNES_FLAG_C
-
-; 92
-EM_STA OdO,Direct_Indirect
-E0_STA OdO,Direct_Indirect
-
-; 93
-EM_STA Od_sO_y,Stack_Relative_Indirect_Indexed
-E0_STA Od_sO_y,Stack_Relative_Indirect_Indexed
-
-; 95
-EM_STA d_x,Direct_Index_X
-E0_STA d_x,Direct_Index_X
-
-; 97
-EM_STA IdI_y,Direct_Indirect_Indexed_Long
-E0_STA IdI_y,Direct_Indirect_Indexed_Long
 
 ; 98
 _TxA B_Y,8,EM_TYA
 _TxA B_Y,16,E0_TYA
-
-; 99
-EM_STA a_y,Absolute_Index_Y
-E0_STA a_y,Absolute_Index_Y
 
 ; 9A
 _TxS B_X,16,E0_TXS
@@ -1698,22 +1645,6 @@ _TxS B_X,8,E1_TXS
 ; 9B
 _TxY B_X,8,EX_TXY
 _TxY B_X,16,E0_TXY
-
-; 9C
-EM_STZ a,Absolute
-E0_STZ a,Absolute
-
-; 9D
-EM_STA a_x,Absolute_Index_X
-E0_STA a_x,Absolute_Index_X
-
-; 9E
-EM_STZ a_x,Absolute_Index_X
-E0_STZ a_x,Absolute_Index_X
-
-; 9F
-EM_STA al_x,Absolute_Long_Index_X
-E0_STA al_x,Absolute_Long_Index_X
 
 ; A0
 EX_LDY i,Immediate

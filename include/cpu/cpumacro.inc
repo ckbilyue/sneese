@@ -1076,15 +1076,7 @@ EXPORT_C E0_STZ_%1
 
 ;%1 = addr
 %macro _STZ 1
-%if M_size
- ADDR_%1
- xor eax,eax
- SET_BYTE
-%else
- ADDR_%1
- xor eax,eax
- SET_WORD Double
-%endif
+ V_STx %1,0,M_size
 %endmacro
 
 ; TRB set flag Z on A & Memory Operand not A & !Memory Operand!

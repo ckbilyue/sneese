@@ -417,7 +417,7 @@ dd  C_LABEL(ALL_JML_al)   ,C_LABEL(E0_EOR_a_x)
 dd  C_LABEL(OpM0_0x5E)    ,C_LABEL(E0_EOR_al_x)
 dd  C_LABEL(E0_RTS)       ,C_LABEL(E0_ADC_Od_xO)    ; 60
 dd  C_LABEL(E0_PER)       ,C_LABEL(E0_ADC_d_s)
-dd  C_LABEL(E0_STZ_d)     ,C_LABEL(E0_ADC_d)
+dd  C_LABEL(OpE0M0_0x64)  ,C_LABEL(E0_ADC_d)
 dd  C_LABEL(OpE0M0_0x66)  ,C_LABEL(E0_ADC_IdI)
 dd  C_LABEL(E0_PLA)       ,C_LABEL(E0_ADC_i)
 dd  C_LABEL(OpM0_0x6A)    ,C_LABEL(E0_RTL)
@@ -425,28 +425,28 @@ dd  C_LABEL(ALL_JMP_OaO)  ,C_LABEL(E0_ADC_a)
 dd  C_LABEL(OpM0_0x6E)    ,C_LABEL(E0_ADC_al)
 dd  C_LABEL(ALL_BVS)      ,C_LABEL(E0_ADC_OdO_y)    ; 70
 dd  C_LABEL(E0_ADC_OdO)   ,C_LABEL(E0_ADC_Od_sO_y)
-dd  C_LABEL(E0_STZ_d_x)   ,C_LABEL(E0_ADC_d_x)
+dd  C_LABEL(OpE0M0_0x74)  ,C_LABEL(E0_ADC_d_x)
 dd  C_LABEL(OpE0M0_0x76)  ,C_LABEL(E0_ADC_IdI_y)
 dd  C_LABEL(ALL_SEI)      ,C_LABEL(E0_ADC_a_y)
 dd  C_LABEL(E0_PLY)       ,C_LABEL(ALL_TDC)
 dd  C_LABEL(ALL_JMP_Oa_xO),C_LABEL(E0_ADC_a_x)
 dd  C_LABEL(OpM0_0x7E)    ,C_LABEL(E0_ADC_al_x)
-dd  C_LABEL(ALL_BRA)      ,C_LABEL(E0_STA_Od_xO)    ; 80
-dd  C_LABEL(ALL_BRL)      ,C_LABEL(E0_STA_d_s)
-dd  C_LABEL(OpE0X0_0x84)  ,C_LABEL(E0_STA_d)
-dd  C_LABEL(OpE0X0_0x86)  ,C_LABEL(E0_STA_IdI)
+dd  C_LABEL(ALL_BRA)      ,C_LABEL(OpE0M0_0x81)     ; 80
+dd  C_LABEL(ALL_BRL)      ,C_LABEL(OpM0_0x83)
+dd  C_LABEL(OpE0X0_0x84)  ,C_LABEL(OpE0M0_0x85)
+dd  C_LABEL(OpE0X0_0x86)  ,C_LABEL(OpE0M0_0x87)
 dd  C_LABEL(OpX0_0x88)    ,C_LABEL(E0_BIT_i)
 dd  C_LABEL(E0_TXA)       ,C_LABEL(E0_PHB)
-dd  C_LABEL(OpX0_0x8C)    ,C_LABEL(E0_STA_a)
-dd  C_LABEL(OpX0_0x8E)    ,C_LABEL(E0_STA_al)
+dd  C_LABEL(OpX0_0x8C)    ,C_LABEL(OpM0_0x8D)
+dd  C_LABEL(OpX0_0x8E)    ,C_LABEL(OpM0_0x8F)
 dd  C_LABEL(ALL_BCC)      ,C_LABEL(OpE0M0X0_0x91)   ; 90
-dd  C_LABEL(E0_STA_OdO)   ,C_LABEL(E0_STA_Od_sO_y)
-dd  C_LABEL(OpE0X0_0x94)  ,C_LABEL(E0_STA_d_x)
-dd  C_LABEL(OpE0X0_0x96)  ,C_LABEL(E0_STA_IdI_y)
-dd  C_LABEL(E0_TYA)       ,C_LABEL(E0_STA_a_y)
+dd  C_LABEL(OpE0M0_0x92)  ,C_LABEL(OpM0_0x93)
+dd  C_LABEL(OpE0X0_0x94)  ,C_LABEL(OpE0M0_0x95)
+dd  C_LABEL(OpE0X0_0x96)  ,C_LABEL(OpE0M0_0x97)
+dd  C_LABEL(E0_TYA)       ,C_LABEL(OpM0_0x99)
 dd  C_LABEL(E0_TXS)       ,C_LABEL(E0_TXY)
-dd  C_LABEL(E0_STZ_a)     ,C_LABEL(E0_STA_a_x)
-dd  C_LABEL(E0_STZ_a_x)   ,C_LABEL(E0_STA_al_x)
+dd  C_LABEL(OpM0_0x9C)    ,C_LABEL(OpM0_0x9D)
+dd  C_LABEL(OpM0_0x9E)    ,C_LABEL(OpM0_0x9F)
 dd  C_LABEL(E0_LDY_i)     ,C_LABEL(E0_LDA_Od_xO)    ; A0
 dd  C_LABEL(E0_LDX_i)     ,C_LABEL(E0_LDA_d_s)
 dd  C_LABEL(E0_LDY_d)     ,C_LABEL(E0_LDA_d)
@@ -508,7 +508,7 @@ db opcode_clocks(2, 1, 4, 0, 0) ; 04 TSB d
 db opcode_clocks(2, 0, 2, 0, 0) ; 05 ORA d
 db opcode_clocks(2, 1, 4, 0, 0) ; 06 ASL d
 db opcode_clocks(2, 0, 3, 2, 0) ; 07 ORA [d]
-  								   
+  								
 db opcode_clocks(1, 1, 1, 0, 0) ; 08 PHP
 db opcode_clocks(3, 0, 0, 0, 0) ; 09 ORA i
 db opcode_clocks(1, 1, 0, 0, 0) ; 0A SLA
@@ -517,7 +517,7 @@ db opcode_clocks(3, 1, 0, 4, 0) ; 0C TSB a
 db opcode_clocks(3, 0, 0, 2, 0) ; 0D ORA a
 db opcode_clocks(3, 1, 0, 4, 0) ; 0E ASL a
 db opcode_clocks(4, 0, 0, 2, 0) ; 0F ORA al
-  								   
+  								
 db opcode_clocks(2, 0, 0, 0, 0) ; 10 BPL r
 db opcode_clocks(2, 1, 2, 2, 0) ; 11 ORA (d),y
 db opcode_clocks(2, 0, 2, 2, 0) ; 12 ORA (d)
@@ -526,7 +526,7 @@ db opcode_clocks(2, 1, 4, 0, 0) ; 14 TRB d
 db opcode_clocks(2, 1, 2, 0, 0) ; 15 ORA d,x
 db opcode_clocks(2, 2, 4, 0, 0) ; 16 ASL d,x
 db opcode_clocks(2, 0, 3, 2, 0) ; 17 ORA [d],y
-  								   
+  								
 db opcode_clocks(1, 1, 0, 0, 0) ; 18 CLC
 db opcode_clocks(3, 1, 0, 2, 0) ; 19 ORA a,y
 db opcode_clocks(1, 1, 0, 0, 0) ; 1A INA
@@ -535,7 +535,7 @@ db opcode_clocks(3, 1, 0, 4, 0) ; 1C TRB a
 db opcode_clocks(3, 1, 0, 2, 0) ; 1D ORA a,x
 db opcode_clocks(3, 2, 0, 4, 0) ; 1E ASL a,x
 db opcode_clocks(4, 0, 0, 2, 0) ; 1F ORA al,x
-  								   
+  								
 db opcode_clocks(3, 1, 2, 0, 0) ; 20 JSR a
 db opcode_clocks(2, 1, 2, 2, 0) ; 21 AND (d,x)
 db opcode_clocks(4, 1, 3, 0, 0) ; 22 JSL al
@@ -544,7 +544,7 @@ db opcode_clocks(2, 0, 2, 0, 0) ; 24 BIT d
 db opcode_clocks(2, 0, 2, 0, 0) ; 25 AND d
 db opcode_clocks(2, 1, 4, 0, 0) ; 26 ROL d
 db opcode_clocks(2, 0, 3, 2, 0) ; 27 AND [d]
-  								   
+  								
 db opcode_clocks(1, 2, 1, 0, 0) ; 28 PLP
 db opcode_clocks(3, 0, 0, 0, 0) ; 29 AND i
 db opcode_clocks(1, 1, 0, 0, 0) ; 2A RLA
@@ -553,7 +553,7 @@ db opcode_clocks(3, 0, 0, 2, 0) ; 2C BIT a
 db opcode_clocks(3, 0, 0, 2, 0) ; 2D AND a
 db opcode_clocks(3, 1, 0, 4, 0) ; 2E ROL a
 db opcode_clocks(4, 0, 0, 2, 0) ; 2F AND al
-  								   
+  								
 db opcode_clocks(2, 0, 0, 0, 0) ; 30 BMI r
 db opcode_clocks(2, 1, 2, 2, 0) ; 31 AND (d),y
 db opcode_clocks(2, 0, 2, 2, 0) ; 32 AND (d)
@@ -562,7 +562,7 @@ db opcode_clocks(2, 1, 2, 0, 0) ; 34 BIT d,x
 db opcode_clocks(2, 1, 2, 0, 0) ; 35 AND d,x
 db opcode_clocks(2, 2, 4, 0, 0) ; 36 ROL d,x
 db opcode_clocks(2, 0, 3, 2, 0) ; 37 AND [d],y
-  								   
+  								
 db opcode_clocks(1, 1, 0, 0, 0) ; 38 SEC
 db opcode_clocks(3, 1, 0, 2, 0) ; 39 AND a,y
 db opcode_clocks(1, 1, 0, 0, 0) ; 3A DEA
@@ -571,7 +571,7 @@ db opcode_clocks(3, 1, 0, 2, 0) ; 3C BIT a,x
 db opcode_clocks(3, 1, 0, 2, 0) ; 3D AND a,x
 db opcode_clocks(3, 2, 0, 4, 0) ; 3E ROL a,x
 db opcode_clocks(4, 0, 0, 2, 0) ; 3F AND al,x
-  								   
+  								
 db opcode_clocks(1, 2, 4, 0, 0) ; 40 RTI
 db opcode_clocks(2, 1, 2, 2, 0) ; 41 EOR (d,x)
 db opcode_clocks(2, 0, 0, 0, 0) ; 42 WDM *
@@ -580,7 +580,7 @@ db opcode_clocks(3, 2, 0, 2, 0) ; 44 MVP
 db opcode_clocks(2, 0, 2, 0, 0) ; 45 EOR d
 db opcode_clocks(2, 1, 4, 0, 0) ; 46 LSR d
 db opcode_clocks(2, 0, 3, 2, 0) ; 47 EOR [d]
-  								   
+  								
 db opcode_clocks(1, 1, 2, 0, 0) ; 48 PHA
 db opcode_clocks(3, 0, 0, 0, 0) ; 49 EOR i
 db opcode_clocks(1, 1, 0, 0, 0) ; 4A SRA
@@ -589,7 +589,7 @@ db opcode_clocks(3, 0, 0, 0, 0) ; 4C JMP a
 db opcode_clocks(3, 0, 0, 2, 0) ; 4D EOR a
 db opcode_clocks(3, 1, 0, 4, 0) ; 4E LSR a
 db opcode_clocks(4, 0, 0, 2, 0) ; 4F EOR al
-  								   
+  								
 db opcode_clocks(2, 0, 0, 0, 0) ; 50 BVC r
 db opcode_clocks(2, 1, 2, 2, 0) ; 51 EOR (d),y
 db opcode_clocks(2, 0, 2, 2, 0) ; 52 EOR (d)
@@ -598,7 +598,7 @@ db opcode_clocks(3, 2, 0, 2, 0) ; 54 MVN
 db opcode_clocks(2, 1, 2, 0, 0) ; 55 EOR d,x
 db opcode_clocks(2, 2, 4, 0, 0) ; 56 LSR d,x
 db opcode_clocks(2, 0, 3, 2, 0) ; 57 EOR [d],y
-  								   
+  								
 db opcode_clocks(1, 1, 0, 0, 0) ; 58 CLI
 db opcode_clocks(3, 1, 0, 2, 0) ; 59 EOR a,y
 db opcode_clocks(1, 1, 2, 0, 0) ; 5A PHY
@@ -607,7 +607,7 @@ db opcode_clocks(4, 0, 0, 0, 0) ; 5C JML al
 db opcode_clocks(3, 1, 0, 2, 0) ; 5D EOR a,x
 db opcode_clocks(3, 2, 0, 4, 0) ; 5E LSR a,x
 db opcode_clocks(4, 0, 0, 2, 0) ; 5F EOR al,x
-  								   
+  								
 db opcode_clocks(1, 3, 2, 0, 0) ; 60 RTS
 db opcode_clocks(2, 1, 2, 2, 0) ; 61 ADC (d,x)
 db opcode_clocks(3, 1, 2, 0, 0) ; 62 PER
@@ -616,7 +616,7 @@ db opcode_clocks(2, 0, 2, 0, 0) ; 64 STZ d
 db opcode_clocks(2, 0, 2, 0, 0) ; 65 ADC d
 db opcode_clocks(2, 1, 4, 0, 0) ; 66 ROR d
 db opcode_clocks(2, 0, 3, 2, 0) ; 67 ADC [d]
-  								   
+  								
 db opcode_clocks(1, 2, 2, 0, 0) ; 68 PLA
 db opcode_clocks(3, 0, 0, 0, 0) ; 69 ADC i
 db opcode_clocks(1, 1, 0, 0, 0) ; 6A RRA
@@ -625,7 +625,7 @@ db opcode_clocks(3, 0, 2, 0, 0) ; 6C JMP (a)
 db opcode_clocks(3, 0, 0, 2, 0) ; 6D ADC a
 db opcode_clocks(3, 1, 0, 4, 0) ; 6E ROR a
 db opcode_clocks(4, 0, 0, 2, 0) ; 6F ADC al
-  								   
+  								
 db opcode_clocks(2, 0, 0, 0, 0) ; 70 BVS r
 db opcode_clocks(2, 1, 2, 2, 0) ; 71 ADC (d),y
 db opcode_clocks(2, 0, 2, 2, 0) ; 72 ADC (d)
@@ -634,7 +634,7 @@ db opcode_clocks(2, 1, 2, 0, 0) ; 74 STZ d,x
 db opcode_clocks(2, 1, 2, 0, 0) ; 75 ADC d,x
 db opcode_clocks(2, 2, 4, 0, 0) ; 76 ROR d,x
 db opcode_clocks(2, 0, 3, 2, 0) ; 77 ADC [d],y
-  								   
+  								
 db opcode_clocks(1, 1, 0, 0, 0) ; 78 SEI
 db opcode_clocks(3, 1, 0, 2, 0) ; 79 ADC a,y
 db opcode_clocks(1, 2, 2, 0, 0) ; 7A PLY
@@ -643,7 +643,7 @@ db opcode_clocks(3, 1, 0, 2, 0) ; 7C JMP (a,x) - bus access in PB
 db opcode_clocks(3, 1, 0, 2, 0) ; 7D ADC a,x
 db opcode_clocks(3, 2, 0, 4, 0) ; 7E ROR a,x
 db opcode_clocks(4, 0, 0, 2, 0) ; 7F ADC al,x
-  								   
+  								
 db opcode_clocks(2, 0, 0, 0, 0) ; 80 BRA r
 db opcode_clocks(2, 1, 2, 2, 0) ; 81 STA (d,x)
 db opcode_clocks(3, 1, 0, 0, 0) ; 82 BRL rl
@@ -652,7 +652,7 @@ db opcode_clocks(2, 0, 2, 0, 0) ; 84 STY d
 db opcode_clocks(2, 0, 2, 0, 0) ; 85 STA d
 db opcode_clocks(2, 0, 2, 0, 0) ; 86 STX d
 db opcode_clocks(2, 0, 3, 2, 0) ; 87 STA [d]
-  								   
+  								
 db opcode_clocks(1, 1, 0, 0, 0) ; 88 DEY
 db opcode_clocks(3, 0, 0, 0, 0) ; 89 BIT i
 db opcode_clocks(1, 1, 0, 0, 0) ; 8A TXA
@@ -661,7 +661,7 @@ db opcode_clocks(3, 0, 0, 2, 0) ; 8C STY a
 db opcode_clocks(3, 0, 0, 2, 0) ; 8D STA a
 db opcode_clocks(3, 0, 0, 2, 0) ; 8E STX a
 db opcode_clocks(4, 0, 0, 2, 0) ; 8F STA al
-  								   
+  								
 db opcode_clocks(2, 0, 0, 0, 0) ; 90 BCC r
 db opcode_clocks(2, 1, 2, 2, 0) ; 91 STA (d),y
 db opcode_clocks(2, 0, 2, 2, 0) ; 92 STA (d)
@@ -670,7 +670,7 @@ db opcode_clocks(2, 1, 2, 0, 0) ; 94 STY d,x
 db opcode_clocks(2, 1, 2, 0, 0) ; 95 STA d,x
 db opcode_clocks(2, 1, 2, 0, 0) ; 96 STX d,y
 db opcode_clocks(2, 0, 3, 2, 0) ; 97 STA [d],y
-  								   
+  								
 db opcode_clocks(1, 1, 0, 0, 0) ; 98 TYA
 db opcode_clocks(3, 1, 0, 2, 0) ; 99 STA a,y
 db opcode_clocks(1, 1, 0, 0, 0) ; 9A TXS
@@ -679,7 +679,7 @@ db opcode_clocks(3, 0, 0, 2, 0) ; 9C STZ a
 db opcode_clocks(3, 1, 0, 2, 0) ; 9D STA a,x
 db opcode_clocks(3, 1, 0, 2, 0) ; 9E STZ a,x
 db opcode_clocks(4, 0, 0, 2, 0) ; 9F STA al,x
-  								   
+  								
 db opcode_clocks(3, 0, 0, 0, 0) ; A0 LDY i
 db opcode_clocks(2, 1, 2, 2, 0) ; A1 LDA (d,x)
 db opcode_clocks(3, 0, 0, 0, 0) ; A2 LDX i
@@ -688,7 +688,7 @@ db opcode_clocks(2, 0, 2, 0, 0) ; A4 LDY d
 db opcode_clocks(2, 0, 2, 0, 0) ; A5 LDA d
 db opcode_clocks(2, 0, 2, 0, 0) ; A6 LDX d
 db opcode_clocks(2, 0, 3, 2, 0) ; A7 LDA [d]
-  								   
+  								
 db opcode_clocks(1, 1, 0, 0, 0) ; A8 TAY
 db opcode_clocks(3, 0, 0, 0, 0) ; A9 LDA i
 db opcode_clocks(1, 1, 0, 0, 0) ; AA TAX
@@ -697,7 +697,7 @@ db opcode_clocks(3, 0, 0, 2, 0) ; AC LDY a
 db opcode_clocks(3, 0, 0, 2, 0) ; AD LDA a
 db opcode_clocks(3, 0, 0, 2, 0) ; AE LDX a
 db opcode_clocks(4, 0, 0, 2, 0) ; AF LDA al
-  								   
+  								
 db opcode_clocks(2, 0, 0, 0, 0) ; B0 BCS r
 db opcode_clocks(2, 1, 2, 2, 0) ; B1 LDA (d),y
 db opcode_clocks(2, 0, 2, 2, 0) ; B2 LDA (d)
@@ -706,7 +706,7 @@ db opcode_clocks(2, 1, 2, 0, 0) ; B4 LDY d,x
 db opcode_clocks(2, 1, 2, 0, 0) ; B5 LDA d,x
 db opcode_clocks(2, 1, 2, 0, 0) ; B6 LDX d,y
 db opcode_clocks(2, 0, 3, 2, 0) ; B7 LDA [d],y
-  								   
+  								
 db opcode_clocks(1, 1, 0, 0, 0) ; B8 CLV
 db opcode_clocks(3, 1, 0, 2, 0) ; B9 LDA a,y
 db opcode_clocks(1, 1, 0, 0, 0) ; BA TSX
@@ -715,7 +715,7 @@ db opcode_clocks(3, 1, 0, 2, 0) ; BC LDY a,x
 db opcode_clocks(3, 1, 0, 2, 0) ; BD LDA a,x
 db opcode_clocks(3, 1, 0, 2, 0) ; BE LDX a,y
 db opcode_clocks(4, 0, 0, 2, 0) ; BF LDA al,x
-  								   
+  								
 db opcode_clocks(3, 0, 0, 0, 0) ; C0 CPY i
 db opcode_clocks(2, 1, 2, 2, 0) ; C1 CMP (d,x)
 db opcode_clocks(2, 1, 0, 0, 0) ; C2 REP i
@@ -724,7 +724,7 @@ db opcode_clocks(2, 0, 2, 0, 0) ; C4 CPY d
 db opcode_clocks(2, 0, 2, 0, 0) ; C5 CMP d
 db opcode_clocks(2, 1, 4, 0, 0) ; C6 DEC d
 db opcode_clocks(2, 0, 3, 2, 0) ; C7 CMP [d]
-  								   
+  								
 db opcode_clocks(1, 1, 0, 0, 0) ; C8 INY
 db opcode_clocks(3, 0, 0, 0, 0) ; C9 CMP i
 db opcode_clocks(1, 1, 0, 0, 0) ; CA DEX
@@ -733,7 +733,7 @@ db opcode_clocks(3, 0, 0, 2, 0) ; CC CPY a
 db opcode_clocks(3, 0, 0, 2, 0) ; CD CMP a
 db opcode_clocks(3, 1, 0, 4, 0) ; CE DEC a
 db opcode_clocks(4, 0, 0, 2, 0) ; CF CMP al
-  								   
+  								
 db opcode_clocks(2, 0, 0, 0, 0) ; D0 BNE r
 db opcode_clocks(2, 1, 2, 2, 0) ; D1 CMP (d),y
 db opcode_clocks(2, 0, 2, 2, 0) ; D2 CMP (d)
@@ -742,7 +742,7 @@ db opcode_clocks(2, 0, 4, 0, 0) ; D4 PEI
 db opcode_clocks(2, 1, 2, 0, 0) ; D5 CMP d,x
 db opcode_clocks(2, 2, 4, 0, 0) ; D6 DEC d,x
 db opcode_clocks(2, 0, 3, 2, 0) ; D7 CMP [d],y
-  								   
+  								
 db opcode_clocks(1, 1, 0, 0, 0) ; D8 CLD
 db opcode_clocks(3, 1, 0, 2, 0) ; D9 CMP a,y
 db opcode_clocks(1, 1, 2, 0, 0) ; DA PHX
@@ -751,7 +751,7 @@ db opcode_clocks(3, 0, 3, 0, 0) ; DC JML (a)
 db opcode_clocks(3, 1, 0, 2, 0) ; DD CMP a,x
 db opcode_clocks(3, 2, 0, 4, 0) ; DE DEC a,x
 db opcode_clocks(4, 0, 0, 2, 0) ; DF CMP al,x
-  								   
+  								
 db opcode_clocks(3, 0, 0, 0, 0) ; E0 CPX i
 db opcode_clocks(2, 1, 2, 2, 0) ; E1 SBC (d,x)
 db opcode_clocks(2, 1, 0, 0, 0) ; E2 SEP i
@@ -760,7 +760,7 @@ db opcode_clocks(2, 0, 2, 0, 0) ; E4 CPX d
 db opcode_clocks(2, 0, 2, 0, 0) ; E5 SBC d
 db opcode_clocks(2, 1, 4, 0, 0) ; E6 INC d
 db opcode_clocks(2, 0, 3, 2, 0) ; E7 SBC [d]
-  								   
+  								
 db opcode_clocks(1, 1, 0, 0, 0) ; E8 INX
 db opcode_clocks(3, 0, 0, 0, 0) ; E9 SBC i
 db opcode_clocks(1, 1, 0, 0, 0) ; EA NOP
@@ -769,7 +769,7 @@ db opcode_clocks(3, 0, 0, 2, 0) ; EC CPX a
 db opcode_clocks(3, 0, 0, 2, 0) ; ED SBC a
 db opcode_clocks(3, 1, 0, 4, 0) ; EE INC a
 db opcode_clocks(4, 0, 0, 2, 0) ; EF SBC al
-  								   
+  								
 db opcode_clocks(2, 0, 0, 0, 0) ; F0 BEQ r
 db opcode_clocks(2, 1, 2, 2, 0) ; F1 SBC (d),y
 db opcode_clocks(2, 0, 2, 2, 0) ; F2 SBC (d)
@@ -778,7 +778,7 @@ db opcode_clocks(3, 0, 2, 0, 0) ; F4 PEA
 db opcode_clocks(2, 1, 2, 0, 0) ; F5 SBC d,x
 db opcode_clocks(2, 2, 4, 0, 0) ; F6 INC d,x
 db opcode_clocks(2, 0, 3, 2, 0) ; F7 SBC [d],y
-  								   
+  								
 db opcode_clocks(1, 1, 0, 0, 0) ; F8 SED
 db opcode_clocks(3, 1, 0, 2, 0) ; F9 SBC a,y
 db opcode_clocks(1, 2, 2, 0, 0) ; FA PLX
@@ -797,7 +797,7 @@ db opcode_clocks(2, 1, 4, 0, 1) ; 04 TSB d
 db opcode_clocks(2, 0, 2, 0, 1) ; 05 ORA d
 db opcode_clocks(2, 1, 4, 0, 1) ; 06 ASL d
 db opcode_clocks(2, 0, 3, 2, 1) ; 07 ORA [d]
-							      
+							
 db opcode_clocks(1, 1, 1, 0, 1) ; 08 PHP
 db opcode_clocks(3, 0, 0, 0, 1) ; 09 ORA i
 db opcode_clocks(1, 1, 0, 0, 1) ; 0A SLA
@@ -806,7 +806,7 @@ db opcode_clocks(3, 1, 0, 4, 1) ; 0C TSB a
 db opcode_clocks(3, 0, 0, 2, 1) ; 0D ORA a
 db opcode_clocks(3, 1, 0, 4, 1) ; 0E ASL a
 db opcode_clocks(4, 0, 0, 2, 1) ; 0F ORA al
-							      
+							
 db opcode_clocks(2, 0, 0, 0, 1) ; 10 BPL r
 db opcode_clocks(2, 1, 2, 2, 1) ; 11 ORA (d),y
 db opcode_clocks(2, 0, 2, 2, 1) ; 12 ORA (d)
@@ -815,7 +815,7 @@ db opcode_clocks(2, 1, 4, 0, 1) ; 14 TRB d
 db opcode_clocks(2, 1, 2, 0, 1) ; 15 ORA d,x
 db opcode_clocks(2, 2, 4, 0, 1) ; 16 ASL d,x
 db opcode_clocks(2, 0, 3, 2, 1) ; 17 ORA [d],y
-							      
+							
 db opcode_clocks(1, 1, 0, 0, 1) ; 18 CLC
 db opcode_clocks(3, 1, 0, 2, 1) ; 19 ORA a,y
 db opcode_clocks(1, 1, 0, 0, 1) ; 1A INA
@@ -824,7 +824,7 @@ db opcode_clocks(3, 1, 0, 4, 1) ; 1C TRB a
 db opcode_clocks(3, 1, 0, 2, 1) ; 1D ORA a,x
 db opcode_clocks(3, 2, 0, 4, 1) ; 1E ASL a,x
 db opcode_clocks(4, 0, 0, 2, 1) ; 1F ORA al,x
-							      
+							
 db opcode_clocks(3, 1, 2, 0, 1) ; 20 JSR a
 db opcode_clocks(2, 1, 2, 2, 1) ; 21 AND (d,x)
 db opcode_clocks(4, 1, 3, 0, 1) ; 22 JSL al
@@ -833,7 +833,7 @@ db opcode_clocks(2, 0, 2, 0, 1) ; 24 BIT d
 db opcode_clocks(2, 0, 2, 0, 1) ; 25 AND d
 db opcode_clocks(2, 1, 4, 0, 1) ; 26 ROL d
 db opcode_clocks(2, 0, 3, 2, 1) ; 27 AND [d]
-							      
+							
 db opcode_clocks(1, 2, 1, 0, 1) ; 28 PLP
 db opcode_clocks(3, 0, 0, 0, 1) ; 29 AND i
 db opcode_clocks(1, 1, 0, 0, 1) ; 2A RLA
@@ -842,7 +842,7 @@ db opcode_clocks(3, 0, 0, 2, 1) ; 2C BIT a
 db opcode_clocks(3, 0, 0, 2, 1) ; 2D AND a
 db opcode_clocks(3, 1, 0, 4, 1) ; 2E ROL a
 db opcode_clocks(4, 0, 0, 2, 1) ; 2F AND al
-							      
+							
 db opcode_clocks(2, 0, 0, 0, 1) ; 30 BMI r
 db opcode_clocks(2, 1, 2, 2, 1) ; 31 AND (d),y
 db opcode_clocks(2, 0, 2, 2, 1) ; 32 AND (d)
@@ -851,7 +851,7 @@ db opcode_clocks(2, 1, 2, 0, 1) ; 34 BIT d,x
 db opcode_clocks(2, 1, 2, 0, 1) ; 35 AND d,x
 db opcode_clocks(2, 2, 4, 0, 1) ; 36 ROL d,x
 db opcode_clocks(2, 0, 3, 2, 1) ; 37 AND [d],y
-							      
+							
 db opcode_clocks(1, 1, 0, 0, 1) ; 38 SEC
 db opcode_clocks(3, 1, 0, 2, 1) ; 39 AND a,y
 db opcode_clocks(1, 1, 0, 0, 1) ; 3A DEA
@@ -860,7 +860,7 @@ db opcode_clocks(3, 1, 0, 2, 1) ; 3C BIT a,x
 db opcode_clocks(3, 1, 0, 2, 1) ; 3D AND a,x
 db opcode_clocks(3, 2, 0, 4, 1) ; 3E ROL a,x
 db opcode_clocks(4, 0, 0, 2, 1) ; 3F AND al,x
-							      
+							
 db opcode_clocks(1, 2, 4, 0, 1) ; 40 RTI
 db opcode_clocks(2, 1, 2, 2, 1) ; 41 EOR (d,x)
 db opcode_clocks(2, 0, 0, 0, 1) ; 42 WDM *
@@ -869,7 +869,7 @@ db opcode_clocks(3, 2, 0, 2, 1) ; 44 MVP
 db opcode_clocks(2, 0, 2, 0, 1) ; 45 EOR d
 db opcode_clocks(2, 1, 4, 0, 1) ; 46 LSR d
 db opcode_clocks(2, 0, 3, 2, 1) ; 47 EOR [d]
-							      
+							
 db opcode_clocks(1, 1, 2, 0, 1) ; 48 PHA
 db opcode_clocks(3, 0, 0, 0, 1) ; 49 EOR i
 db opcode_clocks(1, 1, 0, 0, 1) ; 4A SRA
@@ -878,7 +878,7 @@ db opcode_clocks(3, 0, 0, 0, 1) ; 4C JMP a
 db opcode_clocks(3, 0, 0, 2, 1) ; 4D EOR a
 db opcode_clocks(3, 1, 0, 4, 1) ; 4E LSR a
 db opcode_clocks(4, 0, 0, 2, 1) ; 4F EOR al
-							      
+							
 db opcode_clocks(2, 0, 0, 0, 1) ; 50 BVC r
 db opcode_clocks(2, 1, 2, 2, 1) ; 51 EOR (d),y
 db opcode_clocks(2, 0, 2, 2, 1) ; 52 EOR (d)
@@ -887,7 +887,7 @@ db opcode_clocks(3, 2, 0, 2, 1) ; 54 MVN
 db opcode_clocks(2, 1, 2, 0, 1) ; 55 EOR d,x
 db opcode_clocks(2, 2, 4, 0, 1) ; 56 LSR d,x
 db opcode_clocks(2, 0, 3, 2, 1) ; 57 EOR [d],y
-							      
+							
 db opcode_clocks(1, 1, 0, 0, 1) ; 58 CLI
 db opcode_clocks(3, 1, 0, 2, 1) ; 59 EOR a,y
 db opcode_clocks(1, 1, 2, 0, 1) ; 5A PHY
@@ -896,7 +896,7 @@ db opcode_clocks(4, 0, 0, 0, 1) ; 5C JML al
 db opcode_clocks(3, 1, 0, 2, 1) ; 5D EOR a,x
 db opcode_clocks(3, 2, 0, 4, 1) ; 5E LSR a,x
 db opcode_clocks(4, 0, 0, 2, 1) ; 5F EOR al,x
-							      
+							
 db opcode_clocks(1, 3, 2, 0, 1) ; 60 RTS
 db opcode_clocks(2, 1, 2, 2, 1) ; 61 ADC (d,x)
 db opcode_clocks(3, 1, 2, 0, 1) ; 62 PER
@@ -905,7 +905,7 @@ db opcode_clocks(2, 0, 2, 0, 1) ; 64 STZ d
 db opcode_clocks(2, 0, 2, 0, 1) ; 65 ADC d
 db opcode_clocks(2, 1, 4, 0, 1) ; 66 ROR d
 db opcode_clocks(2, 0, 3, 2, 1) ; 67 ADC [d]
-							      
+							
 db opcode_clocks(1, 2, 2, 0, 1) ; 68 PLA
 db opcode_clocks(3, 0, 0, 0, 1) ; 69 ADC i
 db opcode_clocks(1, 1, 0, 0, 1) ; 6A RRA
@@ -914,7 +914,7 @@ db opcode_clocks(3, 0, 2, 0, 1) ; 6C JMP (a)
 db opcode_clocks(3, 0, 0, 2, 1) ; 6D ADC a
 db opcode_clocks(3, 1, 0, 4, 1) ; 6E ROR a
 db opcode_clocks(4, 0, 0, 2, 1) ; 6F ADC al
-							      
+							
 db opcode_clocks(2, 0, 0, 0, 1) ; 70 BVS r
 db opcode_clocks(2, 1, 2, 2, 1) ; 71 ADC (d),y
 db opcode_clocks(2, 0, 2, 2, 1) ; 72 ADC (d)
@@ -923,7 +923,7 @@ db opcode_clocks(2, 1, 2, 0, 1) ; 74 STZ d,x
 db opcode_clocks(2, 1, 2, 0, 1) ; 75 ADC d,x
 db opcode_clocks(2, 2, 4, 0, 1) ; 76 ROR d,x
 db opcode_clocks(2, 0, 3, 2, 1) ; 77 ADC [d],y
-							      
+							
 db opcode_clocks(1, 1, 0, 0, 1) ; 78 SEI
 db opcode_clocks(3, 1, 0, 2, 1) ; 79 ADC a,y
 db opcode_clocks(1, 2, 2, 0, 1) ; 7A PLY
@@ -932,7 +932,7 @@ db opcode_clocks(3, 1, 0, 2, 1) ; 7C JMP (a,x) - bus access in PB
 db opcode_clocks(3, 1, 0, 2, 1) ; 7D ADC a,x
 db opcode_clocks(3, 2, 0, 4, 1) ; 7E ROR a,x
 db opcode_clocks(4, 0, 0, 2, 1) ; 7F ADC al,x
-							      
+							
 db opcode_clocks(2, 0, 0, 0, 1) ; 80 BRA r
 db opcode_clocks(2, 1, 2, 2, 1) ; 81 STA (d,x)
 db opcode_clocks(3, 1, 0, 0, 1) ; 82 BRL rl
@@ -941,7 +941,7 @@ db opcode_clocks(2, 0, 2, 0, 1) ; 84 STY d
 db opcode_clocks(2, 0, 2, 0, 1) ; 85 STA d
 db opcode_clocks(2, 0, 2, 0, 1) ; 86 STX d
 db opcode_clocks(2, 0, 3, 2, 1) ; 87 STA [d]
-							      
+							
 db opcode_clocks(1, 1, 0, 0, 1) ; 88 DEY
 db opcode_clocks(3, 0, 0, 0, 1) ; 89 BIT i
 db opcode_clocks(1, 1, 0, 0, 1) ; 8A TXA
@@ -950,7 +950,7 @@ db opcode_clocks(3, 0, 0, 2, 1) ; 8C STY a
 db opcode_clocks(3, 0, 0, 2, 1) ; 8D STA a
 db opcode_clocks(3, 0, 0, 2, 1) ; 8E STX a
 db opcode_clocks(4, 0, 0, 2, 1) ; 8F STA al
-							      
+							
 db opcode_clocks(2, 0, 0, 0, 1) ; 90 BCC r
 db opcode_clocks(2, 1, 2, 2, 1) ; 91 STA (d),y
 db opcode_clocks(2, 0, 2, 2, 1) ; 92 STA (d)
@@ -959,7 +959,7 @@ db opcode_clocks(2, 1, 2, 0, 1) ; 94 STY d,x
 db opcode_clocks(2, 1, 2, 0, 1) ; 95 STA d,x
 db opcode_clocks(2, 1, 2, 0, 1) ; 96 STX d,y
 db opcode_clocks(2, 0, 3, 2, 1) ; 97 STA [d],y
-							      
+							
 db opcode_clocks(1, 1, 0, 0, 1) ; 98 TYA
 db opcode_clocks(3, 1, 0, 2, 1) ; 99 STA a,y
 db opcode_clocks(1, 1, 0, 0, 1) ; 9A TXS
@@ -968,7 +968,7 @@ db opcode_clocks(3, 0, 0, 2, 1) ; 9C STZ a
 db opcode_clocks(3, 1, 0, 2, 1) ; 9D STA a,x
 db opcode_clocks(3, 1, 0, 2, 1) ; 9E STZ a,x
 db opcode_clocks(4, 0, 0, 2, 1) ; 9F STA al,x
-							      
+							
 db opcode_clocks(3, 0, 0, 0, 1) ; A0 LDY i
 db opcode_clocks(2, 1, 2, 2, 1) ; A1 LDA (d,x)
 db opcode_clocks(3, 0, 0, 0, 1) ; A2 LDX i
@@ -977,7 +977,7 @@ db opcode_clocks(2, 0, 2, 0, 1) ; A4 LDY d
 db opcode_clocks(2, 0, 2, 0, 1) ; A5 LDA d
 db opcode_clocks(2, 0, 2, 0, 1) ; A6 LDX d
 db opcode_clocks(2, 0, 3, 2, 1) ; A7 LDA [d]
-							      
+							
 db opcode_clocks(1, 1, 0, 0, 1) ; A8 TAY
 db opcode_clocks(3, 0, 0, 0, 1) ; A9 LDA i
 db opcode_clocks(1, 1, 0, 0, 1) ; AA TAX
@@ -986,7 +986,7 @@ db opcode_clocks(3, 0, 0, 2, 1) ; AC LDY a
 db opcode_clocks(3, 0, 0, 2, 1) ; AD LDA a
 db opcode_clocks(3, 0, 0, 2, 1) ; AE LDX a
 db opcode_clocks(4, 0, 0, 2, 1) ; AF LDA al
-							      
+							
 db opcode_clocks(2, 0, 0, 0, 1) ; B0 BCS r
 db opcode_clocks(2, 1, 2, 2, 1) ; B1 LDA (d),y
 db opcode_clocks(2, 0, 2, 2, 1) ; B2 LDA (d)
@@ -995,7 +995,7 @@ db opcode_clocks(2, 1, 2, 0, 1) ; B4 LDY d,x
 db opcode_clocks(2, 1, 2, 0, 1) ; B5 LDA d,x
 db opcode_clocks(2, 1, 2, 0, 1) ; B6 LDX d,y
 db opcode_clocks(2, 0, 3, 2, 1) ; B7 LDA [d],y
-							      
+							
 db opcode_clocks(1, 1, 0, 0, 1) ; B8 CLV
 db opcode_clocks(3, 1, 0, 2, 1) ; B9 LDA a,y
 db opcode_clocks(1, 1, 0, 0, 1) ; BA TSX
@@ -1004,7 +1004,7 @@ db opcode_clocks(3, 1, 0, 2, 1) ; BC LDY a,x
 db opcode_clocks(3, 1, 0, 2, 1) ; BD LDA a,x
 db opcode_clocks(3, 1, 0, 2, 1) ; BE LDX a,y
 db opcode_clocks(4, 0, 0, 2, 1) ; BF LDA al,x
-							      
+							
 db opcode_clocks(3, 0, 0, 0, 1) ; C0 CPY i
 db opcode_clocks(2, 1, 2, 2, 1) ; C1 CMP (d,x)
 db opcode_clocks(2, 1, 0, 0, 1) ; C2 REP i
@@ -1013,7 +1013,7 @@ db opcode_clocks(2, 0, 2, 0, 1) ; C4 CPY d
 db opcode_clocks(2, 0, 2, 0, 1) ; C5 CMP d
 db opcode_clocks(2, 1, 4, 0, 1) ; C6 DEC d
 db opcode_clocks(2, 0, 3, 2, 1) ; C7 CMP [d]
-							      
+							
 db opcode_clocks(1, 1, 0, 0, 1) ; C8 INY
 db opcode_clocks(3, 0, 0, 0, 1) ; C9 CMP i
 db opcode_clocks(1, 1, 0, 0, 1) ; CA DEX
@@ -1022,7 +1022,7 @@ db opcode_clocks(3, 0, 0, 2, 1) ; CC CPY a
 db opcode_clocks(3, 0, 0, 2, 1) ; CD CMP a
 db opcode_clocks(3, 1, 0, 4, 1) ; CE DEC a
 db opcode_clocks(4, 0, 0, 2, 1) ; CF CMP al
-							      
+							
 db opcode_clocks(2, 0, 0, 0, 1) ; D0 BNE r
 db opcode_clocks(2, 1, 2, 2, 1) ; D1 CMP (d),y
 db opcode_clocks(2, 0, 2, 2, 1) ; D2 CMP (d)
@@ -1031,7 +1031,7 @@ db opcode_clocks(2, 0, 4, 0, 1) ; D4 PEI
 db opcode_clocks(2, 1, 2, 0, 1) ; D5 CMP d,x
 db opcode_clocks(2, 2, 4, 0, 1) ; D6 DEC d,x
 db opcode_clocks(2, 0, 3, 2, 1) ; D7 CMP [d],y
-							      
+							
 db opcode_clocks(1, 1, 0, 0, 1) ; D8 CLD
 db opcode_clocks(3, 1, 0, 2, 1) ; D9 CMP a,y
 db opcode_clocks(1, 1, 2, 0, 1) ; DA PHX
@@ -1040,7 +1040,7 @@ db opcode_clocks(3, 0, 3, 0, 1) ; DC JML (a)
 db opcode_clocks(3, 1, 0, 2, 1) ; DD CMP a,x
 db opcode_clocks(3, 2, 0, 4, 1) ; DE DEC a,x
 db opcode_clocks(4, 0, 0, 2, 1) ; DF CMP al,x
-							      
+							
 db opcode_clocks(3, 0, 0, 0, 1) ; E0 CPX i
 db opcode_clocks(2, 1, 2, 2, 1) ; E1 SBC (d,x)
 db opcode_clocks(2, 1, 0, 0, 1) ; E2 SEP i
@@ -1049,7 +1049,7 @@ db opcode_clocks(2, 0, 2, 0, 1) ; E4 CPX d
 db opcode_clocks(2, 0, 2, 0, 1) ; E5 SBC d
 db opcode_clocks(2, 1, 4, 0, 1) ; E6 INC d
 db opcode_clocks(2, 0, 3, 2, 1) ; E7 SBC [d]
-							      
+							
 db opcode_clocks(1, 1, 0, 0, 1) ; E8 INX
 db opcode_clocks(3, 0, 0, 0, 1) ; E9 SBC i
 db opcode_clocks(1, 1, 0, 0, 1) ; EA NOP
@@ -1058,7 +1058,7 @@ db opcode_clocks(3, 0, 0, 2, 1) ; EC CPX a
 db opcode_clocks(3, 0, 0, 2, 1) ; ED SBC a
 db opcode_clocks(3, 1, 0, 4, 1) ; EE INC a
 db opcode_clocks(4, 0, 0, 2, 1) ; EF SBC al
-							      
+							
 db opcode_clocks(2, 0, 0, 0, 1) ; F0 BEQ r
 db opcode_clocks(2, 1, 2, 2, 1) ; F1 SBC (d),y
 db opcode_clocks(2, 0, 2, 2, 1) ; F2 SBC (d)
@@ -1067,7 +1067,7 @@ db opcode_clocks(3, 0, 2, 0, 1) ; F4 PEA
 db opcode_clocks(2, 1, 2, 0, 1) ; F5 SBC d,x
 db opcode_clocks(2, 2, 4, 0, 1) ; F6 INC d,x
 db opcode_clocks(2, 0, 3, 2, 1) ; F7 SBC [d],y
-							      
+							
 db opcode_clocks(1, 1, 0, 0, 1) ; F8 SED
 db opcode_clocks(3, 1, 0, 2, 1) ; F9 SBC a,y
 db opcode_clocks(1, 2, 2, 0, 1) ; FA PLX
@@ -1128,7 +1128,7 @@ dd  C_LABEL(ALL_JML_al)   ,C_LABEL(EM_EOR_a_x)
 dd  C_LABEL(OpM1_0x5E)    ,C_LABEL(EM_EOR_al_x)
 dd  C_LABEL(E0_RTS)       ,C_LABEL(EM_ADC_Od_xO)    ; 60
 dd  C_LABEL(E0_PER)       ,C_LABEL(EM_ADC_d_s)
-dd  C_LABEL(EM_STZ_d)     ,C_LABEL(EM_ADC_d)
+dd  C_LABEL(OpE0M1_0x64)  ,C_LABEL(EM_ADC_d)
 dd  C_LABEL(OpE0M1_0x66)  ,C_LABEL(EM_ADC_IdI)
 dd  C_LABEL(EM_PLA)       ,C_LABEL(EM_ADC_i)
 dd  C_LABEL(OpM1_0x6A)    ,C_LABEL(E0_RTL)
@@ -1136,28 +1136,28 @@ dd  C_LABEL(ALL_JMP_OaO)  ,C_LABEL(EM_ADC_a)
 dd  C_LABEL(OpM1_0x6E)    ,C_LABEL(EM_ADC_al)
 dd  C_LABEL(ALL_BVS)      ,C_LABEL(EM_ADC_OdO_y)    ; 70
 dd  C_LABEL(EM_ADC_OdO)   ,C_LABEL(EM_ADC_Od_sO_y)
-dd  C_LABEL(EM_STZ_d_x)   ,C_LABEL(EM_ADC_d_x)
+dd  C_LABEL(OpE0M1_0x74)  ,C_LABEL(EM_ADC_d_x)
 dd  C_LABEL(OpE0M1_0x76)  ,C_LABEL(EM_ADC_IdI_y)
 dd  C_LABEL(ALL_SEI)      ,C_LABEL(EM_ADC_a_y)
 dd  C_LABEL(E0_PLY)       ,C_LABEL(ALL_TDC)
 dd  C_LABEL(ALL_JMP_Oa_xO),C_LABEL(EM_ADC_a_x)
 dd  C_LABEL(OpM1_0x7E)    ,C_LABEL(EM_ADC_al_x)
-dd  C_LABEL(ALL_BRA)      ,C_LABEL(EM_STA_Od_xO)    ; 80
-dd  C_LABEL(ALL_BRL)      ,C_LABEL(EM_STA_d_s)
-dd  C_LABEL(OpE0X0_0x84)  ,C_LABEL(EM_STA_d)
-dd  C_LABEL(OpE0X0_0x86)  ,C_LABEL(EM_STA_IdI)
+dd  C_LABEL(ALL_BRA)      ,C_LABEL(OpE0M1_0x81)     ; 80
+dd  C_LABEL(ALL_BRL)      ,C_LABEL(OpM1_0x83)
+dd  C_LABEL(OpE0X0_0x84)  ,C_LABEL(OpE0M1_0x85)
+dd  C_LABEL(OpE0X0_0x86)  ,C_LABEL(OpE0M1_0x87)
 dd  C_LABEL(OpX0_0x88)    ,C_LABEL(EM_BIT_i)
 dd  C_LABEL(EM_TXA)       ,C_LABEL(E0_PHB)
-dd  C_LABEL(OpX0_0x8C)    ,C_LABEL(EM_STA_a)
-dd  C_LABEL(OpX0_0x8E)    ,C_LABEL(EM_STA_al)
+dd  C_LABEL(OpX0_0x8C)    ,C_LABEL(OpM1_0x8D)
+dd  C_LABEL(OpX0_0x8E)    ,C_LABEL(OpM1_0x8F)
 dd  C_LABEL(ALL_BCC)      ,C_LABEL(OpE0M1X0_0x91)   ; 90
-dd  C_LABEL(EM_STA_OdO)   ,C_LABEL(EM_STA_Od_sO_y)
-dd  C_LABEL(OpE0X0_0x94)  ,C_LABEL(EM_STA_d_x)
-dd  C_LABEL(OpE0X0_0x96)  ,C_LABEL(EM_STA_IdI_y)
-dd  C_LABEL(EM_TYA)       ,C_LABEL(EM_STA_a_y)
+dd  C_LABEL(OpE0M1_0x92)  ,C_LABEL(OpM1_0x93)
+dd  C_LABEL(OpE0X0_0x94)  ,C_LABEL(OpE0M1_0x95)
+dd  C_LABEL(OpE0X0_0x96)  ,C_LABEL(OpE0M1_0x97)
+dd  C_LABEL(EM_TYA)       ,C_LABEL(OpM1_0x99)
 dd  C_LABEL(E0_TXS)       ,C_LABEL(E0_TXY)
-dd  C_LABEL(EM_STZ_a)     ,C_LABEL(EM_STA_a_x)
-dd  C_LABEL(EM_STZ_a_x)   ,C_LABEL(EM_STA_al_x)
+dd  C_LABEL(OpM1_0x9C)    ,C_LABEL(OpM1_0x9D)
+dd  C_LABEL(OpM1_0x9E)    ,C_LABEL(OpM1_0x9F)
 dd  C_LABEL(E0_LDY_i)     ,C_LABEL(EM_LDA_Od_xO)    ; A0
 dd  C_LABEL(E0_LDX_i)     ,C_LABEL(EM_LDA_d_s)
 dd  C_LABEL(E0_LDY_d)     ,C_LABEL(EM_LDA_d)
@@ -1219,7 +1219,7 @@ db opcode_clocks(2, 1, 2, 0, 0) ; 04 TSB d
 db opcode_clocks(2, 0, 1, 0, 0) ; 05 ORA d
 db opcode_clocks(2, 1, 2, 0, 0) ; 06 ASL d
 db opcode_clocks(2, 0, 3, 1, 0) ; 07 ORA [d]
-								     
+								
 db opcode_clocks(1, 1, 1, 0, 0) ; 08 PHP
 db opcode_clocks(2, 0, 0, 0, 0) ; 09 ORA i
 db opcode_clocks(1, 1, 0, 0, 0) ; 0A SLA
@@ -1228,7 +1228,7 @@ db opcode_clocks(3, 1, 0, 2, 0) ; 0C TSB a
 db opcode_clocks(3, 0, 0, 1, 0) ; 0D ORA a
 db opcode_clocks(3, 1, 0, 2, 0) ; 0E ASL a
 db opcode_clocks(4, 0, 0, 1, 0) ; 0F ORA al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; 10 BPL r
 db opcode_clocks(2, 1, 2, 1, 0) ; 11 ORA (d),y
 db opcode_clocks(2, 0, 2, 1, 0) ; 12 ORA (d)
@@ -1237,7 +1237,7 @@ db opcode_clocks(2, 1, 2, 0, 0) ; 14 TRB d
 db opcode_clocks(2, 1, 1, 0, 0) ; 15 ORA d,x
 db opcode_clocks(2, 2, 2, 0, 0) ; 16 ASL d,x
 db opcode_clocks(2, 0, 3, 1, 0) ; 17 ORA [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; 18 CLC
 db opcode_clocks(3, 1, 0, 1, 0) ; 19 ORA a,y
 db opcode_clocks(1, 1, 0, 0, 0) ; 1A INA
@@ -1246,7 +1246,7 @@ db opcode_clocks(3, 1, 0, 2, 0) ; 1C TRB a
 db opcode_clocks(3, 1, 0, 1, 0) ; 1D ORA a,x
 db opcode_clocks(3, 2, 0, 2, 0) ; 1E ASL a,x
 db opcode_clocks(4, 0, 0, 1, 0) ; 1F ORA al,x
-								     
+								
 db opcode_clocks(3, 1, 2, 0, 0) ; 20 JSR a
 db opcode_clocks(2, 1, 2, 1, 0) ; 21 AND (d,x)
 db opcode_clocks(4, 1, 3, 0, 0) ; 22 JSL al
@@ -1255,7 +1255,7 @@ db opcode_clocks(2, 0, 1, 0, 0) ; 24 BIT d
 db opcode_clocks(2, 0, 1, 0, 0) ; 25 AND d
 db opcode_clocks(2, 1, 2, 0, 0) ; 26 ROL d
 db opcode_clocks(2, 0, 3, 1, 0) ; 27 AND [d]
-								     
+								
 db opcode_clocks(1, 2, 1, 0, 0) ; 28 PLP
 db opcode_clocks(2, 0, 0, 0, 0) ; 29 AND i
 db opcode_clocks(1, 1, 0, 0, 0) ; 2A RLA
@@ -1264,7 +1264,7 @@ db opcode_clocks(3, 0, 0, 1, 0) ; 2C BIT a
 db opcode_clocks(3, 0, 0, 1, 0) ; 2D AND a
 db opcode_clocks(3, 1, 0, 2, 0) ; 2E ROL a
 db opcode_clocks(4, 0, 0, 1, 0) ; 2F AND al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; 30 BMI r
 db opcode_clocks(2, 1, 2, 1, 0) ; 31 AND (d),y
 db opcode_clocks(2, 0, 2, 1, 0) ; 32 AND (d)
@@ -1273,7 +1273,7 @@ db opcode_clocks(2, 1, 1, 0, 0) ; 34 BIT d,x
 db opcode_clocks(2, 1, 1, 0, 0) ; 35 AND d,x
 db opcode_clocks(2, 2, 2, 0, 0) ; 36 ROL d,x
 db opcode_clocks(2, 0, 3, 1, 0) ; 37 AND [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; 38 SEC
 db opcode_clocks(3, 1, 0, 1, 0) ; 39 AND a,y
 db opcode_clocks(1, 1, 0, 0, 0) ; 3A DEA
@@ -1282,7 +1282,7 @@ db opcode_clocks(3, 1, 0, 1, 0) ; 3C BIT a,x
 db opcode_clocks(3, 1, 0, 1, 0) ; 3D AND a,x
 db opcode_clocks(3, 2, 0, 2, 0) ; 3E ROL a,x
 db opcode_clocks(4, 0, 0, 1, 0) ; 3F AND al,x
-								     
+								
 db opcode_clocks(1, 2, 4, 0, 0) ; 40 RTI
 db opcode_clocks(2, 1, 2, 1, 0) ; 41 EOR (d,x)
 db opcode_clocks(2, 0, 0, 0, 0) ; 42 WDM *
@@ -1291,7 +1291,7 @@ db opcode_clocks(3, 2, 0, 2, 0) ; 44 MVP
 db opcode_clocks(2, 0, 1, 0, 0) ; 45 EOR d
 db opcode_clocks(2, 1, 2, 0, 0) ; 46 LSR d
 db opcode_clocks(2, 0, 3, 1, 0) ; 47 EOR [d]
-								     
+								
 db opcode_clocks(1, 1, 1, 0, 0) ; 48 PHA
 db opcode_clocks(2, 0, 0, 0, 0) ; 49 EOR i
 db opcode_clocks(1, 1, 0, 0, 0) ; 4A SRA
@@ -1300,7 +1300,7 @@ db opcode_clocks(3, 0, 0, 0, 0) ; 4C JMP a
 db opcode_clocks(3, 0, 0, 1, 0) ; 4D EOR a
 db opcode_clocks(3, 1, 0, 2, 0) ; 4E LSR a
 db opcode_clocks(4, 0, 0, 1, 0) ; 4F EOR al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; 50 BVC r
 db opcode_clocks(2, 1, 2, 1, 0) ; 51 EOR (d),y
 db opcode_clocks(2, 0, 2, 1, 0) ; 52 EOR (d)
@@ -1309,7 +1309,7 @@ db opcode_clocks(3, 2, 0, 2, 0) ; 54 MVN
 db opcode_clocks(2, 1, 1, 0, 0) ; 55 EOR d,x
 db opcode_clocks(2, 2, 2, 0, 0) ; 56 LSR d,x
 db opcode_clocks(2, 0, 3, 1, 0) ; 57 EOR [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; 58 CLI
 db opcode_clocks(3, 1, 0, 1, 0) ; 59 EOR a,y
 db opcode_clocks(1, 1, 2, 0, 0) ; 5A PHY
@@ -1318,7 +1318,7 @@ db opcode_clocks(4, 0, 0, 0, 0) ; 5C JML al
 db opcode_clocks(3, 1, 0, 1, 0) ; 5D EOR a,x
 db opcode_clocks(3, 2, 0, 2, 0) ; 5E LSR a,x
 db opcode_clocks(4, 0, 0, 1, 0) ; 5F EOR al,x
-								     
+								
 db opcode_clocks(1, 3, 2, 0, 0) ; 60 RTS
 db opcode_clocks(2, 1, 2, 1, 0) ; 61 ADC (d,x)
 db opcode_clocks(3, 1, 2, 0, 0) ; 62 PER
@@ -1327,7 +1327,7 @@ db opcode_clocks(2, 0, 1, 0, 0) ; 64 STZ d
 db opcode_clocks(2, 0, 1, 0, 0) ; 65 ADC d
 db opcode_clocks(2, 1, 2, 0, 0) ; 66 ROR d
 db opcode_clocks(2, 0, 3, 1, 0) ; 67 ADC [d]
-								     
+								
 db opcode_clocks(1, 2, 1, 0, 0) ; 68 PLA
 db opcode_clocks(2, 0, 0, 0, 0) ; 69 ADC i
 db opcode_clocks(1, 1, 0, 0, 0) ; 6A RRA
@@ -1336,7 +1336,7 @@ db opcode_clocks(3, 0, 2, 0, 0) ; 6C JMP (a)
 db opcode_clocks(3, 0, 0, 1, 0) ; 6D ADC a
 db opcode_clocks(3, 1, 0, 2, 0) ; 6E ROR a
 db opcode_clocks(4, 0, 0, 1, 0) ; 6F ADC al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; 70 BVS r
 db opcode_clocks(2, 1, 2, 1, 0) ; 71 ADC (d),y
 db opcode_clocks(2, 0, 2, 1, 0) ; 72 ADC (d)
@@ -1345,7 +1345,7 @@ db opcode_clocks(2, 1, 1, 0, 0) ; 74 STZ d,x
 db opcode_clocks(2, 1, 1, 0, 0) ; 75 ADC d,x
 db opcode_clocks(2, 2, 2, 0, 0) ; 76 ROR d,x
 db opcode_clocks(2, 0, 3, 1, 0) ; 77 ADC [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; 78 SEI
 db opcode_clocks(3, 1, 0, 1, 0) ; 79 ADC a,y
 db opcode_clocks(1, 2, 2, 0, 0) ; 7A PLY
@@ -1354,7 +1354,7 @@ db opcode_clocks(3, 1, 0, 2, 0) ; 7C JMP (a,x) - bus access in PB
 db opcode_clocks(3, 1, 0, 1, 0) ; 7D ADC a,x
 db opcode_clocks(3, 2, 0, 2, 0) ; 7E ROR a,x
 db opcode_clocks(4, 0, 0, 1, 0) ; 7F ADC al,x
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; 80 BRA r
 db opcode_clocks(2, 1, 2, 1, 0) ; 81 STA (d,x)
 db opcode_clocks(3, 1, 0, 0, 0) ; 82 BRL rl
@@ -1363,7 +1363,7 @@ db opcode_clocks(2, 0, 2, 0, 0) ; 84 STY d
 db opcode_clocks(2, 0, 1, 0, 0) ; 85 STA d
 db opcode_clocks(2, 0, 2, 0, 0) ; 86 STX d
 db opcode_clocks(2, 0, 3, 1, 0) ; 87 STA [d]
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; 88 DEY
 db opcode_clocks(2, 0, 0, 0, 0) ; 89 BIT i
 db opcode_clocks(1, 1, 0, 0, 0) ; 8A TXA
@@ -1372,7 +1372,7 @@ db opcode_clocks(3, 0, 0, 2, 0) ; 8C STY a
 db opcode_clocks(3, 0, 0, 1, 0) ; 8D STA a
 db opcode_clocks(3, 0, 0, 2, 0) ; 8E STX a
 db opcode_clocks(4, 0, 0, 1, 0) ; 8F STA al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; 90 BCC r
 db opcode_clocks(2, 1, 2, 1, 0) ; 91 STA (d),y
 db opcode_clocks(2, 0, 2, 1, 0) ; 92 STA (d)
@@ -1381,7 +1381,7 @@ db opcode_clocks(2, 1, 2, 0, 0) ; 94 STY d,x
 db opcode_clocks(2, 1, 1, 0, 0) ; 95 STA d,x
 db opcode_clocks(2, 1, 2, 0, 0) ; 96 STX d,y
 db opcode_clocks(2, 0, 3, 1, 0) ; 97 STA [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; 98 TYA
 db opcode_clocks(3, 1, 0, 1, 0) ; 99 STA a,y
 db opcode_clocks(1, 1, 0, 0, 0) ; 9A TXS
@@ -1390,7 +1390,7 @@ db opcode_clocks(3, 0, 0, 1, 0) ; 9C STZ a
 db opcode_clocks(3, 1, 0, 1, 0) ; 9D STA a,x
 db opcode_clocks(3, 1, 0, 1, 0) ; 9E STZ a,x
 db opcode_clocks(4, 0, 0, 1, 0) ; 9F STA al,x
-								     
+								
 db opcode_clocks(3, 0, 0, 0, 0) ; A0 LDY i
 db opcode_clocks(2, 1, 2, 1, 0) ; A1 LDA (d,x)
 db opcode_clocks(3, 0, 0, 0, 0) ; A2 LDX i
@@ -1399,7 +1399,7 @@ db opcode_clocks(2, 0, 2, 0, 0) ; A4 LDY d
 db opcode_clocks(2, 0, 1, 0, 0) ; A5 LDA d
 db opcode_clocks(2, 0, 2, 0, 0) ; A6 LDX d
 db opcode_clocks(2, 0, 3, 1, 0) ; A7 LDA [d]
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; A8 TAY
 db opcode_clocks(2, 0, 0, 0, 0) ; A9 LDA i
 db opcode_clocks(1, 1, 0, 0, 0) ; AA TAX
@@ -1408,7 +1408,7 @@ db opcode_clocks(3, 0, 0, 2, 0) ; AC LDY a
 db opcode_clocks(3, 0, 0, 1, 0) ; AD LDA a
 db opcode_clocks(3, 0, 0, 2, 0) ; AE LDX a
 db opcode_clocks(4, 0, 0, 1, 0) ; AF LDA al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; B0 BCS r
 db opcode_clocks(2, 1, 2, 1, 0) ; B1 LDA (d),y
 db opcode_clocks(2, 0, 2, 1, 0) ; B2 LDA (d)
@@ -1417,7 +1417,7 @@ db opcode_clocks(2, 1, 2, 0, 0) ; B4 LDY d,x
 db opcode_clocks(2, 1, 1, 0, 0) ; B5 LDA d,x
 db opcode_clocks(2, 1, 2, 0, 0) ; B6 LDX d,y
 db opcode_clocks(2, 0, 3, 1, 0) ; B7 LDA [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; B8 CLV
 db opcode_clocks(3, 1, 0, 1, 0) ; B9 LDA a,y
 db opcode_clocks(1, 1, 0, 0, 0) ; BA TSX
@@ -1426,7 +1426,7 @@ db opcode_clocks(3, 1, 0, 2, 0) ; BC LDY a,x
 db opcode_clocks(3, 1, 0, 1, 0) ; BD LDA a,x
 db opcode_clocks(3, 1, 0, 2, 0) ; BE LDX a,y
 db opcode_clocks(4, 0, 0, 1, 0) ; BF LDA al,x
-								     
+								
 db opcode_clocks(3, 0, 0, 0, 0) ; C0 CPY i
 db opcode_clocks(2, 1, 2, 1, 0) ; C1 CMP (d,x)
 db opcode_clocks(2, 1, 0, 0, 0) ; C2 REP i
@@ -1435,7 +1435,7 @@ db opcode_clocks(2, 0, 2, 0, 0) ; C4 CPY d
 db opcode_clocks(2, 0, 1, 0, 0) ; C5 CMP d
 db opcode_clocks(2, 1, 2, 0, 0) ; C6 DEC d
 db opcode_clocks(2, 0, 3, 1, 0) ; C7 CMP [d]
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; C8 INY
 db opcode_clocks(2, 0, 0, 0, 0) ; C9 CMP i
 db opcode_clocks(1, 1, 0, 0, 0) ; CA DEX
@@ -1444,7 +1444,7 @@ db opcode_clocks(3, 0, 0, 2, 0) ; CC CPY a
 db opcode_clocks(3, 0, 0, 1, 0) ; CD CMP a
 db opcode_clocks(3, 1, 0, 2, 0) ; CE DEC a
 db opcode_clocks(4, 0, 0, 1, 0) ; CF CMP al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; D0 BNE r
 db opcode_clocks(2, 1, 2, 1, 0) ; D1 CMP (d),y
 db opcode_clocks(2, 0, 2, 1, 0) ; D2 CMP (d)
@@ -1453,7 +1453,7 @@ db opcode_clocks(2, 0, 4, 0, 0) ; D4 PEI
 db opcode_clocks(2, 1, 1, 0, 0) ; D5 CMP d,x
 db opcode_clocks(2, 2, 2, 0, 0) ; D6 DEC d,x
 db opcode_clocks(2, 0, 3, 1, 0) ; D7 CMP [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; D8 CLD
 db opcode_clocks(3, 1, 0, 1, 0) ; D9 CMP a,y
 db opcode_clocks(1, 1, 2, 0, 0) ; DA PHX
@@ -1462,7 +1462,7 @@ db opcode_clocks(3, 0, 3, 0, 0) ; DC JML (a)
 db opcode_clocks(3, 1, 0, 1, 0) ; DD CMP a,x
 db opcode_clocks(3, 2, 0, 2, 0) ; DE DEC a,x
 db opcode_clocks(4, 0, 0, 1, 0) ; DF CMP al,x
-								     
+								
 db opcode_clocks(3, 0, 0, 0, 0) ; E0 CPX i
 db opcode_clocks(2, 1, 2, 1, 0) ; E1 SBC (d,x)
 db opcode_clocks(2, 1, 0, 0, 0) ; E2 SEP i
@@ -1471,7 +1471,7 @@ db opcode_clocks(2, 0, 2, 0, 0) ; E4 CPX d
 db opcode_clocks(2, 0, 1, 0, 0) ; E5 SBC d
 db opcode_clocks(2, 1, 2, 0, 0) ; E6 INC d
 db opcode_clocks(2, 0, 3, 1, 0) ; E7 SBC [d]
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; E8 INX
 db opcode_clocks(2, 0, 0, 0, 0) ; E9 SBC i
 db opcode_clocks(1, 1, 0, 0, 0) ; EA NOP
@@ -1480,7 +1480,7 @@ db opcode_clocks(3, 0, 0, 2, 0) ; EC CPX a
 db opcode_clocks(3, 0, 0, 1, 0) ; ED SBC a
 db opcode_clocks(3, 1, 0, 2, 0) ; EE INC a
 db opcode_clocks(4, 0, 0, 1, 0) ; EF SBC al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; F0 BEQ r
 db opcode_clocks(2, 1, 2, 1, 0) ; F1 SBC (d),y
 db opcode_clocks(2, 0, 2, 1, 0) ; F2 SBC (d)
@@ -1489,7 +1489,7 @@ db opcode_clocks(3, 0, 2, 0, 0) ; F4 PEA
 db opcode_clocks(2, 1, 1, 0, 0) ; F5 SBC d,x
 db opcode_clocks(2, 2, 2, 0, 0) ; F6 INC d,x
 db opcode_clocks(2, 0, 3, 1, 0) ; F7 SBC [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; F8 SED
 db opcode_clocks(3, 1, 0, 1, 0) ; F9 SBC a,y
 db opcode_clocks(1, 2, 2, 0, 0) ; FA PLX
@@ -1508,7 +1508,7 @@ db opcode_clocks(2, 1, 2, 0, 1) ; 04 TSB d
 db opcode_clocks(2, 0, 1, 0, 1) ; 05 ORA d
 db opcode_clocks(2, 1, 2, 0, 1) ; 06 ASL d
 db opcode_clocks(2, 0, 3, 1, 1) ; 07 ORA [d]
-							      
+							
 db opcode_clocks(1, 1, 1, 0, 1) ; 08 PHP
 db opcode_clocks(2, 0, 0, 0, 1) ; 09 ORA i
 db opcode_clocks(1, 1, 0, 0, 1) ; 0A SLA
@@ -1517,7 +1517,7 @@ db opcode_clocks(3, 1, 0, 2, 1) ; 0C TSB a
 db opcode_clocks(3, 0, 0, 1, 1) ; 0D ORA a
 db opcode_clocks(3, 1, 0, 2, 1) ; 0E ASL a
 db opcode_clocks(4, 0, 0, 1, 1) ; 0F ORA al
-							      
+							
 db opcode_clocks(2, 0, 0, 0, 1) ; 10 BPL r
 db opcode_clocks(2, 1, 2, 1, 1) ; 11 ORA (d),y
 db opcode_clocks(2, 0, 2, 1, 1) ; 12 ORA (d)
@@ -1526,7 +1526,7 @@ db opcode_clocks(2, 1, 2, 0, 1) ; 14 TRB d
 db opcode_clocks(2, 1, 1, 0, 1) ; 15 ORA d,x
 db opcode_clocks(2, 2, 2, 0, 1) ; 16 ASL d,x
 db opcode_clocks(2, 0, 3, 1, 1) ; 17 ORA [d],y
-							      
+							
 db opcode_clocks(1, 1, 0, 0, 1) ; 18 CLC
 db opcode_clocks(3, 1, 0, 1, 1) ; 19 ORA a,y
 db opcode_clocks(1, 1, 0, 0, 1) ; 1A INA
@@ -1535,7 +1535,7 @@ db opcode_clocks(3, 1, 0, 2, 1) ; 1C TRB a
 db opcode_clocks(3, 1, 0, 1, 1) ; 1D ORA a,x
 db opcode_clocks(3, 2, 0, 2, 1) ; 1E ASL a,x
 db opcode_clocks(4, 0, 0, 1, 1) ; 1F ORA al,x
-							      
+							
 db opcode_clocks(3, 1, 2, 0, 1) ; 20 JSR a
 db opcode_clocks(2, 1, 2, 1, 1) ; 21 AND (d,x)
 db opcode_clocks(4, 1, 3, 0, 1) ; 22 JSL al
@@ -1544,7 +1544,7 @@ db opcode_clocks(2, 0, 1, 0, 1) ; 24 BIT d
 db opcode_clocks(2, 0, 1, 0, 1) ; 25 AND d
 db opcode_clocks(2, 1, 2, 0, 1) ; 26 ROL d
 db opcode_clocks(2, 0, 3, 1, 1) ; 27 AND [d]
-							      
+							
 db opcode_clocks(1, 2, 1, 0, 1) ; 28 PLP
 db opcode_clocks(2, 0, 0, 0, 1) ; 29 AND i
 db opcode_clocks(1, 1, 0, 0, 1) ; 2A RLA
@@ -1553,7 +1553,7 @@ db opcode_clocks(3, 0, 0, 1, 1) ; 2C BIT a
 db opcode_clocks(3, 0, 0, 1, 1) ; 2D AND a
 db opcode_clocks(3, 1, 0, 2, 1) ; 2E ROL a
 db opcode_clocks(4, 0, 0, 1, 1) ; 2F AND al
-							      
+							
 db opcode_clocks(2, 0, 0, 0, 1) ; 30 BMI r
 db opcode_clocks(2, 1, 2, 1, 1) ; 31 AND (d),y
 db opcode_clocks(2, 0, 2, 1, 1) ; 32 AND (d)
@@ -1562,7 +1562,7 @@ db opcode_clocks(2, 1, 1, 0, 1) ; 34 BIT d,x
 db opcode_clocks(2, 1, 1, 0, 1) ; 35 AND d,x
 db opcode_clocks(2, 2, 2, 0, 1) ; 36 ROL d,x
 db opcode_clocks(2, 0, 3, 1, 1) ; 37 AND [d],y
-							      
+							
 db opcode_clocks(1, 1, 0, 0, 1) ; 38 SEC
 db opcode_clocks(3, 1, 0, 1, 1) ; 39 AND a,y
 db opcode_clocks(1, 1, 0, 0, 1) ; 3A DEA
@@ -1571,7 +1571,7 @@ db opcode_clocks(3, 1, 0, 1, 1) ; 3C BIT a,x
 db opcode_clocks(3, 1, 0, 1, 1) ; 3D AND a,x
 db opcode_clocks(3, 2, 0, 2, 1) ; 3E ROL a,x
 db opcode_clocks(4, 0, 0, 1, 1) ; 3F AND al,x
-							      
+							
 db opcode_clocks(1, 2, 4, 0, 1) ; 40 RTI
 db opcode_clocks(2, 1, 2, 1, 1) ; 41 EOR (d,x)
 db opcode_clocks(2, 0, 0, 0, 1) ; 42 WDM *
@@ -1580,7 +1580,7 @@ db opcode_clocks(3, 2, 0, 2, 1) ; 44 MVP
 db opcode_clocks(2, 0, 1, 0, 1) ; 45 EOR d
 db opcode_clocks(2, 1, 2, 0, 1) ; 46 LSR d
 db opcode_clocks(2, 0, 3, 1, 1) ; 47 EOR [d]
-							      
+							
 db opcode_clocks(1, 1, 1, 0, 1) ; 48 PHA
 db opcode_clocks(2, 0, 0, 0, 1) ; 49 EOR i
 db opcode_clocks(1, 1, 0, 0, 1) ; 4A SRA
@@ -1589,7 +1589,7 @@ db opcode_clocks(3, 0, 0, 0, 1) ; 4C JMP a
 db opcode_clocks(3, 0, 0, 1, 1) ; 4D EOR a
 db opcode_clocks(3, 1, 0, 2, 1) ; 4E LSR a
 db opcode_clocks(4, 0, 0, 1, 1) ; 4F EOR al
-							      
+							
 db opcode_clocks(2, 0, 0, 0, 1) ; 50 BVC r
 db opcode_clocks(2, 1, 2, 1, 1) ; 51 EOR (d),y
 db opcode_clocks(2, 0, 2, 1, 1) ; 52 EOR (d)
@@ -1598,7 +1598,7 @@ db opcode_clocks(3, 2, 0, 2, 1) ; 54 MVN
 db opcode_clocks(2, 1, 1, 0, 1) ; 55 EOR d,x
 db opcode_clocks(2, 2, 2, 0, 1) ; 56 LSR d,x
 db opcode_clocks(2, 0, 3, 1, 1) ; 57 EOR [d],y
-							      
+							
 db opcode_clocks(1, 1, 0, 0, 1) ; 58 CLI
 db opcode_clocks(3, 1, 0, 1, 1) ; 59 EOR a,y
 db opcode_clocks(1, 1, 2, 0, 1) ; 5A PHY
@@ -1607,7 +1607,7 @@ db opcode_clocks(4, 0, 0, 0, 1) ; 5C JML al
 db opcode_clocks(3, 1, 0, 1, 1) ; 5D EOR a,x
 db opcode_clocks(3, 2, 0, 2, 1) ; 5E LSR a,x
 db opcode_clocks(4, 0, 0, 1, 1) ; 5F EOR al,x
-							      
+							
 db opcode_clocks(1, 3, 2, 0, 1) ; 60 RTS
 db opcode_clocks(2, 1, 2, 1, 1) ; 61 ADC (d,x)
 db opcode_clocks(3, 1, 2, 0, 1) ; 62 PER
@@ -1616,7 +1616,7 @@ db opcode_clocks(2, 0, 1, 0, 1) ; 64 STZ d
 db opcode_clocks(2, 0, 1, 0, 1) ; 65 ADC d
 db opcode_clocks(2, 1, 2, 0, 1) ; 66 ROR d
 db opcode_clocks(2, 0, 3, 1, 1) ; 67 ADC [d]
-							      
+							
 db opcode_clocks(1, 2, 1, 0, 1) ; 68 PLA
 db opcode_clocks(2, 0, 0, 0, 1) ; 69 ADC i
 db opcode_clocks(1, 1, 0, 0, 1) ; 6A RRA
@@ -1625,7 +1625,7 @@ db opcode_clocks(3, 0, 2, 0, 1) ; 6C JMP (a)
 db opcode_clocks(3, 0, 0, 1, 1) ; 6D ADC a
 db opcode_clocks(3, 1, 0, 2, 1) ; 6E ROR a
 db opcode_clocks(4, 0, 0, 1, 1) ; 6F ADC al
-							      
+							
 db opcode_clocks(2, 0, 0, 0, 1) ; 70 BVS r
 db opcode_clocks(2, 1, 2, 1, 1) ; 71 ADC (d),y
 db opcode_clocks(2, 0, 2, 1, 1) ; 72 ADC (d)
@@ -1634,7 +1634,7 @@ db opcode_clocks(2, 1, 1, 0, 1) ; 74 STZ d,x
 db opcode_clocks(2, 1, 1, 0, 1) ; 75 ADC d,x
 db opcode_clocks(2, 2, 2, 0, 1) ; 76 ROR d,x
 db opcode_clocks(2, 0, 3, 1, 1) ; 77 ADC [d],y
-							      
+							
 db opcode_clocks(1, 1, 0, 0, 1) ; 78 SEI
 db opcode_clocks(3, 1, 0, 1, 1) ; 79 ADC a,y
 db opcode_clocks(1, 2, 2, 0, 1) ; 7A PLY
@@ -1643,7 +1643,7 @@ db opcode_clocks(3, 1, 0, 2, 1) ; 7C JMP (a,x) - bus access in PB
 db opcode_clocks(3, 1, 0, 1, 1) ; 7D ADC a,x
 db opcode_clocks(3, 2, 0, 2, 1) ; 7E ROR a,x
 db opcode_clocks(4, 0, 0, 1, 1) ; 7F ADC al,x
-							      
+							
 db opcode_clocks(2, 0, 0, 0, 1) ; 80 BRA r
 db opcode_clocks(2, 1, 2, 1, 1) ; 81 STA (d,x)
 db opcode_clocks(3, 1, 0, 0, 1) ; 82 BRL rl
@@ -1652,7 +1652,7 @@ db opcode_clocks(2, 0, 2, 0, 1) ; 84 STY d
 db opcode_clocks(2, 0, 1, 0, 1) ; 85 STA d
 db opcode_clocks(2, 0, 2, 0, 1) ; 86 STX d
 db opcode_clocks(2, 0, 3, 1, 1) ; 87 STA [d]
-							      
+							
 db opcode_clocks(1, 1, 0, 0, 1) ; 88 DEY
 db opcode_clocks(2, 0, 0, 0, 1) ; 89 BIT i
 db opcode_clocks(1, 1, 0, 0, 1) ; 8A TXA
@@ -1661,7 +1661,7 @@ db opcode_clocks(3, 0, 0, 2, 1) ; 8C STY a
 db opcode_clocks(3, 0, 0, 1, 1) ; 8D STA a
 db opcode_clocks(3, 0, 0, 2, 1) ; 8E STX a
 db opcode_clocks(4, 0, 0, 1, 1) ; 8F STA al
-							      
+							
 db opcode_clocks(2, 0, 0, 0, 1) ; 90 BCC r
 db opcode_clocks(2, 1, 2, 1, 1) ; 91 STA (d),y
 db opcode_clocks(2, 0, 2, 1, 1) ; 92 STA (d)
@@ -1670,7 +1670,7 @@ db opcode_clocks(2, 1, 2, 0, 1) ; 94 STY d,x
 db opcode_clocks(2, 1, 1, 0, 1) ; 95 STA d,x
 db opcode_clocks(2, 1, 2, 0, 1) ; 96 STX d,y
 db opcode_clocks(2, 0, 3, 1, 1) ; 97 STA [d],y
-							      
+							
 db opcode_clocks(1, 1, 0, 0, 1) ; 98 TYA
 db opcode_clocks(3, 1, 0, 1, 1) ; 99 STA a,y
 db opcode_clocks(1, 1, 0, 0, 1) ; 9A TXS
@@ -1679,7 +1679,7 @@ db opcode_clocks(3, 0, 0, 1, 1) ; 9C STZ a
 db opcode_clocks(3, 1, 0, 1, 1) ; 9D STA a,x
 db opcode_clocks(3, 1, 0, 1, 1) ; 9E STZ a,x
 db opcode_clocks(4, 0, 0, 1, 1) ; 9F STA al,x
-							      
+							
 db opcode_clocks(3, 0, 0, 0, 1) ; A0 LDY i
 db opcode_clocks(2, 1, 2, 1, 1) ; A1 LDA (d,x)
 db opcode_clocks(3, 0, 0, 0, 1) ; A2 LDX i
@@ -1688,7 +1688,7 @@ db opcode_clocks(2, 0, 2, 0, 1) ; A4 LDY d
 db opcode_clocks(2, 0, 1, 0, 1) ; A5 LDA d
 db opcode_clocks(2, 0, 2, 0, 1) ; A6 LDX d
 db opcode_clocks(2, 0, 3, 1, 1) ; A7 LDA [d]
-							      
+							
 db opcode_clocks(1, 1, 0, 0, 1) ; A8 TAY
 db opcode_clocks(2, 0, 0, 0, 1) ; A9 LDA i
 db opcode_clocks(1, 1, 0, 0, 1) ; AA TAX
@@ -1697,7 +1697,7 @@ db opcode_clocks(3, 0, 0, 2, 1) ; AC LDY a
 db opcode_clocks(3, 0, 0, 1, 1) ; AD LDA a
 db opcode_clocks(3, 0, 0, 2, 1) ; AE LDX a
 db opcode_clocks(4, 0, 0, 1, 1) ; AF LDA al
-							      
+							
 db opcode_clocks(2, 0, 0, 0, 1) ; B0 BCS r
 db opcode_clocks(2, 1, 2, 1, 1) ; B1 LDA (d),y
 db opcode_clocks(2, 0, 2, 1, 1) ; B2 LDA (d)
@@ -1706,7 +1706,7 @@ db opcode_clocks(2, 1, 2, 0, 1) ; B4 LDY d,x
 db opcode_clocks(2, 1, 1, 0, 1) ; B5 LDA d,x
 db opcode_clocks(2, 1, 2, 0, 1) ; B6 LDX d,y
 db opcode_clocks(2, 0, 3, 1, 1) ; B7 LDA [d],y
-							      
+							
 db opcode_clocks(1, 1, 0, 0, 1) ; B8 CLV
 db opcode_clocks(3, 1, 0, 1, 1) ; B9 LDA a,y
 db opcode_clocks(1, 1, 0, 0, 1) ; BA TSX
@@ -1715,7 +1715,7 @@ db opcode_clocks(3, 1, 0, 2, 1) ; BC LDY a,x
 db opcode_clocks(3, 1, 0, 1, 1) ; BD LDA a,x
 db opcode_clocks(3, 1, 0, 2, 1) ; BE LDX a,y
 db opcode_clocks(4, 0, 0, 1, 1) ; BF LDA al,x
-							      
+							
 db opcode_clocks(3, 0, 0, 0, 1) ; C0 CPY i
 db opcode_clocks(2, 1, 2, 1, 1) ; C1 CMP (d,x)
 db opcode_clocks(2, 1, 0, 0, 1) ; C2 REP i
@@ -1724,7 +1724,7 @@ db opcode_clocks(2, 0, 2, 0, 1) ; C4 CPY d
 db opcode_clocks(2, 0, 1, 0, 1) ; C5 CMP d
 db opcode_clocks(2, 1, 2, 0, 1) ; C6 DEC d
 db opcode_clocks(2, 0, 3, 1, 1) ; C7 CMP [d]
-							      
+							
 db opcode_clocks(1, 1, 0, 0, 1) ; C8 INY
 db opcode_clocks(2, 0, 0, 0, 1) ; C9 CMP i
 db opcode_clocks(1, 1, 0, 0, 1) ; CA DEX
@@ -1733,7 +1733,7 @@ db opcode_clocks(3, 0, 0, 2, 1) ; CC CPY a
 db opcode_clocks(3, 0, 0, 1, 1) ; CD CMP a
 db opcode_clocks(3, 1, 0, 2, 1) ; CE DEC a
 db opcode_clocks(4, 0, 0, 1, 1) ; CF CMP al
-							      
+							
 db opcode_clocks(2, 0, 0, 0, 1) ; D0 BNE r
 db opcode_clocks(2, 1, 2, 1, 1) ; D1 CMP (d),y
 db opcode_clocks(2, 0, 2, 1, 1) ; D2 CMP (d)
@@ -1742,7 +1742,7 @@ db opcode_clocks(2, 0, 4, 0, 1) ; D4 PEI
 db opcode_clocks(2, 1, 1, 0, 1) ; D5 CMP d,x
 db opcode_clocks(2, 2, 2, 0, 1) ; D6 DEC d,x
 db opcode_clocks(2, 0, 3, 1, 1) ; D7 CMP [d],y
-							      
+							
 db opcode_clocks(1, 1, 0, 0, 1) ; D8 CLD
 db opcode_clocks(3, 1, 0, 1, 1) ; D9 CMP a,y
 db opcode_clocks(1, 1, 2, 0, 1) ; DA PHX
@@ -1751,7 +1751,7 @@ db opcode_clocks(3, 0, 3, 0, 1) ; DC JML (a)
 db opcode_clocks(3, 1, 0, 1, 1) ; DD CMP a,x
 db opcode_clocks(3, 2, 0, 2, 1) ; DE DEC a,x
 db opcode_clocks(4, 0, 0, 1, 1) ; DF CMP al,x
-							      
+							
 db opcode_clocks(3, 0, 0, 0, 1) ; E0 CPX i
 db opcode_clocks(2, 1, 2, 1, 1) ; E1 SBC (d,x)
 db opcode_clocks(2, 1, 0, 0, 1) ; E2 SEP i
@@ -1760,7 +1760,7 @@ db opcode_clocks(2, 0, 2, 0, 1) ; E4 CPX d
 db opcode_clocks(2, 0, 1, 0, 1) ; E5 SBC d
 db opcode_clocks(2, 1, 2, 0, 1) ; E6 INC d
 db opcode_clocks(2, 0, 3, 1, 1) ; E7 SBC [d]
-							      
+							
 db opcode_clocks(1, 1, 0, 0, 1) ; E8 INX
 db opcode_clocks(2, 0, 0, 0, 1) ; E9 SBC i
 db opcode_clocks(1, 1, 0, 0, 1) ; EA NOP
@@ -1769,7 +1769,7 @@ db opcode_clocks(3, 0, 0, 2, 1) ; EC CPX a
 db opcode_clocks(3, 0, 0, 1, 1) ; ED SBC a
 db opcode_clocks(3, 1, 0, 2, 1) ; EE INC a
 db opcode_clocks(4, 0, 0, 1, 1) ; EF SBC al
-							      
+							
 db opcode_clocks(2, 0, 0, 0, 1) ; F0 BEQ r
 db opcode_clocks(2, 1, 2, 1, 1) ; F1 SBC (d),y
 db opcode_clocks(2, 0, 2, 1, 1) ; F2 SBC (d)
@@ -1778,7 +1778,7 @@ db opcode_clocks(3, 0, 2, 0, 1) ; F4 PEA
 db opcode_clocks(2, 1, 1, 0, 1) ; F5 SBC d,x
 db opcode_clocks(2, 2, 2, 0, 1) ; F6 INC d,x
 db opcode_clocks(2, 0, 3, 1, 1) ; F7 SBC [d],y
-							      
+							
 db opcode_clocks(1, 1, 0, 0, 1) ; F8 SED
 db opcode_clocks(3, 1, 0, 1, 1) ; F9 SBC a,y
 db opcode_clocks(1, 2, 2, 0, 1) ; FA PLX
@@ -1839,7 +1839,7 @@ dd  C_LABEL(ALL_JML_al)   ,C_LABEL(E0_EOR_a_x)
 dd  C_LABEL(OpM0_0x5E)    ,C_LABEL(E0_EOR_al_x)
 dd  C_LABEL(E0_RTS)       ,C_LABEL(E0_ADC_Od_xO)    ; 60
 dd  C_LABEL(E0_PER)       ,C_LABEL(E0_ADC_d_s)
-dd  C_LABEL(E0_STZ_d)     ,C_LABEL(E0_ADC_d)
+dd  C_LABEL(OpE0M0_0x64)  ,C_LABEL(E0_ADC_d)
 dd  C_LABEL(OpE0M0_0x66)  ,C_LABEL(E0_ADC_IdI)
 dd  C_LABEL(E0_PLA)       ,C_LABEL(E0_ADC_i)
 dd  C_LABEL(OpM0_0x6A)    ,C_LABEL(E0_RTL)
@@ -1847,28 +1847,28 @@ dd  C_LABEL(ALL_JMP_OaO)  ,C_LABEL(E0_ADC_a)
 dd  C_LABEL(OpM0_0x6E)    ,C_LABEL(E0_ADC_al)
 dd  C_LABEL(ALL_BVS)      ,C_LABEL(E0_ADC_OdO_y)    ; 70
 dd  C_LABEL(E0_ADC_OdO)   ,C_LABEL(E0_ADC_Od_sO_y)
-dd  C_LABEL(E0_STZ_d_x)   ,C_LABEL(E0_ADC_d_x)
+dd  C_LABEL(OpE0M0_0x74)  ,C_LABEL(E0_ADC_d_x)
 dd  C_LABEL(OpE0M0_0x76)  ,C_LABEL(E0_ADC_IdI_y)
 dd  C_LABEL(ALL_SEI)      ,C_LABEL(E0_ADC_a_y)
 dd  C_LABEL(EX_PLY)       ,C_LABEL(ALL_TDC)
 dd  C_LABEL(ALL_JMP_Oa_xO),C_LABEL(E0_ADC_a_x)
 dd  C_LABEL(OpM0_0x7E)    ,C_LABEL(E0_ADC_al_x)
-dd  C_LABEL(ALL_BRA)      ,C_LABEL(E0_STA_Od_xO)    ; 80
-dd  C_LABEL(ALL_BRL)      ,C_LABEL(E0_STA_d_s)
-dd  C_LABEL(OpE0X1_0x84)  ,C_LABEL(E0_STA_d)
-dd  C_LABEL(OpE0X1_0x86)  ,C_LABEL(E0_STA_IdI)
+dd  C_LABEL(ALL_BRA)      ,C_LABEL(OpE0M0_0x81)     ; 80
+dd  C_LABEL(ALL_BRL)      ,C_LABEL(OpM0_0x83)
+dd  C_LABEL(OpE0X1_0x84)  ,C_LABEL(OpE0M0_0x85)
+dd  C_LABEL(OpE0X1_0x86)  ,C_LABEL(OpE0M0_0x87)
 dd  C_LABEL(OpX1_0x88)    ,C_LABEL(E0_BIT_i)
 dd  C_LABEL(E0_TXA)       ,C_LABEL(E0_PHB)
-dd  C_LABEL(OpX1_0x8C)    ,C_LABEL(E0_STA_a)
-dd  C_LABEL(OpX1_0x8E)    ,C_LABEL(E0_STA_al)
+dd  C_LABEL(OpX1_0x8C)    ,C_LABEL(OpM0_0x8D)
+dd  C_LABEL(OpX1_0x8E)    ,C_LABEL(OpM0_0x8F)
 dd  C_LABEL(ALL_BCC)      ,C_LABEL(OpE0M0X1_0x91)   ; 90
-dd  C_LABEL(E0_STA_OdO)   ,C_LABEL(E0_STA_Od_sO_y)
-dd  C_LABEL(OpE0X1_0x94)  ,C_LABEL(E0_STA_d_x)
-dd  C_LABEL(OpE0X1_0x96)  ,C_LABEL(E0_STA_IdI_y)
-dd  C_LABEL(E0_TYA)       ,C_LABEL(E0_STA_a_y)
+dd  C_LABEL(OpE0M0_0x92)  ,C_LABEL(OpM0_0x93)
+dd  C_LABEL(OpE0X1_0x94)  ,C_LABEL(OpE0M0_0x95)
+dd  C_LABEL(OpE0X1_0x96)  ,C_LABEL(OpE0M0_0x97)
+dd  C_LABEL(E0_TYA)       ,C_LABEL(OpM0_0x99)
 dd  C_LABEL(E0_TXS)       ,C_LABEL(EX_TXY)
-dd  C_LABEL(E0_STZ_a)     ,C_LABEL(E0_STA_a_x)
-dd  C_LABEL(E0_STZ_a_x)   ,C_LABEL(E0_STA_al_x)
+dd  C_LABEL(OpM0_0x9C)    ,C_LABEL(OpM0_0x9D)
+dd  C_LABEL(OpM0_0x9E)    ,C_LABEL(OpM0_0x9F)
 dd  C_LABEL(EX_LDY_i)     ,C_LABEL(E0_LDA_Od_xO)    ; A0
 dd  C_LABEL(EX_LDX_i)     ,C_LABEL(E0_LDA_d_s)
 dd  C_LABEL(EX_LDY_d)     ,C_LABEL(E0_LDA_d)
@@ -1930,7 +1930,7 @@ db opcode_clocks(2, 1, 4, 0, 0) ; 04 TSB d
 db opcode_clocks(2, 0, 2, 0, 0) ; 05 ORA d
 db opcode_clocks(2, 1, 4, 0, 0) ; 06 ASL d
 db opcode_clocks(2, 0, 3, 2, 0) ; 07 ORA [d]
-								     
+								
 db opcode_clocks(1, 1, 1, 0, 0) ; 08 PHP
 db opcode_clocks(3, 0, 0, 0, 0) ; 09 ORA i
 db opcode_clocks(1, 1, 0, 0, 0) ; 0A SLA
@@ -1939,7 +1939,7 @@ db opcode_clocks(3, 1, 0, 4, 0) ; 0C TSB a
 db opcode_clocks(3, 0, 0, 2, 0) ; 0D ORA a
 db opcode_clocks(3, 1, 0, 4, 0) ; 0E ASL a
 db opcode_clocks(4, 0, 0, 2, 0) ; 0F ORA al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; 10 BPL r
 db opcode_clocks(2, 0, 2, 2, 0) ; 11 ORA (d),y
 db opcode_clocks(2, 0, 2, 2, 0) ; 12 ORA (d)
@@ -1948,7 +1948,7 @@ db opcode_clocks(2, 1, 4, 0, 0) ; 14 TRB d
 db opcode_clocks(2, 1, 2, 0, 0) ; 15 ORA d,x
 db opcode_clocks(2, 2, 4, 0, 0) ; 16 ASL d,x
 db opcode_clocks(2, 0, 3, 2, 0) ; 17 ORA [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; 18 CLC
 db opcode_clocks(3, 0, 0, 2, 0) ; 19 ORA a,y
 db opcode_clocks(1, 1, 0, 0, 0) ; 1A INA
@@ -1957,7 +1957,7 @@ db opcode_clocks(3, 1, 0, 4, 0) ; 1C TRB a
 db opcode_clocks(3, 0, 0, 2, 0) ; 1D ORA a,x
 db opcode_clocks(3, 2, 0, 4, 0) ; 1E ASL a,x
 db opcode_clocks(4, 0, 0, 2, 0) ; 1F ORA al,x
-								     
+								
 db opcode_clocks(3, 1, 2, 0, 0) ; 20 JSR a
 db opcode_clocks(2, 1, 2, 2, 0) ; 21 AND (d,x)
 db opcode_clocks(4, 1, 3, 0, 0) ; 22 JSL al
@@ -1966,7 +1966,7 @@ db opcode_clocks(2, 0, 2, 0, 0) ; 24 BIT d
 db opcode_clocks(2, 0, 2, 0, 0) ; 25 AND d
 db opcode_clocks(2, 1, 4, 0, 0) ; 26 ROL d
 db opcode_clocks(2, 0, 3, 2, 0) ; 27 AND [d]
-								     
+								
 db opcode_clocks(1, 2, 1, 0, 0) ; 28 PLP
 db opcode_clocks(3, 0, 0, 0, 0) ; 29 AND i
 db opcode_clocks(1, 1, 0, 0, 0) ; 2A RLA
@@ -1975,7 +1975,7 @@ db opcode_clocks(3, 0, 0, 2, 0) ; 2C BIT a
 db opcode_clocks(3, 0, 0, 2, 0) ; 2D AND a
 db opcode_clocks(3, 1, 0, 4, 0) ; 2E ROL a
 db opcode_clocks(4, 0, 0, 2, 0) ; 2F AND al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; 30 BMI r
 db opcode_clocks(2, 0, 2, 2, 0) ; 31 AND (d),y
 db opcode_clocks(2, 0, 2, 2, 0) ; 32 AND (d)
@@ -1984,7 +1984,7 @@ db opcode_clocks(2, 1, 2, 0, 0) ; 34 BIT d,x
 db opcode_clocks(2, 1, 2, 0, 0) ; 35 AND d,x
 db opcode_clocks(2, 2, 4, 0, 0) ; 36 ROL d,x
 db opcode_clocks(2, 0, 3, 2, 0) ; 37 AND [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; 38 SEC
 db opcode_clocks(3, 0, 0, 2, 0) ; 39 AND a,y
 db opcode_clocks(1, 1, 0, 0, 0) ; 3A DEA
@@ -1993,7 +1993,7 @@ db opcode_clocks(3, 0, 0, 2, 0) ; 3C BIT a,x
 db opcode_clocks(3, 0, 0, 2, 0) ; 3D AND a,x
 db opcode_clocks(3, 2, 0, 4, 0) ; 3E ROL a,x
 db opcode_clocks(4, 0, 0, 2, 0) ; 3F AND al,x
-								     
+								
 db opcode_clocks(1, 2, 4, 0, 0) ; 40 RTI
 db opcode_clocks(2, 1, 2, 2, 0) ; 41 EOR (d,x)
 db opcode_clocks(2, 0, 0, 0, 0) ; 42 WDM *
@@ -2002,7 +2002,7 @@ db opcode_clocks(3, 2, 0, 2, 0) ; 44 MVP
 db opcode_clocks(2, 0, 2, 0, 0) ; 45 EOR d
 db opcode_clocks(2, 1, 4, 0, 0) ; 46 LSR d
 db opcode_clocks(2, 0, 3, 2, 0) ; 47 EOR [d]
-								     
+								
 db opcode_clocks(1, 1, 2, 0, 0) ; 48 PHA
 db opcode_clocks(3, 0, 0, 0, 0) ; 49 EOR i
 db opcode_clocks(1, 1, 0, 0, 0) ; 4A SRA
@@ -2011,7 +2011,7 @@ db opcode_clocks(3, 0, 0, 0, 0) ; 4C JMP a
 db opcode_clocks(3, 0, 0, 2, 0) ; 4D EOR a
 db opcode_clocks(3, 1, 0, 4, 0) ; 4E LSR a
 db opcode_clocks(4, 0, 0, 2, 0) ; 4F EOR al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; 50 BVC r
 db opcode_clocks(2, 0, 2, 2, 0) ; 51 EOR (d),y
 db opcode_clocks(2, 0, 2, 2, 0) ; 52 EOR (d)
@@ -2020,7 +2020,7 @@ db opcode_clocks(3, 2, 0, 2, 0) ; 54 MVN
 db opcode_clocks(2, 1, 2, 0, 0) ; 55 EOR d,x
 db opcode_clocks(2, 2, 4, 0, 0) ; 56 LSR d,x
 db opcode_clocks(2, 0, 3, 2, 0) ; 57 EOR [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; 58 CLI
 db opcode_clocks(3, 0, 0, 2, 0) ; 59 EOR a,y
 db opcode_clocks(1, 1, 1, 0, 0) ; 5A PHY
@@ -2029,7 +2029,7 @@ db opcode_clocks(4, 0, 0, 0, 0) ; 5C JML al
 db opcode_clocks(3, 0, 0, 2, 0) ; 5D EOR a,x
 db opcode_clocks(3, 2, 0, 4, 0) ; 5E LSR a,x
 db opcode_clocks(4, 0, 0, 2, 0) ; 5F EOR al,x
-								     
+								
 db opcode_clocks(1, 3, 2, 0, 0) ; 60 RTS
 db opcode_clocks(2, 1, 2, 2, 0) ; 61 ADC (d,x)
 db opcode_clocks(3, 1, 2, 0, 0) ; 62 PER
@@ -2038,7 +2038,7 @@ db opcode_clocks(2, 0, 2, 0, 0) ; 64 STZ d
 db opcode_clocks(2, 0, 2, 0, 0) ; 65 ADC d
 db opcode_clocks(2, 1, 4, 0, 0) ; 66 ROR d
 db opcode_clocks(2, 0, 3, 2, 0) ; 67 ADC [d]
-								     
+								
 db opcode_clocks(1, 2, 2, 0, 0) ; 68 PLA
 db opcode_clocks(3, 0, 0, 0, 0) ; 69 ADC i
 db opcode_clocks(1, 1, 0, 0, 0) ; 6A RRA
@@ -2047,7 +2047,7 @@ db opcode_clocks(3, 0, 2, 0, 0) ; 6C JMP (a)
 db opcode_clocks(3, 0, 0, 2, 0) ; 6D ADC a
 db opcode_clocks(3, 1, 0, 4, 0) ; 6E ROR a
 db opcode_clocks(4, 0, 0, 2, 0) ; 6F ADC al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; 70 BVS r
 db opcode_clocks(2, 0, 2, 2, 0) ; 71 ADC (d),y
 db opcode_clocks(2, 0, 2, 2, 0) ; 72 ADC (d)
@@ -2056,7 +2056,7 @@ db opcode_clocks(2, 1, 2, 0, 0) ; 74 STZ d,x
 db opcode_clocks(2, 1, 2, 0, 0) ; 75 ADC d,x
 db opcode_clocks(2, 2, 4, 0, 0) ; 76 ROR d,x
 db opcode_clocks(2, 0, 3, 2, 0) ; 77 ADC [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; 78 SEI
 db opcode_clocks(3, 0, 0, 2, 0) ; 79 ADC a,y
 db opcode_clocks(1, 2, 1, 0, 0) ; 7A PLY
@@ -2065,7 +2065,7 @@ db opcode_clocks(3, 1, 0, 2, 0) ; 7C JMP (a,x) - bus access in PB
 db opcode_clocks(3, 0, 0, 2, 0) ; 7D ADC a,x
 db opcode_clocks(3, 2, 0, 4, 0) ; 7E ROR a,x
 db opcode_clocks(4, 0, 0, 2, 0) ; 7F ADC al,x
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; 80 BRA r
 db opcode_clocks(2, 1, 2, 2, 0) ; 81 STA (d,x)
 db opcode_clocks(3, 1, 0, 0, 0) ; 82 BRL rl
@@ -2074,7 +2074,7 @@ db opcode_clocks(2, 0, 1, 0, 0) ; 84 STY d
 db opcode_clocks(2, 0, 2, 0, 0) ; 85 STA d
 db opcode_clocks(2, 0, 1, 0, 0) ; 86 STX d
 db opcode_clocks(2, 0, 3, 2, 0) ; 87 STA [d]
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; 88 DEY
 db opcode_clocks(3, 0, 0, 0, 0) ; 89 BIT i
 db opcode_clocks(1, 1, 0, 0, 0) ; 8A TXA
@@ -2083,7 +2083,7 @@ db opcode_clocks(3, 0, 0, 1, 0) ; 8C STY a
 db opcode_clocks(3, 0, 0, 2, 0) ; 8D STA a
 db opcode_clocks(3, 0, 0, 1, 0) ; 8E STX a
 db opcode_clocks(4, 0, 0, 2, 0) ; 8F STA al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; 90 BCC r
 db opcode_clocks(2, 1, 2, 2, 0) ; 91 STA (d),y
 db opcode_clocks(2, 0, 2, 2, 0) ; 92 STA (d)
@@ -2092,7 +2092,7 @@ db opcode_clocks(2, 1, 1, 0, 0) ; 94 STY d,x
 db opcode_clocks(2, 1, 2, 0, 0) ; 95 STA d,x
 db opcode_clocks(2, 1, 1, 0, 0) ; 96 STX d,y
 db opcode_clocks(2, 0, 3, 2, 0) ; 97 STA [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; 98 TYA
 db opcode_clocks(3, 1, 0, 2, 0) ; 99 STA a,y
 db opcode_clocks(1, 1, 0, 0, 0) ; 9A TXS
@@ -2101,7 +2101,7 @@ db opcode_clocks(3, 0, 0, 2, 0) ; 9C STZ a
 db opcode_clocks(3, 1, 0, 2, 0) ; 9D STA a,x
 db opcode_clocks(3, 1, 0, 2, 0) ; 9E STZ a,x
 db opcode_clocks(4, 0, 0, 2, 0) ; 9F STA al,x
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; A0 LDY i
 db opcode_clocks(2, 1, 2, 2, 0) ; A1 LDA (d,x)
 db opcode_clocks(2, 0, 0, 0, 0) ; A2 LDX i
@@ -2110,7 +2110,7 @@ db opcode_clocks(2, 0, 1, 0, 0) ; A4 LDY d
 db opcode_clocks(2, 0, 2, 0, 0) ; A5 LDA d
 db opcode_clocks(2, 0, 1, 0, 0) ; A6 LDX d
 db opcode_clocks(2, 0, 3, 2, 0) ; A7 LDA [d]
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; A8 TAY
 db opcode_clocks(3, 0, 0, 0, 0) ; A9 LDA i
 db opcode_clocks(1, 1, 0, 0, 0) ; AA TAX
@@ -2119,7 +2119,7 @@ db opcode_clocks(3, 0, 0, 1, 0) ; AC LDY a
 db opcode_clocks(3, 0, 0, 2, 0) ; AD LDA a
 db opcode_clocks(3, 0, 0, 1, 0) ; AE LDX a
 db opcode_clocks(4, 0, 0, 2, 0) ; AF LDA al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; B0 BCS r
 db opcode_clocks(2, 0, 2, 2, 0) ; B1 LDA (d),y
 db opcode_clocks(2, 0, 2, 2, 0) ; B2 LDA (d)
@@ -2128,7 +2128,7 @@ db opcode_clocks(2, 1, 1, 0, 0) ; B4 LDY d,x
 db opcode_clocks(2, 1, 2, 0, 0) ; B5 LDA d,x
 db opcode_clocks(2, 1, 1, 0, 0) ; B6 LDX d,y
 db opcode_clocks(2, 0, 3, 2, 0) ; B7 LDA [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; B8 CLV
 db opcode_clocks(3, 0, 0, 2, 0) ; B9 LDA a,y
 db opcode_clocks(1, 1, 0, 0, 0) ; BA TSX
@@ -2137,7 +2137,7 @@ db opcode_clocks(3, 0, 0, 1, 0) ; BC LDY a,x
 db opcode_clocks(3, 0, 0, 2, 0) ; BD LDA a,x
 db opcode_clocks(3, 0, 0, 1, 0) ; BE LDX a,y
 db opcode_clocks(4, 0, 0, 2, 0) ; BF LDA al,x
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; C0 CPY i
 db opcode_clocks(2, 1, 2, 2, 0) ; C1 CMP (d,x)
 db opcode_clocks(2, 1, 0, 0, 0) ; C2 REP i
@@ -2146,7 +2146,7 @@ db opcode_clocks(2, 0, 1, 0, 0) ; C4 CPY d
 db opcode_clocks(2, 0, 2, 0, 0) ; C5 CMP d
 db opcode_clocks(2, 1, 4, 0, 0) ; C6 DEC d
 db opcode_clocks(2, 0, 3, 2, 0) ; C7 CMP [d]
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; C8 INY
 db opcode_clocks(3, 0, 0, 0, 0) ; C9 CMP i
 db opcode_clocks(1, 1, 0, 0, 0) ; CA DEX
@@ -2155,7 +2155,7 @@ db opcode_clocks(3, 0, 0, 1, 0) ; CC CPY a
 db opcode_clocks(3, 0, 0, 2, 0) ; CD CMP a
 db opcode_clocks(3, 1, 0, 4, 0) ; CE DEC a
 db opcode_clocks(4, 0, 0, 2, 0) ; CF CMP al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; D0 BNE r
 db opcode_clocks(2, 0, 2, 2, 0) ; D1 CMP (d),y
 db opcode_clocks(2, 0, 2, 2, 0) ; D2 CMP (d)
@@ -2164,7 +2164,7 @@ db opcode_clocks(2, 0, 4, 0, 0) ; D4 PEI
 db opcode_clocks(2, 1, 2, 0, 0) ; D5 CMP d,x
 db opcode_clocks(2, 2, 4, 0, 0) ; D6 DEC d,x
 db opcode_clocks(2, 0, 3, 2, 0) ; D7 CMP [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; D8 CLD
 db opcode_clocks(3, 0, 0, 2, 0) ; D9 CMP a,y
 db opcode_clocks(1, 1, 1, 0, 0) ; DA PHX
@@ -2173,7 +2173,7 @@ db opcode_clocks(3, 0, 3, 0, 0) ; DC JML (a)
 db opcode_clocks(3, 0, 0, 2, 0) ; DD CMP a,x
 db opcode_clocks(3, 2, 0, 4, 0) ; DE DEC a,x
 db opcode_clocks(4, 0, 0, 2, 0) ; DF CMP al,x
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; E0 CPX i
 db opcode_clocks(2, 1, 2, 2, 0) ; E1 SBC (d,x)
 db opcode_clocks(2, 1, 0, 0, 0) ; E2 SEP i
@@ -2182,7 +2182,7 @@ db opcode_clocks(2, 0, 1, 0, 0) ; E4 CPX d
 db opcode_clocks(2, 0, 2, 0, 0) ; E5 SBC d
 db opcode_clocks(2, 1, 4, 0, 0) ; E6 INC d
 db opcode_clocks(2, 0, 3, 2, 0) ; E7 SBC [d]
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; E8 INX
 db opcode_clocks(3, 0, 0, 0, 0) ; E9 SBC i
 db opcode_clocks(1, 1, 0, 0, 0) ; EA NOP
@@ -2191,7 +2191,7 @@ db opcode_clocks(3, 0, 0, 1, 0) ; EC CPX a
 db opcode_clocks(3, 0, 0, 2, 0) ; ED SBC a
 db opcode_clocks(3, 1, 0, 4, 0) ; EE INC a
 db opcode_clocks(4, 0, 0, 2, 0) ; EF SBC al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; F0 BEQ r
 db opcode_clocks(2, 0, 2, 2, 0) ; F1 SBC (d),y
 db opcode_clocks(2, 0, 2, 2, 0) ; F2 SBC (d)
@@ -2200,7 +2200,7 @@ db opcode_clocks(3, 0, 2, 0, 0) ; F4 PEA
 db opcode_clocks(2, 1, 2, 0, 0) ; F5 SBC d,x
 db opcode_clocks(2, 2, 4, 0, 0) ; F6 INC d,x
 db opcode_clocks(2, 0, 3, 2, 0) ; F7 SBC [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; F8 SED
 db opcode_clocks(3, 0, 0, 2, 0) ; F9 SBC a,y
 db opcode_clocks(1, 2, 1, 0, 0) ; FA PLX
@@ -2219,7 +2219,7 @@ db opcode_clocks(2, 1, 4, 0, 1) ; 04 TSB d
 db opcode_clocks(2, 0, 2, 0, 1) ; 05 ORA d
 db opcode_clocks(2, 1, 4, 0, 1) ; 06 ASL d
 db opcode_clocks(2, 0, 3, 2, 1) ; 07 ORA [d]
-								     
+								
 db opcode_clocks(1, 1, 1, 0, 1) ; 08 PHP
 db opcode_clocks(3, 0, 0, 0, 1) ; 09 ORA i
 db opcode_clocks(1, 1, 0, 0, 1) ; 0A SLA
@@ -2228,7 +2228,7 @@ db opcode_clocks(3, 1, 0, 4, 1) ; 0C TSB a
 db opcode_clocks(3, 0, 0, 2, 1) ; 0D ORA a
 db opcode_clocks(3, 1, 0, 4, 1) ; 0E ASL a
 db opcode_clocks(4, 0, 0, 2, 1) ; 0F ORA al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 1) ; 10 BPL r
 db opcode_clocks(2, 0, 2, 2, 1) ; 11 ORA (d),y
 db opcode_clocks(2, 0, 2, 2, 1) ; 12 ORA (d)
@@ -2237,7 +2237,7 @@ db opcode_clocks(2, 1, 4, 0, 1) ; 14 TRB d
 db opcode_clocks(2, 1, 2, 0, 1) ; 15 ORA d,x
 db opcode_clocks(2, 2, 4, 0, 1) ; 16 ASL d,x
 db opcode_clocks(2, 0, 3, 2, 1) ; 17 ORA [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 1) ; 18 CLC
 db opcode_clocks(3, 0, 0, 2, 1) ; 19 ORA a,y
 db opcode_clocks(1, 1, 0, 0, 1) ; 1A INA
@@ -2246,7 +2246,7 @@ db opcode_clocks(3, 1, 0, 4, 1) ; 1C TRB a
 db opcode_clocks(3, 0, 0, 2, 1) ; 1D ORA a,x
 db opcode_clocks(3, 2, 0, 4, 1) ; 1E ASL a,x
 db opcode_clocks(4, 0, 0, 2, 1) ; 1F ORA al,x
-								     
+								
 db opcode_clocks(3, 1, 2, 0, 1) ; 20 JSR a
 db opcode_clocks(2, 1, 2, 2, 1) ; 21 AND (d,x)
 db opcode_clocks(4, 1, 3, 0, 1) ; 22 JSL al
@@ -2255,7 +2255,7 @@ db opcode_clocks(2, 0, 2, 0, 1) ; 24 BIT d
 db opcode_clocks(2, 0, 2, 0, 1) ; 25 AND d
 db opcode_clocks(2, 1, 4, 0, 1) ; 26 ROL d
 db opcode_clocks(2, 0, 3, 2, 1) ; 27 AND [d]
-								     
+								
 db opcode_clocks(1, 2, 1, 0, 1) ; 28 PLP
 db opcode_clocks(3, 0, 0, 0, 1) ; 29 AND i
 db opcode_clocks(1, 1, 0, 0, 1) ; 2A RLA
@@ -2264,7 +2264,7 @@ db opcode_clocks(3, 0, 0, 2, 1) ; 2C BIT a
 db opcode_clocks(3, 0, 0, 2, 1) ; 2D AND a
 db opcode_clocks(3, 1, 0, 4, 1) ; 2E ROL a
 db opcode_clocks(4, 0, 0, 2, 1) ; 2F AND al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 1) ; 30 BMI r
 db opcode_clocks(2, 0, 2, 2, 1) ; 31 AND (d),y
 db opcode_clocks(2, 0, 2, 2, 1) ; 32 AND (d)
@@ -2273,7 +2273,7 @@ db opcode_clocks(2, 1, 2, 0, 1) ; 34 BIT d,x
 db opcode_clocks(2, 1, 2, 0, 1) ; 35 AND d,x
 db opcode_clocks(2, 2, 4, 0, 1) ; 36 ROL d,x
 db opcode_clocks(2, 0, 3, 2, 1) ; 37 AND [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 1) ; 38 SEC
 db opcode_clocks(3, 0, 0, 2, 1) ; 39 AND a,y
 db opcode_clocks(1, 1, 0, 0, 1) ; 3A DEA
@@ -2282,7 +2282,7 @@ db opcode_clocks(3, 0, 0, 2, 1) ; 3C BIT a,x
 db opcode_clocks(3, 0, 0, 2, 1) ; 3D AND a,x
 db opcode_clocks(3, 2, 0, 4, 1) ; 3E ROL a,x
 db opcode_clocks(4, 0, 0, 2, 1) ; 3F AND al,x
-								     
+								
 db opcode_clocks(1, 2, 4, 0, 1) ; 40 RTI
 db opcode_clocks(2, 1, 2, 2, 1) ; 41 EOR (d,x)
 db opcode_clocks(2, 0, 0, 0, 1) ; 42 WDM *
@@ -2291,7 +2291,7 @@ db opcode_clocks(3, 2, 0, 2, 1) ; 44 MVP
 db opcode_clocks(2, 0, 2, 0, 1) ; 45 EOR d
 db opcode_clocks(2, 1, 4, 0, 1) ; 46 LSR d
 db opcode_clocks(2, 0, 3, 2, 1) ; 47 EOR [d]
-								     
+								
 db opcode_clocks(1, 1, 2, 0, 1) ; 48 PHA
 db opcode_clocks(3, 0, 0, 0, 1) ; 49 EOR i
 db opcode_clocks(1, 1, 0, 0, 1) ; 4A SRA
@@ -2300,7 +2300,7 @@ db opcode_clocks(3, 0, 0, 0, 1) ; 4C JMP a
 db opcode_clocks(3, 0, 0, 2, 1) ; 4D EOR a
 db opcode_clocks(3, 1, 0, 4, 1) ; 4E LSR a
 db opcode_clocks(4, 0, 0, 2, 1) ; 4F EOR al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 1) ; 50 BVC r
 db opcode_clocks(2, 0, 2, 2, 1) ; 51 EOR (d),y
 db opcode_clocks(2, 0, 2, 2, 1) ; 52 EOR (d)
@@ -2309,7 +2309,7 @@ db opcode_clocks(3, 2, 0, 2, 1) ; 54 MVN
 db opcode_clocks(2, 1, 2, 0, 1) ; 55 EOR d,x
 db opcode_clocks(2, 2, 4, 0, 1) ; 56 LSR d,x
 db opcode_clocks(2, 0, 3, 2, 1) ; 57 EOR [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 1) ; 58 CLI
 db opcode_clocks(3, 0, 0, 2, 1) ; 59 EOR a,y
 db opcode_clocks(1, 1, 1, 0, 1) ; 5A PHY
@@ -2318,7 +2318,7 @@ db opcode_clocks(4, 0, 0, 0, 1) ; 5C JML al
 db opcode_clocks(3, 0, 0, 2, 1) ; 5D EOR a,x
 db opcode_clocks(3, 2, 0, 4, 1) ; 5E LSR a,x
 db opcode_clocks(4, 0, 0, 2, 1) ; 5F EOR al,x
-								     
+								
 db opcode_clocks(1, 3, 2, 0, 1) ; 60 RTS
 db opcode_clocks(2, 1, 2, 2, 1) ; 61 ADC (d,x)
 db opcode_clocks(3, 1, 2, 0, 1) ; 62 PER
@@ -2327,7 +2327,7 @@ db opcode_clocks(2, 0, 2, 0, 1) ; 64 STZ d
 db opcode_clocks(2, 0, 2, 0, 1) ; 65 ADC d
 db opcode_clocks(2, 1, 4, 0, 1) ; 66 ROR d
 db opcode_clocks(2, 0, 3, 2, 1) ; 67 ADC [d]
-								     
+								
 db opcode_clocks(1, 2, 2, 0, 1) ; 68 PLA
 db opcode_clocks(3, 0, 0, 0, 1) ; 69 ADC i
 db opcode_clocks(1, 1, 0, 0, 1) ; 6A RRA
@@ -2336,7 +2336,7 @@ db opcode_clocks(3, 0, 2, 0, 1) ; 6C JMP (a)
 db opcode_clocks(3, 0, 0, 2, 1) ; 6D ADC a
 db opcode_clocks(3, 1, 0, 4, 1) ; 6E ROR a
 db opcode_clocks(4, 0, 0, 2, 1) ; 6F ADC al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 1) ; 70 BVS r
 db opcode_clocks(2, 0, 2, 2, 1) ; 71 ADC (d),y
 db opcode_clocks(2, 0, 2, 2, 1) ; 72 ADC (d)
@@ -2345,7 +2345,7 @@ db opcode_clocks(2, 1, 2, 0, 1) ; 74 STZ d,x
 db opcode_clocks(2, 1, 2, 0, 1) ; 75 ADC d,x
 db opcode_clocks(2, 2, 4, 0, 1) ; 76 ROR d,x
 db opcode_clocks(2, 0, 3, 2, 1) ; 77 ADC [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 1) ; 78 SEI
 db opcode_clocks(3, 0, 0, 2, 1) ; 79 ADC a,y
 db opcode_clocks(1, 2, 1, 0, 1) ; 7A PLY
@@ -2354,7 +2354,7 @@ db opcode_clocks(3, 1, 0, 2, 1) ; 7C JMP (a,x) - bus access in PB
 db opcode_clocks(3, 0, 0, 2, 1) ; 7D ADC a,x
 db opcode_clocks(3, 2, 0, 4, 1) ; 7E ROR a,x
 db opcode_clocks(4, 0, 0, 2, 1) ; 7F ADC al,x
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 1) ; 80 BRA r
 db opcode_clocks(2, 1, 2, 2, 1) ; 81 STA (d,x)
 db opcode_clocks(3, 1, 0, 0, 1) ; 82 BRL rl
@@ -2363,7 +2363,7 @@ db opcode_clocks(2, 0, 1, 0, 1) ; 84 STY d
 db opcode_clocks(2, 0, 2, 0, 1) ; 85 STA d
 db opcode_clocks(2, 0, 1, 0, 1) ; 86 STX d
 db opcode_clocks(2, 0, 3, 2, 1) ; 87 STA [d]
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 1) ; 88 DEY
 db opcode_clocks(3, 0, 0, 0, 1) ; 89 BIT i
 db opcode_clocks(1, 1, 0, 0, 1) ; 8A TXA
@@ -2372,7 +2372,7 @@ db opcode_clocks(3, 0, 0, 1, 1) ; 8C STY a
 db opcode_clocks(3, 0, 0, 2, 1) ; 8D STA a
 db opcode_clocks(3, 0, 0, 1, 1) ; 8E STX a
 db opcode_clocks(4, 0, 0, 2, 1) ; 8F STA al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 1) ; 90 BCC r
 db opcode_clocks(2, 1, 2, 2, 1) ; 91 STA (d),y
 db opcode_clocks(2, 0, 2, 2, 1) ; 92 STA (d)
@@ -2381,7 +2381,7 @@ db opcode_clocks(2, 1, 1, 0, 1) ; 94 STY d,x
 db opcode_clocks(2, 1, 2, 0, 1) ; 95 STA d,x
 db opcode_clocks(2, 1, 1, 0, 1) ; 96 STX d,y
 db opcode_clocks(2, 0, 3, 2, 1) ; 97 STA [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 1) ; 98 TYA
 db opcode_clocks(3, 1, 0, 2, 1) ; 99 STA a,y
 db opcode_clocks(1, 1, 0, 0, 1) ; 9A TXS
@@ -2390,7 +2390,7 @@ db opcode_clocks(3, 0, 0, 2, 1) ; 9C STZ a
 db opcode_clocks(3, 1, 0, 2, 1) ; 9D STA a,x
 db opcode_clocks(3, 1, 0, 2, 1) ; 9E STZ a,x
 db opcode_clocks(4, 0, 0, 2, 1) ; 9F STA al,x
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 1) ; A0 LDY i
 db opcode_clocks(2, 1, 2, 2, 1) ; A1 LDA (d,x)
 db opcode_clocks(2, 0, 0, 0, 1) ; A2 LDX i
@@ -2399,7 +2399,7 @@ db opcode_clocks(2, 0, 1, 0, 1) ; A4 LDY d
 db opcode_clocks(2, 0, 2, 0, 1) ; A5 LDA d
 db opcode_clocks(2, 0, 1, 0, 1) ; A6 LDX d
 db opcode_clocks(2, 0, 3, 2, 1) ; A7 LDA [d]
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 1) ; A8 TAY
 db opcode_clocks(3, 0, 0, 0, 1) ; A9 LDA i
 db opcode_clocks(1, 1, 0, 0, 1) ; AA TAX
@@ -2408,7 +2408,7 @@ db opcode_clocks(3, 0, 0, 1, 1) ; AC LDY a
 db opcode_clocks(3, 0, 0, 2, 1) ; AD LDA a
 db opcode_clocks(3, 0, 0, 1, 1) ; AE LDX a
 db opcode_clocks(4, 0, 0, 2, 1) ; AF LDA al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 1) ; B0 BCS r
 db opcode_clocks(2, 0, 2, 2, 1) ; B1 LDA (d),y
 db opcode_clocks(2, 0, 2, 2, 1) ; B2 LDA (d)
@@ -2417,7 +2417,7 @@ db opcode_clocks(2, 1, 1, 0, 1) ; B4 LDY d,x
 db opcode_clocks(2, 1, 2, 0, 1) ; B5 LDA d,x
 db opcode_clocks(2, 1, 1, 0, 1) ; B6 LDX d,y
 db opcode_clocks(2, 0, 3, 2, 1) ; B7 LDA [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 1) ; B8 CLV
 db opcode_clocks(3, 0, 0, 2, 1) ; B9 LDA a,y
 db opcode_clocks(1, 1, 0, 0, 1) ; BA TSX
@@ -2426,7 +2426,7 @@ db opcode_clocks(3, 0, 0, 1, 1) ; BC LDY a,x
 db opcode_clocks(3, 0, 0, 2, 1) ; BD LDA a,x
 db opcode_clocks(3, 0, 0, 1, 1) ; BE LDX a,y
 db opcode_clocks(4, 0, 0, 2, 1) ; BF LDA al,x
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 1) ; C0 CPY i
 db opcode_clocks(2, 1, 2, 2, 1) ; C1 CMP (d,x)
 db opcode_clocks(2, 1, 0, 0, 1) ; C2 REP i
@@ -2435,7 +2435,7 @@ db opcode_clocks(2, 0, 1, 0, 1) ; C4 CPY d
 db opcode_clocks(2, 0, 2, 0, 1) ; C5 CMP d
 db opcode_clocks(2, 1, 4, 0, 1) ; C6 DEC d
 db opcode_clocks(2, 0, 3, 2, 1) ; C7 CMP [d]
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 1) ; C8 INY
 db opcode_clocks(3, 0, 0, 0, 1) ; C9 CMP i
 db opcode_clocks(1, 1, 0, 0, 1) ; CA DEX
@@ -2444,7 +2444,7 @@ db opcode_clocks(3, 0, 0, 1, 1) ; CC CPY a
 db opcode_clocks(3, 0, 0, 2, 1) ; CD CMP a
 db opcode_clocks(3, 1, 0, 4, 1) ; CE DEC a
 db opcode_clocks(4, 0, 0, 2, 1) ; CF CMP al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 1) ; D0 BNE r
 db opcode_clocks(2, 0, 2, 2, 1) ; D1 CMP (d),y
 db opcode_clocks(2, 0, 2, 2, 1) ; D2 CMP (d)
@@ -2453,7 +2453,7 @@ db opcode_clocks(2, 0, 4, 0, 1) ; D4 PEI
 db opcode_clocks(2, 1, 2, 0, 1) ; D5 CMP d,x
 db opcode_clocks(2, 2, 4, 0, 1) ; D6 DEC d,x
 db opcode_clocks(2, 0, 3, 2, 1) ; D7 CMP [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 1) ; D8 CLD
 db opcode_clocks(3, 0, 0, 2, 1) ; D9 CMP a,y
 db opcode_clocks(1, 1, 1, 0, 1) ; DA PHX
@@ -2462,7 +2462,7 @@ db opcode_clocks(3, 0, 3, 0, 1) ; DC JML (a)
 db opcode_clocks(3, 0, 0, 2, 1) ; DD CMP a,x
 db opcode_clocks(3, 2, 0, 4, 1) ; DE DEC a,x
 db opcode_clocks(4, 0, 0, 2, 1) ; DF CMP al,x
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 1) ; E0 CPX i
 db opcode_clocks(2, 1, 2, 2, 1) ; E1 SBC (d,x)
 db opcode_clocks(2, 1, 0, 0, 1) ; E2 SEP i
@@ -2471,7 +2471,7 @@ db opcode_clocks(2, 0, 1, 0, 1) ; E4 CPX d
 db opcode_clocks(2, 0, 2, 0, 1) ; E5 SBC d
 db opcode_clocks(2, 1, 4, 0, 1) ; E6 INC d
 db opcode_clocks(2, 0, 3, 2, 1) ; E7 SBC [d]
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 1) ; E8 INX
 db opcode_clocks(3, 0, 0, 0, 1) ; E9 SBC i
 db opcode_clocks(1, 1, 0, 0, 1) ; EA NOP
@@ -2480,7 +2480,7 @@ db opcode_clocks(3, 0, 0, 1, 1) ; EC CPX a
 db opcode_clocks(3, 0, 0, 2, 1) ; ED SBC a
 db opcode_clocks(3, 1, 0, 4, 1) ; EE INC a
 db opcode_clocks(4, 0, 0, 2, 1) ; EF SBC al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 1) ; F0 BEQ r
 db opcode_clocks(2, 0, 2, 2, 1) ; F1 SBC (d),y
 db opcode_clocks(2, 0, 2, 2, 1) ; F2 SBC (d)
@@ -2489,7 +2489,7 @@ db opcode_clocks(3, 0, 2, 0, 1) ; F4 PEA
 db opcode_clocks(2, 1, 2, 0, 1) ; F5 SBC d,x
 db opcode_clocks(2, 2, 4, 0, 1) ; F6 INC d,x
 db opcode_clocks(2, 0, 3, 2, 1) ; F7 SBC [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 1) ; F8 SED
 db opcode_clocks(3, 0, 0, 2, 1) ; F9 SBC a,y
 db opcode_clocks(1, 2, 1, 0, 1) ; FA PLX
@@ -2550,7 +2550,7 @@ dd  C_LABEL(ALL_JML_al)   ,C_LABEL(EM_EOR_a_x)
 dd  C_LABEL(OpM1_0x5E)    ,C_LABEL(EM_EOR_al_x)
 dd  C_LABEL(E0_RTS)       ,C_LABEL(EM_ADC_Od_xO)    ; 60
 dd  C_LABEL(E0_PER)       ,C_LABEL(EM_ADC_d_s)
-dd  C_LABEL(EM_STZ_d)     ,C_LABEL(EM_ADC_d)
+dd  C_LABEL(OpE0M1_0x64)  ,C_LABEL(EM_ADC_d)
 dd  C_LABEL(OpE0M1_0x66)  ,C_LABEL(EM_ADC_IdI)
 dd  C_LABEL(EM_PLA)       ,C_LABEL(EM_ADC_i)
 dd  C_LABEL(OpM1_0x6A)    ,C_LABEL(E0_RTL)
@@ -2558,28 +2558,28 @@ dd  C_LABEL(ALL_JMP_OaO)  ,C_LABEL(EM_ADC_a)
 dd  C_LABEL(OpM1_0x6E)    ,C_LABEL(EM_ADC_al)
 dd  C_LABEL(ALL_BVS)      ,C_LABEL(EM_ADC_OdO_y)    ; 70
 dd  C_LABEL(EM_ADC_OdO)   ,C_LABEL(EM_ADC_Od_sO_y)
-dd  C_LABEL(EM_STZ_d_x)   ,C_LABEL(EM_ADC_d_x)
+dd  C_LABEL(OpE0M1_0x74)  ,C_LABEL(EM_ADC_d_x)
 dd  C_LABEL(OpE0M1_0x76)  ,C_LABEL(EM_ADC_IdI_y)
 dd  C_LABEL(ALL_SEI)      ,C_LABEL(EM_ADC_a_y)
 dd  C_LABEL(EX_PLY)       ,C_LABEL(ALL_TDC)
 dd  C_LABEL(ALL_JMP_Oa_xO),C_LABEL(EM_ADC_a_x)
 dd  C_LABEL(OpM1_0x7E)    ,C_LABEL(EM_ADC_al_x)
-dd  C_LABEL(ALL_BRA)      ,C_LABEL(EM_STA_Od_xO)    ; 80
-dd  C_LABEL(ALL_BRL)      ,C_LABEL(EM_STA_d_s)
-dd  C_LABEL(OpE0X1_0x84)  ,C_LABEL(EM_STA_d)
-dd  C_LABEL(OpE0X1_0x86)  ,C_LABEL(EM_STA_IdI)
+dd  C_LABEL(ALL_BRA)      ,C_LABEL(OpE0M1_0x81)     ; 80
+dd  C_LABEL(ALL_BRL)      ,C_LABEL(OpM1_0x83)
+dd  C_LABEL(OpE0X1_0x84)  ,C_LABEL(OpE0M1_0x85)
+dd  C_LABEL(OpE0X1_0x86)  ,C_LABEL(OpE0M1_0x87)
 dd  C_LABEL(OpX1_0x88)    ,C_LABEL(EM_BIT_i)
 dd  C_LABEL(EM_TXA)       ,C_LABEL(E0_PHB)
-dd  C_LABEL(OpX1_0x8C)    ,C_LABEL(EM_STA_a)
-dd  C_LABEL(OpX1_0x8E)    ,C_LABEL(EM_STA_al)
+dd  C_LABEL(OpX1_0x8C)    ,C_LABEL(OpM1_0x8D)
+dd  C_LABEL(OpX1_0x8E)    ,C_LABEL(OpM1_0x8F)
 dd  C_LABEL(ALL_BCC)      ,C_LABEL(OpE0M1X1_0x91)   ; 90
-dd  C_LABEL(EM_STA_OdO)   ,C_LABEL(EM_STA_Od_sO_y)
-dd  C_LABEL(OpE0X1_0x94)  ,C_LABEL(EM_STA_d_x)
-dd  C_LABEL(OpE0X1_0x96)  ,C_LABEL(EM_STA_IdI_y)
-dd  C_LABEL(EM_TYA)       ,C_LABEL(EM_STA_a_y)
+dd  C_LABEL(OpE0M1_0x92)  ,C_LABEL(OpM1_0x93)
+dd  C_LABEL(OpE0X1_0x94)  ,C_LABEL(OpE0M1_0x95)
+dd  C_LABEL(OpE0X1_0x96)  ,C_LABEL(OpE0M1_0x97)
+dd  C_LABEL(EM_TYA)       ,C_LABEL(OpM1_0x99)
 dd  C_LABEL(E0_TXS)       ,C_LABEL(EX_TXY)
-dd  C_LABEL(EM_STZ_a)     ,C_LABEL(EM_STA_a_x)
-dd  C_LABEL(EM_STZ_a_x)   ,C_LABEL(EM_STA_al_x)
+dd  C_LABEL(OpM1_0x9C)    ,C_LABEL(OpM1_0x9D)
+dd  C_LABEL(OpM1_0x9E)    ,C_LABEL(OpM1_0x9F)
 dd  C_LABEL(EX_LDY_i)     ,C_LABEL(EM_LDA_Od_xO)    ; A0
 dd  C_LABEL(EX_LDX_i)     ,C_LABEL(EM_LDA_d_s)
 dd  C_LABEL(EX_LDY_d)     ,C_LABEL(EM_LDA_d)
@@ -2641,7 +2641,7 @@ db opcode_clocks(2, 1, 2, 0, 0) ; 04 TSB d
 db opcode_clocks(2, 0, 1, 0, 0) ; 05 ORA d
 db opcode_clocks(2, 1, 2, 0, 0) ; 06 ASL d
 db opcode_clocks(2, 0, 3, 1, 0) ; 07 ORA [d]
-								     
+								
 db opcode_clocks(1, 1, 1, 0, 0) ; 08 PHP
 db opcode_clocks(2, 0, 0, 0, 0) ; 09 ORA i
 db opcode_clocks(1, 1, 0, 0, 0) ; 0A SLA
@@ -2650,7 +2650,7 @@ db opcode_clocks(3, 1, 0, 2, 0) ; 0C TSB a
 db opcode_clocks(3, 0, 0, 1, 0) ; 0D ORA a
 db opcode_clocks(3, 1, 0, 2, 0) ; 0E ASL a
 db opcode_clocks(4, 0, 0, 1, 0) ; 0F ORA al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; 10 BPL r
 db opcode_clocks(2, 0, 2, 1, 0) ; 11 ORA (d),y
 db opcode_clocks(2, 0, 2, 1, 0) ; 12 ORA (d)
@@ -2659,7 +2659,7 @@ db opcode_clocks(2, 1, 2, 0, 0) ; 14 TRB d
 db opcode_clocks(2, 1, 1, 0, 0) ; 15 ORA d,x
 db opcode_clocks(2, 2, 2, 0, 0) ; 16 ASL d,x
 db opcode_clocks(2, 0, 3, 1, 0) ; 17 ORA [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; 18 CLC
 db opcode_clocks(3, 0, 0, 1, 0) ; 19 ORA a,y
 db opcode_clocks(1, 1, 0, 0, 0) ; 1A INA
@@ -2668,7 +2668,7 @@ db opcode_clocks(3, 1, 0, 2, 0) ; 1C TRB a
 db opcode_clocks(3, 0, 0, 1, 0) ; 1D ORA a,x
 db opcode_clocks(3, 2, 0, 2, 0) ; 1E ASL a,x
 db opcode_clocks(4, 0, 0, 1, 0) ; 1F ORA al,x
-								     
+								
 db opcode_clocks(3, 1, 2, 0, 0) ; 20 JSR a
 db opcode_clocks(2, 1, 2, 1, 0) ; 21 AND (d,x)
 db opcode_clocks(4, 1, 3, 0, 0) ; 22 JSL al
@@ -2677,7 +2677,7 @@ db opcode_clocks(2, 0, 1, 0, 0) ; 24 BIT d
 db opcode_clocks(2, 0, 1, 0, 0) ; 25 AND d
 db opcode_clocks(2, 1, 2, 0, 0) ; 26 ROL d
 db opcode_clocks(2, 0, 3, 1, 0) ; 27 AND [d]
-								     
+								
 db opcode_clocks(1, 2, 1, 0, 0) ; 28 PLP
 db opcode_clocks(2, 0, 0, 0, 0) ; 29 AND i
 db opcode_clocks(1, 1, 0, 0, 0) ; 2A RLA
@@ -2686,7 +2686,7 @@ db opcode_clocks(3, 0, 0, 1, 0) ; 2C BIT a
 db opcode_clocks(3, 0, 0, 1, 0) ; 2D AND a
 db opcode_clocks(3, 1, 0, 2, 0) ; 2E ROL a
 db opcode_clocks(4, 0, 0, 1, 0) ; 2F AND al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; 30 BMI r
 db opcode_clocks(2, 0, 2, 1, 0) ; 31 AND (d),y
 db opcode_clocks(2, 0, 2, 1, 0) ; 32 AND (d)
@@ -2695,7 +2695,7 @@ db opcode_clocks(2, 1, 1, 0, 0) ; 34 BIT d,x
 db opcode_clocks(2, 1, 1, 0, 0) ; 35 AND d,x
 db opcode_clocks(2, 2, 2, 0, 0) ; 36 ROL d,x
 db opcode_clocks(2, 0, 3, 1, 0) ; 37 AND [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; 38 SEC
 db opcode_clocks(3, 0, 0, 1, 0) ; 39 AND a,y
 db opcode_clocks(1, 1, 0, 0, 0) ; 3A DEA
@@ -2704,7 +2704,7 @@ db opcode_clocks(3, 0, 0, 1, 0) ; 3C BIT a,x
 db opcode_clocks(3, 0, 0, 1, 0) ; 3D AND a,x
 db opcode_clocks(3, 2, 0, 2, 0) ; 3E ROL a,x
 db opcode_clocks(4, 0, 0, 1, 0) ; 3F AND al,x
-								     
+								
 db opcode_clocks(1, 2, 4, 0, 0) ; 40 RTI
 db opcode_clocks(2, 1, 2, 1, 0) ; 41 EOR (d,x)
 db opcode_clocks(2, 0, 0, 0, 0) ; 42 WDM *
@@ -2713,7 +2713,7 @@ db opcode_clocks(3, 2, 0, 2, 0) ; 44 MVP
 db opcode_clocks(2, 0, 1, 0, 0) ; 45 EOR d
 db opcode_clocks(2, 1, 2, 0, 0) ; 46 LSR d
 db opcode_clocks(2, 0, 3, 1, 0) ; 47 EOR [d]
-								     
+								
 db opcode_clocks(1, 1, 1, 0, 0) ; 48 PHA
 db opcode_clocks(2, 0, 0, 0, 0) ; 49 EOR i
 db opcode_clocks(1, 1, 0, 0, 0) ; 4A SRA
@@ -2722,7 +2722,7 @@ db opcode_clocks(3, 0, 0, 0, 0) ; 4C JMP a
 db opcode_clocks(3, 0, 0, 1, 0) ; 4D EOR a
 db opcode_clocks(3, 1, 0, 2, 0) ; 4E LSR a
 db opcode_clocks(4, 0, 0, 1, 0) ; 4F EOR al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; 50 BVC r
 db opcode_clocks(2, 0, 2, 1, 0) ; 51 EOR (d),y
 db opcode_clocks(2, 0, 2, 1, 0) ; 52 EOR (d)
@@ -2731,7 +2731,7 @@ db opcode_clocks(3, 2, 0, 2, 0) ; 54 MVN
 db opcode_clocks(2, 1, 1, 0, 0) ; 55 EOR d,x
 db opcode_clocks(2, 2, 2, 0, 0) ; 56 LSR d,x
 db opcode_clocks(2, 0, 3, 1, 0) ; 57 EOR [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; 58 CLI
 db opcode_clocks(3, 0, 0, 1, 0) ; 59 EOR a,y
 db opcode_clocks(1, 1, 1, 0, 0) ; 5A PHY
@@ -2740,7 +2740,7 @@ db opcode_clocks(4, 0, 0, 0, 0) ; 5C JML al
 db opcode_clocks(3, 0, 0, 1, 0) ; 5D EOR a,x
 db opcode_clocks(3, 2, 0, 2, 0) ; 5E LSR a,x
 db opcode_clocks(4, 0, 0, 1, 0) ; 5F EOR al,x
-								     
+								
 db opcode_clocks(1, 3, 2, 0, 0) ; 60 RTS
 db opcode_clocks(2, 1, 2, 1, 0) ; 61 ADC (d,x)
 db opcode_clocks(3, 1, 2, 0, 0) ; 62 PER
@@ -2749,7 +2749,7 @@ db opcode_clocks(2, 0, 1, 0, 0) ; 64 STZ d
 db opcode_clocks(2, 0, 1, 0, 0) ; 65 ADC d
 db opcode_clocks(2, 1, 2, 0, 0) ; 66 ROR d
 db opcode_clocks(2, 0, 3, 1, 0) ; 67 ADC [d]
-								     
+								
 db opcode_clocks(1, 2, 1, 0, 0) ; 68 PLA
 db opcode_clocks(2, 0, 0, 0, 0) ; 69 ADC i
 db opcode_clocks(1, 1, 0, 0, 0) ; 6A RRA
@@ -2758,7 +2758,7 @@ db opcode_clocks(3, 0, 2, 0, 0) ; 6C JMP (a)
 db opcode_clocks(3, 0, 0, 1, 0) ; 6D ADC a
 db opcode_clocks(3, 1, 0, 2, 0) ; 6E ROR a
 db opcode_clocks(4, 0, 0, 1, 0) ; 6F ADC al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; 70 BVS r
 db opcode_clocks(2, 0, 2, 1, 0) ; 71 ADC (d),y
 db opcode_clocks(2, 0, 2, 1, 0) ; 72 ADC (d)
@@ -2767,7 +2767,7 @@ db opcode_clocks(2, 1, 1, 0, 0) ; 74 STZ d,x
 db opcode_clocks(2, 1, 1, 0, 0) ; 75 ADC d,x
 db opcode_clocks(2, 2, 2, 0, 0) ; 76 ROR d,x
 db opcode_clocks(2, 0, 3, 1, 0) ; 77 ADC [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; 78 SEI
 db opcode_clocks(3, 0, 0, 1, 0) ; 79 ADC a,y
 db opcode_clocks(1, 2, 1, 0, 0) ; 7A PLY
@@ -2776,7 +2776,7 @@ db opcode_clocks(3, 1, 0, 2, 0) ; 7C JMP (a,x) - bus access in PB
 db opcode_clocks(3, 0, 0, 1, 0) ; 7D ADC a,x
 db opcode_clocks(3, 2, 0, 2, 0) ; 7E ROR a,x
 db opcode_clocks(4, 0, 0, 1, 0) ; 7F ADC al,x
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; 80 BRA r
 db opcode_clocks(2, 1, 2, 1, 0) ; 81 STA (d,x)
 db opcode_clocks(3, 1, 0, 0, 0) ; 82 BRL rl
@@ -2785,7 +2785,7 @@ db opcode_clocks(2, 0, 1, 0, 0) ; 84 STY d
 db opcode_clocks(2, 0, 1, 0, 0) ; 85 STA d
 db opcode_clocks(2, 0, 1, 0, 0) ; 86 STX d
 db opcode_clocks(2, 0, 3, 1, 0) ; 87 STA [d]
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; 88 DEY
 db opcode_clocks(2, 0, 0, 0, 0) ; 89 BIT i
 db opcode_clocks(1, 1, 0, 0, 0) ; 8A TXA
@@ -2794,7 +2794,7 @@ db opcode_clocks(3, 0, 0, 1, 0) ; 8C STY a
 db opcode_clocks(3, 0, 0, 1, 0) ; 8D STA a
 db opcode_clocks(3, 0, 0, 1, 0) ; 8E STX a
 db opcode_clocks(4, 0, 0, 1, 0) ; 8F STA al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; 90 BCC r
 db opcode_clocks(2, 1, 2, 1, 0) ; 91 STA (d),y
 db opcode_clocks(2, 0, 2, 1, 0) ; 92 STA (d)
@@ -2803,7 +2803,7 @@ db opcode_clocks(2, 1, 1, 0, 0) ; 94 STY d,x
 db opcode_clocks(2, 1, 1, 0, 0) ; 95 STA d,x
 db opcode_clocks(2, 1, 1, 0, 0) ; 96 STX d,y
 db opcode_clocks(2, 0, 3, 1, 0) ; 97 STA [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; 98 TYA
 db opcode_clocks(3, 1, 0, 1, 0) ; 99 STA a,y
 db opcode_clocks(1, 1, 0, 0, 0) ; 9A TXS
@@ -2812,7 +2812,7 @@ db opcode_clocks(3, 0, 0, 1, 0) ; 9C STZ a
 db opcode_clocks(3, 1, 0, 1, 0) ; 9D STA a,x
 db opcode_clocks(3, 1, 0, 1, 0) ; 9E STZ a,x
 db opcode_clocks(4, 0, 0, 1, 0) ; 9F STA al,x
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; A0 LDY i
 db opcode_clocks(2, 1, 2, 1, 0) ; A1 LDA (d,x)
 db opcode_clocks(2, 0, 0, 0, 0) ; A2 LDX i
@@ -2821,7 +2821,7 @@ db opcode_clocks(2, 0, 1, 0, 0) ; A4 LDY d
 db opcode_clocks(2, 0, 1, 0, 0) ; A5 LDA d
 db opcode_clocks(2, 0, 1, 0, 0) ; A6 LDX d
 db opcode_clocks(2, 0, 3, 1, 0) ; A7 LDA [d]
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; A8 TAY
 db opcode_clocks(2, 0, 0, 0, 0) ; A9 LDA i
 db opcode_clocks(1, 1, 0, 0, 0) ; AA TAX
@@ -2830,7 +2830,7 @@ db opcode_clocks(3, 0, 0, 1, 0) ; AC LDY a
 db opcode_clocks(3, 0, 0, 1, 0) ; AD LDA a
 db opcode_clocks(3, 0, 0, 1, 0) ; AE LDX a
 db opcode_clocks(4, 0, 0, 1, 0) ; AF LDA al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; B0 BCS r
 db opcode_clocks(2, 0, 2, 1, 0) ; B1 LDA (d),y
 db opcode_clocks(2, 0, 2, 1, 0) ; B2 LDA (d)
@@ -2839,7 +2839,7 @@ db opcode_clocks(2, 1, 1, 0, 0) ; B4 LDY d,x
 db opcode_clocks(2, 1, 1, 0, 0) ; B5 LDA d,x
 db opcode_clocks(2, 1, 1, 0, 0) ; B6 LDX d,y
 db opcode_clocks(2, 0, 3, 1, 0) ; B7 LDA [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; B8 CLV
 db opcode_clocks(3, 0, 0, 1, 0) ; B9 LDA a,y
 db opcode_clocks(1, 1, 0, 0, 0) ; BA TSX
@@ -2848,7 +2848,7 @@ db opcode_clocks(3, 0, 0, 1, 0) ; BC LDY a,x
 db opcode_clocks(3, 0, 0, 1, 0) ; BD LDA a,x
 db opcode_clocks(3, 0, 0, 1, 0) ; BE LDX a,y
 db opcode_clocks(4, 0, 0, 1, 0) ; BF LDA al,x
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; C0 CPY i
 db opcode_clocks(2, 1, 2, 1, 0) ; C1 CMP (d,x)
 db opcode_clocks(2, 1, 0, 0, 0) ; C2 REP i
@@ -2857,7 +2857,7 @@ db opcode_clocks(2, 0, 1, 0, 0) ; C4 CPY d
 db opcode_clocks(2, 0, 1, 0, 0) ; C5 CMP d
 db opcode_clocks(2, 1, 2, 0, 0) ; C6 DEC d
 db opcode_clocks(2, 0, 3, 1, 0) ; C7 CMP [d]
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; C8 INY
 db opcode_clocks(2, 0, 0, 0, 0) ; C9 CMP i
 db opcode_clocks(1, 1, 0, 0, 0) ; CA DEX
@@ -2866,7 +2866,7 @@ db opcode_clocks(3, 0, 0, 1, 0) ; CC CPY a
 db opcode_clocks(3, 0, 0, 1, 0) ; CD CMP a
 db opcode_clocks(3, 1, 0, 2, 0) ; CE DEC a
 db opcode_clocks(4, 0, 0, 1, 0) ; CF CMP al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; D0 BNE r
 db opcode_clocks(2, 0, 2, 1, 0) ; D1 CMP (d),y
 db opcode_clocks(2, 0, 2, 1, 0) ; D2 CMP (d)
@@ -2875,7 +2875,7 @@ db opcode_clocks(2, 0, 4, 0, 0) ; D4 PEI
 db opcode_clocks(2, 1, 1, 0, 0) ; D5 CMP d,x
 db opcode_clocks(2, 2, 2, 0, 0) ; D6 DEC d,x
 db opcode_clocks(2, 0, 3, 1, 0) ; D7 CMP [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; D8 CLD
 db opcode_clocks(3, 0, 0, 1, 0) ; D9 CMP a,y
 db opcode_clocks(1, 1, 1, 0, 0) ; DA PHX
@@ -2884,7 +2884,7 @@ db opcode_clocks(3, 0, 3, 0, 0) ; DC JML (a)
 db opcode_clocks(3, 0, 0, 1, 0) ; DD CMP a,x
 db opcode_clocks(3, 2, 0, 2, 0) ; DE DEC a,x
 db opcode_clocks(4, 0, 0, 1, 0) ; DF CMP al,x
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; E0 CPX i
 db opcode_clocks(2, 1, 2, 1, 0) ; E1 SBC (d,x)
 db opcode_clocks(2, 1, 0, 0, 0) ; E2 SEP i
@@ -2893,7 +2893,7 @@ db opcode_clocks(2, 0, 1, 0, 0) ; E4 CPX d
 db opcode_clocks(2, 0, 1, 0, 0) ; E5 SBC d
 db opcode_clocks(2, 1, 2, 0, 0) ; E6 INC d
 db opcode_clocks(2, 0, 3, 1, 0) ; E7 SBC [d]
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; E8 INX
 db opcode_clocks(2, 0, 0, 0, 0) ; E9 SBC i
 db opcode_clocks(1, 1, 0, 0, 0) ; EA NOP
@@ -2902,7 +2902,7 @@ db opcode_clocks(3, 0, 0, 1, 0) ; EC CPX a
 db opcode_clocks(3, 0, 0, 1, 0) ; ED SBC a
 db opcode_clocks(3, 1, 0, 2, 0) ; EE INC a
 db opcode_clocks(4, 0, 0, 1, 0) ; EF SBC al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; F0 BEQ r
 db opcode_clocks(2, 0, 2, 1, 0) ; F1 SBC (d),y
 db opcode_clocks(2, 0, 2, 1, 0) ; F2 SBC (d)
@@ -2911,7 +2911,7 @@ db opcode_clocks(3, 0, 2, 0, 0) ; F4 PEA
 db opcode_clocks(2, 1, 1, 0, 0) ; F5 SBC d,x
 db opcode_clocks(2, 2, 2, 0, 0) ; F6 INC d,x
 db opcode_clocks(2, 0, 3, 1, 0) ; F7 SBC [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; F8 SED
 db opcode_clocks(3, 0, 0, 1, 0) ; F9 SBC a,y
 db opcode_clocks(1, 2, 1, 0, 0) ; FA PLX
@@ -2930,7 +2930,7 @@ db opcode_clocks(2, 1, 2, 0, 1) ; 04 TSB d
 db opcode_clocks(2, 0, 1, 0, 1) ; 05 ORA d
 db opcode_clocks(2, 1, 2, 0, 1) ; 06 ASL d
 db opcode_clocks(2, 0, 3, 1, 1) ; 07 ORA [d]
-								     
+								
 db opcode_clocks(1, 1, 1, 0, 1) ; 08 PHP
 db opcode_clocks(2, 0, 0, 0, 1) ; 09 ORA i
 db opcode_clocks(1, 1, 0, 0, 1) ; 0A SLA
@@ -2939,7 +2939,7 @@ db opcode_clocks(3, 1, 0, 2, 1) ; 0C TSB a
 db opcode_clocks(3, 0, 0, 1, 1) ; 0D ORA a
 db opcode_clocks(3, 1, 0, 2, 1) ; 0E ASL a
 db opcode_clocks(4, 0, 0, 1, 1) ; 0F ORA al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 1) ; 10 BPL r
 db opcode_clocks(2, 0, 2, 1, 1) ; 11 ORA (d),y
 db opcode_clocks(2, 0, 2, 1, 1) ; 12 ORA (d)
@@ -2948,7 +2948,7 @@ db opcode_clocks(2, 1, 2, 0, 1) ; 14 TRB d
 db opcode_clocks(2, 1, 1, 0, 1) ; 15 ORA d,x
 db opcode_clocks(2, 2, 2, 0, 1) ; 16 ASL d,x
 db opcode_clocks(2, 0, 3, 1, 1) ; 17 ORA [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 1) ; 18 CLC
 db opcode_clocks(3, 0, 0, 1, 1) ; 19 ORA a,y
 db opcode_clocks(1, 1, 0, 0, 1) ; 1A INA
@@ -2957,7 +2957,7 @@ db opcode_clocks(3, 1, 0, 2, 1) ; 1C TRB a
 db opcode_clocks(3, 0, 0, 1, 1) ; 1D ORA a,x
 db opcode_clocks(3, 2, 0, 2, 1) ; 1E ASL a,x
 db opcode_clocks(4, 0, 0, 1, 1) ; 1F ORA al,x
-								     
+								
 db opcode_clocks(3, 1, 2, 0, 1) ; 20 JSR a
 db opcode_clocks(2, 1, 2, 1, 1) ; 21 AND (d,x)
 db opcode_clocks(4, 1, 3, 0, 1) ; 22 JSL al
@@ -2966,7 +2966,7 @@ db opcode_clocks(2, 0, 1, 0, 1) ; 24 BIT d
 db opcode_clocks(2, 0, 1, 0, 1) ; 25 AND d
 db opcode_clocks(2, 1, 2, 0, 1) ; 26 ROL d
 db opcode_clocks(2, 0, 3, 1, 1) ; 27 AND [d]
-								     
+								
 db opcode_clocks(1, 2, 1, 0, 1) ; 28 PLP
 db opcode_clocks(2, 0, 0, 0, 1) ; 29 AND i
 db opcode_clocks(1, 1, 0, 0, 1) ; 2A RLA
@@ -2975,7 +2975,7 @@ db opcode_clocks(3, 0, 0, 1, 1) ; 2C BIT a
 db opcode_clocks(3, 0, 0, 1, 1) ; 2D AND a
 db opcode_clocks(3, 1, 0, 2, 1) ; 2E ROL a
 db opcode_clocks(4, 0, 0, 1, 1) ; 2F AND al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 1) ; 30 BMI r
 db opcode_clocks(2, 0, 2, 1, 1) ; 31 AND (d),y
 db opcode_clocks(2, 0, 2, 1, 1) ; 32 AND (d)
@@ -2984,7 +2984,7 @@ db opcode_clocks(2, 1, 1, 0, 1) ; 34 BIT d,x
 db opcode_clocks(2, 1, 1, 0, 1) ; 35 AND d,x
 db opcode_clocks(2, 2, 2, 0, 1) ; 36 ROL d,x
 db opcode_clocks(2, 0, 3, 1, 1) ; 37 AND [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 1) ; 38 SEC
 db opcode_clocks(3, 0, 0, 1, 1) ; 39 AND a,y
 db opcode_clocks(1, 1, 0, 0, 1) ; 3A DEA
@@ -2993,7 +2993,7 @@ db opcode_clocks(3, 0, 0, 1, 1) ; 3C BIT a,x
 db opcode_clocks(3, 0, 0, 1, 1) ; 3D AND a,x
 db opcode_clocks(3, 2, 0, 2, 1) ; 3E ROL a,x
 db opcode_clocks(4, 0, 0, 1, 1) ; 3F AND al,x
-								     
+								
 db opcode_clocks(1, 2, 4, 0, 1) ; 40 RTI
 db opcode_clocks(2, 1, 2, 1, 1) ; 41 EOR (d,x)
 db opcode_clocks(2, 0, 0, 0, 1) ; 42 WDM *
@@ -3002,7 +3002,7 @@ db opcode_clocks(3, 2, 0, 2, 1) ; 44 MVP
 db opcode_clocks(2, 0, 1, 0, 1) ; 45 EOR d
 db opcode_clocks(2, 1, 2, 0, 1) ; 46 LSR d
 db opcode_clocks(2, 0, 3, 1, 1) ; 47 EOR [d]
-								     
+								
 db opcode_clocks(1, 1, 1, 0, 1) ; 48 PHA
 db opcode_clocks(2, 0, 0, 0, 1) ; 49 EOR i
 db opcode_clocks(1, 1, 0, 0, 1) ; 4A SRA
@@ -3011,7 +3011,7 @@ db opcode_clocks(3, 0, 0, 0, 1) ; 4C JMP a
 db opcode_clocks(3, 0, 0, 1, 1) ; 4D EOR a
 db opcode_clocks(3, 1, 0, 2, 1) ; 4E LSR a
 db opcode_clocks(4, 0, 0, 1, 1) ; 4F EOR al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 1) ; 50 BVC r
 db opcode_clocks(2, 0, 2, 1, 1) ; 51 EOR (d),y
 db opcode_clocks(2, 0, 2, 1, 1) ; 52 EOR (d)
@@ -3020,7 +3020,7 @@ db opcode_clocks(3, 2, 0, 2, 1) ; 54 MVN
 db opcode_clocks(2, 1, 1, 0, 1) ; 55 EOR d,x
 db opcode_clocks(2, 2, 2, 0, 1) ; 56 LSR d,x
 db opcode_clocks(2, 0, 3, 1, 1) ; 57 EOR [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 1) ; 58 CLI
 db opcode_clocks(3, 0, 0, 1, 1) ; 59 EOR a,y
 db opcode_clocks(1, 1, 1, 0, 1) ; 5A PHY
@@ -3029,7 +3029,7 @@ db opcode_clocks(4, 0, 0, 0, 1) ; 5C JML al
 db opcode_clocks(3, 0, 0, 1, 1) ; 5D EOR a,x
 db opcode_clocks(3, 2, 0, 2, 1) ; 5E LSR a,x
 db opcode_clocks(4, 0, 0, 1, 1) ; 5F EOR al,x
-								     
+								
 db opcode_clocks(1, 3, 2, 0, 1) ; 60 RTS
 db opcode_clocks(2, 1, 2, 1, 1) ; 61 ADC (d,x)
 db opcode_clocks(3, 1, 2, 0, 1) ; 62 PER
@@ -3038,7 +3038,7 @@ db opcode_clocks(2, 0, 1, 0, 1) ; 64 STZ d
 db opcode_clocks(2, 0, 1, 0, 1) ; 65 ADC d
 db opcode_clocks(2, 1, 2, 0, 1) ; 66 ROR d
 db opcode_clocks(2, 0, 3, 1, 1) ; 67 ADC [d]
-								     
+								
 db opcode_clocks(1, 2, 1, 0, 1) ; 68 PLA
 db opcode_clocks(2, 0, 0, 0, 1) ; 69 ADC i
 db opcode_clocks(1, 1, 0, 0, 1) ; 6A RRA
@@ -3047,7 +3047,7 @@ db opcode_clocks(3, 0, 2, 0, 1) ; 6C JMP (a)
 db opcode_clocks(3, 0, 0, 1, 1) ; 6D ADC a
 db opcode_clocks(3, 1, 0, 2, 1) ; 6E ROR a
 db opcode_clocks(4, 0, 0, 1, 1) ; 6F ADC al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 1) ; 70 BVS r
 db opcode_clocks(2, 0, 2, 1, 1) ; 71 ADC (d),y
 db opcode_clocks(2, 0, 2, 1, 1) ; 72 ADC (d)
@@ -3056,7 +3056,7 @@ db opcode_clocks(2, 1, 1, 0, 1) ; 74 STZ d,x
 db opcode_clocks(2, 1, 1, 0, 1) ; 75 ADC d,x
 db opcode_clocks(2, 2, 2, 0, 1) ; 76 ROR d,x
 db opcode_clocks(2, 0, 3, 1, 1) ; 77 ADC [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 1) ; 78 SEI
 db opcode_clocks(3, 0, 0, 1, 1) ; 79 ADC a,y
 db opcode_clocks(1, 2, 1, 0, 1) ; 7A PLY
@@ -3065,7 +3065,7 @@ db opcode_clocks(3, 1, 0, 2, 1) ; 7C JMP (a,x) - bus access in PB
 db opcode_clocks(3, 0, 0, 1, 1) ; 7D ADC a,x
 db opcode_clocks(3, 2, 0, 2, 1) ; 7E ROR a,x
 db opcode_clocks(4, 0, 0, 1, 1) ; 7F ADC al,x
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 1) ; 80 BRA r
 db opcode_clocks(2, 1, 2, 1, 1) ; 81 STA (d,x)
 db opcode_clocks(3, 1, 0, 0, 1) ; 82 BRL rl
@@ -3074,7 +3074,7 @@ db opcode_clocks(2, 0, 1, 0, 1) ; 84 STY d
 db opcode_clocks(2, 0, 1, 0, 1) ; 85 STA d
 db opcode_clocks(2, 0, 1, 0, 1) ; 86 STX d
 db opcode_clocks(2, 0, 3, 1, 1) ; 87 STA [d]
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 1) ; 88 DEY
 db opcode_clocks(2, 0, 0, 0, 1) ; 89 BIT i
 db opcode_clocks(1, 1, 0, 0, 1) ; 8A TXA
@@ -3083,7 +3083,7 @@ db opcode_clocks(3, 0, 0, 1, 1) ; 8C STY a
 db opcode_clocks(3, 0, 0, 1, 1) ; 8D STA a
 db opcode_clocks(3, 0, 0, 1, 1) ; 8E STX a
 db opcode_clocks(4, 0, 0, 1, 1) ; 8F STA al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 1) ; 90 BCC r
 db opcode_clocks(2, 1, 2, 1, 1) ; 91 STA (d),y
 db opcode_clocks(2, 0, 2, 1, 1) ; 92 STA (d)
@@ -3092,7 +3092,7 @@ db opcode_clocks(2, 1, 1, 0, 1) ; 94 STY d,x
 db opcode_clocks(2, 1, 1, 0, 1) ; 95 STA d,x
 db opcode_clocks(2, 1, 1, 0, 1) ; 96 STX d,y
 db opcode_clocks(2, 0, 3, 1, 1) ; 97 STA [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 1) ; 98 TYA
 db opcode_clocks(3, 1, 0, 1, 1) ; 99 STA a,y
 db opcode_clocks(1, 1, 0, 0, 1) ; 9A TXS
@@ -3101,7 +3101,7 @@ db opcode_clocks(3, 0, 0, 1, 1) ; 9C STZ a
 db opcode_clocks(3, 1, 0, 1, 1) ; 9D STA a,x
 db opcode_clocks(3, 1, 0, 1, 1) ; 9E STZ a,x
 db opcode_clocks(4, 0, 0, 1, 1) ; 9F STA al,x
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 1) ; A0 LDY i
 db opcode_clocks(2, 1, 2, 1, 1) ; A1 LDA (d,x)
 db opcode_clocks(2, 0, 0, 0, 1) ; A2 LDX i
@@ -3110,7 +3110,7 @@ db opcode_clocks(2, 0, 1, 0, 1) ; A4 LDY d
 db opcode_clocks(2, 0, 1, 0, 1) ; A5 LDA d
 db opcode_clocks(2, 0, 1, 0, 1) ; A6 LDX d
 db opcode_clocks(2, 0, 3, 1, 1) ; A7 LDA [d]
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 1) ; A8 TAY
 db opcode_clocks(2, 0, 0, 0, 1) ; A9 LDA i
 db opcode_clocks(1, 1, 0, 0, 1) ; AA TAX
@@ -3119,7 +3119,7 @@ db opcode_clocks(3, 0, 0, 1, 1) ; AC LDY a
 db opcode_clocks(3, 0, 0, 1, 1) ; AD LDA a
 db opcode_clocks(3, 0, 0, 1, 1) ; AE LDX a
 db opcode_clocks(4, 0, 0, 1, 1) ; AF LDA al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 1) ; B0 BCS r
 db opcode_clocks(2, 0, 2, 1, 1) ; B1 LDA (d),y
 db opcode_clocks(2, 0, 2, 1, 1) ; B2 LDA (d)
@@ -3128,7 +3128,7 @@ db opcode_clocks(2, 1, 1, 0, 1) ; B4 LDY d,x
 db opcode_clocks(2, 1, 1, 0, 1) ; B5 LDA d,x
 db opcode_clocks(2, 1, 1, 0, 1) ; B6 LDX d,y
 db opcode_clocks(2, 0, 3, 1, 1) ; B7 LDA [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 1) ; B8 CLV
 db opcode_clocks(3, 0, 0, 1, 1) ; B9 LDA a,y
 db opcode_clocks(1, 1, 0, 0, 1) ; BA TSX
@@ -3137,7 +3137,7 @@ db opcode_clocks(3, 0, 0, 1, 1) ; BC LDY a,x
 db opcode_clocks(3, 0, 0, 1, 1) ; BD LDA a,x
 db opcode_clocks(3, 0, 0, 1, 1) ; BE LDX a,y
 db opcode_clocks(4, 0, 0, 1, 1) ; BF LDA al,x
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 1) ; C0 CPY i
 db opcode_clocks(2, 1, 2, 1, 1) ; C1 CMP (d,x)
 db opcode_clocks(2, 1, 0, 0, 1) ; C2 REP i
@@ -3146,7 +3146,7 @@ db opcode_clocks(2, 0, 1, 0, 1) ; C4 CPY d
 db opcode_clocks(2, 0, 1, 0, 1) ; C5 CMP d
 db opcode_clocks(2, 1, 2, 0, 1) ; C6 DEC d
 db opcode_clocks(2, 0, 3, 1, 1) ; C7 CMP [d]
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 1) ; C8 INY
 db opcode_clocks(2, 0, 0, 0, 1) ; C9 CMP i
 db opcode_clocks(1, 1, 0, 0, 1) ; CA DEX
@@ -3155,7 +3155,7 @@ db opcode_clocks(3, 0, 0, 1, 1) ; CC CPY a
 db opcode_clocks(3, 0, 0, 1, 1) ; CD CMP a
 db opcode_clocks(3, 1, 0, 2, 1) ; CE DEC a
 db opcode_clocks(4, 0, 0, 1, 1) ; CF CMP al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 1) ; D0 BNE r
 db opcode_clocks(2, 0, 2, 1, 1) ; D1 CMP (d),y
 db opcode_clocks(2, 0, 2, 1, 1) ; D2 CMP (d)
@@ -3164,7 +3164,7 @@ db opcode_clocks(2, 0, 4, 0, 1) ; D4 PEI
 db opcode_clocks(2, 1, 1, 0, 1) ; D5 CMP d,x
 db opcode_clocks(2, 2, 2, 0, 1) ; D6 DEC d,x
 db opcode_clocks(2, 0, 3, 1, 1) ; D7 CMP [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 1) ; D8 CLD
 db opcode_clocks(3, 0, 0, 1, 1) ; D9 CMP a,y
 db opcode_clocks(1, 1, 1, 0, 1) ; DA PHX
@@ -3173,7 +3173,7 @@ db opcode_clocks(3, 0, 3, 0, 1) ; DC JML (a)
 db opcode_clocks(3, 0, 0, 1, 1) ; DD CMP a,x
 db opcode_clocks(3, 2, 0, 2, 1) ; DE DEC a,x
 db opcode_clocks(4, 0, 0, 1, 1) ; DF CMP al,x
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 1) ; E0 CPX i
 db opcode_clocks(2, 1, 2, 1, 1) ; E1 SBC (d,x)
 db opcode_clocks(2, 1, 0, 0, 1) ; E2 SEP i
@@ -3182,7 +3182,7 @@ db opcode_clocks(2, 0, 1, 0, 1) ; E4 CPX d
 db opcode_clocks(2, 0, 1, 0, 1) ; E5 SBC d
 db opcode_clocks(2, 1, 2, 0, 1) ; E6 INC d
 db opcode_clocks(2, 0, 3, 1, 1) ; E7 SBC [d]
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 1) ; E8 INX
 db opcode_clocks(2, 0, 0, 0, 1) ; E9 SBC i
 db opcode_clocks(1, 1, 0, 0, 1) ; EA NOP
@@ -3191,7 +3191,7 @@ db opcode_clocks(3, 0, 0, 1, 1) ; EC CPX a
 db opcode_clocks(3, 0, 0, 1, 1) ; ED SBC a
 db opcode_clocks(3, 1, 0, 2, 1) ; EE INC a
 db opcode_clocks(4, 0, 0, 1, 1) ; EF SBC al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 1) ; F0 BEQ r
 db opcode_clocks(2, 0, 2, 1, 1) ; F1 SBC (d),y
 db opcode_clocks(2, 0, 2, 1, 1) ; F2 SBC (d)
@@ -3200,7 +3200,7 @@ db opcode_clocks(3, 0, 2, 0, 1) ; F4 PEA
 db opcode_clocks(2, 1, 1, 0, 1) ; F5 SBC d,x
 db opcode_clocks(2, 2, 2, 0, 1) ; F6 INC d,x
 db opcode_clocks(2, 0, 3, 1, 1) ; F7 SBC [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 1) ; F8 SED
 db opcode_clocks(3, 0, 0, 1, 1) ; F9 SBC a,y
 db opcode_clocks(1, 2, 1, 0, 1) ; FA PLX
@@ -3261,7 +3261,7 @@ dd  C_LABEL(ALL_JML_al)   ,C_LABEL(EM_EOR_a_x)
 dd  C_LABEL(OpM1_0x5E)    ,C_LABEL(EM_EOR_al_x)
 dd  C_LABEL(E1_RTS)       ,C_LABEL(EM_ADC_Od_xO)    ; 60
 dd  C_LABEL(E1_PER)       ,C_LABEL(EM_ADC_d_s)
-dd  C_LABEL(EM_STZ_d)     ,C_LABEL(EM_ADC_d)
+dd  C_LABEL(OpE1_0x64)    ,C_LABEL(EM_ADC_d)
 dd  C_LABEL(OpE1_0x66)    ,C_LABEL(EM_ADC_IdI)
 dd  C_LABEL(E1_PLA)       ,C_LABEL(EM_ADC_i)
 dd  C_LABEL(OpM1_0x6A)    ,C_LABEL(E1_RTL)
@@ -3269,28 +3269,28 @@ dd  C_LABEL(ALL_JMP_OaO)  ,C_LABEL(EM_ADC_a)
 dd  C_LABEL(OpM1_0x6E)    ,C_LABEL(EM_ADC_al)
 dd  C_LABEL(ALL_BVS)      ,C_LABEL(EM_ADC_OdO_y)    ; 70
 dd  C_LABEL(EM_ADC_OdO)   ,C_LABEL(EM_ADC_Od_sO_y)
-dd  C_LABEL(EM_STZ_d_x)   ,C_LABEL(EM_ADC_d_x)
+dd  C_LABEL(OpE1_0x74)    ,C_LABEL(EM_ADC_d_x)
 dd  C_LABEL(OpE1_0x76)    ,C_LABEL(EM_ADC_IdI_y)
 dd  C_LABEL(ALL_SEI)      ,C_LABEL(EM_ADC_a_y)
 dd  C_LABEL(E1_PLY)       ,C_LABEL(ALL_TDC)
 dd  C_LABEL(ALL_JMP_Oa_xO),C_LABEL(EM_ADC_a_x)
 dd  C_LABEL(OpM1_0x7E)    ,C_LABEL(EM_ADC_al_x)
-dd  C_LABEL(ALL_BRA)      ,C_LABEL(EM_STA_Od_xO)    ; 80
-dd  C_LABEL(ALL_BRL)      ,C_LABEL(EM_STA_d_s)
-dd  C_LABEL(OpE1_0x84)    ,C_LABEL(EM_STA_d)
-dd  C_LABEL(OpE1_0x86)    ,C_LABEL(EM_STA_IdI)
+dd  C_LABEL(ALL_BRA)      ,C_LABEL(OpE1_0x81)       ; 80
+dd  C_LABEL(ALL_BRL)      ,C_LABEL(OpM1_0x83)
+dd  C_LABEL(OpE1_0x84)    ,C_LABEL(OpE1_0x85)
+dd  C_LABEL(OpE1_0x86)    ,C_LABEL(OpE1_0x87)
 dd  C_LABEL(OpX1_0x88)    ,C_LABEL(EM_BIT_i)
 dd  C_LABEL(EM_TXA)       ,C_LABEL(E1_PHB)
-dd  C_LABEL(OpX1_0x8C)    ,C_LABEL(EM_STA_a)
-dd  C_LABEL(OpX1_0x8E)    ,C_LABEL(EM_STA_al)
+dd  C_LABEL(OpX1_0x8C)    ,C_LABEL(OpM1_0x8D)
+dd  C_LABEL(OpX1_0x8E)    ,C_LABEL(OpM1_0x8F)
 dd  C_LABEL(ALL_BCC)      ,C_LABEL(OpE1_0x91)       ; 90
-dd  C_LABEL(EM_STA_OdO)   ,C_LABEL(EM_STA_Od_sO_y)
-dd  C_LABEL(OpE1_0x94)    ,C_LABEL(EM_STA_d_x)
-dd  C_LABEL(OpE1_0x96)    ,C_LABEL(EM_STA_IdI_y)
-dd  C_LABEL(EM_TYA)       ,C_LABEL(EM_STA_a_y)
+dd  C_LABEL(OpE1_0x92)    ,C_LABEL(OpM1_0x93)
+dd  C_LABEL(OpE1_0x94)    ,C_LABEL(OpE1_0x95)
+dd  C_LABEL(OpE1_0x96)    ,C_LABEL(OpE1_0x97)
+dd  C_LABEL(EM_TYA)       ,C_LABEL(OpM1_0x99)
 dd  C_LABEL(E1_TXS)       ,C_LABEL(EX_TXY)
-dd  C_LABEL(EM_STZ_a)     ,C_LABEL(EM_STA_a_x)
-dd  C_LABEL(EM_STZ_a_x)   ,C_LABEL(EM_STA_al_x)
+dd  C_LABEL(OpM1_0x9C)    ,C_LABEL(OpM1_0x9D)
+dd  C_LABEL(OpM1_0x9E)    ,C_LABEL(OpM1_0x9F)
 dd  C_LABEL(EX_LDY_i)     ,C_LABEL(EM_LDA_Od_xO)    ; A0
 dd  C_LABEL(EX_LDX_i)     ,C_LABEL(EM_LDA_d_s)
 dd  C_LABEL(EX_LDY_d)     ,C_LABEL(EM_LDA_d)
@@ -3352,7 +3352,7 @@ db opcode_clocks(2, 1, 2, 0, 0) ; 04 TSB d
 db opcode_clocks(2, 0, 1, 0, 0) ; 05 ORA d
 db opcode_clocks(2, 1, 2, 0, 0) ; 06 ASL d
 db opcode_clocks(2, 0, 3, 1, 0) ; 07 ORA [d]
-								     
+								
 db opcode_clocks(1, 1, 1, 0, 0) ; 08 PHP
 db opcode_clocks(2, 0, 0, 0, 0) ; 09 ORA i
 db opcode_clocks(1, 1, 0, 0, 0) ; 0A SLA
@@ -3361,7 +3361,7 @@ db opcode_clocks(3, 1, 0, 2, 0) ; 0C TSB a
 db opcode_clocks(3, 0, 0, 1, 0) ; 0D ORA a
 db opcode_clocks(3, 1, 0, 2, 0) ; 0E ASL a
 db opcode_clocks(4, 0, 0, 1, 0) ; 0F ORA al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; 10 BPL r
 db opcode_clocks(2, 0, 2, 1, 0) ; 11 ORA (d),y
 db opcode_clocks(2, 0, 2, 1, 0) ; 12 ORA (d)
@@ -3370,7 +3370,7 @@ db opcode_clocks(2, 1, 2, 0, 0) ; 14 TRB d
 db opcode_clocks(2, 1, 1, 0, 0) ; 15 ORA d,x
 db opcode_clocks(2, 2, 2, 0, 0) ; 16 ASL d,x
 db opcode_clocks(2, 0, 3, 1, 0) ; 17 ORA [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; 18 CLC
 db opcode_clocks(3, 0, 0, 1, 0) ; 19 ORA a,y
 db opcode_clocks(1, 1, 0, 0, 0) ; 1A INA
@@ -3379,7 +3379,7 @@ db opcode_clocks(3, 1, 0, 2, 0) ; 1C TRB a
 db opcode_clocks(3, 0, 0, 1, 0) ; 1D ORA a,x
 db opcode_clocks(3, 2, 0, 2, 0) ; 1E ASL a,x
 db opcode_clocks(4, 0, 0, 1, 0) ; 1F ORA al,x
-								     
+								
 db opcode_clocks(3, 1, 2, 0, 0) ; 20 JSR a
 db opcode_clocks(2, 1, 2, 1, 0) ; 21 AND (d,x)
 db opcode_clocks(4, 1, 3, 0, 0) ; 22 JSL al
@@ -3388,7 +3388,7 @@ db opcode_clocks(2, 0, 1, 0, 0) ; 24 BIT d
 db opcode_clocks(2, 0, 1, 0, 0) ; 25 AND d
 db opcode_clocks(2, 1, 2, 0, 0) ; 26 ROL d
 db opcode_clocks(2, 0, 3, 1, 0) ; 27 AND [d]
-								     
+								
 db opcode_clocks(1, 2, 1, 0, 0) ; 28 PLP
 db opcode_clocks(2, 0, 0, 0, 0) ; 29 AND i
 db opcode_clocks(1, 1, 0, 0, 0) ; 2A RLA
@@ -3397,7 +3397,7 @@ db opcode_clocks(3, 0, 0, 1, 0) ; 2C BIT a
 db opcode_clocks(3, 0, 0, 1, 0) ; 2D AND a
 db opcode_clocks(3, 1, 0, 2, 0) ; 2E ROL a
 db opcode_clocks(4, 0, 0, 1, 0) ; 2F AND al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; 30 BMI r
 db opcode_clocks(2, 0, 2, 1, 0) ; 31 AND (d),y
 db opcode_clocks(2, 0, 2, 1, 0) ; 32 AND (d)
@@ -3406,7 +3406,7 @@ db opcode_clocks(2, 1, 1, 0, 0) ; 34 BIT d,x
 db opcode_clocks(2, 1, 1, 0, 0) ; 35 AND d,x
 db opcode_clocks(2, 2, 2, 0, 0) ; 36 ROL d,x
 db opcode_clocks(2, 0, 3, 1, 0) ; 37 AND [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; 38 SEC
 db opcode_clocks(3, 0, 0, 1, 0) ; 39 AND a,y
 db opcode_clocks(1, 1, 0, 0, 0) ; 3A DEA
@@ -3415,7 +3415,7 @@ db opcode_clocks(3, 0, 0, 1, 0) ; 3C BIT a,x
 db opcode_clocks(3, 0, 0, 1, 0) ; 3D AND a,x
 db opcode_clocks(3, 2, 0, 2, 0) ; 3E ROL a,x
 db opcode_clocks(4, 0, 0, 1, 0) ; 3F AND al,x
-								     
+								
 db opcode_clocks(1, 2, 3, 0, 0) ; 40 RTI
 db opcode_clocks(2, 1, 2, 1, 0) ; 41 EOR (d,x)
 db opcode_clocks(2, 0, 0, 0, 0) ; 42 WDM *
@@ -3424,7 +3424,7 @@ db opcode_clocks(3, 2, 0, 2, 0) ; 44 MVP
 db opcode_clocks(2, 0, 1, 0, 0) ; 45 EOR d
 db opcode_clocks(2, 1, 2, 0, 0) ; 46 LSR d
 db opcode_clocks(2, 0, 3, 1, 0) ; 47 EOR [d]
-								     
+								
 db opcode_clocks(1, 1, 1, 0, 0) ; 48 PHA
 db opcode_clocks(2, 0, 0, 0, 0) ; 49 EOR i
 db opcode_clocks(1, 1, 0, 0, 0) ; 4A SRA
@@ -3433,7 +3433,7 @@ db opcode_clocks(3, 0, 0, 0, 0) ; 4C JMP a
 db opcode_clocks(3, 0, 0, 1, 0) ; 4D EOR a
 db opcode_clocks(3, 1, 0, 2, 0) ; 4E LSR a
 db opcode_clocks(4, 0, 0, 1, 0) ; 4F EOR al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; 50 BVC r
 db opcode_clocks(2, 0, 2, 1, 0) ; 51 EOR (d),y
 db opcode_clocks(2, 0, 2, 1, 0) ; 52 EOR (d)
@@ -3442,7 +3442,7 @@ db opcode_clocks(3, 2, 0, 2, 0) ; 54 MVN
 db opcode_clocks(2, 1, 1, 0, 0) ; 55 EOR d,x
 db opcode_clocks(2, 2, 2, 0, 0) ; 56 LSR d,x
 db opcode_clocks(2, 0, 3, 1, 0) ; 57 EOR [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; 58 CLI
 db opcode_clocks(3, 0, 0, 1, 0) ; 59 EOR a,y
 db opcode_clocks(1, 1, 1, 0, 0) ; 5A PHY
@@ -3451,7 +3451,7 @@ db opcode_clocks(4, 0, 0, 0, 0) ; 5C JML al
 db opcode_clocks(3, 0, 0, 1, 0) ; 5D EOR a,x
 db opcode_clocks(3, 2, 0, 2, 0) ; 5E LSR a,x
 db opcode_clocks(4, 0, 0, 1, 0) ; 5F EOR al,x
-								     
+								
 db opcode_clocks(1, 3, 2, 0, 0) ; 60 RTS
 db opcode_clocks(2, 1, 2, 1, 0) ; 61 ADC (d,x)
 db opcode_clocks(3, 1, 2, 0, 0) ; 62 PER
@@ -3460,7 +3460,7 @@ db opcode_clocks(2, 0, 1, 0, 0) ; 64 STZ d
 db opcode_clocks(2, 0, 1, 0, 0) ; 65 ADC d
 db opcode_clocks(2, 1, 2, 0, 0) ; 66 ROR d
 db opcode_clocks(2, 0, 3, 1, 0) ; 67 ADC [d]
-								     
+								
 db opcode_clocks(1, 2, 1, 0, 0) ; 68 PLA
 db opcode_clocks(2, 0, 0, 0, 0) ; 69 ADC i
 db opcode_clocks(1, 1, 0, 0, 0) ; 6A RRA
@@ -3469,7 +3469,7 @@ db opcode_clocks(3, 0, 2, 0, 0) ; 6C JMP (a)
 db opcode_clocks(3, 0, 0, 1, 0) ; 6D ADC a
 db opcode_clocks(3, 1, 0, 2, 0) ; 6E ROR a
 db opcode_clocks(4, 0, 0, 1, 0) ; 6F ADC al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; 70 BVS r
 db opcode_clocks(2, 0, 2, 1, 0) ; 71 ADC (d),y
 db opcode_clocks(2, 0, 2, 1, 0) ; 72 ADC (d)
@@ -3478,7 +3478,7 @@ db opcode_clocks(2, 1, 1, 0, 0) ; 74 STZ d,x
 db opcode_clocks(2, 1, 1, 0, 0) ; 75 ADC d,x
 db opcode_clocks(2, 2, 2, 0, 0) ; 76 ROR d,x
 db opcode_clocks(2, 0, 3, 1, 0) ; 77 ADC [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; 78 SEI
 db opcode_clocks(3, 0, 0, 1, 0) ; 79 ADC a,y
 db opcode_clocks(1, 2, 1, 0, 0) ; 7A PLY
@@ -3487,7 +3487,7 @@ db opcode_clocks(3, 1, 0, 2, 0) ; 7C JMP (a,x) - bus access in PB
 db opcode_clocks(3, 0, 0, 1, 0) ; 7D ADC a,x
 db opcode_clocks(3, 2, 0, 2, 0) ; 7E ROR a,x
 db opcode_clocks(4, 0, 0, 1, 0) ; 7F ADC al,x
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; 80 BRA r
 db opcode_clocks(2, 1, 2, 1, 0) ; 81 STA (d,x)
 db opcode_clocks(3, 1, 0, 0, 0) ; 82 BRL rl
@@ -3496,7 +3496,7 @@ db opcode_clocks(2, 0, 1, 0, 0) ; 84 STY d
 db opcode_clocks(2, 0, 1, 0, 0) ; 85 STA d
 db opcode_clocks(2, 0, 1, 0, 0) ; 86 STX d
 db opcode_clocks(2, 0, 3, 1, 0) ; 87 STA [d]
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; 88 DEY
 db opcode_clocks(2, 0, 0, 0, 0) ; 89 BIT i
 db opcode_clocks(1, 1, 0, 0, 0) ; 8A TXA
@@ -3505,7 +3505,7 @@ db opcode_clocks(3, 0, 0, 1, 0) ; 8C STY a
 db opcode_clocks(3, 0, 0, 1, 0) ; 8D STA a
 db opcode_clocks(3, 0, 0, 1, 0) ; 8E STX a
 db opcode_clocks(4, 0, 0, 1, 0) ; 8F STA al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; 90 BCC r
 db opcode_clocks(2, 1, 2, 1, 0) ; 91 STA (d),y
 db opcode_clocks(2, 0, 2, 1, 0) ; 92 STA (d)
@@ -3514,7 +3514,7 @@ db opcode_clocks(2, 1, 1, 0, 0) ; 94 STY d,x
 db opcode_clocks(2, 1, 1, 0, 0) ; 95 STA d,x
 db opcode_clocks(2, 1, 1, 0, 0) ; 96 STX d,y
 db opcode_clocks(2, 0, 3, 1, 0) ; 97 STA [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; 98 TYA
 db opcode_clocks(3, 1, 0, 1, 0) ; 99 STA a,y
 db opcode_clocks(1, 1, 0, 0, 0) ; 9A TXS
@@ -3523,7 +3523,7 @@ db opcode_clocks(3, 0, 0, 1, 0) ; 9C STZ a
 db opcode_clocks(3, 1, 0, 1, 0) ; 9D STA a,x
 db opcode_clocks(3, 1, 0, 1, 0) ; 9E STZ a,x
 db opcode_clocks(4, 0, 0, 1, 0) ; 9F STA al,x
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; A0 LDY i
 db opcode_clocks(2, 1, 2, 1, 0) ; A1 LDA (d,x)
 db opcode_clocks(2, 0, 0, 0, 0) ; A2 LDX i
@@ -3532,7 +3532,7 @@ db opcode_clocks(2, 0, 1, 0, 0) ; A4 LDY d
 db opcode_clocks(2, 0, 1, 0, 0) ; A5 LDA d
 db opcode_clocks(2, 0, 1, 0, 0) ; A6 LDX d
 db opcode_clocks(2, 0, 3, 1, 0) ; A7 LDA [d]
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; A8 TAY
 db opcode_clocks(2, 0, 0, 0, 0) ; A9 LDA i
 db opcode_clocks(1, 1, 0, 0, 0) ; AA TAX
@@ -3541,7 +3541,7 @@ db opcode_clocks(3, 0, 0, 1, 0) ; AC LDY a
 db opcode_clocks(3, 0, 0, 1, 0) ; AD LDA a
 db opcode_clocks(3, 0, 0, 1, 0) ; AE LDX a
 db opcode_clocks(4, 0, 0, 1, 0) ; AF LDA al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; B0 BCS r
 db opcode_clocks(2, 0, 2, 1, 0) ; B1 LDA (d),y
 db opcode_clocks(2, 0, 2, 1, 0) ; B2 LDA (d)
@@ -3550,7 +3550,7 @@ db opcode_clocks(2, 1, 1, 0, 0) ; B4 LDY d,x
 db opcode_clocks(2, 1, 1, 0, 0) ; B5 LDA d,x
 db opcode_clocks(2, 1, 1, 0, 0) ; B6 LDX d,y
 db opcode_clocks(2, 0, 3, 1, 0) ; B7 LDA [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; B8 CLV
 db opcode_clocks(3, 0, 0, 1, 0) ; B9 LDA a,y
 db opcode_clocks(1, 1, 0, 0, 0) ; BA TSX
@@ -3559,7 +3559,7 @@ db opcode_clocks(3, 0, 0, 1, 0) ; BC LDY a,x
 db opcode_clocks(3, 0, 0, 1, 0) ; BD LDA a,x
 db opcode_clocks(3, 0, 0, 1, 0) ; BE LDX a,y
 db opcode_clocks(4, 0, 0, 1, 0) ; BF LDA al,x
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; C0 CPY i
 db opcode_clocks(2, 1, 2, 1, 0) ; C1 CMP (d,x)
 db opcode_clocks(2, 1, 0, 0, 0) ; C2 REP i
@@ -3568,7 +3568,7 @@ db opcode_clocks(2, 0, 1, 0, 0) ; C4 CPY d
 db opcode_clocks(2, 0, 1, 0, 0) ; C5 CMP d
 db opcode_clocks(2, 1, 2, 0, 0) ; C6 DEC d
 db opcode_clocks(2, 0, 3, 1, 0) ; C7 CMP [d]
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; C8 INY
 db opcode_clocks(2, 0, 0, 0, 0) ; C9 CMP i
 db opcode_clocks(1, 1, 0, 0, 0) ; CA DEX
@@ -3577,7 +3577,7 @@ db opcode_clocks(3, 0, 0, 1, 0) ; CC CPY a
 db opcode_clocks(3, 0, 0, 1, 0) ; CD CMP a
 db opcode_clocks(3, 1, 0, 2, 0) ; CE DEC a
 db opcode_clocks(4, 0, 0, 1, 0) ; CF CMP al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; D0 BNE r
 db opcode_clocks(2, 0, 2, 1, 0) ; D1 CMP (d),y
 db opcode_clocks(2, 0, 2, 1, 0) ; D2 CMP (d)
@@ -3586,7 +3586,7 @@ db opcode_clocks(2, 0, 4, 0, 0) ; D4 PEI
 db opcode_clocks(2, 1, 1, 0, 0) ; D5 CMP d,x
 db opcode_clocks(2, 2, 2, 0, 0) ; D6 DEC d,x
 db opcode_clocks(2, 0, 3, 1, 0) ; D7 CMP [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; D8 CLD
 db opcode_clocks(3, 0, 0, 1, 0) ; D9 CMP a,y
 db opcode_clocks(1, 1, 1, 0, 0) ; DA PHX
@@ -3595,7 +3595,7 @@ db opcode_clocks(3, 0, 3, 0, 0) ; DC JML (a)
 db opcode_clocks(3, 0, 0, 1, 0) ; DD CMP a,x
 db opcode_clocks(3, 2, 0, 2, 0) ; DE DEC a,x
 db opcode_clocks(4, 0, 0, 1, 0) ; DF CMP al,x
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; E0 CPX i
 db opcode_clocks(2, 1, 2, 1, 0) ; E1 SBC (d,x)
 db opcode_clocks(2, 1, 0, 0, 0) ; E2 SEP i
@@ -3604,7 +3604,7 @@ db opcode_clocks(2, 0, 1, 0, 0) ; E4 CPX d
 db opcode_clocks(2, 0, 1, 0, 0) ; E5 SBC d
 db opcode_clocks(2, 1, 2, 0, 0) ; E6 INC d
 db opcode_clocks(2, 0, 3, 1, 0) ; E7 SBC [d]
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; E8 INX
 db opcode_clocks(2, 0, 0, 0, 0) ; E9 SBC i
 db opcode_clocks(1, 1, 0, 0, 0) ; EA NOP
@@ -3613,7 +3613,7 @@ db opcode_clocks(3, 0, 0, 1, 0) ; EC CPX a
 db opcode_clocks(3, 0, 0, 1, 0) ; ED SBC a
 db opcode_clocks(3, 1, 0, 2, 0) ; EE INC a
 db opcode_clocks(4, 0, 0, 1, 0) ; EF SBC al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 0) ; F0 BEQ r
 db opcode_clocks(2, 0, 2, 1, 0) ; F1 SBC (d),y
 db opcode_clocks(2, 0, 2, 1, 0) ; F2 SBC (d)
@@ -3622,7 +3622,7 @@ db opcode_clocks(3, 0, 2, 0, 0) ; F4 PEA
 db opcode_clocks(2, 1, 1, 0, 0) ; F5 SBC d,x
 db opcode_clocks(2, 2, 2, 0, 0) ; F6 INC d,x
 db opcode_clocks(2, 0, 3, 1, 0) ; F7 SBC [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 0) ; F8 SED
 db opcode_clocks(3, 0, 0, 1, 0) ; F9 SBC a,y
 db opcode_clocks(1, 2, 1, 0, 0) ; FA PLX
@@ -3641,7 +3641,7 @@ db opcode_clocks(2, 1, 2, 0, 1) ; 04 TSB d
 db opcode_clocks(2, 0, 1, 0, 1) ; 05 ORA d
 db opcode_clocks(2, 1, 2, 0, 1) ; 06 ASL d
 db opcode_clocks(2, 0, 3, 1, 1) ; 07 ORA [d]
-								     
+								
 db opcode_clocks(1, 1, 1, 0, 1) ; 08 PHP
 db opcode_clocks(2, 0, 0, 0, 1) ; 09 ORA i
 db opcode_clocks(1, 1, 0, 0, 1) ; 0A SLA
@@ -3650,7 +3650,7 @@ db opcode_clocks(3, 1, 0, 2, 1) ; 0C TSB a
 db opcode_clocks(3, 0, 0, 1, 1) ; 0D ORA a
 db opcode_clocks(3, 1, 0, 2, 1) ; 0E ASL a
 db opcode_clocks(4, 0, 0, 1, 1) ; 0F ORA al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 1) ; 10 BPL r
 db opcode_clocks(2, 0, 2, 1, 1) ; 11 ORA (d),y
 db opcode_clocks(2, 0, 2, 1, 1) ; 12 ORA (d)
@@ -3659,7 +3659,7 @@ db opcode_clocks(2, 1, 2, 0, 1) ; 14 TRB d
 db opcode_clocks(2, 1, 1, 0, 1) ; 15 ORA d,x
 db opcode_clocks(2, 2, 2, 0, 1) ; 16 ASL d,x
 db opcode_clocks(2, 0, 3, 1, 1) ; 17 ORA [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 1) ; 18 CLC
 db opcode_clocks(3, 0, 0, 1, 1) ; 19 ORA a,y
 db opcode_clocks(1, 1, 0, 0, 1) ; 1A INA
@@ -3668,7 +3668,7 @@ db opcode_clocks(3, 1, 0, 2, 1) ; 1C TRB a
 db opcode_clocks(3, 0, 0, 1, 1) ; 1D ORA a,x
 db opcode_clocks(3, 2, 0, 2, 1) ; 1E ASL a,x
 db opcode_clocks(4, 0, 0, 1, 1) ; 1F ORA al,x
-								     
+								
 db opcode_clocks(3, 1, 2, 0, 1) ; 20 JSR a
 db opcode_clocks(2, 1, 2, 1, 1) ; 21 AND (d,x)
 db opcode_clocks(4, 1, 3, 0, 1) ; 22 JSL al
@@ -3677,7 +3677,7 @@ db opcode_clocks(2, 0, 1, 0, 1) ; 24 BIT d
 db opcode_clocks(2, 0, 1, 0, 1) ; 25 AND d
 db opcode_clocks(2, 1, 2, 0, 1) ; 26 ROL d
 db opcode_clocks(2, 0, 3, 1, 1) ; 27 AND [d]
-								     
+								
 db opcode_clocks(1, 2, 1, 0, 1) ; 28 PLP
 db opcode_clocks(2, 0, 0, 0, 1) ; 29 AND i
 db opcode_clocks(1, 1, 0, 0, 1) ; 2A RLA
@@ -3686,7 +3686,7 @@ db opcode_clocks(3, 0, 0, 1, 1) ; 2C BIT a
 db opcode_clocks(3, 0, 0, 1, 1) ; 2D AND a
 db opcode_clocks(3, 1, 0, 2, 1) ; 2E ROL a
 db opcode_clocks(4, 0, 0, 1, 1) ; 2F AND al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 1) ; 30 BMI r
 db opcode_clocks(2, 0, 2, 1, 1) ; 31 AND (d),y
 db opcode_clocks(2, 0, 2, 1, 1) ; 32 AND (d)
@@ -3695,7 +3695,7 @@ db opcode_clocks(2, 1, 1, 0, 1) ; 34 BIT d,x
 db opcode_clocks(2, 1, 1, 0, 1) ; 35 AND d,x
 db opcode_clocks(2, 2, 2, 0, 1) ; 36 ROL d,x
 db opcode_clocks(2, 0, 3, 1, 1) ; 37 AND [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 1) ; 38 SEC
 db opcode_clocks(3, 0, 0, 1, 1) ; 39 AND a,y
 db opcode_clocks(1, 1, 0, 0, 1) ; 3A DEA
@@ -3704,7 +3704,7 @@ db opcode_clocks(3, 0, 0, 1, 1) ; 3C BIT a,x
 db opcode_clocks(3, 0, 0, 1, 1) ; 3D AND a,x
 db opcode_clocks(3, 2, 0, 2, 1) ; 3E ROL a,x
 db opcode_clocks(4, 0, 0, 1, 1) ; 3F AND al,x
-								     
+								
 db opcode_clocks(1, 2, 3, 0, 1) ; 40 RTI
 db opcode_clocks(2, 1, 2, 1, 1) ; 41 EOR (d,x)
 db opcode_clocks(2, 0, 0, 0, 1) ; 42 WDM *
@@ -3713,7 +3713,7 @@ db opcode_clocks(3, 2, 0, 2, 1) ; 44 MVP
 db opcode_clocks(2, 0, 1, 0, 1) ; 45 EOR d
 db opcode_clocks(2, 1, 2, 0, 1) ; 46 LSR d
 db opcode_clocks(2, 0, 3, 1, 1) ; 47 EOR [d]
-								     
+								
 db opcode_clocks(1, 1, 1, 0, 1) ; 48 PHA
 db opcode_clocks(2, 0, 0, 0, 1) ; 49 EOR i
 db opcode_clocks(1, 1, 0, 0, 1) ; 4A SRA
@@ -3722,7 +3722,7 @@ db opcode_clocks(3, 0, 0, 0, 1) ; 4C JMP a
 db opcode_clocks(3, 0, 0, 1, 1) ; 4D EOR a
 db opcode_clocks(3, 1, 0, 2, 1) ; 4E LSR a
 db opcode_clocks(4, 0, 0, 1, 1) ; 4F EOR al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 1) ; 50 BVC r
 db opcode_clocks(2, 0, 2, 1, 1) ; 51 EOR (d),y
 db opcode_clocks(2, 0, 2, 1, 1) ; 52 EOR (d)
@@ -3731,7 +3731,7 @@ db opcode_clocks(3, 2, 0, 2, 1) ; 54 MVN
 db opcode_clocks(2, 1, 1, 0, 1) ; 55 EOR d,x
 db opcode_clocks(2, 2, 2, 0, 1) ; 56 LSR d,x
 db opcode_clocks(2, 0, 3, 1, 1) ; 57 EOR [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 1) ; 58 CLI
 db opcode_clocks(3, 0, 0, 1, 1) ; 59 EOR a,y
 db opcode_clocks(1, 1, 1, 0, 1) ; 5A PHY
@@ -3740,7 +3740,7 @@ db opcode_clocks(4, 0, 0, 0, 1) ; 5C JML al
 db opcode_clocks(3, 0, 0, 1, 1) ; 5D EOR a,x
 db opcode_clocks(3, 2, 0, 2, 1) ; 5E LSR a,x
 db opcode_clocks(4, 0, 0, 1, 1) ; 5F EOR al,x
-								     
+								
 db opcode_clocks(1, 3, 2, 0, 1) ; 60 RTS
 db opcode_clocks(2, 1, 2, 1, 1) ; 61 ADC (d,x)
 db opcode_clocks(3, 1, 2, 0, 1) ; 62 PER
@@ -3749,7 +3749,7 @@ db opcode_clocks(2, 0, 1, 0, 1) ; 64 STZ d
 db opcode_clocks(2, 0, 1, 0, 1) ; 65 ADC d
 db opcode_clocks(2, 1, 2, 0, 1) ; 66 ROR d
 db opcode_clocks(2, 0, 3, 1, 1) ; 67 ADC [d]
-								     
+								
 db opcode_clocks(1, 2, 1, 0, 1) ; 68 PLA
 db opcode_clocks(2, 0, 0, 0, 1) ; 69 ADC i
 db opcode_clocks(1, 1, 0, 0, 1) ; 6A RRA
@@ -3758,7 +3758,7 @@ db opcode_clocks(3, 0, 2, 0, 1) ; 6C JMP (a)
 db opcode_clocks(3, 0, 0, 1, 1) ; 6D ADC a
 db opcode_clocks(3, 1, 0, 2, 1) ; 6E ROR a
 db opcode_clocks(4, 0, 0, 1, 1) ; 6F ADC al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 1) ; 70 BVS r
 db opcode_clocks(2, 0, 2, 1, 1) ; 71 ADC (d),y
 db opcode_clocks(2, 0, 2, 1, 1) ; 72 ADC (d)
@@ -3767,7 +3767,7 @@ db opcode_clocks(2, 1, 1, 0, 1) ; 74 STZ d,x
 db opcode_clocks(2, 1, 1, 0, 1) ; 75 ADC d,x
 db opcode_clocks(2, 2, 2, 0, 1) ; 76 ROR d,x
 db opcode_clocks(2, 0, 3, 1, 1) ; 77 ADC [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 1) ; 78 SEI
 db opcode_clocks(3, 0, 0, 1, 1) ; 79 ADC a,y
 db opcode_clocks(1, 2, 1, 0, 1) ; 7A PLY
@@ -3776,7 +3776,7 @@ db opcode_clocks(3, 1, 0, 2, 1) ; 7C JMP (a,x) - bus access in PB
 db opcode_clocks(3, 0, 0, 1, 1) ; 7D ADC a,x
 db opcode_clocks(3, 2, 0, 2, 1) ; 7E ROR a,x
 db opcode_clocks(4, 0, 0, 1, 1) ; 7F ADC al,x
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 1) ; 80 BRA r
 db opcode_clocks(2, 1, 2, 1, 1) ; 81 STA (d,x)
 db opcode_clocks(3, 1, 0, 0, 1) ; 82 BRL rl
@@ -3785,7 +3785,7 @@ db opcode_clocks(2, 0, 1, 0, 1) ; 84 STY d
 db opcode_clocks(2, 0, 1, 0, 1) ; 85 STA d
 db opcode_clocks(2, 0, 1, 0, 1) ; 86 STX d
 db opcode_clocks(2, 0, 3, 1, 1) ; 87 STA [d]
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 1) ; 88 DEY
 db opcode_clocks(2, 0, 0, 0, 1) ; 89 BIT i
 db opcode_clocks(1, 1, 0, 0, 1) ; 8A TXA
@@ -3794,7 +3794,7 @@ db opcode_clocks(3, 0, 0, 1, 1) ; 8C STY a
 db opcode_clocks(3, 0, 0, 1, 1) ; 8D STA a
 db opcode_clocks(3, 0, 0, 1, 1) ; 8E STX a
 db opcode_clocks(4, 0, 0, 1, 1) ; 8F STA al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 1) ; 90 BCC r
 db opcode_clocks(2, 1, 2, 1, 1) ; 91 STA (d),y
 db opcode_clocks(2, 0, 2, 1, 1) ; 92 STA (d)
@@ -3803,7 +3803,7 @@ db opcode_clocks(2, 1, 1, 0, 1) ; 94 STY d,x
 db opcode_clocks(2, 1, 1, 0, 1) ; 95 STA d,x
 db opcode_clocks(2, 1, 1, 0, 1) ; 96 STX d,y
 db opcode_clocks(2, 0, 3, 1, 1) ; 97 STA [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 1) ; 98 TYA
 db opcode_clocks(3, 1, 0, 1, 1) ; 99 STA a,y
 db opcode_clocks(1, 1, 0, 0, 1) ; 9A TXS
@@ -3812,7 +3812,7 @@ db opcode_clocks(3, 0, 0, 1, 1) ; 9C STZ a
 db opcode_clocks(3, 1, 0, 1, 1) ; 9D STA a,x
 db opcode_clocks(3, 1, 0, 1, 1) ; 9E STZ a,x
 db opcode_clocks(4, 0, 0, 1, 1) ; 9F STA al,x
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 1) ; A0 LDY i
 db opcode_clocks(2, 1, 2, 1, 1) ; A1 LDA (d,x)
 db opcode_clocks(2, 0, 0, 0, 1) ; A2 LDX i
@@ -3821,7 +3821,7 @@ db opcode_clocks(2, 0, 1, 0, 1) ; A4 LDY d
 db opcode_clocks(2, 0, 1, 0, 1) ; A5 LDA d
 db opcode_clocks(2, 0, 1, 0, 1) ; A6 LDX d
 db opcode_clocks(2, 0, 3, 1, 1) ; A7 LDA [d]
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 1) ; A8 TAY
 db opcode_clocks(2, 0, 0, 0, 1) ; A9 LDA i
 db opcode_clocks(1, 1, 0, 0, 1) ; AA TAX
@@ -3830,7 +3830,7 @@ db opcode_clocks(3, 0, 0, 1, 1) ; AC LDY a
 db opcode_clocks(3, 0, 0, 1, 1) ; AD LDA a
 db opcode_clocks(3, 0, 0, 1, 1) ; AE LDX a
 db opcode_clocks(4, 0, 0, 1, 1) ; AF LDA al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 1) ; B0 BCS r
 db opcode_clocks(2, 0, 2, 1, 1) ; B1 LDA (d),y
 db opcode_clocks(2, 0, 2, 1, 1) ; B2 LDA (d)
@@ -3839,7 +3839,7 @@ db opcode_clocks(2, 1, 1, 0, 1) ; B4 LDY d,x
 db opcode_clocks(2, 1, 1, 0, 1) ; B5 LDA d,x
 db opcode_clocks(2, 1, 1, 0, 1) ; B6 LDX d,y
 db opcode_clocks(2, 0, 3, 1, 1) ; B7 LDA [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 1) ; B8 CLV
 db opcode_clocks(3, 0, 0, 1, 1) ; B9 LDA a,y
 db opcode_clocks(1, 1, 0, 0, 1) ; BA TSX
@@ -3848,7 +3848,7 @@ db opcode_clocks(3, 0, 0, 1, 1) ; BC LDY a,x
 db opcode_clocks(3, 0, 0, 1, 1) ; BD LDA a,x
 db opcode_clocks(3, 0, 0, 1, 1) ; BE LDX a,y
 db opcode_clocks(4, 0, 0, 1, 1) ; BF LDA al,x
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 1) ; C0 CPY i
 db opcode_clocks(2, 1, 2, 1, 1) ; C1 CMP (d,x)
 db opcode_clocks(2, 1, 0, 0, 1) ; C2 REP i
@@ -3857,7 +3857,7 @@ db opcode_clocks(2, 0, 1, 0, 1) ; C4 CPY d
 db opcode_clocks(2, 0, 1, 0, 1) ; C5 CMP d
 db opcode_clocks(2, 1, 2, 0, 1) ; C6 DEC d
 db opcode_clocks(2, 0, 3, 1, 1) ; C7 CMP [d]
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 1) ; C8 INY
 db opcode_clocks(2, 0, 0, 0, 1) ; C9 CMP i
 db opcode_clocks(1, 1, 0, 0, 1) ; CA DEX
@@ -3866,7 +3866,7 @@ db opcode_clocks(3, 0, 0, 1, 1) ; CC CPY a
 db opcode_clocks(3, 0, 0, 1, 1) ; CD CMP a
 db opcode_clocks(3, 1, 0, 2, 1) ; CE DEC a
 db opcode_clocks(4, 0, 0, 1, 1) ; CF CMP al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 1) ; D0 BNE r
 db opcode_clocks(2, 0, 2, 1, 1) ; D1 CMP (d),y
 db opcode_clocks(2, 0, 2, 1, 1) ; D2 CMP (d)
@@ -3875,7 +3875,7 @@ db opcode_clocks(2, 0, 4, 0, 1) ; D4 PEI
 db opcode_clocks(2, 1, 1, 0, 1) ; D5 CMP d,x
 db opcode_clocks(2, 2, 2, 0, 1) ; D6 DEC d,x
 db opcode_clocks(2, 0, 3, 1, 1) ; D7 CMP [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 1) ; D8 CLD
 db opcode_clocks(3, 0, 0, 1, 1) ; D9 CMP a,y
 db opcode_clocks(1, 1, 1, 0, 1) ; DA PHX
@@ -3884,7 +3884,7 @@ db opcode_clocks(3, 0, 3, 0, 1) ; DC JML (a)
 db opcode_clocks(3, 0, 0, 1, 1) ; DD CMP a,x
 db opcode_clocks(3, 2, 0, 2, 1) ; DE DEC a,x
 db opcode_clocks(4, 0, 0, 1, 1) ; DF CMP al,x
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 1) ; E0 CPX i
 db opcode_clocks(2, 1, 2, 1, 1) ; E1 SBC (d,x)
 db opcode_clocks(2, 1, 0, 0, 1) ; E2 SEP i
@@ -3893,7 +3893,7 @@ db opcode_clocks(2, 0, 1, 0, 1) ; E4 CPX d
 db opcode_clocks(2, 0, 1, 0, 1) ; E5 SBC d
 db opcode_clocks(2, 1, 2, 0, 1) ; E6 INC d
 db opcode_clocks(2, 0, 3, 1, 1) ; E7 SBC [d]
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 1) ; E8 INX
 db opcode_clocks(2, 0, 0, 0, 1) ; E9 SBC i
 db opcode_clocks(1, 1, 0, 0, 1) ; EA NOP
@@ -3902,7 +3902,7 @@ db opcode_clocks(3, 0, 0, 1, 1) ; EC CPX a
 db opcode_clocks(3, 0, 0, 1, 1) ; ED SBC a
 db opcode_clocks(3, 1, 0, 2, 1) ; EE INC a
 db opcode_clocks(4, 0, 0, 1, 1) ; EF SBC al
-								     
+								
 db opcode_clocks(2, 0, 0, 0, 1) ; F0 BEQ r
 db opcode_clocks(2, 0, 2, 1, 1) ; F1 SBC (d),y
 db opcode_clocks(2, 0, 2, 1, 1) ; F2 SBC (d)
@@ -3911,7 +3911,7 @@ db opcode_clocks(3, 0, 2, 0, 1) ; F4 PEA
 db opcode_clocks(2, 1, 1, 0, 1) ; F5 SBC d,x
 db opcode_clocks(2, 2, 2, 0, 1) ; F6 INC d,x
 db opcode_clocks(2, 0, 3, 1, 1) ; F7 SBC [d],y
-								     
+								
 db opcode_clocks(1, 1, 0, 0, 1) ; F8 SED
 db opcode_clocks(3, 0, 0, 1, 1) ; F9 SBC a,y
 db opcode_clocks(1, 2, 1, 0, 1) ; FA PLX
@@ -3954,7 +3954,7 @@ section .text
  test R_Cycles,R_Cycles
  jl near C_LABEL(CPU_START_NEXT)
  jmp near HANDLE_EVENT
- 
+
 %else
 ;mov cl,0
  jmp near C_LABEL(CPU_RETURN)
