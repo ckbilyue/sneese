@@ -29,6 +29,10 @@ OPCODE_PROLOG(0x0F) ; ORA al
  _ORA Absolute_Long
 OPCODE_EPILOG
 
+OPCODE_PROLOG(0x13) ; ORA (d,s),y
+ _ORA Stack_Relative_Indirect_Indexed
+OPCODE_EPILOG
+
 OPCODE_PROLOG(0x1A) ; INC A
  RMW _INC_M,Accumulator
 OPCODE_EPILOG
@@ -69,6 +73,10 @@ OPCODE_PROLOG(0x2F) ; AND al
  _AND Absolute_Long
 OPCODE_EPILOG
 
+OPCODE_PROLOG(0x33) ; AND (d,s),y
+ _AND Stack_Relative_Indirect_Indexed
+OPCODE_EPILOG
+
 OPCODE_PROLOG(0x3A) ; DEC A
  RMW _DEC_M,Accumulator
 OPCODE_EPILOG
@@ -101,6 +109,10 @@ OPCODE_PROLOG(0x4F) ; EOR al
  _EOR Absolute_Long
 OPCODE_EPILOG
 
+OPCODE_PROLOG(0x53) ; EOR (d,s),y
+ _EOR Stack_Relative_Indirect_Indexed
+OPCODE_EPILOG
+
 OPCODE_PROLOG(0x5E) ; LSR a,x
  RMW _LSR,Absolute_Index_X
 OPCODE_EPILOG
@@ -127,6 +139,10 @@ OPCODE_EPILOG
 
 OPCODE_PROLOG(0x6F) ; ADC al
  _ADC Absolute_Long
+OPCODE_EPILOG
+
+OPCODE_PROLOG(0x73) ; ADC (d,s),y
+ _ADC Stack_Relative_Indirect_Indexed
 OPCODE_EPILOG
 
 OPCODE_PROLOG(0x7E) ; ROR a,x
@@ -185,6 +201,10 @@ OPCODE_PROLOG(0xAF) ; LDA al
  _LDA Absolute_Long
 OPCODE_EPILOG
 
+OPCODE_PROLOG(0xB3) ; LDA (d,s),y
+ _LDA Stack_Relative_Indirect_Indexed
+OPCODE_EPILOG
+
 OPCODE_PROLOG(0xC3) ; CMP d,s
  _CMP Stack_Relative
 OPCODE_EPILOG
@@ -203,6 +223,10 @@ OPCODE_EPILOG
 
 OPCODE_PROLOG(0xCF) ; CMP al
  _CMP Absolute_Long
+OPCODE_EPILOG
+
+OPCODE_PROLOG(0xD3) ; CMP (d,s),y
+ _CMP Stack_Relative_Indirect_Indexed
 OPCODE_EPILOG
 
 OPCODE_PROLOG(0xDE) ; DEC a,x
@@ -227,6 +251,10 @@ OPCODE_EPILOG
 
 OPCODE_PROLOG(0xEF) ; SBC al
  _SBC Absolute_Long
+OPCODE_EPILOG
+
+OPCODE_PROLOG(0xF3) ; SBC (d,s),y
+ _SBC Stack_Relative_Indirect_Indexed
 OPCODE_EPILOG
 
 OPCODE_PROLOG(0xFE) ; INC a,x

@@ -501,10 +501,6 @@ BFC BPL,SNES_FLAG_N
 EM_ORA OdO,Direct_Indirect
 E0_ORA OdO,Direct_Indirect
 
-; 13
-EM_ORA Od_sO_y,Stack_Relative_Indirect_Indexed
-E0_ORA Od_sO_y,Stack_Relative_Indirect_Indexed
-
 ; 15
 EM_ORA d_x,Direct_Index_X
 E0_ORA d_x,Direct_Index_X
@@ -786,10 +782,6 @@ BFS BMI,SNES_FLAG_N
 EM_AND OdO,Direct_Indirect
 E0_AND OdO,Direct_Indirect
 
-; 33
-EM_AND Od_sO_y,Stack_Relative_Indirect_Indexed
-E0_AND Od_sO_y,Stack_Relative_Indirect_Indexed
-
 ; 34
 EM_BIT d_x,Direct_Index_X
 E0_BIT d_x,Direct_Index_X
@@ -1027,10 +1019,6 @@ BFC BVC,SNES_FLAG_V
 ; 52
 EM_EOR OdO,Direct_Indirect
 E0_EOR OdO,Direct_Indirect
-
-; 53
-EM_EOR Od_sO_y,Stack_Relative_Indirect_Indexed
-E0_EOR Od_sO_y,Stack_Relative_Indirect_Indexed
 
 ; 54
 
@@ -1400,10 +1388,6 @@ BFS BVS,SNES_FLAG_V
 EM_ADC OdO,Direct_Indirect
 E0_ADC OdO,Direct_Indirect
 
-; 73
-EM_ADC Od_sO_y,Stack_Relative_Indirect_Indexed
-E0_ADC Od_sO_y,Stack_Relative_Indirect_Indexed
-
 ; 75
 EM_ADC d_x,Direct_Index_X
 E0_ADC d_x,Direct_Index_X
@@ -1600,10 +1584,6 @@ BFS BCS,SNES_FLAG_C
 ; B2
 EM_LDA OdO,Direct_Indirect
 E0_LDA OdO,Direct_Indirect
-
-; B3
-EM_LDA Od_sO_y,Stack_Relative_Indirect_Indexed
-E0_LDA Od_sO_y,Stack_Relative_Indirect_Indexed
 
 ; B4
 EX_LDY d_x,Direct_Index_X
@@ -1822,10 +1802,6 @@ BFC BNE,SNES_FLAG_Z
 ; D2
 EM_CMP OdO,Direct_Indirect
 E0_CMP OdO,Direct_Indirect
-
-; D3
-EM_CMP Od_sO_y,Stack_Relative_Indirect_Indexed
-E0_CMP Od_sO_y,Stack_Relative_Indirect_Indexed
 
 ; D4
 
@@ -2069,10 +2045,6 @@ BFS BEQ,SNES_FLAG_Z
 ; F2
 EM_SBC OdO,Direct_Indirect
 E0_SBC OdO,Direct_Indirect
-
-; F3
-EM_SBC Od_sO_y,Stack_Relative_Indirect_Indexed
-E0_SBC Od_sO_y,Stack_Relative_Indirect_Indexed
 
 ; F4
 
