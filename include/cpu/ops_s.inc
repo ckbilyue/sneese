@@ -57,8 +57,6 @@ OPCODE_PROLOG(0x28) ; PLP s
  jz .no_irq_enable
  JUMP_FLAG SNES_FLAG_I,.no_irq_enable
 %endif
- mov al,CEM_Instruction_After_IRQ_Enable
- mov [CPU_Execution_Mode],al
  xor edx,edx
  SAVE_CYCLES
  mov [C_LABEL(EventTrip)],edx
@@ -102,8 +100,6 @@ OPCODE_PROLOG(0x40) ; RTI s
  test bl,bl
  jz .no_irq_enable
  JUMP_FLAG SNES_FLAG_I,.no_irq_enable
- mov al,CEM_Instruction_After_IRQ_Enable
- mov [CPU_Execution_Mode],al
  xor edx,edx
  SAVE_CYCLES
  mov [C_LABEL(EventTrip)],edx
@@ -238,8 +234,6 @@ OPCODE_PROLOG(0xC2) ; REP #
  jz .no_irq_enable
  JUMP_FLAG SNES_FLAG_I,.no_irq_enable
 %endif
- mov al,CEM_Instruction_After_IRQ_Enable
- mov [CPU_Execution_Mode],al
  xor edx,edx
  SAVE_CYCLES
  mov [C_LABEL(EventTrip)],edx

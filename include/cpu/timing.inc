@@ -285,6 +285,7 @@ gap_str:db " ",0
 nl_str:db 10,0
 section .text
 
+
 %macro report_event 0
 %ifdef REPORT_EVENTS
  push 8
@@ -358,6 +359,13 @@ section .text
 
  report_event
 
+ cmp [NMI_pin],NMI_Raised
+ je .nmi_waiting
+
+ mov al,CEM_Instruction_After_IRQ_Enable
+ mov [CPU_Execution_Mode],al
+
+.nmi_waiting:
  call IRQ_Check_Late    ; chain
 
  LOAD_CYCLES
@@ -1148,12 +1156,12 @@ ALIGNC
 
 ALIGNC
 IRQ_Check_Newline:
- cmp byte [NMI_pin],NMI_Raised
- je .nmi_bypass
-
  mov bl,[C_LABEL(NMITIMEN)]
 
  mov edx,[FixedTrip]
+
+ cmp byte [NMI_pin],NMI_Raised
+ je .nmi_bypass
 
  test bl,0x30       ; IRQ enabled?
  jz .no_irq
@@ -1171,11 +1179,11 @@ IRQ_Check_Newline:
  mov dword [Event_Handler],IRQ_Event
  ret
 
+.nmi_bypass:
 .no_irq:
  mov ebx,[Fixed_Event]
  mov [C_LABEL(EventTrip)],edx
  mov [Event_Handler],ebx
-.nmi_bypass:
  ret
 
 
@@ -1185,6 +1193,8 @@ IRQ_Check:
  SAVE_CYCLES edx
  cmp byte [NMI_pin],NMI_Raised
  je .nmi_bypass
+
+ mov [Last_Trip],edx
 
  push edx
  mov bl,[C_LABEL(NMITIMEN)]
@@ -1208,6 +1218,8 @@ IRQ_Check:
  mov dword [Event_Handler],IRQ_Event
  jmp .fixup_timing
 
+.nmi_bypass:
+ mov edx,[FixedTrip]
 .no_irq:
  mov ebx,[Fixed_Event]
  mov [C_LABEL(EventTrip)],edx
@@ -1215,8 +1227,6 @@ IRQ_Check:
 .fixup_timing:
  LOAD_CYCLES edx
  pop edx
-.nmi_bypass:
- mov [Last_Trip],edx
  ret
 
 

@@ -425,8 +425,6 @@ OPCODE_PROLOG(0x58) ; CLI i
 
  test cl,cl
  jz .no_irq_enable
- mov al,CEM_Instruction_After_IRQ_Enable
- mov [CPU_Execution_Mode],al
  xor edx,edx
  SAVE_CYCLES
  mov [C_LABEL(EventTrip)],edx
