@@ -67,7 +67,7 @@ void LoadConfigCurrent(void)
  char default_keymap[] = "45 39 41 43  5  4 23 19 17  1 65 66";
  char keymapbuf[81];
 
- SCREEN_MODE = get_config_int("display", "screenmode", 2);
+ SCREEN_MODE = get_config_int("display", "screenmode", 1);
 #if defined(ALLEGRO_DOS)
  if (cfg_version >= 0.72 && SCREEN_MODE > 6) SCREEN_MODE = 0;
 #elif defined(ALLEGRO_WINDOWS) || defined(ALLEGRO_UNIX) || defined(ALLEGRO_BEOS)
