@@ -1196,11 +1196,11 @@ ALIGNC
 IRQ_Check:
  SAVE_CYCLES edx
  cmp byte [NMI_pin],NMI_Raised
+ push edx
  je .nmi_bypass
 
  mov [Last_Trip],edx
 
- push edx
  mov bl,[C_LABEL(NMITIMEN)]
 
  mov edx,[FixedTrip]
