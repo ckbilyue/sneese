@@ -69,8 +69,8 @@ EXE    := sneese$(SUFFIX)$(EXE_EXT)
 endif
 
 OFLAGS = -march=i486 -mcpu=pentium -O3 -ffast-math $(PFLAGS) \
- -fno-rtti -fno-exceptions -fstrength-reduce -fthread-jumps \
- -fexpensive-optimizations -fschedule-insns2 -fgcse
+ -fstrength-reduce -fthread-jumps -fexpensive-optimizations \
+ -fschedule-insns2 -fgcse
 
 # Probably just a gcc < 3 problem. I'll upgrade soon. Really ;-)
 ifneq ($(OSTYPE),beos)
@@ -101,6 +101,7 @@ CFLAGS = $(OFLAGS) -ggdb3 -I$(INCLUDE)/
 ifdef ZLIB
 CFLAGS += -DZLIB
 endif
+CPPFLAGS = $(CFLAGS) -fno-rtti -fno-exceptions
 
 ifneq ($(SAVE_ASM_OUTPUT),0)
 OBJBASE := s
@@ -161,13 +162,13 @@ $(OBJ)/%.s: $(SRC)/%.c
 	$(GCC) -S $(CFLAGS) $(DFLAGS) -o $@ $<
 
 $(OBJ)/%.s: $(SRC)/%.cpp
-	$(GCC) -S $(CFLAGS) $(DFLAGS) -o $@ $<
+        $(GCC) -S $(CPPFLAGS) $(DFLAGS) -o $@ $<
 
 $(OBJ)/%.o: $(SRC)/%.c
 	$(GCC) -c $(CFLAGS) $(DFLAGS) -o $@ $<
 
 $(OBJ)/%.o: $(SRC)/%.cpp
-	$(GCC) -c $(CFLAGS) $(DFLAGS) -o $@ $<
+        $(GCC) -c $(CPPFLAGS) $(DFLAGS) -o $@ $<
 
 $(EXE): $(addprefix $(OBJ)/, $(OBJS))
 	$(GXX) $(PFLAGS) $(DFLAGS) -o $(EXE) $(addprefix $(OBJ)/, $(OBJS)) $(MIOFLAGS) $(ALLEG)
