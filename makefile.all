@@ -77,19 +77,7 @@ ifdef OBJFIX_INCLUDE
 include $(OBJFIX_INCLUDE)
 endif
 
-OFLAGS = -march=i486 -mcpu=pentium -O3 -ffast-math $(PFLAGS) \
- -fstrength-reduce -fthread-jumps -fexpensive-optimizations \
- -fschedule-insns2 -fgcse
-
-# Probably just a gcc < 3 problem. I'll upgrade soon. Really ;-)
-ifneq ($(OSTYPE),beos)
-OFLAGS += -foptimize-sibling-calls -fgcse-lm -fgcse-sm
-
-# gcc version 2.9-beos-991026 (the "default" gcc version for BeOS
-# R5 PE) is broken. Adding -fschedule-insns produces faulty code
-# and causes SNEeSe to crash when opening a ROM.
-OFLAGS += -fschedule-insns
-endif
+OFLAGS = -march=i486 -mcpu=pentium -O3 -ffast-math $(PFLAGS) 
 
 
 endif
