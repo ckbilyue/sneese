@@ -4738,15 +4738,21 @@ EXPORT_C Reset_CPU
  mov [In_CPU],al
  mov [CPU_Execution_Mode],al ;CEM_Normal_Execution == 0
  mov dword [OpTable],OpTableE1  ; Set current opcode emulation table
-;mov [C_LABEL(SNES_Cycles)SNES_Cycles],eax  ; Clear cycle counts
-;mov R_Cycles,eax       ; Needed for IRQNewFrame later
- mov dword [C_LABEL(SNES_Cycles)],52    ; Clear cycle counts
+ mov [C_LABEL(SNES_Cycles)],eax ; Clear cycle counts
+
+ LOAD_BASE
+ LOAD_CYCLES
+
+ mov dword [CPU_LABEL(S)],0x01FF
  mov [CPU_LABEL(A)],eax ; Clear A, D, X, Y
  mov [CPU_LABEL(D)],eax
  mov [CPU_LABEL(X)],eax
  mov [CPU_LABEL(Y)],eax
- mov [CPU_LABEL(DB_Shifted)],eax    ; Clear bank registers
- mov [CPU_LABEL(PB_Shifted)],eax
+
+ call E1_RESET
+ SAVE_CYCLES
+
+ mov al,[CPU_LABEL(PB)]
  mov [C_LABEL(OLD_PB)],al
 
 %ifdef DEBUG
@@ -4754,7 +4760,6 @@ EXPORT_C Reset_CPU
 ;mov [C_LABEL(Timer_Counter_FPS)],eax
 %endif
  ; Initialize flags
- LOAD_BASE
 ;FLAGS_TO (SNES_FLAG_B1+SNES_FLAG_E+SNES_FLAG_I)
  STORE_FLAGS_E 1
  STORE_FLAGS_N 0
@@ -4765,7 +4770,6 @@ EXPORT_C Reset_CPU
  STORE_FLAGS_I 1
  STORE_FLAGS_Z 1
  STORE_FLAGS_C 0
- mov dword [CPU_LABEL(S)],0x01FF
 
 ;%1 = vector; %2 = label prefix;
 ;%3 = register with relative address of ROM at 00:E000-FFFF
@@ -4973,6 +4977,36 @@ HANDLE_EVENT:
  SAVE_CYCLES
  jmp dword [Event_Handler]
 
+ALIGNC
+EXPORT E1_RESET
+ ; RESET (Emulation mode)
+ add R_Cycles,_5A22_FAST_CYCLE * 2
+ mov ebx,B_S
+ GET_BYTE       ;dummy stack access
+ GET_BYTE       ;dummy stack access
+ GET_BYTE       ;dummy stack access
+
+;7.12.2 In the Emulation mode, the PBR and DBR registers are cleared to 00
+;when a hardware interrupt, BRK or COP is executed. In this case, previous
+;contents of the PBR are not automatically saved.
+ mov byte [CPU_LABEL(DB)],0
+
+ mov ebx,0xFFFC         ; Get Emulation mode IRQ vector
+
+ xor eax,eax
+ GET_WORD
+ mov [CPU_LABEL(PC)],eax    ; Setup PC vector
+ mov byte [CPU_LABEL(PB)],0 ; Setup bank
+;SET_FLAG SNES_FLAG_I   ; Disable IRQs
+ STORE_FLAGS_I 1
+%ifndef NO_FASTROM
+ mov byte [C_LABEL(CycleTable)],4   ; SlowROM bank
+%endif
+;CLR_FLAG SNES_FLAG_D   ; Disable decimal mode
+ STORE_FLAGS_D 0
+ ret
+
+ALIGNC
 EXPORT E1_IRQ
  ; Emulation mode IRQ
  mov eax,[CPU_LABEL(PC)]
