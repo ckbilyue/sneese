@@ -228,20 +228,31 @@ ALIGNC
 %if M_8bit
  READ8_%1
  mov cl,B_A
+%ifnidni %1,Immediate
  STORE_FLAGS_N al
  and cl,al
  and al,0x40
  STORE_FLAGS_Z cl
  STORE_FLAGS_V al
+%else   ; immediate affects only Z flag, others copy 2 MSBs to NV
+ and cl,al
+ STORE_FLAGS_Z cl
+%endif
 %else
  READ16_%1
  mov ecx,B_A
+%ifnidni %1,Immediate
  STORE_FLAGS_N ah
  and ecx,eax
  and ah,0x40
  or cl,ch
  STORE_FLAGS_V ah
  STORE_FLAGS_Z cl
+%else   ; immediate affects only Z flag, others copy 2 MSBs to NV
+ and ecx,eax
+ or cl,ch
+ STORE_FLAGS_Z cl
+%endif
 %endif
 %endmacro
 

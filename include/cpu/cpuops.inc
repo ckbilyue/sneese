@@ -718,7 +718,7 @@ EXPORT_C E1_RTI
 ; 42
 ALIGNC
 EXPORT_C ALL_WDM
- add R_NativePC,byte 2
+ READ8_Immediate
  OPCODE_EPILOG
 
 ; 4C
@@ -1126,24 +1126,6 @@ EXPORT_C ALL_BRL        ; Branch always long (-32768 to 32767)
  mov eax,C_LABEL(Blank)
  jmp short .read_direct
 %endif
-
-; 89    ; Differs from norm, only sets Z flag
-
-ALIGNC
-EXPORT_C EM_BIT_i
- READ8_Immediate
- mov cl,B_A
- and al,cl
- STORE_FLAGS_Z al
- OPCODE_EPILOG
-ALIGNC
-EXPORT_C E0_BIT_i
- READ16_Immediate
- mov ecx,B_A
- and eax,ecx
- or al,ah
- STORE_FLAGS_Z al
- OPCODE_EPILOG
 
 OPCODE_PROLOG(0xB8) ; CLV i
  _CLx V         ; Clear oVerflow flag
