@@ -74,6 +74,8 @@ Changes
   SRAM: Corrected LoROM SRAM address ranges, per a theory shared by
    myself and MKendora [TRAC]
   Memory map: Corrected ROM mirroring [TRAC]
+  ROM loader: Reduced some problems with starting the emulator in a path
+   other than the one where it is located [TRAC]
  0.776 [TRAC]
   Render: Added support for dual window clipping with all logic
    modes of backgrounds in modes 5 and 6

@@ -442,13 +442,14 @@ BITMAP *joypad=0;
 void Reload_Bitmaps()
 {
 #ifndef NO_LOGO
+ char logo_name[MAXPATH];
+
  if (sneese) destroy_bitmap(sneese);
 
- #ifdef DEBUG
-  sneese = load_pcx("sneese.dat#sneese", sneesepal);
- #else
-  sneese = load_pcx("#sneese", sneesepal);
- #endif
+ strcpy(logo_name, dat_name);
+ strcat(logo_name, "#sneese");
+
+ sneese = load_pcx(logo_name, sneesepal);
 #endif
 }
 

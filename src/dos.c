@@ -446,8 +446,14 @@ int platform_init(int argc, char **argv)
   * when started from a different directory
   * (ie, drag-and-drop via Windows Explorer)
   */
+ {
+  char exe_name[MAXPATH];
 
- fnsplit(argv[0], f_drive, f_dir, f_file, f_ext);
+  get_executable_name(exe_name, MAXPATH);
+  fnsplit(exe_name, f_drive, f_dir, f_file, f_ext);
+ }
+
+ fnmerge(home_dir, f_drive, f_dir, "", "");
 
  if (getcwd(start_dir, MAXPATH) == NULL)
  {
@@ -456,23 +462,16 @@ int platform_init(int argc, char **argv)
   return 1;
  }
 
- if (!strlen(f_drive) && !strlen(f_dir))
- {
-  strcpy(home_dir, start_dir);
-  fnsplit(home_dir, f_drive, f_dir, f_file, f_ext);
- }
- else
- {
-  fnmerge(home_dir, f_drive, f_dir, "", "");
-  chdir(home_dir);
- }
+ strcpy(cfg_name, home_dir);
+
+ strcpy(dat_name, home_dir);
 
 #ifdef ALLEGRO_WINDOWS
- strcpy(cfg_name, "sneesew.cfg");
+ strcat(cfg_name, "sneesew.cfg");
 #else
- strcpy(cfg_name, "sneese.cfg");
+ strcat(cfg_name, "sneese.cfg");
 #endif
- strcpy(dat_name, "sneese.dat");
+ strcat(dat_name, "sneese.dat");
 
  set_config_file(cfg_name); /* Yup, config files exist */
 

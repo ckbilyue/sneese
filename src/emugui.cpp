@@ -84,16 +84,19 @@ const char *GUI_init()
 {
  char *errormsg;
 
+ char joypad_name[MAXPATH];
+
+
  errormsg = GUI_core_init();
 
  if (errormsg) return errormsg;
 
  if (joypad) destroy_bitmap(joypad);
- #ifdef DEBUG
-  joypad = load_pcx("sneese.dat#joypad", sneesepal);
- #else
-  joypad = load_pcx("#joypad", sneesepal);
- #endif
+
+ strcpy(joypad_name, dat_name);
+ strcat(joypad_name, "#joypad");
+
+ joypad = load_pcx(joypad_name, sneesepal);
 
  return 0;
 }
