@@ -37,7 +37,7 @@ extern FILELIST *DirList;
 
 // This fills an array of FILELIST with file information
 // from the path given, starting at file number Offset
-int GetDirList(char *Path, FILELIST *&Files, int Offset, int &MaxLen);
+int GetDirList(char *Path, FILELIST *&Files, int Offset);
 
 /* ------------------------- GUI STUFF ------------------------- */
 
@@ -260,11 +260,6 @@ void PlotSelectedMenuItem(WINDOW *window,pGUI_FONT font,
 BITMAP *SetGUIScreen(int);
 
 int WaitForKeyPress();
-
-extern BORDER_WINDOW File_window;
-
-void UpdateFileWindow(int SelFile, int NumFiles, int FirstFile = 0);
-const char *FileWindow();
 
 #endif /* defined(__cplusplus)||defined(c_plusplus) */
 

@@ -66,17 +66,17 @@ int max_listed_files = 1024;
 
 FILELIST *DirList;
 
-// This fills an array of FILELIST with file information
-// from the path given, starting at file number Offset
-// and with a maximum number of files of MaxLen
-
 int fncmp(const FILELIST *f1, const FILELIST *f2){
  if (f2->Directory && !f1->Directory) return -1;
  if (f1->Directory && !f2->Directory) return 1;
  return stricmp(f1->Name, f2->Name);
 }
 
-int GetDirList(char *Path, FILELIST *&Files, int Offset, int &MaxLen){
+// This fills an array of FILELIST with file information
+// from the path given, starting at file number Offset
+// and with a maximum number of files of max_listed_files
+
+int GetDirList(char *Path, FILELIST *&Files, int Offset){
  al_ffblk FileInfo;
  int FilesRead;
 
@@ -95,18 +95,15 @@ int GetDirList(char *Path, FILELIST *&Files, int Offset, int &MaxLen){
  FilesRead = 1;
 
  do {
-  if (FilesRead == MaxLen - 26)
+  if (FilesRead == max_listed_files - 26)
   {
-   Files = (FILELIST *) realloc(Files, sizeof(FILELIST[max_listed_files + 128]));
+   Files = (FILELIST *) realloc(Files, sizeof(FILELIST[max_listed_files += 128]));
    if (!Files)
    {
     set_gfx_mode(GFX_TEXT, 0, 0, 0, 0);
     printf("Fatal error: Failure allocating memory for directory\n");
     exit(EXIT_FAILURE);
    }
-
-   max_listed_files += 128;
-   MaxLen = max_listed_files;
   }
 
   if (strcmp(".", FileInfo.name) != 0 && strcmp("..", FileInfo.name) != 0){
@@ -620,166 +617,3 @@ void PlotCharBorder(unsigned char Character,int x,int y){
   }
  }
 }*/
-
-BORDER_WINDOW File_window(20,0,38*default_font->get_widthspace(),15*default_font->get_heightspace());
-
-void UpdateFileWindow(int SelFile, int NumFiles, int FirstFile){
- char TempString[MAXPATH + 2];
-
- File_window.refresh();
- for (int a = 0; a < NumFiles; a++){
-  int CurFile = FirstFile + a;
-  if (DirList[CurFile].Directory)
-   sprintf(TempString, "[%s]", DirList[CurFile].Name);
-  if (a == SelFile)
-   PlotSelectedMenuItem(&File_window, default_font,
-    DirList[CurFile].Directory ? TempString : DirList[CurFile].Name,
-    0, default_font->get_heightspace() * a, 38);
-  else
-   PlotMenuItem(&File_window, default_font,
-    DirList[CurFile].Directory ? TempString : DirList[CurFile].Name,
-    0, default_font->get_heightspace() * a, 38);
- }
-
-#ifndef NO_LOGO
- if (sneese)
-  stretch_blit(sneese, Allegro_Bitmap, 0, 0,
-   GUI_ScreenWidth, GUI_ScreenHeight, 0, 0, SCREEN_W, SCREEN_H);
-#endif
- draw_sprite(Allegro_Bitmap, GUI_Bitmap, 0, 0);
- vsync();
- CopyGUIScreen();
-}
-
-const char *FileWindow()
-{
- clear_keybuf();
- static int FileListPos = 0;
- static int SelFile = 0;
- int NumFiles;
- int keypress, key_asc, key_scan;
- static char current_file_window_dir[MAXPATH] = ".";
- static char filename[MAXPATH];
-
- chdir(current_file_window_dir);
- NumFiles = GetDirList("*.*", DirList, FileListPos, max_listed_files);
-
- UpdateFileWindow(SelFile,
-  FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos,
-  FileListPos);
-
- for(;;)
- {
-  while (!keypressed());
-  keypress = readkey();
-  key_asc = keypress & 0xFF;
-  key_scan = keypress >> 8;
-
-  switch (key_scan)
-  {
-   case KEY_HOME:
-    FileListPos = 0;
-    SelFile = 0;
-
-    UpdateFileWindow(SelFile,
-     FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos,
-     FileListPos);
-    continue;
-
-   case KEY_END:
-    // Jump to end of files, then to end of drives
-    if (FileListPos + 15 + 26 < NumFiles) FileListPos = NumFiles - 15 - 26;
-    else FileListPos = NumFiles - 15;
-
-    if (FileListPos < 0) FileListPos = 0;
-    SelFile = (FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos) - 1;
-
-    UpdateFileWindow(SelFile,
-     FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos,
-     FileListPos);
-    continue;
-
-   case KEY_PGUP:
-    if (FileListPos != 0)
-    {
-     FileListPos -= 15;
-     if (FileListPos < 0) FileListPos = 0;
-    } else SelFile = 0;
-
-    UpdateFileWindow(SelFile,
-     FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos,
-     FileListPos);
-    continue;
-
-   case KEY_PGDN:
-    if (FileListPos + 15 < NumFiles)
-    {
-     FileListPos += 15;
-     if (FileListPos + 15 >= NumFiles) FileListPos = NumFiles - 15;
-    } else SelFile =
-     (FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos) - 1;
-
-    UpdateFileWindow(SelFile,
-     FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos,
-     FileListPos);
-    continue;
-
-  case KEY_UP:
-   if (SelFile == 0 && FileListPos > 0)
-   {
-    FileListPos--;
-
-    UpdateFileWindow(SelFile,
-     FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos,
-     FileListPos);
-   } else if (SelFile > 0)
-   {
-    UpdateFileWindow(--SelFile,
-     FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos,
-     FileListPos);
-   }
-   continue;
-
-   case KEY_DOWN:
-    if(SelFile == 14 && FileListPos < NumFiles - 15)
-    {
-     FileListPos++;
-     UpdateFileWindow(SelFile,
-      FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos,
-      FileListPos);
-    } else if (SelFile
-     < (FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos) - 1)
-    {
-     UpdateFileWindow(++SelFile,
-      FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos,
-      FileListPos);
-    }
-    continue;
-
-   case KEY_ESC:
-    return NULL;
-
-   case KEY_ENTER:
-    if (DirList[FileListPos + SelFile].Directory)
-    {
-     char dir[MAXDIR];
-
-     chdir(DirList[FileListPos + SelFile].Name);
-     strcpy(current_file_window_dir, getcwd(dir, MAXDIR)); // "remember" last opened dir
-     FileListPos = 0;
-     SelFile = 0;
-     NumFiles = GetDirList("*.*", DirList, FileListPos, max_listed_files);
-     UpdateFileWindow(SelFile,
-      FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos,
-      FileListPos);
-     continue;
-    } else {
-     fix_filename_path(filename, DirList[FileListPos + SelFile].Name,
-      MAXPATH);
-
-     return filename;
-    }
-  }
- }
- return NULL;
-}

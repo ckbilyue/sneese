@@ -143,6 +143,8 @@ const char *GUI_init()
 
 WINDOW *GUI_window=0;
 
+WINDOW *File_window=0;
+
 WINDOW *Main_window=0;
 
 enum {
@@ -282,17 +284,56 @@ char *Screen_Options[NUM_SCREEN_OPTIONS]={
 #error Unsupported platform.
 #endif
 
-void UpdateGUI(int Selected)
+void UpdateGUI()
 {
- clear(GUI_Bitmap);
+ GUI_window->refresh();
+}
+
+void UpdateMainWindow(int Selected)
+{
+ static int last = 0;
+
+ if (Selected < 0) Selected = last;
+ else last = Selected;
+
+ UpdateGUI();
  Main_window->refresh();
  for(int a=0;a<MAIN_NUM_OPTIONS;a++)
   if(a!=Selected) PlotMenuItem(Main_window,default_font,Main_Options[a],0,default_font->get_heightspace()*a,16);
   else PlotSelectedMenuItem(Main_window,default_font,Main_Options[a],0,default_font->get_heightspace()*a,16);
 }
 
+void UpdateFileWindow(int SelFile, int NumFiles, int FirstFile)
+{
+ char TempString[MAXPATH + 2];
+
+ UpdateMainWindow(-1);
+ File_window->refresh();
+ for (int a = 0; a < NumFiles; a++){
+  int CurFile = FirstFile + a;
+  if (DirList[CurFile].Directory)
+   sprintf(TempString, "[%s]", DirList[CurFile].Name);
+  if (a == SelFile)
+   PlotSelectedMenuItem(File_window, default_font,
+    DirList[CurFile].Directory ? TempString : DirList[CurFile].Name,
+    0, default_font->get_heightspace() * a, 38);
+  else
+   PlotMenuItem(File_window, default_font,
+    DirList[CurFile].Directory ? TempString : DirList[CurFile].Name,
+    0, default_font->get_heightspace() * a, 38);
+ }
+
+ refresh_gui();
+}
+
 void UpdateConfigWindow(int Selected)
 {
+ static int last = 0;
+
+ if (Selected < 0) Selected = last;
+ else last = Selected;
+
+ UpdateMainWindow(-1);
  Config_window->refresh();
  for(int a=0;a<CONFIG_NUM_OPTIONS;a++)
   if(a!=Selected) PlotMenuItem(Config_window,default_font,Config_Options[a],0,default_font->get_heightspace()*a,24);
@@ -301,7 +342,12 @@ void UpdateConfigWindow(int Selected)
 
 void UpdateScreenWindow(int Selected)
 {
- UpdateConfigWindow(CONFIG_SCREEN_MODE);
+ static int last = 0;
+
+ if (Selected < 0) Selected = last;
+ else last = Selected;
+
+ UpdateConfigWindow(-1);
  Screen_window->refresh();
  for(int a=0;a<NUM_SCREEN_OPTIONS;a++)
   if(a!=Selected) PlotMenuItem(Screen_window,default_font,Screen_Options[a],0,default_font->get_heightspace()*a,20);
@@ -310,7 +356,12 @@ void UpdateScreenWindow(int Selected)
 
 void UpdateSoundWindow(int Selected)
 {
- UpdateConfigWindow(CONFIG_SOUND);
+ static int last = 0;
+
+ if (Selected < 0) Selected = last;
+ else last = Selected;
+
+ UpdateConfigWindow(-1);
  Sound_window->refresh();
  for(int a=0;a<SOUND_NUM_OPTIONS;a++)
   if(a!=Selected) PlotMenuItem(Sound_window,default_font,Sound_Options[a],0,default_font->get_heightspace()*a,24);
@@ -319,14 +370,150 @@ void UpdateSoundWindow(int Selected)
 
 void UpdateControlsWindow(int Selected)
 {
- UpdateConfigWindow(CONFIG_CONTROLLERS);
+ static int last = 0;
+
+ if (Selected < 0) Selected = last;
+ else last = Selected;
+
+ UpdateConfigWindow(-1);
  Controls_window->refresh();
  for(int a=0;a<CONTROLS_NUM_OPTIONS;a++)
   if(a!=Selected) PlotMenuItem(Controls_window,default_font,Controls_Options[a],0,default_font->get_heightspace()*a,24);
   else PlotSelectedMenuItem(Controls_window,default_font,Controls_Options[a],0,default_font->get_heightspace()*a,24);
- refresh_gui();
 }
 
+const char *FileWindow()
+{
+ clear_keybuf();
+ static int FileListPos = 0;
+ static int SelFile = 0;
+ int NumFiles;
+ int keypress, key_asc, key_scan;
+ static char current_file_window_dir[MAXPATH] = ".";
+ static char filename[MAXPATH];
+
+ chdir(current_file_window_dir);
+ NumFiles = GetDirList("*.*", DirList, FileListPos);
+
+ UpdateFileWindow(SelFile,
+  FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos,
+  FileListPos);
+
+ for(;;)
+ {
+  while (!keypressed());
+  keypress = readkey();
+  key_asc = keypress & 0xFF;
+  key_scan = keypress >> 8;
+
+  switch (key_scan)
+  {
+   case KEY_HOME:
+    FileListPos = 0;
+    SelFile = 0;
+
+    UpdateFileWindow(SelFile,
+     FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos,
+     FileListPos);
+    continue;
+
+   case KEY_END:
+    // Jump to end of files, then to end of drives
+    if (FileListPos + 15 + 26 < NumFiles) FileListPos = NumFiles - 15 - 26;
+    else FileListPos = NumFiles - 15;
+
+    if (FileListPos < 0) FileListPos = 0;
+    SelFile = (FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos) - 1;
+
+    UpdateFileWindow(SelFile,
+     FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos,
+     FileListPos);
+    continue;
+
+   case KEY_PGUP:
+    if (FileListPos != 0)
+    {
+     FileListPos -= 15;
+     if (FileListPos < 0) FileListPos = 0;
+    } else SelFile = 0;
+
+    UpdateFileWindow(SelFile,
+     FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos,
+     FileListPos);
+    continue;
+
+   case KEY_PGDN:
+    if (FileListPos + 15 < NumFiles)
+    {
+     FileListPos += 15;
+     if (FileListPos + 15 >= NumFiles) FileListPos = NumFiles - 15;
+    } else SelFile =
+     (FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos) - 1;
+
+    UpdateFileWindow(SelFile,
+     FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos,
+     FileListPos);
+    continue;
+
+  case KEY_UP:
+   if (SelFile == 0 && FileListPos > 0)
+   {
+    FileListPos--;
+
+    UpdateFileWindow(SelFile,
+     FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos,
+     FileListPos);
+   } else if (SelFile > 0)
+   {
+    UpdateFileWindow(--SelFile,
+     FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos,
+     FileListPos);
+   }
+   continue;
+
+   case KEY_DOWN:
+    if(SelFile == 14 && FileListPos < NumFiles - 15)
+    {
+     FileListPos++;
+     UpdateFileWindow(SelFile,
+      FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos,
+      FileListPos);
+    } else if (SelFile
+     < (FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos) - 1)
+    {
+     UpdateFileWindow(++SelFile,
+      FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos,
+      FileListPos);
+    }
+    continue;
+
+   case KEY_ESC:
+    return NULL;
+
+   case KEY_ENTER:
+    if (DirList[FileListPos + SelFile].Directory)
+    {
+     char dir[MAXDIR];
+
+     chdir(DirList[FileListPos + SelFile].Name);
+     strcpy(current_file_window_dir, getcwd(dir, MAXDIR)); // "remember" last opened dir
+     FileListPos = 0;
+     SelFile = 0;
+     NumFiles = GetDirList("*.*", DirList, FileListPos);
+     UpdateFileWindow(SelFile,
+      FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos,
+      FileListPos);
+     continue;
+    } else {
+     fix_filename_path(filename, DirList[FileListPos + SelFile].Name,
+      MAXPATH);
+
+     return filename;
+    }
+  }
+ }
+ return NULL;
+}
 int ScreenWindow()
 {
  int CursorAt = SCREEN_MODE;
@@ -337,6 +524,7 @@ int ScreenWindow()
  {
   UpdateScreenWindow(CursorAt);
   refresh_gui();
+
   while (!keypressed());
   keypress = readkey();
   key_asc = keypress & 0xFF;
@@ -403,6 +591,7 @@ int SoundWindow()
  {
   UpdateSoundWindow(CursorAt);
   refresh_gui();
+
   while (!keypressed());
   keypress = readkey();
   key_asc = keypress & 0xFF;
@@ -608,6 +797,7 @@ void UpdateControllerScreen(const SNES_CONTROLLER_INPUTS *input)
 {
  char tempch[9];
 
+ UpdateControlsWindow(-1);
  ControlSetup_window->refresh();
 
  scantotext(input->up,tempch);
@@ -675,10 +865,14 @@ int AskKey(const char *msg, int *whatkey, SNES_CONTROLLER_INPUTS *input)
  lastkeypress_chain = keyboard_lowlevel_callback;
  keyboard_lowlevel_callback = lastkeypress_callback;
 
+
+ UpdateControllerScreen(input);
+
  PlotStringShadow(ControlSetup_window, default_font,
   msg, 84, 96, 15, 8);
 
  refresh_gui();
+
 
  do tmp = lastkeypressed(); while (!tmp);
  if (keypressed()) readkey(); /* throw away the key */
@@ -689,15 +883,12 @@ int AskKey(const char *msg, int *whatkey, SNES_CONTROLLER_INPUTS *input)
 
  *whatkey=tmp;
 
- UpdateControllerScreen(input);
-
  return TRUE;
 }
 
 void AskControllerInputs(SNES_CONTROLLER_INPUTS *input)
 {
  clear_keybuf();
- UpdateControllerScreen(input);
 
  if (AskKey("Press key for UP", &input->up, input))
   if (AskKey("Press key for DOWN", &input->down, input))
@@ -712,8 +903,13 @@ void AskControllerInputs(SNES_CONTROLLER_INPUTS *input)
   if (AskKey("Press key for SELECT", &input->select, input))
   if (AskKey("Press key for START", &input->start, input))
  {
-  PlotStringShadow(ControlSetup_window,default_font,"Press ESC to exit",84,96,15,8);
+  UpdateControllerScreen(input);
+
+  PlotStringShadow(ControlSetup_window,default_font,
+   "Press ESC to exit",84,96,15,8);
+
   refresh_gui();
+
 
   for (;;)
   {
@@ -721,8 +917,6 @@ void AskControllerInputs(SNES_CONTROLLER_INPUTS *input)
    if ((readkey() >> 8) == KEY_ESC) break;
   }
  }
-
- UpdateGUI(MAIN_CONFIGURE);
 }
 
 int ControlsWindow()
@@ -762,6 +956,8 @@ int ControlsWindow()
  for(;;)
  {
   UpdateControlsWindow(CursorAt);
+  refresh_gui();
+
   while (!keypressed());
   keypress = readkey();
   key_asc = keypress & 0xFF;
@@ -887,6 +1083,7 @@ int ConfigWindow()
  {
   UpdateConfigWindow(CursorAt);
   refresh_gui();
+
   while (!keypressed());
   keypress = readkey();
   key_asc = keypress & 0xFF;
@@ -1074,17 +1271,12 @@ int ConfigWindow()
       set_palette_range(&GUIPal[-240],240,255,1);    // Set the GUI palette up.
 #endif
      }
-     UpdateGUI(MAIN_CONFIGURE);
      break;
     }
 
     if (CursorAt == CONFIG_CONTROLLERS)
     {
-     while((temp = ControlsWindow()) != -1)
-     {
-      fill_backdrop(Allegro_Bitmap);
-     }
-     UpdateGUI(MAIN_CONFIGURE);
+     while((temp = ControlsWindow()) != -1);
      break;
     }
 
@@ -1102,11 +1294,7 @@ int ConfigWindow()
 
     if (CursorAt == CONFIG_SOUND)
     {
-     while((temp = SoundWindow()) != -1)
-     {
-      fill_backdrop(Allegro_Bitmap);
-     }
-     UpdateGUI(MAIN_CONFIGURE);
+     while((temp = SoundWindow()) != -1);
      break;
     }
 
@@ -1540,8 +1728,9 @@ void BGWinStatus(void)
 
 CTL *joypad_bitmap=0;
 
-CTL_CLEAR GUI_clear;
+CTL_CLEAR GUI_clear(0);
 CTL_CLEAR Main_clear;
+CTL_CLEAR File_clear;
 CTL_CLEAR Screen_clear;
 CTL_CLEAR Config_clear;
 CTL_CLEAR Sound_clear;
@@ -1551,15 +1740,12 @@ CTL_CLEAR HWStatus_clear;
 CTL_CLEAR DMAStatus_clear;
 CTL_CLEAR APUStatus_clear;
 CTL_CLEAR BGWinStatus_clear;
-CTL_CLEAR File_clear;
 
 int allocate_windows()
 {
- static int file_cleared=0;
- if(!file_cleared) File_window+=File_clear;
-
- GUI_window=new BORDER_WINDOW(-1,-1,320,240);
+ GUI_window=new WINDOW(0,0,320,240);
  Main_window=new BORDER_WINDOW(0,0,16*default_font->get_widthspace(),MAIN_NUM_OPTIONS*default_font->get_heightspace());
+ File_window=new BORDER_WINDOW(20,0,38*default_font->get_widthspace(),15*default_font->get_heightspace());
  Screen_window=new BORDER_WINDOW(100,30,21*default_font->get_widthspace(),NUM_SCREEN_OPTIONS*default_font->get_heightspace());
  Config_window=new BORDER_WINDOW(70,15,24*default_font->get_widthspace(),CONFIG_NUM_OPTIONS*default_font->get_heightspace());
  Controls_window=new BORDER_WINDOW(90,105,24*default_font->get_widthspace(),CONTROLS_NUM_OPTIONS*default_font->get_heightspace());
@@ -1570,12 +1756,14 @@ int allocate_windows()
  DMAStatus_window=new BORDER_WINDOW(10,70,33*default_font->get_widthspace(),9*default_font->get_heightspace());
  APUStatus_window=new BORDER_WINDOW(8,70,48*default_font->get_widthspace(),9*default_font->get_heightspace());
  BGWinStatus_window=new BORDER_WINDOW(8,70,48*default_font->get_widthspace(),9*default_font->get_heightspace());
- if(!(GUI_window && Main_window && Screen_window && Config_window &&
-    Controls_window && Sound_window && ControlSetup_window &&
-    ROMInfo_window && HWStatus_window && DMAStatus_window &&
-    APUStatus_window && BGWinStatus_window)) return 1;
+ if(!(GUI_window && Main_window && File_window && Screen_window &&
+    Config_window && Controls_window && Sound_window &&
+    ControlSetup_window && ROMInfo_window && HWStatus_window &&
+    DMAStatus_window && APUStatus_window && BGWinStatus_window))
+     return 1;
  *GUI_window+=GUI_clear;
  *Main_window+=Main_clear;
+ *File_window+=File_clear;
  *Screen_window+=Screen_clear;
  *Config_window+=Config_clear;
  *Controls_window+=Config_clear;
@@ -1595,6 +1783,7 @@ void free_windows()
 {
  delete GUI_window;
  delete Main_window;
+ delete File_window;
  delete joypad_bitmap;
  delete Screen_window; delete Config_window; delete Sound_window;
  delete ControlSetup_window; delete ROMInfo_window;
@@ -1603,6 +1792,7 @@ void free_windows()
 
  GUI_window=0;
  Main_window=0;
+ File_window=0;
  joypad_bitmap=0;
  Screen_window=0; Config_window=0; Sound_window=0;
  ControlSetup_window=0; ROMInfo_window=0; HWStatus_window=0;
@@ -1635,8 +1825,9 @@ GUI_ERROR GUI()
  {
   int keypress, key_asc, key_scan;
 
-  UpdateGUI(CursorAt);
+  UpdateMainWindow(CursorAt);
   refresh_gui();
+
   while (!keypressed());
   keypress = readkey();
   key_asc = keypress & 0xFF;
