@@ -25,6 +25,8 @@ Changes
   5A22: Changed emulation-mode interrupts to NOT zero data bank
    register - thanks to Overload for pointing out that the SNES CPU
    does not do this [TRAC]
+  Source: Fixed a bug which prevented compilation on some setups,
+   including BeOS [DBJH]
   Sound: Added 8-sample delay before key-on completion [TRAC]
   Timing: Fixed up some IRQ setup logic bugs introduced by the
    NMI logic improvements [TRAC]
