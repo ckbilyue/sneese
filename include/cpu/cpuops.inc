@@ -891,17 +891,13 @@ OPCODE_PROLOG(0x7C) ; JMP (a,x)
 %endif
 OPCODE_EPILOG
 
-; 82
-                                 
-ALIGNC
-EXPORT_C ALL_BRL        ; Branch always long (-32768 to 32767)
- mov al,[1+R_NativePC]
- GET_PC ebx
+OPCODE_PROLOG(0x82) ; BRL rl
+; Branch always long (-32768 to 32767)
 %ifdef TRAP_INVALID_JUMP
  mov [C_LABEL(Map_Byte)],ebx
 %endif
- mov ah,[2+R_NativePC]
- add ebx,byte 3
+ READ16_Immediate
+ GET_PC ebx
  add eax,ebx
  and eax,0xFFFF
  mov ebx,B_PB_Shifted
@@ -930,6 +926,7 @@ EXPORT_C ALL_BRL        ; Branch always long (-32768 to 32767)
  mov eax,C_LABEL(Blank)
  jmp short .read_direct
 %endif
+OPCODE_EPILOG
 
 OPCODE_PROLOG(0xB8) ; CLV i
  _CLx V         ; Clear oVerflow flag
