@@ -41,6 +41,9 @@ Changes
   SPC700: Improved timer accuracy and behavior of register area, thanks
    to research from anomie [TRAC]
   Source: Removed support for double-clocked SPC700 execution rate [TRAC]
+  JMA Support: Fixed some bugs in decompression, improved performance,
+   reduced memory requirements, upgraded stream support, and added
+   support for JMA v1 files [Nach]
  0.832
   Documentation: Updated grossly insufficient copyright attributations
    [TRAC]
