@@ -27,6 +27,73 @@ You must read and accept the license prior to use.
 ;
 ; Final address in ebx, or eax when address is to be stored in PC!
 
+; Helper macro for read-modify-write operations.
+
+;insn, addr
+%macro RMW 2
+ RMW_ %+ %2 %1
+%endmacro
+
+
+; Implied
+%macro ADDR_Implied 0
+ inc R_NativePC
+%endmacro
+
+
+; shift, rotate, increment, and decrement of registers
+;  RMW 8-bit and 16-bit
+; M  ASL-0A  INC-1A  ROL-2A  DEC-3A  LSR-4A  ROR-6A
+;  X DEY-88  INY-C8  DEX-CA  INX-E8
+%macro RMW_Accumulator 1
+ ADDR_Implied
+%if M_8bit
+ mov al,B_A
+%else
+ mov eax,B_A
+%endif
+;add R_Cycles,_5A22_FAST_CYCLE
+ %1
+%if M_8bit
+ mov B_A,al
+%else
+ mov B_A,ax
+%endif
+%endmacro
+
+%macro RMW_Index_X 1
+ ADDR_Implied
+%if X_8bit
+ mov al,B_X
+%else
+ mov eax,B_X
+%endif
+;add R_Cycles,_5A22_FAST_CYCLE
+ %1
+%if X_8bit
+ mov B_X,al
+%else
+ mov B_X,ax
+%endif
+%endmacro
+
+%macro RMW_Index_Y 1
+ ADDR_Implied
+%if X_8bit
+ mov al,B_Y
+%else
+ mov eax,B_Y
+%endif
+;add R_Cycles,_5A22_FAST_CYCLE
+ %1
+%if X_8bit
+ mov B_Y,al
+%else
+ mov B_Y,ax
+%endif
+%endmacro
+
+
 ; Immediate (read-only)
 ;  Read 8-bit and 16-bit
 ;    ORA-09  AND-29  EOR-49  ADC-69  BIT-89  LDY-A0  LDX-A2  LDA-A9

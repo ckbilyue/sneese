@@ -186,8 +186,10 @@ $(EXE): $(addprefix $(OBJ)/, $(OBJS))
 
 $(OBJ)/cpu/65c816.$(ASM_OBJ_EXT): $(SRC)/cpu/65c816.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, cpu/cpuaddr.inc cpu/cpumacro.inc cpu/cpuops.inc \
- cpu/timing.inc cpu/regs.inc cpu/cpumem.inc cpu/dma.inc apu/spc.inc \
- cycles.inc misc.inc ppu/ppu.inc ppu/screen.inc ppu/sprites.inc)
+ cpu/ops_s.inc cpu/ops_sm.inc cpu/ops_sx.inc cpu/ops_smx.inc cpu/ops_m.inc \
+ cpu/ops_x.inc cpu/ops_mx.inc cpu/timing.inc cpu/regs.inc cpu/cpumem.inc \
+ cpu/dma.inc apu/spc.inc cycles.inc misc.inc ppu/ppu.inc ppu/screen.inc \
+ ppu/sprites.inc)
 $(OBJ)/apu/spc700.$(ASM_OBJ_EXT): $(SRC)/apu/spc700.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, apu/spc.inc apu/regs.inc apu/spcaddr.inc \
  apu/spcmacro.inc apu/spcops.inc cpu/regs.inc cycles.inc misc.inc \

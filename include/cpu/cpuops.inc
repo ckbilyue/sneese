@@ -305,6 +305,94 @@ You must read and accept the license prior to use.
 ;    FF: SBC al,x    4,5 T(MDC) M(NVZC)
 ;
 
+
+;S,M,X
+%macro Setup_Opcode_Sizes 3
+%define S_size %1
+%if S_size == 8
+%define S_8bit 1
+%else
+%define S_8bit 0
+%endif
+
+%define M_size %2
+%if M_size == 8
+%define M_8bit 1
+%else
+%define M_8bit 0
+%endif
+
+%define X_size %3
+%if X_size == 8
+%define X_8bit 1
+%else
+%define X_8bit 0
+%endif
+%endmacro
+
+
+%macro Clear_Opcode_Sizes 0
+%undef S_size
+%undef S_8bit
+%undef M_size
+%undef M_8bit
+%undef X_size
+%undef X_8bit
+%endmacro
+
+
+Setup_Opcode_Sizes 8,8,8
+%include "cpu/ops_s.inc"
+%include "cpu/ops_sm.inc"
+%include "cpu/ops_sx.inc"
+%include "cpu/ops_smx.inc"
+Clear_Opcode_Sizes
+
+Setup_Opcode_Sizes 16,8,8
+%include "cpu/ops_s.inc"
+%include "cpu/ops_sm.inc"
+%include "cpu/ops_sx.inc"
+%include "cpu/ops_smx.inc"
+Clear_Opcode_Sizes
+
+Setup_Opcode_Sizes 16,16,16
+%include "cpu/ops_sm.inc"
+%include "cpu/ops_sx.inc"
+%include "cpu/ops_smx.inc"
+Clear_Opcode_Sizes
+
+Setup_Opcode_Sizes 16,8,16
+%include "cpu/ops_smx.inc"
+Clear_Opcode_Sizes
+
+Setup_Opcode_Sizes 16,16,8
+%include "cpu/ops_smx.inc"
+Clear_Opcode_Sizes
+
+Setup_Opcode_Sizes 16,8,8
+%include "cpu/ops_m.inc"
+%include "cpu/ops_x.inc"
+%include "cpu/ops_mx.inc"
+Clear_Opcode_Sizes
+
+Setup_Opcode_Sizes 16,16,16
+%include "cpu/ops_m.inc"
+%include "cpu/ops_x.inc"
+%include "cpu/ops_mx.inc"
+Clear_Opcode_Sizes
+
+Setup_Opcode_Sizes 16,8,16
+%include "cpu/ops_mx.inc"
+Clear_Opcode_Sizes
+
+Setup_Opcode_Sizes 16,16,8
+%include "cpu/ops_mx.inc"
+Clear_Opcode_Sizes
+
+
+%define OPCODE_PROLOG(op) EXPORT_C Op_ %+ op
+
+
 ;%1 = vector, %2 = offset
 %macro NativeInterrupt 2
  mov al,B_PB
@@ -499,27 +587,6 @@ _CLx C,ALL_CLC          ; Clear Carry flag
 ; 19
 EM_ORA a_y,Absolute_Index_Y
 E0_ORA a_y,Absolute_Index_Y
-
-; 1A
-
-ALIGNC
-EXPORT_C EM_INA
- mov al,B_A
- inc R_NativePC
- inc al
- mov B_A,al
- STORE_FLAGS_NZ al
- OPCODE_EPILOG
-ALIGNC
-EXPORT_C E0_INA
- mov eax,B_A
- inc R_NativePC
- inc eax
- mov B_A,ax
- STORE_FLAGS_N ah
- or al,ah
- STORE_FLAGS_Z al
- OPCODE_EPILOG
 
 ; 1B
 _TxS B_A,16,E0_TCS
@@ -882,27 +949,6 @@ _SEx C,ALL_SEC          ; Set Carry flag
 ; 39
 EM_AND a_y,Absolute_Index_Y
 E0_AND a_y,Absolute_Index_Y
-
-; 3A
-
-ALIGNC
-EXPORT_C EM_DEA
- mov al,B_A
- inc R_NativePC
- dec al
- mov B_A,al
- STORE_FLAGS_NZ al
- OPCODE_EPILOG
-ALIGNC
-EXPORT_C E0_DEA
- mov eax,B_A
- inc R_NativePC
- dec eax
- mov B_A,ax
- or al,ah
- STORE_FLAGS_N ah
- STORE_FLAGS_Z al
- OPCODE_EPILOG
 
 ; 3B
 _TxC B_S,ALL_TSC
@@ -1778,43 +1824,19 @@ E0_STX d,Direct
 EM_STA IdI,Direct_Indirect_Long
 E0_STA IdI,Direct_Indirect_Long
 
-; 88
-
-ALIGNC
-EXPORT_C EX_DEY
- mov al,B_Y
- inc R_NativePC
- dec al
- mov B_Y,al
- STORE_FLAGS_NZ al
- OPCODE_EPILOG
-ALIGNC
-EXPORT_C E0_DEY
- mov eax,B_Y
- inc R_NativePC
- dec eax
- mov B_Y,ax
- or al,ah
- STORE_FLAGS_N ah
- STORE_FLAGS_Z al
- OPCODE_EPILOG
-
 ; 89    ; Differs from norm, only sets Z flag
 
 ALIGNC
 EXPORT_C EM_BIT_i
- mov al,[1+R_NativePC]
+ READ8_Immediate
  mov cl,B_A
- add R_NativePC,byte 2
  and al,cl
  STORE_FLAGS_Z al
  OPCODE_EPILOG
 ALIGNC
 EXPORT_C E0_BIT_i
- mov al,[1+R_NativePC]
+ READ16_Immediate
  mov ecx,B_A
- mov ah,[2+R_NativePC]
- add R_NativePC,byte 3
  and eax,ecx
  or al,ah
  STORE_FLAGS_Z al
@@ -2177,51 +2199,10 @@ E0_DEC d,Direct
 EM_CMP IdI,Direct_Indirect_Long
 E0_CMP IdI,Direct_Indirect_Long
 
-; C8
-
-ALIGNC
-EXPORT_C EX_INY
- mov al,B_Y
- inc R_NativePC
- inc al
- mov B_Y,al
- STORE_FLAGS_NZ al
- OPCODE_EPILOG
-ALIGNC
-EXPORT_C E0_INY
- mov eax,B_Y
- inc R_NativePC
- inc eax
- mov B_Y,ax
- or al,ah
- STORE_FLAGS_N ah
- STORE_FLAGS_Z al
- OPCODE_EPILOG
 
 ; C9
 EM_CMP i,Immediate
 E0_CMP i,Immediate
-
-; CA
-
-ALIGNC
-EXPORT_C EX_DEX
- mov al,B_X
- inc R_NativePC
- dec al
- mov B_X,al
- STORE_FLAGS_NZ al
- OPCODE_EPILOG
-ALIGNC
-EXPORT_C E0_DEX
- mov eax,B_X
- inc R_NativePC
- dec eax
- mov B_X,ax
- or al,ah
- STORE_FLAGS_N ah
- STORE_FLAGS_Z al
- OPCODE_EPILOG
 
 ; CB
 
@@ -2522,27 +2503,6 @@ E0_INC d,Direct
 ; E7
 EM_SBC IdI,Direct_Indirect_Long
 E0_SBC IdI,Direct_Indirect_Long
-
-; E8
-
-ALIGNC
-EXPORT_C EX_INX
- mov al,B_X
- inc R_NativePC
- inc al
- mov B_X,al
- STORE_FLAGS_NZ al
- OPCODE_EPILOG
-ALIGNC
-EXPORT_C E0_INX
- mov eax,B_X
- inc R_NativePC
- inc eax
- mov B_X,ax
- or al,ah
- STORE_FLAGS_N ah
- STORE_FLAGS_Z al
- OPCODE_EPILOG
 
 ; E9
 EM_SBC i,Immediate

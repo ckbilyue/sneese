@@ -1,0 +1,12 @@
+%define OPCODE_PROLOG(op) EXPORT_C OpM %+ M_8bit %+ _ %+ op
+
+
+OPCODE_PROLOG(0x1A) ; INC A
+ RMW _INC_M,Accumulator
+OPCODE_EPILOG
+
+OPCODE_PROLOG(0x3A) ; DEC A
+ RMW _DEC_M,Accumulator
+OPCODE_EPILOG
+
+%undef OPCODE_PROLOG

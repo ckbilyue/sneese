@@ -336,6 +336,23 @@ EXPORT_C E0_DEC_%1
  OPCODE_EPILOG
 %endmacro
 
+;size
+%macro _DEC 1
+%if (%1) == 8
+ dec al
+ STORE_FLAGS_NZ al
+%else
+ dec eax
+ mov cl,ah
+ STORE_FLAGS_N ah
+ or cl,al
+ STORE_FLAGS_Z cl
+%endif
+%endmacro
+
+%define _DEC_M _DEC M_size
+%define _DEC_X _DEC X_size
+
 ;%1 = label, %2 = addr
 %macro EM_EOR 2
 ALIGNC
@@ -385,6 +402,23 @@ EXPORT_C E0_INC_%1
  STORE_FLAGS_Z al
  OPCODE_EPILOG
 %endmacro
+
+;size
+%macro _INC 1
+%if (%1) == 8
+ inc al
+ STORE_FLAGS_NZ al
+%else
+ inc eax
+ mov cl,ah
+ STORE_FLAGS_N ah
+ or cl,al
+ STORE_FLAGS_Z cl
+%endif
+%endmacro
+
+%define _INC_M _INC M_size
+%define _INC_X _INC X_size
 
 ;%1 = label, %2 = addr
 %macro EM_LDA 2
