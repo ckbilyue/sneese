@@ -444,7 +444,8 @@ Emulation details:
     - Partial wide-tile support in modes 5 and 6 (odd pixels are skipped).
     - Partial priority-per-pixel support in mode 7 (may still have bugs).
  - Dual window clipping with all logic modes in BG modes 0-6.
- - Full mosaic effect in BG modes 0-7.
+ - Full mosaic effect in BG modes 0-7, with correct countdown register
+    support.
  - Screen sizes 32x32, 64x32, 32x64, and 64x64 supported.
  - Sprites are supported in all sizes (8x8, 16x16, 32x32, 64x64), with
     name and base select, priority rotation, correct sprite-to-sprite
