@@ -77,9 +77,65 @@ unsigned char *RomAddress;      // Address of SNES ROM
 unsigned SaveRamLength = 0;
 
 int Allocate_ROM();
-int rom_bank_count_64k, rom_bank_count_32k;
-int rom_bank_count_mask, rom_bank_count_premask;
 int ROM_format;
+
+typedef struct {
+ int bank_count;
+ unsigned char overflow_mask;
+ unsigned char bank_lookup[256];
+} ROM_MIRRORING_DATA;
+
+ROM_MIRRORING_DATA rmd_32k, rmd_64k;
+
+void setup_rom_mirroring(ROM_MIRRORING_DATA *rmd)
+{
+    int copycount, missing, count, next, banks_mirror_size;
+
+    /* Compute a mask used to wrap invalid ROM bank numbers.
+     */
+    if (((rmd->bank_count * 2 - 1) & (rmd->bank_count - 1)) ==
+     (rmd->bank_count - 1))
+    /* compute mask for even power of two */
+    {
+        banks_mirror_size = rmd->bank_count;
+    }
+    else
+    /* compute mask */
+    {
+        int i;
+
+        /* compute the smallest even power of 2 greater than
+           ROM bank count, and use that to compute the mask */
+        for (i = 0; (rmd->bank_count >> i) > 0; i++);
+
+        banks_mirror_size = (1 << i);
+    }
+
+    rmd -> overflow_mask = banks_mirror_size - 1;
+
+
+    /* identity-map all the present banks */
+    for (copycount = 0; copycount < rmd->bank_count; copycount++)
+    {
+        rmd -> bank_lookup [copycount] = copycount;
+    }
+
+
+    /* mirror-map all the not-present banks */
+    for (next = rmd->bank_count, missing = banks_mirror_size - rmd->bank_count,
+        count = 1; missing; count <<= 1, missing >>= 1)
+    {
+        if (missing & 1)
+        {
+            for (copycount = count; copycount; copycount--, next++)
+            {
+                rmd -> bank_lookup[next] =
+                    rmd -> bank_lookup[next - count];
+            }
+        }
+    }
+}
+
 
 SNESRomInfoStruct RomInfoLo, RomInfoHi;
 
@@ -240,13 +296,14 @@ int Allocate_ROM()
  Free_ROM();
 
  AllocROMAddress =
-  (unsigned char *) malloc (rom_bank_count_64k * (64 << 10) + (12 << 10));
- if (!AllocROMAddress) return rom_bank_count_64k * (64 << 10) + (12 << 10);
+  (unsigned char *) malloc (rmd_64k.bank_count * (64 << 10) + (12 << 10));
+ if (!AllocROMAddress) return rmd_64k.bank_count * (64 << 10) + (12 << 10);
 
  RomAddress =   // Force 4k alignment/8k misalignment
   (unsigned char *)(((unsigned)
    ((AllocROMAddress + ((8 << 10) - 1))) & ~((8 << 10) - 1)) + (4 << 10));
- memset(RomAddress, 0xFF, rom_bank_count_64k * (64 << 10));
+ memset(RomAddress, 0xFF, rmd_64k.bank_count * (64 << 10));
+
  return 0;
 }
 
@@ -399,14 +456,7 @@ inline void map_rom_32k_lorom(int bank)
 {
  int needed_bank;
 
- if ((bank & 0x7F & rom_bank_count_premask) >= rom_bank_count_32k)
- {
-  needed_bank = bank & rom_bank_count_mask;
- }
- else
- {
-  needed_bank = bank & rom_bank_count_premask;
- }
+ needed_bank = rmd_32k.bank_lookup [(bank & 0x7F) & rmd_32k.overflow_mask];
 
  for (int i = 4; i < 8; i++)
  {
@@ -420,14 +470,7 @@ inline void map_rom_32k_lorom_40_C0(int bank)
 {
  int needed_bank;
 
- if ((bank & 0x3F & rom_bank_count_premask) >= rom_bank_count_32k)
- {
-  needed_bank = bank & rom_bank_count_mask;
- }
- else
- {
-  needed_bank = bank & rom_bank_count_premask;
- }
+ needed_bank = rmd_32k.bank_lookup [(bank & 0x3F) & rmd_32k.overflow_mask];
 
  for (int i = 0; i < 4; i++)
  {
@@ -443,14 +486,7 @@ inline void map_rom_32k_hirom(int bank)
 {
  int needed_bank;
 
- if ((bank & 0x3F & rom_bank_count_premask) >= rom_bank_count_64k)
- {
-  needed_bank = bank & rom_bank_count_mask;
- }
- else
- {
-  needed_bank = bank & rom_bank_count_premask;
- }
+ needed_bank = rmd_64k.bank_lookup [(bank & 0x3F) & rmd_64k.overflow_mask];
 
  for (int i = 4; i < 8; i++)
  {
@@ -464,14 +500,7 @@ inline void map_rom_64k(int bank)
 {
  int needed_bank;
 
- if ((bank & 0x3F & rom_bank_count_premask) >= rom_bank_count_64k)
- {
-  needed_bank = bank & rom_bank_count_mask;
- }
- else
- {
-  needed_bank = bank & rom_bank_count_premask;
- }
+ needed_bank = rmd_64k.bank_lookup [(bank & 0x3F) & rmd_64k.overflow_mask];
 
  for (int i = 0; i < 8; i++)
  {
@@ -555,27 +584,6 @@ bool Set_LoROM_Map()
   map_unmapped_64k(b);
  }
 
- /* Compute ROM bank masks for 32k banks */
- if (((rom_bank_count_32k * 2 - 1) & (rom_bank_count_32k - 1))
-  == (rom_bank_count_32k - 1))
- /* compute masks for even power of two */
- {
-  rom_bank_count_premask = rom_bank_count_32k - 1;
-  rom_bank_count_mask = rom_bank_count_premask;
- }
- else
- /* compute masks */
- {
-  int i;
-
-  /* compute the largest even power of 2 less than
-   * PRG ROM page count, and use that to compute the masks */
-  for (i = 0; (rom_bank_count_32k >> (i + 1)) > 0; i++);
-
-  rom_bank_count_premask = (1 << i + 1) - 1;
-  rom_bank_count_mask = (1 << i) - 1;
- }
-
  for (b = 0; b <= 0x3F; b++)
  {
   map_rom_32k_lorom(b);
@@ -657,27 +665,6 @@ bool Set_HiROM_Map()
   map_unmapped_64k(b);
  }
 
- /* Compute ROM bank masks for 64k banks */
- if (((rom_bank_count_64k * 2 - 1) & (rom_bank_count_64k - 1))
-  == (rom_bank_count_64k - 1))
- /* compute masks for even power of two */
- {
-  rom_bank_count_premask = rom_bank_count_64k - 1;
-  rom_bank_count_mask = rom_bank_count_premask;
- }
- else
- /* compute masks */
- {
-  int i;
-
-  /* compute the largest even power of 2 less than
-   * PRG ROM page count, and use that to compute the masks */
-  for (i = 0; (rom_bank_count_64k >> (i + 1)) > 0; i++);
-
-  rom_bank_count_premask = (1 << i + 1) - 1;
-  rom_bank_count_mask = (1 << i) - 1;
- }
-
  for (b = 0; b <= 0x3F; b++)
  {
   map_rom_32k_hirom(b);
@@ -751,16 +738,16 @@ int ROM_video_standard = Undetected;
 void Load_32k(FILE *infile)
 {
  // Read in as 32k blocks and (de)interleave
- for (int cnt = 0; cnt < rom_bank_count_64k; cnt++) // Read first half
+ for (int cnt = 0; cnt < rmd_64k.bank_count; cnt++) // Read first half
   fread2(RomAddress + cnt * 65536 + 32768, 1, 32768, infile);
 
- for (int cnt = 0; cnt < rom_bank_count_64k; cnt++) // Read second half
+ for (int cnt = 0; cnt < rmd_64k.bank_count; cnt++) // Read second half
   fread2(RomAddress + cnt * 65536, 1, 32768, infile);
 }
 
 void Load_64k(FILE *infile)
 {
- for (int cnt = 0; cnt < rom_bank_count_64k; cnt++) // Read in ROM
+ for (int cnt = 0; cnt < rmd_64k.bank_count; cnt++) // Read in ROM
  {
   fread2(RomAddress + cnt * 65536, 1, 65536, infile);
  }
@@ -887,16 +874,16 @@ static bool open_rom_normal(char *Filename)
   case Off: ROM_format &= ~Interleaved; break;
  }
 
- rom_bank_count_64k = (((infilesize - ROM_start) + (64 << 10) - 1)
+ rmd_64k.bank_count = (((infilesize - ROM_start) + (64 << 10) - 1)
   / (64 << 10));
- rom_bank_count_32k = (((infilesize - ROM_start) + (32 << 10) - 1)
+ rmd_32k.bank_count = (((infilesize - ROM_start) + (32 << 10) - 1)
   / (32 << 10));
 
  // Maximum 32Mbit ROM size for LoROM
- if (rom_bank_count_64k > 64)
+ if (rmd_64k.bank_count > 64)
  {
-  rom_bank_count_64k = 64;
-  rom_bank_count_32k = 128;
+  rmd_64k.bank_count = 64;
+  rmd_32k.bank_count = 128;
  }
 
  if (Allocate_ROM())   // Dynamic allocation of ROM
@@ -904,6 +891,9 @@ static bool open_rom_normal(char *Filename)
   fclose2(infile);
   return FALSE;        // return false if no memory left
  }
+
+ setup_rom_mirroring(&rmd_32k);
+ setup_rom_mirroring(&rmd_64k);
 
  fseek2(infile, ROM_start, SEEK_SET);
 
@@ -974,7 +964,7 @@ bool Load_32k_split(FILE *infile, char *Filename, int parts, long total_size)
 
  // Read in as 32k blocks and interleave
  for (int cnt = 0;
-      cnt < rom_bank_count_64k && part <= parts; cnt++) // Read first half
+      cnt < rmd_64k.bank_count && part <= parts; cnt++) // Read first half
  {
   infilesize = fread2(RomAddress + cnt * 65536 + 32768, 1, 32768, infile);
   if (infilesize != EOF) bytes_read += infilesize;
@@ -1012,7 +1002,7 @@ bool Load_32k_split(FILE *infile, char *Filename, int parts, long total_size)
  }
 
  for (int cnt = 0;
-      cnt < rom_bank_count_64k && part <= parts; cnt++) // Read second half
+      cnt < rmd_64k.bank_count && part <= parts; cnt++) // Read second half
  {
   infilesize = fread2(RomAddress + cnt * 65536, 1, 32768, infile);
   if (infilesize != EOF) bytes_read += infilesize;
@@ -1142,14 +1132,14 @@ static bool open_rom_split(char *Filename)
   case Off: ROM_format &= ~Interleaved; break;
  }
 
- rom_bank_count_64k = ((total_size + (64 << 10) - 1) / (64 << 10));
- rom_bank_count_32k = ((total_size + (32 << 10) - 1) / (32 << 10));
+ rmd_64k.bank_count = ((total_size + (64 << 10) - 1) / (64 << 10));
+ rmd_32k.bank_count = ((total_size + (32 << 10) - 1) / (32 << 10));
 
  // Maximum 32Mbit ROM size for LoROM
- if (rom_bank_count_64k > 64)
+ if (rmd_64k.bank_count > 64)
  {
-  rom_bank_count_64k = 64;
-  rom_bank_count_32k = 128;
+  rmd_64k.bank_count = 64;
+  rmd_32k.bank_count = 128;
  }
 
  if (Allocate_ROM())   // Dynamic allocation of ROM
@@ -1157,6 +1147,9 @@ static bool open_rom_split(char *Filename)
   fclose2(infile);
   return FALSE;        // return false if no memory left
  }
+
+ setup_rom_mirroring(&rmd_32k);
+ setup_rom_mirroring(&rmd_64k);
 
  fseek2(infile,ROM_start,SEEK_SET);
 
