@@ -131,7 +131,8 @@ NMI_Next_Event:     skipl   ; Fixed event following render
 NMI_Next_Trip:      skipl
 
 Vblank_Start:       skipl   ; Scanline of last Vblank start
-EXPORT HTimer           ,skipl  ; Clock cycle position of H-IRQ delay start
+EXPORT HTimer           ,skipl  ; IRQ position on scanline
+EXPORT HTimer_Set       ,skipl  ; H-IRQ position set in $4207-8
 
 EXPORT_C HTIMEL ,skipb  ; H IRQ position low
 EXPORT_C HTIMEH ,skipb  ; H IRQ position high
@@ -219,7 +220,6 @@ section .text
 %%less_than_1_fps:
  mov [C_LABEL(FPSTicks)],eax
  mov [FPSCount],eax
-ALIGNC
 %%no_update:
 %endmacro
 
@@ -301,7 +301,7 @@ HDMA_Event:
  popa
 %endif
 .no_HDMA:
- call HIRQ_Check_Late   ; chain
+ call IRQ_Check_Late    ; chain
 
  LOAD_CYCLES
  test R_Cycles,R_Cycles
@@ -313,7 +313,7 @@ HDMA_Event:
 
 ALIGNC
 Enabling_IRQ_Event:
- call HIRQ_Check_Late   ; chain
+ call IRQ_Check_Late    ; chain
 
  LOAD_CYCLES
  test R_Cycles,R_Cycles
@@ -371,7 +371,7 @@ ALIGNC
  pop edi
 
 .no_irq:
- call HIRQ_Check_Late   ; chain
+ call IRQ_Check_Late    ; chain
 
  LOAD_CYCLES
  test R_Cycles,R_Cycles
@@ -389,7 +389,7 @@ DMA_Event:
  mov eax,[DMA_Next_Trip]
  mov [FixedTrip],eax
 
- call HIRQ_Check_Late   ; chain
+ call IRQ_Check_Late    ; chain
 
  LOAD_CYCLES
  test R_Cycles,R_Cycles
@@ -411,7 +411,7 @@ Render_Event:
 ;mov [C_LABEL(EventTrip)],eax
  mov [FixedTrip],eax
  RenderScanline
- call HIRQ_Check_Late   ; chain
+ call IRQ_Check_Late    ; chain
 
  LOAD_CYCLES
  test R_Cycles,R_Cycles
@@ -827,6 +827,12 @@ CheckNMI:
  mov byte [NMI_pin],NMI_Raised          ;raise NMI input
 
 .setup_nmi:
+ ;setup chain to next timing event
+ mov eax,[Fixed_Event]
+ mov edx,[FixedTrip]
+ mov [NMI_Next_Event],eax
+ mov [NMI_Next_Trip],edx
+
  ;NMI executes after one opcode
  mov eax,[C_LABEL(SNES_Cycles)]
  inc eax
@@ -835,11 +841,6 @@ CheckNMI:
  mov eax,NMI_Event
  mov [Fixed_Event],eax
  mov [Event_Handler],eax
-
- ;setup chain to next timing event
- mov dword [NMI_Next_Event],VBL_Update_Controllers
- mov dword [NMI_Next_Trip],CYCLES_NEW_SCANLINE
-
 
 .CHECK_KEYS:
  call C_LABEL(UPDATE_KEYS)
@@ -862,7 +863,8 @@ CheckNMI:
 
 
  mov eax,[C_LABEL(Current_Line_Timing)] ; Get current scanline
- CheckVIRQ
+ call IRQ_Check_Newline
+ 
 .no_irq_check:
  ret
 
@@ -953,7 +955,7 @@ ALIGNC
  SAVE_CYCLES
  pop edi
 .no_nmi:
- call HIRQ_Check_Late   ; chain
+ call IRQ_Check_Late    ; chain
 
  LOAD_CYCLES
  test R_Cycles,R_Cycles
@@ -964,20 +966,11 @@ ALIGNC
  jmp near CPU_START
 
 ALIGNC
-VIRQ_Event:
+IRQ_Event:
  mov eax,[C_LABEL(EventTrip)]
  mov [Last_Trip],eax
 
- mov dh,0x80        ; V-IRQ
- jmp short HIRQ_Event.do_IRQ
-
-ALIGNC
-HIRQ_Event:
- mov eax,[C_LABEL(EventTrip)]
- mov [Last_Trip],eax
-
- mov dh,0x40        ; H-IRQ
-.do_IRQ:
+ mov dh,0x80        ; Internal IRQ
  or [IRQ_pin],dh
 
  mov al,[CPU_Execution_Mode]
@@ -1025,51 +1018,15 @@ ALIGNC
  jmp near CPU_START
 
 ALIGNC
-; This can only trash ebx/edx!
-HIRQ_Check:
- SAVE_CYCLES edx
+IRQ_Check_Newline:
  cmp byte [NMI_pin],NMI_Raised
  je .nmi_bypass
 
- push edx
  mov bl,[C_LABEL(NMITIMEN)]
- test bl,0x10       ; H-IRQ enabled?
- jz .no_irq
- test bl,0x20       ; V-IRQ enabled?
- jz .no_virq
- mov edx,[C_LABEL(Current_Line_Timing)]
- cmp [C_LABEL(VTIMEL)],edx
- jne .no_irq
-.no_virq:
- mov ebx,[HTimer]
+
  mov edx,[FixedTrip]
- cmp [esp],ebx      ; Check against current cycle
- jae .past_irq      ; Are we after the IRQ position?
- cmp edx,ebx
- jb .past_irq       ; Next static event is before IRQ?
- mov [C_LABEL(EventTrip)],ebx
- mov dword [Event_Handler],HIRQ_Event
- jmp short .no_irq
-.past_irq:
- mov ebx,[Fixed_Event]
- mov [C_LABEL(EventTrip)],edx
- mov [Event_Handler],ebx
-.no_irq:
- add esp,4
- LOAD_CYCLES edx
- ret
 
-.nmi_bypass:
- mov [Last_Trip],edx
- ret
-
-
-ALIGNC
-; This can only trash ebx/edi!
-HIRQ_Check_Late:
- mov bl,[C_LABEL(NMITIMEN)]
- mov edi,[FixedTrip]
- test bl,0x10       ; H-IRQ enabled?
+ test bl,0x30       ; IRQ enabled?
  jz .no_irq
  test bl,0x20       ; V-IRQ enabled?
  jz .no_virq
@@ -1078,17 +1035,94 @@ HIRQ_Check_Late:
  jne .no_irq
 .no_virq:
  mov ebx,[HTimer]
- cmp [Last_Trip],ebx    ; Check against last event trip cycle
- jae .no_irq        ; Are we after the IRQ?
+ cmp edx,ebx
+ jb .no_irq         ; Next static event is before IRQ?
+
+ mov [C_LABEL(EventTrip)],ebx
+ mov dword [Event_Handler],IRQ_Event
+ ret
+
+.no_irq:
+ mov ebx,[Fixed_Event]
+ mov [C_LABEL(EventTrip)],edx
+ mov [Event_Handler],ebx
+.nmi_bypass:
+ ret
+
+
+ALIGNC
+; This can only trash ebx/edx!
+IRQ_Check:
+ SAVE_CYCLES edx
+ cmp byte [NMI_pin],NMI_Raised
+ je .nmi_bypass
+
+ push edx
+ mov bl,[C_LABEL(NMITIMEN)]
+
+ mov edx,[FixedTrip]
+
+ test bl,0x30       ; IRQ enabled?
+ jz .no_irq
+ test bl,0x20       ; V-IRQ enabled?
+ jz .no_virq
+ mov ebx,[C_LABEL(Current_Line_Timing)]
+ cmp [C_LABEL(VTIMEL)],ebx
+ jne .no_irq
+.no_virq:
+ mov ebx,[HTimer]
+ cmp edx,ebx
+ jb .no_irq         ; Next static event is before IRQ?
+ cmp [esp],ebx      ; Check against current cycle
+ jae .no_irq        ; Are we after the IRQ position?
+ mov [C_LABEL(EventTrip)],ebx
+ mov dword [Event_Handler],IRQ_Event
+ jmp .fixup_timing
+
+.no_irq:
+ mov ebx,[Fixed_Event]
+ mov [C_LABEL(EventTrip)],edx
+ mov [Event_Handler],ebx
+.fixup_timing:
+ LOAD_CYCLES edx
+ pop edx
+.nmi_bypass:
+ mov [Last_Trip],edx
+ ret
+
+
+ALIGNC
+; This can only trash ebx/edi!
+IRQ_Check_Late:
+ cmp byte [NMI_pin],NMI_Raised
+ je .nmi_bypass
+
+ mov bl,[C_LABEL(NMITIMEN)]
+
+ mov edi,[FixedTrip]
+
+ test bl,0x30       ; IRQ enabled?
+ jz .no_irq
+ test bl,0x20       ; V-IRQ enabled?
+ jz .no_virq
+ mov ebx,[C_LABEL(Current_Line_Timing)]
+ cmp [C_LABEL(VTIMEL)],ebx
+ jne .no_irq
+.no_virq:
+ mov ebx,[HTimer]
  cmp edi,ebx
  jb .no_irq         ; Next static event is before IRQ?
+ cmp [Last_Trip],ebx    ; Check against last event trip cycle
+ jae .no_irq        ; Are we after the IRQ?
  mov [C_LABEL(EventTrip)],ebx
- mov dword [Event_Handler],HIRQ_Event
+ mov dword [Event_Handler],IRQ_Event
  ret
+
 .no_irq:
  mov ebx,[Fixed_Event]
  mov [C_LABEL(EventTrip)],edi
  mov [Event_Handler],ebx
+.nmi_bypass:
  ret
 
 ALIGNC
@@ -1371,10 +1405,9 @@ EXPORT SNES_R4210 ; RDNMI
 ALIGNC
 EXPORT SNES_R4211 ; TIMEUP
  mov al,[IRQ_pin]
- test al,0xC0
+ and al,0x80
  jz .no_irq
- mov al,0x80
- and byte [IRQ_pin],~0xC0   ; Clear H/V IRQ
+ and byte [IRQ_pin],~0x80   ; Clear Internal IRQ
 .no_irq:
 
  ;merge in open bus bits
@@ -1537,11 +1570,18 @@ EXPORT SNES_W4200 ; NMITIMEN
 .no_nmi_change:
  test bl,0x30
  jz .no_irq_change
- call HIRQ_Check
+
+ mov edx,eax
+ shr edx,4
+ sbb edx,edx
+ and edx,[HTimer_Set]
+ mov [HTimer],edx
+
+ call IRQ_Check
 .no_irq_change:
  pop ebx
 .no_change:
- and byte [IRQ_pin],0x1F
+ and byte [IRQ_pin],~0x80   ; Clear Internal IRQ
  ret
 
 ALIGNC
@@ -1609,118 +1649,94 @@ EXPORT SNES_W4206 ; WRDIVB
  pop eax
  ret
 
-ALIGNC
-EXPORT SNES_W4207 ; HTIMEL
- push ebx
- mov ebx,[C_LABEL(HTIMEL)]
- cmp al,bl
- je .no_change
- mov bl,al
- mov [C_LABEL(HTIMEL)],ebx
-
- cmp ebx,DOTS_PER_SCANLINE
+Update_HTimer:
+ cmp edx,DOTS_PER_SCANLINE
  jae .Invalid_HTimer
 
- shl ebx,2
+ shl edx,2
 
  ; Do some magic for the memory refresh 'missing' cycles
- cmp ebx,CYCLES_REFRESH_START   ; Before memory refresh
+ cmp edx,CYCLES_REFRESH_START   ; Before memory refresh
  jb .not_in_refresh
- cmp ebx,CYCLES_REFRESH_END     ; During memory refresh
+ cmp edx,CYCLES_REFRESH_END     ; During memory refresh
  jb .in_refresh
- sub ebx,byte CYCLES_IN_REFRESH
+ sub edx,byte CYCLES_IN_REFRESH
  jmp short .not_in_refresh
 ALIGNC
 .in_refresh:
- mov ebx,CYCLES_REFRESH_START   ; During memory refresh
+ mov edx,CYCLES_REFRESH_START   ; During memory refresh
 .not_in_refresh:
- mov [HTimer],ebx
+ mov [HTimer_Set],edx
  test byte [C_LABEL(NMITIMEN)],0x10
  jz .no_change
- call HIRQ_Check
-.no_change:
+ mov [HTimer],edx
+ push ebx
+ call IRQ_Check
  pop ebx
+.no_change:
  ret
 
 ALIGNC
 .Invalid_HTimer:
- mov dword [HTimer],-1
- pop ebx
+ mov edx,-1
+ jmp .not_in_refresh
+
+ALIGNC
+EXPORT SNES_W4207 ; HTIMEL
+ mov edx,[C_LABEL(HTIMEL)]
+ cmp al,dl
+ je .no_change
+ mov dl,al
+ mov [C_LABEL(HTIMEL)],edx
+
+ call Update_HTimer
+.no_change:
  ret
 
 ALIGNC
 EXPORT SNES_W4208 ; HTIMEH
  push eax
- push ebx
- mov ebx,[C_LABEL(HTIMEL)]
+ mov edx,[C_LABEL(HTIMEL)]
  and al,1
- and bh,1
- cmp al,bh
+ cmp al,dh
  je .no_change
- mov bh,al
- mov [C_LABEL(HTIMEL)],ebx
+ mov dh,al
+ mov [C_LABEL(HTIMEL)],edx
 
- cmp ebx,DOTS_PER_SCANLINE
- jae .Invalid_HTimer
+ call Update_HTimer
 
- shl ebx,2
-
- ; Do some magic for the memory refresh 'missing' cycles
- cmp ebx,CYCLES_REFRESH_START   ; Before memory refresh
- jb .not_in_refresh
- cmp ebx,CYCLES_REFRESH_END     ; During memory refresh
- jb .in_refresh
- sub ebx,byte CYCLES_IN_REFRESH
- jmp short .not_in_refresh
-ALIGNC
-.in_refresh:
- mov ebx,CYCLES_REFRESH_START   ; During memory refresh
-.not_in_refresh:
- mov [HTimer],ebx
- test byte [C_LABEL(NMITIMEN)],0x10
- jz .no_change
- call HIRQ_Check
 .no_change:
- pop ebx
- pop eax
- ret
-
-ALIGNC
-.Invalid_HTimer:
- mov dword [HTimer],-1
- pop ebx
  pop eax
  ret
 
 ALIGNC
 EXPORT SNES_W4209 ; VTIMEL
- push ebx
- mov ebx,[C_LABEL(VTIMEL)]
- cmp al,bl
+ mov edx,[C_LABEL(VTIMEL)]
+ cmp al,dl
  je .no_change
  mov [C_LABEL(VTIMEL)],al
  test byte [C_LABEL(NMITIMEN)],0x20
  jz .no_change
- call HIRQ_Check
-.no_change:
+ push ebx
+ call IRQ_Check
  pop ebx
+.no_change:
  ret
 
 ALIGNC
 EXPORT SNES_W420A ; VTIMEH   ; Handled in screen core!
  push eax
- push ebx
- mov ebx,[C_LABEL(VTIMEL)]
+ mov edx,[C_LABEL(VTIMEL)]
  and al,1
- and bh,1
- cmp al,bh
+ cmp al,dh
  je .no_change
  mov [C_LABEL(VTIMEH)],al
  test byte [C_LABEL(NMITIMEN)],0x20
  jz .no_change
- call HIRQ_Check
-.no_change:
+ push ebx
+ call IRQ_Check
  pop ebx
+.no_change:
  pop eax
  ret
 

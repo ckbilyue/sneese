@@ -26,6 +26,8 @@ Changes
    register - thanks to Overload for pointing out that the SNES CPU
    does not do this [TRAC]
   Sound: Added 8-sample delay before key-on completion [TRAC]
+  Timing: Fixed up some IRQ setup logic bugs introduced by the
+   NMI logic improvements [TRAC]
  0.83 [TRAC]
   Sound: Fixed a bug in envelope height reading of channels that weren't
    playing; value to be read wasn't being updated, fixes Secret of

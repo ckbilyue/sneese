@@ -1742,52 +1742,6 @@ section .text
 %endif
 %endmacro
 
-; Requires current scanline to be in %eax
-%macro CheckVIRQ 0
- mov bl,[C_LABEL(NMITIMEN)]
- mov edx,[FixedTrip]
-
- cmp byte [NMI_pin],NMI_Raised
- je %%nmi_bypass
-
- test bl,0x30       ; IRQ enabled?
- jz %%no_irq
-
- test bl,0x20       ; V-IRQ enabled?
- jz %%no_virq
-
- ; V-IRQ is enabled, are we on the right scanline?
-;mov eax,[C_LABEL(Current_Line_Timing)]
- cmp [C_LABEL(VTIMEL)],eax
- jne %%no_irq
-
-%%no_virq:
- ; If V-IRQ is enabled, we're on the correct scanline
- ; If it isn't enabled, H-IRQ must be enabled for us to be here
-
- ; If H-IRQ is disabled, H-position is start of scanline (0)
- xor edi,edi
-
- test bl,0x10       ; H-IRQ enabled?
- mov ebx,VIRQ_Event
- jz %%no_hirq
-
- mov edi,[HTimer]
- mov ebx,HIRQ_Event
-
-%%no_hirq:
- cmp edx,edi
- jnb %%irq_before_next_event
-
-%%no_irq:
-%%nmi_bypass:
- mov edi,edx
- mov ebx,[Fixed_Event]
-%%irq_before_next_event:
- mov [C_LABEL(EventTrip)],edi
- mov [Event_Handler],ebx
-%endmacro
-
 
 ALIGNC
 EXPORT_C Reset_CPU
@@ -1807,6 +1761,8 @@ EXPORT_C Reset_CPU
  mov [C_LABEL(NMITIMEN)],al
  mov [C_LABEL(HTIMEL)],eax
  mov [C_LABEL(VTIMEL)],eax
+ mov [HTimer],eax
+ mov [HTimer_Set],eax
 
  ; Reset other registers
  mov byte [C_LABEL(WRIO)],0xFF
@@ -1992,7 +1948,7 @@ EXTERN_C set_gfx_mode
 ; New for 0.25 - one CPU execution loop, also used for SPC
 ALIGNC
 EXPORT CPU_START_IRQ
- CheckVIRQ  ; Check for Vertical IRQ
+ call IRQ_Check_Newline
 CPU_START:
  LOAD_CYCLES
  test R_Cycles,R_Cycles
