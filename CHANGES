@@ -48,6 +48,8 @@ Changes
    continue fetching and to not terminate channel, thanks to anomie for
    research [TRAC]
   Sound: Adjusted some aspects of DSP reset [TRAC]
+  Sound: Fixed a bug in decoding of BRR blocks with invalid range values;
+   thanks to anomie for pointing this out [TRAC]
  0.832
   Documentation: Updated grossly insufficient copyright attributations
    [TRAC]

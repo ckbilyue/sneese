@@ -390,7 +390,7 @@ static int get_brr_block(int voice, struct voice_state *pvs)
   output = (input ^ 8) - 8;
 
   if (range <= 12) output = (output << range) >> 1;
-  else output &= ~0xFFF;
+  else output &= ~0x7FF;
 
   if (filter)
   {
