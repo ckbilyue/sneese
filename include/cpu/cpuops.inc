@@ -467,10 +467,6 @@ ALIGNC
 EXPORT_C E1_COP
  Emu6502Interrupt B_COP_Evector,B_COP_Eoffset
 
-; 07
-EM_ORA IdI,Direct_Indirect_Long
-E0_ORA IdI,Direct_Indirect_Long
-
 ; 08
 
 ALIGNC
@@ -492,10 +488,6 @@ E1_PUSH16 B_D,E1_PHD,New
 
 ; 10
 BFC BPL,SNES_FLAG_N
-
-; 17
-EM_ORA IdI_y,Direct_Indirect_Indexed_Long
-E0_ORA IdI_y,Direct_Indirect_Indexed_Long
 
 ; 18
 _CLx C,ALL_CLC          ; Clear Carry flag
@@ -690,10 +682,6 @@ EXPORT_C E1_JSL_al
  jmp short .read_direct
 %endif
 
-; 27
-EM_AND IdI,Direct_Indirect_Long
-E0_AND IdI,Direct_Indirect_Long
-
 ; 28
 
 ALIGNC
@@ -745,10 +733,6 @@ E1_PULL16 B_D,E1_PLD
 
 ; 30
 BFS BMI,SNES_FLAG_N
-
-; 37
-EM_AND IdI_y,Direct_Indirect_Indexed_Long
-E0_AND IdI_y,Direct_Indirect_Indexed_Long
 
 ; 38
 _SEx C,ALL_SEC          ; Set Carry flag
@@ -899,10 +883,6 @@ ALIGNC
 EXPORT_C EX_MVP
  ALL_MVX 1,MVP
 
-; 47
-EM_EOR IdI,Direct_Indirect_Long
-E0_EOR IdI,Direct_Indirect_Long
-
 ; 48
 E0_PUSH16 B_A,E0_PHA
 E0_PUSH8 B_A,EM_PHA
@@ -961,10 +941,6 @@ EXPORT_C E0_MVN
 ALIGNC
 EXPORT_C EX_MVN
  ALL_MVX 1,MVN
-
-; 57
-EM_EOR IdI_y,Direct_Indirect_Indexed_Long
-E0_EOR IdI_y,Direct_Indirect_Indexed_Long
 
 ; 58
 
@@ -1145,10 +1121,6 @@ EXPORT_C E1_PER
  E1_PUSH_W
  OPCODE_EPILOG
 
-; 67
-EM_ADC IdI,Direct_Indirect_Long
-E0_ADC IdI,Direct_Indirect_Long
-
 ; 68
 E0_PULL16 B_A,E0_PLA
 E0_PULL8 B_A,EM_PLA
@@ -1296,10 +1268,6 @@ EXPORT_C ALL_JMP_OaO
 ; 70
 BFS BVS,SNES_FLAG_V
 
-; 77
-EM_ADC IdI_y,Direct_Indirect_Indexed_Long
-E0_ADC IdI_y,Direct_Indirect_Indexed_Long
-
 ; 78
 _SEx I,ALL_SEI          ; Set Interrupt disable flag
 
@@ -1442,10 +1410,6 @@ _TxY B_X,16,E0_TXY
 EM_LDA Od_xO,Direct_Indexed_Indirect
 E0_LDA Od_xO,Direct_Indexed_Indirect
 
-; A7
-EM_LDA IdI,Direct_Indirect_Long
-E0_LDA IdI,Direct_Indirect_Long
-
 ; A8
 _TxY B_A,8,EX_TAY
 _TxY B_A,16,E0_TAY
@@ -1460,10 +1424,6 @@ E1_PULL8 B_DB,E1_PLB
 
 ; B0
 BFS BCS,SNES_FLAG_C
-
-; B7
-EM_LDA IdI_y,Direct_Indirect_Indexed_Long
-E0_LDA IdI_y,Direct_Indirect_Indexed_Long
 
 ; B8
 _CLx V,ALL_CLV          ; Clear oVerflow flag
@@ -1596,11 +1556,6 @@ EXPORT_C E1_REP
 .no_irq_enable:
  OPCODE_EPILOG
 
-; C7
-EM_CMP IdI,Direct_Indirect_Long
-E0_CMP IdI,Direct_Indirect_Long
-
-
 ; CB
 
 ALIGNC
@@ -1648,10 +1603,6 @@ EXPORT_C E1_PEI
  READ16_Direct
  E1_PUSH_W
  OPCODE_EPILOG
-
-; D7
-EM_CMP IdI_y,Direct_Indirect_Indexed_Long
-E0_CMP IdI_y,Direct_Indirect_Indexed_Long
 
 ; D8
 _CLx D,ALL_CLD          ; Clear Decimal mode flag
@@ -1825,10 +1776,6 @@ EXPORT_C E1_SEP
 
  OPCODE_EPILOG
 
-; E7
-EM_SBC IdI,Direct_Indirect_Long
-E0_SBC IdI,Direct_Indirect_Long
-
 ; EA
 
 ALIGNC
@@ -1867,10 +1814,6 @@ EXPORT_C E1_PEA
  add R_NativePC,byte 3
  E1_PUSH_W
  OPCODE_EPILOG
-
-; F7
-EM_SBC IdI_y,Direct_Indirect_Indexed_Long
-E0_SBC IdI_y,Direct_Indirect_Indexed_Long
 
 ; F8
 _SEx D,ALL_SED          ; Set Decimal mode flag

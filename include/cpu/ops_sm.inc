@@ -21,6 +21,10 @@ OPCODE_PROLOG(0x06) ; ASL d
  RMW _ASL,Direct
 OPCODE_EPILOG
 
+OPCODE_PROLOG(0x07) ; ORA [d]
+ _ORA Direct_Indirect_Long
+OPCODE_EPILOG
+
 OPCODE_PROLOG(0x12) ; ORA (d)
  _ORA Direct_Indirect
 OPCODE_EPILOG
@@ -35,6 +39,10 @@ OPCODE_EPILOG
 
 OPCODE_PROLOG(0x16) ; ASL d,x
  RMW _ASL,Direct_Index_X
+OPCODE_EPILOG
+
+OPCODE_PROLOG(0x17) ; ORA [d],y
+ _ORA Direct_Indirect_Indexed_Long
 OPCODE_EPILOG
 
 OPCODE_PROLOG(0x21) ; AND (d,x)
@@ -53,6 +61,10 @@ OPCODE_PROLOG(0x26) ; ROL d
  RMW _ROL,Direct
 OPCODE_EPILOG
 
+OPCODE_PROLOG(0x27) ; AND [d]
+ _AND Direct_Indirect_Long
+OPCODE_EPILOG
+
 OPCODE_PROLOG(0x32) ; AND (d)
  _AND Direct_Indirect
 OPCODE_EPILOG
@@ -69,6 +81,10 @@ OPCODE_PROLOG(0x36) ; ROL d,x
  RMW _ROL,Direct_Index_X
 OPCODE_EPILOG
 
+OPCODE_PROLOG(0x37) ; AND [d],y
+ _AND Direct_Indirect_Indexed_Long
+OPCODE_EPILOG
+
 OPCODE_PROLOG(0x41) ; EOR (d,x)
  _EOR Direct_Indexed_Indirect
 OPCODE_EPILOG
@@ -81,6 +97,10 @@ OPCODE_PROLOG(0x46) ; LSR d
  RMW _LSR,Direct
 OPCODE_EPILOG
 
+OPCODE_PROLOG(0x47) ; EOR [d]
+ _EOR Direct_Indirect_Long
+OPCODE_EPILOG
+
 OPCODE_PROLOG(0x52) ; EOR (d)
  _EOR Direct_Indirect
 OPCODE_EPILOG
@@ -91,6 +111,10 @@ OPCODE_EPILOG
 
 OPCODE_PROLOG(0x56) ; LSR d,x
  RMW _LSR,Direct_Index_X
+OPCODE_EPILOG
+
+OPCODE_PROLOG(0x57) ; EOR [d],y
+ _EOR Direct_Indirect_Indexed_Long
 OPCODE_EPILOG
 
 OPCODE_PROLOG(0x61) ; ADC (d,x)
@@ -109,6 +133,10 @@ OPCODE_PROLOG(0x66) ; ROR d
  RMW _ROR,Direct
 OPCODE_EPILOG
 
+OPCODE_PROLOG(0x67) ; ADC [d]
+ _ADC Direct_Indirect_Long
+OPCODE_EPILOG
+
 OPCODE_PROLOG(0x72) ; ADC (d)
  _ADC Direct_Indirect
 OPCODE_EPILOG
@@ -123,6 +151,10 @@ OPCODE_EPILOG
 
 OPCODE_PROLOG(0x76) ; ROR d,x
  RMW _ROR,Direct_Index_X
+OPCODE_EPILOG
+
+OPCODE_PROLOG(0x77) ; ADC [d],y
+ _ADC Direct_Indirect_Indexed_Long
 OPCODE_EPILOG
 
 OPCODE_PROLOG(0x81) ; STA (d,x)
@@ -157,12 +189,20 @@ OPCODE_PROLOG(0xA5) ; LDA d
  _LDA Direct
 OPCODE_EPILOG
 
+OPCODE_PROLOG(0xA7) ; LDA [d]
+ _LDA Direct_Indirect_Long
+OPCODE_EPILOG
+
 OPCODE_PROLOG(0xB2) ; LDA (d)
  _LDA Direct_Indirect
 OPCODE_EPILOG
 
 OPCODE_PROLOG(0xB5) ; LDA d,x
  _LDA Direct_Index_X
+OPCODE_EPILOG
+
+OPCODE_PROLOG(0xB7) ; LDA [d],y
+ _LDA Direct_Indirect_Indexed_Long
 OPCODE_EPILOG
 
 OPCODE_PROLOG(0xC1) ; CMP (d,x)
@@ -177,6 +217,10 @@ OPCODE_PROLOG(0xC6) ; DEC d
  RMW _DEC_M,Direct
 OPCODE_EPILOG
 
+OPCODE_PROLOG(0xC7) ; CMP [d]
+ _CMP Direct_Indirect_Long
+OPCODE_EPILOG
+
 OPCODE_PROLOG(0xD2) ; CMP (d)
  _CMP Direct_Indirect
 OPCODE_EPILOG
@@ -187,6 +231,10 @@ OPCODE_EPILOG
 
 OPCODE_PROLOG(0xD6) ; DEC d,x
  RMW _DEC_M,Direct_Index_X
+OPCODE_EPILOG
+
+OPCODE_PROLOG(0xD7) ; CMP [d],y
+ _CMP Direct_Indirect_Indexed_Long
 OPCODE_EPILOG
 
 OPCODE_PROLOG(0xE1) ; SBC (d,x)
@@ -201,6 +249,10 @@ OPCODE_PROLOG(0xE6) ; INC d
  RMW _INC_M,Direct
 OPCODE_EPILOG
 
+OPCODE_PROLOG(0xE7) ; SBC [d]
+ _SBC Direct_Indirect_Long
+OPCODE_EPILOG
+
 OPCODE_PROLOG(0xF2) ; SBC (d)
  _SBC Direct_Indirect
 OPCODE_EPILOG
@@ -211,6 +263,10 @@ OPCODE_EPILOG
 
 OPCODE_PROLOG(0xF6) ; INC d,x
  RMW _INC_M,Direct_Index_X
+OPCODE_EPILOG
+
+OPCODE_PROLOG(0xF7) ; SBC [d],y
+ _SBC Direct_Indirect_Indexed_Long
 OPCODE_EPILOG
 
 %undef OPCODE_PROLOG
