@@ -1029,6 +1029,11 @@ HIRQ_Check_Late:
 
 ALIGNC
 EXPORT SNES_R2137 ; SLHV  ; This latches the counter for horizontal/vertical data!
+ ;counters cannot be latched if I/O port bit 7 held low
+ mov al,[C_LABEL(WRIO)]
+ and al,[C_LABEL(RDIO)]
+ jns .no_change
+
  push ebx
  cmp byte [In_CPU],0
  jz .not_in_cpu
@@ -1041,7 +1046,9 @@ EXPORT SNES_R2137 ; SLHV  ; This latches the counter for horizontal/vertical dat
  xor edx,edx
 
  ; Set up H counters to cycles executed / 4, V counter to current scanline
+
  ; All this below ensures bits 9-15 to be same as bits 1-7
+ ; (open bus kludge)
  shr ebx,2
  mov al,0xFE
  cmp ebx,128
@@ -1079,6 +1086,8 @@ EXPORT SNES_R2137 ; SLHV  ; This latches the counter for horizontal/vertical dat
  pop ebx
  mov [OPHCT],al
  mov [OPVCT],al
+.no_change:
+ mov al,0x21    ;open bus kludge
  ret
 
 ALIGNC
@@ -1141,6 +1150,7 @@ EXPORT SNES_R4016 ; JOYC1
  test byte [JOYC1],1
  jz .read_enabled
  mov al,0
+ or al,0x40     ;open bus kludge
  ret
 
 .read_enabled:
@@ -1158,6 +1168,7 @@ EXPORT SNES_R4016 ; JOYC1
  and al,bl
  pop ebx
  pop ecx
+ or al,0x40     ;open bus kludge
  ret
 
 .unused:
@@ -1165,6 +1176,7 @@ EXPORT SNES_R4016 ; JOYC1
  mov al,1           ; Joypad connected
  pop ebx
  pop ecx
+ or al,0x40     ;open bus kludge
  ret
 
 ALIGNC
@@ -1179,6 +1191,7 @@ ALIGNC
  and al,bl
  pop ebx
  pop ecx
+ or al,0x40     ;open bus kludge
  ret
 
 ALIGNC
@@ -1186,6 +1199,7 @@ EXPORT SNES_R4017 ; JOYC2
  test byte [JOYC1],1
  jz .read_enabled
  mov al,0
+ or al,0x5C     ;open bus kludge
  ret
 
 .read_enabled:
@@ -1203,6 +1217,7 @@ EXPORT SNES_R4017 ; JOYC2
  and al,1
  pop ebx
  pop ecx
+ or al,0x5C     ;open bus kludge
  ret
 
 .unused:
@@ -1210,6 +1225,7 @@ EXPORT SNES_R4017 ; JOYC2
  mov al,1           ; (???) Return 0 this bit is for mtap I think
  pop ebx
  pop ecx
+ or al,0x5C     ;open bus kludge
  ret
 
 ALIGNC
@@ -1224,6 +1240,7 @@ ALIGNC
  and al,1
  pop ebx
  pop ecx
+ or al,0x5C     ;open bus kludge
  ret
 
 
@@ -1246,6 +1263,7 @@ EXPORT SNES_R4203 ; WRMPYB
 ALIGNC
 EXPORT SNES_R4210 ; RDNMI
  mov al,[RDNMI]
+ or al,0x40     ;open bus kludge
  mov byte [RDNMI],VERSION_NUMBER_5A22   ; NMI on/off + version #
  ret
 
@@ -1258,24 +1276,10 @@ EXPORT SNES_R4211 ; TIMEUP
  test al,0xC0
  jz .no_irq
  mov al,0x80
+ and byte [IRQ_pin],0x1F    ; Clear H/V IRQ
 .no_irq:
 
- cmp byte [In_CPU],0
- jz .not_in_cpu
- GET_CYCLES edx
- jmp short .got_cycles
-.not_in_cpu:
- mov edx,[C_LABEL(SNES_Cycles)]
-.got_cycles:
-
- and byte [IRQ_pin],0x1F    ; Clear H/V IRQ
- cmp edx,CYCLES_HBLANK_START    ; Hblank after display
- jae .hblank
- cmp edx,CYCLES_DISPLAY_START   ; Hblank before display
- jae .no_hblank
-.hblank:
- or al,HVBJOY_IN_HBLANK ; We're in Hblank...
-.no_hblank:
+ or al,0x42     ;open bus kludge
 
  ret
 
@@ -1306,6 +1310,8 @@ EXPORT SNES_R4212 ; HVBJOY
 .hblank:
  or al,HVBJOY_IN_HBLANK ; We're in Hblank...
 .no_hblank:
+
+ or al,0x02     ;open bus kludge
  ret
 
 ALIGNC
@@ -1413,18 +1419,18 @@ EXPORT SNES_W4201 ; WRIO
  cmp dl,al
  je .no_change
 
+ push eax
  xor dl,al
- mov [C_LABEL(WRIO)],al
+ jns .no_latch
 
  test al,al
- jns .no_latch
-
- test dl,dl
- jns .no_latch
+ js .no_latch
 
  call SNES_R2137
 .no_latch:
 
+ pop eax
+ mov [C_LABEL(WRIO)],al
 .no_change:
  ret
 
@@ -1612,15 +1618,4 @@ EXPORT SNES_W420D ; MEMSEL    ; FastROM switch
 
  pop eax
 %endif
- ret
-
-ALIGNC
-EXPORT SNES_W4210 ; RDNMI
- mov byte [RDNMI],VERSION_NUMBER_5A22   ; NMI on/off + version
- ret
-
-ALIGNC
-EXPORT SNES_W4211 ; TIMEUP
-;mov byte [TIMEUP],0
- and byte [IRQ_pin],0x1F
  ret
