@@ -11,6 +11,14 @@ You must read and accept the license prior to use.
 
 %endif
 
+%define SNEeSe_ppu_bg16e_asm
+
+%include "misc.inc"
+%include "ppu/ppu.inc"
+%include "ppu/tiles.inc"
+%include "ppu/screen.inc"
+
+
 %define R16E_Local_Bytes 52
 %define R16E_Plotter_Table esp+48
 %define R16E_Clipped esp+44
@@ -690,4 +698,8 @@ Generate_Line_Plotter_Table_16_Even V,2
 Generate_Line_Plotter_Table_16_Even V,4
 
 section .text
-%include "ppu/bg16me.inc"
+ALIGNC
+section .data
+ALIGND
+section .bss
+ALIGNB

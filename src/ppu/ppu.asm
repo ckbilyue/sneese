@@ -28,23 +28,18 @@ You must read and accept the license prior to use.
 %include "cpu/dma.inc"
 %include "ppu/sprites.inc"
 %include "ppu/screen.inc"
+%include "ppu/tiles.inc"
 %include "cpu/cpumem.inc"
 
-EXTERN SNES_R2134,SNES_R2135,SNES_R2136,SNES_R2137
-EXTERN SNES_R213C,SNES_R213D
+EXTERN SNES_R2137,SNES_R213C,SNES_R213D
 
 EXTERN SNES_R4200,SNES_R4210,SNES_R4211,SNES_R4212
 
-EXTERN SNES_W211A,SNES_W211B,SNES_W211C,SNES_W211D
-EXTERN SNES_W211E,SNES_W211F,SNES_W2120
 EXTERN SNES_W4200,SNES_W4201,SNES_W4207,SNES_W4208
 EXTERN SNES_W4209,SNES_W420A,SNES_W420D,SNES_W4210
 EXTERN SNES_W4211
 EXTERN HVBJOY
 
-EXTERN_C SCREEN_MODE_7
-
-EXTERN_C Reset_Mode_7
 EXTERN_C LastRenderLine
 EXTERN_C BrightnessLevel
 EXTERN_C NMITIMEN
@@ -62,14 +57,7 @@ EXTERN_C SNES_COUNTRY
 EXTERN Ready_Line_Render
 EXTERN_C PaletteChanged
 EXTERN_C Offset_Change_Disable
-EXTERN_C M7H_13,M7V_13
-EXTERN Redo_M7
-EXTERN_C M7SEL
-EXTERN_C EXTBG_Mask
-EXTERN M7_Handler_Table,M7_Handler
 EXTERN_C fixedpalettecheck
-
-EXTERN Recache_Tile_Set
 
 EXTERN_C SPC_MASK
 EXTERN_C OutputScreen
@@ -389,34 +377,6 @@ EXPORT_C BG34NBA,skipb  ; aaaabbbb  aaaa=base address 4, bbbb=base address 3
 
 EXPORT_C VMAIN,skipb    ; i000abcd  i=inc type,ab=full graphic,cd=SC increment
 
-EXPORT_C WH0,skipb      ; Holds window 1 left position
-EXPORT_C TM ,skipb      ; 000odcba  o=OBJ enable,a-d=BG1-4 enable
-EXPORT_C WBGLOG,skipb   ; BG Window mask logic
-EXPORT_C W12SEL ,skipb  ; Holds plane 1/2 window mask settings
-EXPORT_C WH1,skipb      ; Holds window 1 right position
-EXPORT_C TMW,skipb
-EXPORT_C WOBJLOG,skipb  ; OBJ/Colour Window mask logic
-EXPORT_C W34SEL ,skipb  ; Holds plane 3/4 window mask settings
-EXPORT_C WH2,skipb      ; Holds window 2 left position
-EXPORT_C TS ,skipb      ; 000odcba  o=OBJ enable,a-d=BG1-4 enable
-EXPORT_C CGWSEL,skipb
-EXPORT_C WOBJSEL,skipb  ; Holds colour/object window mask settings
-EXPORT_C WH3,skipb      ; Holds window 2 right position
-EXPORT_C TSW,skipb
-EXPORT_C CGADSUB,skipb
-
-%macro WIN_DATA 1
-ALIGNB
-EXPORT_C TableWin%1
-EXPORT_C Win%1_Count_Out,skipb
-EXPORT_C Win%1_Bands_Out,skipb 2*2
-EXPORT_C Win%1_Count_In,skipb
-EXPORT_C Win%1_Bands_In,skipb 2
-%endmacro
-
-WIN_DATA 1
-WIN_DATA 2
-
 ALIGNB
 EXPORT_C COLDATA,skipl  ; Actual data from COLDATA
 CGAddress:  skipl   ; Palette position for writes to CGRAM
@@ -462,29 +422,11 @@ EXPORT_C JOY4H,skipb 3
 
 EXPORT_C Current_Line_Timing,skipl
 
-EXPORT Window_Offset_First,skipl
-EXPORT Window_Offset_Second,skipl
-
 EXPORT_C SETINI,skipb
 EXPORT STAT78,skipb     ; Enable support for field register
 
 EXPORT Redo_Offset_Change,skipb
 EXPORT Redo_Offset_Change_VOffsets,skipb
-
-EXPORT TM_Allowed,skipb ; allowed layer mask & layer disable mask & TM
-EXPORT TS_Allowed,skipb ; allowed layer mask & layer disable mask & TS
-EXPORT Layers_In_Use,skipb  ; TM_Allowed | TS_Allowed
-
-;Layering vars
-EXPORT Layers_Low       ; one of allowed TM, TS, or TM || TS
-EXPORT Layers_High      ; one of allowed TS, TM, or 0
-
-EXPORT SCR_TM,skipb     ; TM taken from here
-EXPORT SCR_TS,skipb     ; TS taken from here
-EXPORT SCR_TMW,skipb    ; TMW taken from here
-EXPORT SCR_TSW,skipb    ; TSW taken from here
-EXPORT_C Layer_Disable_Mask,skipb   ; This is used to force planes to disable!
-EXPORT_C Layering_Mode,skipb
 
 EXPORT BGMODE_Allowed_Layer_Mask,skipb
 EXPORT BGMODE_Tile_Layer_Mask,skipb

@@ -11,6 +11,14 @@ You must read and accept the license prior to use.
 
 %endif
 
+%define SNEeSe_ppu_bg16o_asm
+
+%include "misc.inc"
+%include "ppu/ppu.inc"
+%include "ppu/tiles.inc"
+%include "ppu/screen.inc"
+
+
 %define RO16x16_Local_Bytes 56+24
 %define RO16x16_Plotter_Table esp+52+24
 %define RO16x16_Clipped esp+48+24
@@ -444,7 +452,7 @@ Render_Offset_16x16_Base:
  mov edi,[RO16x16_BaseDestPtr]
  add edi,eax
 
- mov esi,[RO8x8_Clipped]
+ mov esi,[RO16x16_Clipped]
  mov al,[Win_Count+edx+esi]
 
  test al,al
@@ -1014,4 +1022,8 @@ Generate_Line_Plotter_Table_Offset_16x16 V,2
 Generate_Line_Plotter_Table_Offset_16x16 V,8
 
 section .text
-%include "ppu/bg16om.inc"
+ALIGNC
+section .data
+ALIGND
+section .bss
+ALIGNB

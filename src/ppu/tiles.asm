@@ -57,7 +57,7 @@ You must read and accept the license prior to use.
 %include "ppu/tiles.inc"
 %include "ppu/screen.inc"
 
-extern _SNES_Screen8
+EXTERN_C SNES_Screen8
 
 section .text
 EXPORT_C tiles_text_start
@@ -210,14 +210,14 @@ EXPORT Recache_Tile_Set
  push esi
 
 %ifdef Profile_Recache_Sets
-extern _Tiles_Recached, _Sets_Recached
- add [_Tiles_Recached],edi
- inc dword [_Sets_Recached]
+EXTERN_C Tiles_Recached, Sets_Recached
+ add [C_LABEL(Tiles_Recached)],edi
+ inc dword [C_LABEL(Sets_Recached)]
 %endif
 
 %ifdef WATCH_RECACHE_SETS
-extern _BreaksLast
- inc dword [_BreaksLast]
+EXTERN_C BreaksLast
+ inc dword [C_LABEL(BreaksLast)]
 %endif
 
 %ifndef ALT_RECACHE_4_8_BPL

@@ -29,21 +29,13 @@ EXTERN Mosaic_Size_Select,Mosaic_Size,MOSAIC
 EXTERN_C INIDISP,BGMODE,Base_BGMODE
 EXTERN_C BG12NBA,BG34NBA
 EXTERN_C VMAIN
-EXTERN_C W12SEL,W34SEL,WOBJSEL,WBGLOG,WOBJLOG,CGWSEL,CGADSUB
-EXTERN_C Win1_Count_In,Win1_Count_Out,Win1_Bands_In,Win1_Bands_Out
-EXTERN_C Win2_Count_In,Win2_Count_Out,Win2_Bands_In,Win2_Bands_Out
-EXTERN_C WH0,WH1,WH2,WH3
-EXTERN_C TM,TS,TMW,TSW
 
 EXTERN_C COLDATA
 EXTERN_C Current_Line_Timing
 EXTERN_C SETINI
 EXTERN STAT78
 EXTERN Redo_Offset_Change,Redo_Offset_Change_VOffsets
-EXTERN TM_Allowed,TS_Allowed,Layers_In_Use
-EXTERN Window_Offset_First,Window_Offset_Second
-EXTERN SCR_TM,SCR_TS,SCR_TMW,SCR_TSW
-EXTERN_C Layer_Disable_Mask,Layering_Mode
+
 EXTERN BGMODE_Allowed_Layer_Mask,BGMODE_Tile_Layer_Mask
 EXTERN BGMODE_Allowed_Offset_Change
 
@@ -97,29 +89,6 @@ EXTERN_BG_DATA 1
 EXTERN_BG_DATA 2
 EXTERN_BG_DATA 3
 EXTERN_BG_DATA 4
-
-%macro EXTERN_WIN_DATA 1
-EXTERN_C TableWin%1
-EXTERN_C Win%1_Count_Out
-EXTERN_C Win%1_Bands_Out
-EXTERN_C Win%1_Count_In
-EXTERN_C Win%1_Bands_In
-%endmacro
-
-EXTERN_WIN_DATA 1
-EXTERN_WIN_DATA 2
-
-%macro MERGED_WIN_DATA 2
-EXPORT_C TableWin%1
-EXPORT_C Win%1_Count,skipb
-EXPORT_C Win%1_Bands,skipb 2*%2
-%endmacro
-
-%macro EXTERN_MERGED_WIN_DATA 2
-EXTERN_C TableWin%1
-EXTERN_C Win%1_Count
-EXTERN_C Win%1_Bands
-%endmacro
 
 EXTERN_C BG1SC,BG2SC,BG3SC,BG4SC
 EXTERN_C BG1HOFS,BG2HOFS,BG3HOFS,BG4HOFS

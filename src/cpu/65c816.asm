@@ -353,7 +353,6 @@ _E_flag:skipb
 _Z_flag:skipb
 EXPORT In_CPU,skipb         ; nonzero if CPU is executing
 
-EXPORT_C Offset_Change_Disable  ,skipb
 EXPORT_C FPS_ENABLED            ,skipb
 _V_flag:skipb
 EXPORT_C BREAKS_ENABLED         ,skipb

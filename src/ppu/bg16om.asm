@@ -11,6 +11,14 @@ You must read and accept the license prior to use.
 
 %endif
 
+%define SNEeSe_ppu_bg16om_asm
+
+%include "misc.inc"
+%include "ppu/ppu.inc"
+%include "ppu/tiles.inc"
+%include "ppu/screen.inc"
+
+
 %define RO16x16M_MAX_LINE_COUNT 8
 
 %define RO16x16M_Local_Bytes 64+8+24
@@ -1336,3 +1344,8 @@ Generate_Line_Plotter_Table_Offset_16x16M V,4
 Generate_Line_Plotter_Table_Offset_16x16M V,8
 
 section .text
+ALIGNC
+section .data
+ALIGND
+section .bss
+ALIGNB

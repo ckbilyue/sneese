@@ -216,6 +216,10 @@ void DisplayStatus()
  printf("VOFS:%04X %04X %04X %04X\n",
   (unsigned) (BG1VOFS & 0xFFFF), (unsigned) (BG2VOFS & 0xFFFF),
   (unsigned) (BG3VOFS & 0xFFFF), (unsigned) (BG4VOFS & 0xFFFF));
+ printf("M7:%04X %04X %04X %04X - %04X,%04X\n",
+  (unsigned) (M7A & 0xFFFF), (unsigned) (M7B & 0xFFFF),
+  (unsigned) (M7C & 0xFFFF), (unsigned) (M7D & 0xFFFF),
+  (unsigned) (M7X & 0xFFFF), (unsigned) (M7Y & 0xFFFF));
 
  printf("BGMODE:%02X      TM:%02X   TMW:%02X\n",
   (unsigned) BGMODE, (unsigned) TM, (unsigned) TMW);

@@ -11,12 +11,20 @@ You must read and accept the license prior to use.
 
 %endif
 
-%define R16MER_VMapOffset esp+16
-%define R16MER_Plotter esp+12
-%define R16MER_BG_Table esp+8
-%define R16MER_Next_Pixel esp+4
-%define R16MER_Pixel_Count esp
-%define R16MER_Inner (4)
+%define SNEeSe_ppu_bg8m_asm
+
+%include "misc.inc"
+%include "ppu/ppu.inc"
+%include "ppu/tiles.inc"
+%include "ppu/screen.inc"
+
+
+%define R8x8MR_VMapOffset esp+16
+%define R8x8MR_Plotter esp+12
+%define R8x8MR_BG_Table esp+8
+%define R8x8MR_Next_Pixel esp+4
+%define R8x8MR_Pixel_Count esp
+%define R8x8MR_Inner (4)
 
 ;VMapOffset = bg_line_offset (vscroll + current line) / bg tile size *
 ; 32 words (per line)
@@ -35,7 +43,7 @@ You must read and accept the license prior to use.
 
 %if 0
 C-pseudo code
-void Render_16M_Even_Run
+void Render_8x8M_Run
 (BGTABLE *bgtable, UINT8 *output, int vmapoffset, int nextpixel,
  int numpixels,
  void (*plotter)(UINT16 *screen_address, UINT8 pixeloffset,
@@ -95,8 +103,8 @@ void Render_16M_Even_Run
 }
 %endif
 ALIGNC
-Render_16M_Even_Run:
- mov ecx,[R16MER_Next_Pixel+R16MER_Inner]
+Render_8x8M_Run:
+ mov ecx,[R8x8MR_Next_Pixel+R8x8MR_Inner]
  mov esi,[Mosaic_Size_Select]
  xor eax,eax
  add edi,ecx    ;first pixel
@@ -107,7 +115,7 @@ Render_16M_Even_Run:
  add ecx,eax
 
  mov esi,[VLMapAddress+edx]
- mov ebx,[R16MER_VMapOffset+R16MER_Inner+4]
+ mov ebx,[R8x8MR_VMapOffset+R8x8MR_Inner+4]
  cmp ecx,0x100
  jb .do_before_wrap
  sub ecx,0x100
@@ -122,7 +130,7 @@ Render_16M_Even_Run:
  pop esi
  mov eax,[Mosaic_Size]
  ;hscroll + first pixel, relative to screen of first tile to be plotted
- mov [R16MER_Next_Pixel+R16MER_Inner],ecx
+ mov [R8x8MR_Next_Pixel+R8x8MR_Inner],ecx
  cmp esi,eax
  lea ebx,[ebx+ebp*2]
  jz .do_unclipped_before_wrap
@@ -130,8 +138,8 @@ Render_16M_Even_Run:
  mov ebp,ecx
  add eax,ecx
  and ebp,byte 7
- mov ecx,[R16MER_Pixel_Count+R16MER_Inner]
- mov [R16MER_Next_Pixel+R16MER_Inner],eax   ;nextpixel += Mosaic_Size
+ mov ecx,[R8x8MR_Pixel_Count+R8x8MR_Inner]
+ mov [R8x8MR_Next_Pixel+R8x8MR_Inner],eax   ;nextpixel += Mosaic_Size
  cmp ecx,esi
 
  ; left clipped
@@ -139,7 +147,7 @@ Render_16M_Even_Run:
 
  sub ecx,esi
  push ebp
- mov [R16MER_Pixel_Count+R16MER_Inner+4],ecx    ;count -= Mosaic_Count[nextpixel]
+ mov [R8x8MR_Pixel_Count+R8x8MR_Inner+4],ecx    ;count -= Mosaic_Count[nextpixel]
  mov ecx,esi
 
 ;ebx = screen
@@ -147,7 +155,7 @@ Render_16M_Even_Run:
 ;ebp = pixel offset in tile
 ;edi = output
 
- call [R16MER_Plotter+R16MER_Inner+4]
+ call [R8x8MR_Plotter+R8x8MR_Inner+4]
 
  mov eax,[Mosaic_Size]
  pop ebp
@@ -159,7 +167,7 @@ Render_16M_Even_Run:
 
 .do_unclipped_before_wrap:
  mov ecx,0xFF
- mov ebp,[R16MER_Next_Pixel+R16MER_Inner]
+ mov ebp,[R8x8MR_Next_Pixel+R8x8MR_Inner]
  sub ecx,ebp
  jb .do_after_wrap
 
@@ -171,32 +179,32 @@ Render_16M_Even_Run:
  mov al,[C_LABEL(MosaicCount)+ecx+esi]
  add eax,ecx
 
- mov ecx,[R16MER_Pixel_Count+R16MER_Inner]
+ mov ecx,[R8x8MR_Pixel_Count+R8x8MR_Inner]
  cmp ecx,eax
  jle .last_run
 
- add [R16MER_Next_Pixel+R16MER_Inner],eax   ;nextpixel += count
+ add [R8x8MR_Next_Pixel+R8x8MR_Inner],eax   ;nextpixel += count
  sub ecx,eax
- mov [R16MER_Pixel_Count+R16MER_Inner],ecx  ;numpixels -= count
+ mov [R8x8MR_Pixel_Count+R8x8MR_Inner],ecx  ;numpixels -= count
  mov ecx,eax
 
 ; if (numpixels <= 0) return;
 ; output += count;
 
- call [R16MER_Plotter+R16MER_Inner]
+ call [R8x8MR_Plotter+R8x8MR_Inner]
 
- mov ebp,[R16MER_Next_Pixel+R16MER_Inner]
+ mov ebp,[R8x8MR_Next_Pixel+R8x8MR_Inner]
 
 .do_after_wrap:
 
  mov ebx,0xFF
- mov edx,[R16MER_BG_Table+R16MER_Inner]
+ mov edx,[R8x8MR_BG_Table+R8x8MR_Inner]
  and ebx,ebp
- mov esi,[R16MER_VMapOffset+R16MER_Inner]
+ mov esi,[R8x8MR_VMapOffset+R8x8MR_Inner]
  shr ebx,3
  and ebp,byte 7
  add ebx,ebx
- mov ecx,[R16MER_Pixel_Count+R16MER_Inner]
+ mov ecx,[R8x8MR_Pixel_Count+R8x8MR_Inner]
  add ebx,esi
  mov esi,[VRMapAddress+edx]
  add ebx,esi
@@ -207,35 +215,41 @@ Render_16M_Even_Run:
 ; plotter(screen_address, nextpixel & 7, numpixels, output);
 
 .last_run:
- jmp [R16MER_Plotter+R16MER_Inner]
+ jmp [R8x8MR_Plotter+R8x8MR_Inner]
 
-%define R16ME_Local_Bytes 24
-%define R16ME_Plotter_Table esp+20
-%define R16ME_Clipped esp+16
-%define R16ME_BG_Table esp+12
-%define R16ME_Current_Line esp+8
-%define R16ME_BaseDestPtr esp+4
-%define R16ME_Lines esp
+%define R8x8M_Local_Bytes 24
+%define R8x8M_Plotter_Table esp+20
+%define R8x8M_Clipped esp+16
+%define R8x8M_BG_Table esp+12
+%define R8x8M_Current_Line esp+8
+%define R8x8M_BaseDestPtr esp+4
+%define R8x8M_Lines esp
 
-%macro Render_16M_Even 2
+%macro Render_8x8M 1
 ALIGNC
-EXPORT_C Render_16x%2M_Even_C%1
+EXPORT_C Render_8x8M_C%1
 %ifndef NO_NP_RENDER
- mov ecx,C_LABEL(Plot_Lines_NP_16M_Even_Table_C%1)
+ mov ecx,C_LABEL(Plot_Lines_NP_8x8M_Table_C%1)
  test al,al
  jnz .have_plotter
 %endif
 
- mov ecx,C_LABEL(Plot_Lines_V_16M_Even_Table_C%1)
+ mov ecx,C_LABEL(Plot_Lines_V_8x8M_Table_C%1)
 
 .have_plotter:
- jmp short Render_16x%2M_Even_Base
+%if %1 == 2
+ mov eax,[M0_Color+edx]
+ mov [Palette_Base],eax
+%endif
+ jmp short Render_8x8M_Base
 %endmacro
 
-;%1 = tile height
-%macro Render_16M_Even_Base 1
+Render_8x8M 2
+Render_8x8M 4
+Render_8x8M 8
+
 ALIGNC
-Render_16x%1M_Even_Base:
+Render_8x8M_Base:
  push ecx
  push esi
  push edx
@@ -247,20 +261,20 @@ Render_16x%1M_Even_Base:
  mov [TilesetAddress],eax
 
 .next_line:
- mov edx,[R16ME_BG_Table]
+ mov edx,[R8x8M_BG_Table]
 
- mov eax,[R16ME_Current_Line]
+ mov eax,[R8x8M_Current_Line]
  call Sort_Screen_Height_Mosaic
 
- mov eax,[R16ME_Current_Line]
+ mov eax,[R8x8M_Current_Line]
  mov ebx,[Mosaic_Size_Select]
  xor ecx,ecx
  mov cl,[C_LABEL(MosaicCount)+eax+ebx]
  mov al,[C_LABEL(MosaicLine)+eax+ebx]
  push ecx
- SORT_TILES_%1_TALL
+ SORT_TILES_8_TALL
  pop ecx
- mov ebp,[R16ME_Lines]
+ mov ebp,[R8x8M_Lines]
 
  cmp ecx,ebp
  ja .no_multi
@@ -270,19 +284,19 @@ Render_16x%1M_Even_Base:
  jb .not_too_many
  mov ebp,8
 .not_too_many:
- mov edi,[R16ME_BaseDestPtr]
+ mov edi,[R8x8M_BaseDestPtr]
  mov eax,ebp
  shl eax,8
  lea ecx,[edi+ebp*GfxBufferLineSlack]
  add eax,ecx
 
- mov ecx,[R16ME_Plotter_Table]
- mov [R16ME_BaseDestPtr],eax
+ mov ecx,[R8x8M_Plotter_Table]
+ mov [R8x8M_BaseDestPtr],eax
  mov eax,[C_LABEL(SNES_Screen8)]
  add edi,eax
  mov ecx,[ecx+ebp*4-4]
 
- mov esi,[R16ME_Clipped]
+ mov esi,[R8x8M_Clipped]
  push ebp
  mov al,[Win_Count+edx+esi]
 
@@ -301,7 +315,7 @@ Render_16x%1M_Even_Base:
 
  xor ecx,ecx
  mov cl,[edx+1]
- mov edx,[R16ME_BG_Table+24]
+ mov edx,[R8x8M_BG_Table+24]
  sub cl,bl
  setz ch
 
@@ -314,7 +328,7 @@ Render_16x%1M_Even_Base:
 
 .not_last_run:
  mov [esp+28],al
- call Render_16M_Even_Run
+ call Render_8x8M_Run
 
  mov edx,[esp+20]
  mov edi,[esp+24]
@@ -335,44 +349,35 @@ Render_16x%1M_Even_Base:
  dec al
  jne .not_last_run
 .last_run:
- call Render_16M_Even_Run
+ call Render_8x8M_Run
  add esp,byte 32
 
 .done:
  pop ebp
 
- mov eax,[R16ME_Current_Line]
- mov ecx,[R16ME_Lines]
+ mov eax,[R8x8M_Current_Line]
+ mov ecx,[R8x8M_Lines]
  add eax,ebp
  sub ecx,ebp
- mov [R16ME_Current_Line],eax
- mov [R16ME_Lines],ecx
+ mov [R8x8M_Current_Line],eax
+ mov [R8x8M_Lines],ecx
 
 %ifndef LAYERS_PER_LINE
-;cmp dword [R16ME_Lines],0
+;cmp dword [R8x8M_Lines],0
  jnz near .next_line
 %endif
 
- mov edx,[R16ME_BG_Table]
+ mov edx,[R8x8M_BG_Table]
  mov al,[Tile_Priority_Used]
  mov [Priority_Used+edx],al
  mov ah,[Tile_Priority_Unused]
  mov [Priority_Unused+edx],ah
 
- add esp,byte R16ME_Local_Bytes
+ add esp,byte R8x8M_Local_Bytes
  ret
-%endmacro
-
-Render_16M_Even 2,8
-Render_16M_Even 4,8
-Render_16M_Even_Base 8
-
-Render_16M_Even 2,16
-Render_16M_Even 4,16
-Render_16M_Even_Base 16
 
 ;%1 = label, %2 = priority - 0 = none, 1 = low, 2 = high, %3 = lines
-%macro Plot_Lines_16M_Even_C2 3
+%macro Plot_Lines_8x8M_C2 3
 ALIGNC
 %if %2 > 0
 %%wrong_priority_last:
@@ -425,9 +430,13 @@ EXPORT_C %1     ; Define label, entry point
  shl esi,3
  mov edx,eax
  add esi,ebp
+ mov ebp,[TilesetAddress]
+ and esi,0x3FF * 8 + 7  ; Clip to tileset
  and edx,byte 7*4   ; Get palette
+ add esi,ebp
 
  mov ebp,[Palette_Base]
+ and esi,0xFFFF * 4 / 8 ; Clip to VRAM
 
  mov edx,[palette_2bpl+edx]
  or edx,ebp         ; Adjust palette for mode 0
@@ -437,25 +446,13 @@ EXPORT_C %1     ; Define label, entry point
  mov eax,[Mosaic_Size]
  js near %%xflip
 
+ lea esi,[C_LABEL(TileCache2)+esi*8]
 %%flip_none_same_tile:
- push esi
- push ebp
- and ebp,byte 4
- add ebp,ebp
- add esi,ebp
- xor ebp,byte -1
- and esi,0x3FF * 8 + 7  ; Clip to tileset
- add esi,[TilesetAddress]
- and esi,0xFFFF * 4 / 8 ; Clip to VRAM
- lea esi,[C_LABEL(TileCache2)+esi*8+ebp+1]
- pop ebp
-
  cmp ecx,eax
  ja %%flip_none_partial
  mov eax,ecx
 %%flip_none_partial:
- mov bl,[esi+ebp*2]
- pop esi
+ mov bl,[esi+ebp]
 %if %2 == 1 || %2 == 3
  mov [Tile_Priority_Used],al
 %endif
@@ -468,10 +465,10 @@ EXPORT_C %1     ; Define label, entry point
  sub ecx,eax
 
 %%flip_none_next_pixel:
-%assign PLM16E_Dest_Offset 0
+%assign PLM8x8_Dest_Offset 0
 %rep %3
- mov [edi+PLM16E_Dest_Offset],bl
-%assign PLM16E_Dest_Offset (PLM16E_Dest_Offset + GfxBufferLinePitch)
+ mov [edi+PLM8x8_Dest_Offset],bl
+%assign PLM8x8_Dest_Offset (PLM8x8_Dest_Offset + GfxBufferLinePitch)
 %endrep
  inc edi
  dec eax
@@ -506,26 +503,14 @@ ALIGNC
 
 ALIGNC
 %%xflip:
+ lea esi,[C_LABEL(TileCache2)+esi*8+8]
  xor ebp,byte -1
 %%flip_x_same_tile:
- push esi
- push ebp
- and ebp,byte 4
- add ebp,ebp
- add esi,ebp
- xor ebp,byte 8
- and esi,0x3FF * 8 + 7  ; Clip to tileset
- add esi,[TilesetAddress]
- and esi,0xFFFF * 4 / 8 ; Clip to VRAM
- lea esi,[C_LABEL(TileCache2)+esi*8+ebp+8]
- pop ebp
-
  cmp ecx,eax
  ja %%flip_x_partial
  mov eax,ecx
 %%flip_x_partial:
- mov bl,[esi+ebp*2]
- pop esi
+ mov bl,[esi+ebp]
 %if %2 == 1 || %2 == 3
  mov [Tile_Priority_Used],al
 %endif
@@ -538,10 +523,10 @@ ALIGNC
  sub ecx,eax
 
 %%flip_x_next_pixel:
-%assign PLM16E_Dest_Offset 0
+%assign PLM8x8_Dest_Offset 0
 %rep %3
- mov [edi+PLM16E_Dest_Offset],bl
-%assign PLM16E_Dest_Offset (PLM16E_Dest_Offset + GfxBufferLinePitch)
+ mov [edi+PLM8x8_Dest_Offset],bl
+%assign PLM8x8_Dest_Offset (PLM8x8_Dest_Offset + GfxBufferLinePitch)
 %endrep
  inc edi
  dec eax
@@ -577,7 +562,7 @@ ALIGNC
 %endmacro
 
 ;%1 = label, %2 = priority - 0 = none, 1 = low, 2 = high, %3 = lines
-%macro Plot_Lines_16M_Even_C4 3
+%macro Plot_Lines_8x8M_C4 3
 ALIGNC
 %if %2 > 0
 %%wrong_priority_last:
@@ -630,8 +615,12 @@ EXPORT_C %1     ; Define label, entry point
  shl esi,3
  mov edx,eax
  add esi,ebp
+ mov ebp,[TilesetAddress]
+ and esi,0x3FF * 8 + 7  ; Clip to tileset
  and edx,byte 7*4   ; Get palette
+ add esi,ebp
 
+ and esi,0xFFFF * 2 / 8 ; Clip to VRAM
  mov edx,[palette_4bpl+edx]
  pop ebp
 
@@ -639,25 +628,13 @@ EXPORT_C %1     ; Define label, entry point
  mov eax,[Mosaic_Size]
  js near %%xflip
 
+ lea esi,[C_LABEL(TileCache4)+esi*8]
 %%flip_none_same_tile:
- push esi
- push ebp
- and ebp,byte 4
- add ebp,ebp
- add esi,ebp
- xor ebp,byte -1
- and esi,0x3FF * 8 + 7  ; Clip to tileset
- add esi,[TilesetAddress]
- and esi,0xFFFF * 2 / 8 ; Clip to VRAM
- lea esi,[C_LABEL(TileCache4)+esi*8+ebp+1]
- pop ebp
-
  cmp ecx,eax
  ja %%flip_none_partial
  mov eax,ecx
 %%flip_none_partial:
- mov bl,[esi+ebp*2]
- pop esi
+ mov bl,[esi+ebp]
 %if %2 == 1 || %2 == 3
  mov [Tile_Priority_Used],al
 %endif
@@ -670,12 +647,11 @@ EXPORT_C %1     ; Define label, entry point
  sub ecx,eax
 
 %%flip_none_next_pixel:
-%assign PLM16E_Dest_Offset 0
+%assign PLM8x8_Dest_Offset 0
 %rep %3
- mov [edi+PLM16E_Dest_Offset],bl
-%assign PLM16E_Dest_Offset (PLM16E_Dest_Offset + GfxBufferLinePitch)
+ mov [edi+PLM8x8_Dest_Offset],bl
+%assign PLM8x8_Dest_Offset (PLM8x8_Dest_Offset + GfxBufferLinePitch)
 %endrep
-%undef PLM16E_Dest_Offset
  inc edi
  dec eax
  jnz %%flip_none_next_pixel
@@ -708,26 +684,14 @@ EXPORT_C %1     ; Define label, entry point
 
 ALIGNC
 %%xflip:
+ lea esi,[C_LABEL(TileCache4)+esi*8+8]
  xor ebp,byte -1
 %%flip_x_same_tile:
- push esi
- push ebp
- and ebp,byte 4
- add ebp,ebp
- add esi,ebp
- xor ebp,byte 8
- and esi,0x3FF * 8 + 7  ; Clip to tileset
- add esi,[TilesetAddress]
- and esi,0xFFFF * 2 / 8 ; Clip to VRAM
- lea esi,[C_LABEL(TileCache4)+esi*8+ebp+8]
- pop ebp
-
  cmp ecx,eax
  ja %%flip_x_partial
  mov eax,ecx
 %%flip_x_partial:
- mov bl,[esi+ebp*2]
- pop esi
+ mov bl,[esi+ebp]
 %if %2 == 1 || %2 == 3
  mov [Tile_Priority_Used],al
 %endif
@@ -740,12 +704,11 @@ ALIGNC
  sub ecx,eax
 
 %%flip_x_next_pixel:
-%assign PLM16E_Dest_Offset 0
+%assign PLM8x8_Dest_Offset 0
 %rep %3
- mov [edi+PLM16E_Dest_Offset],bl
-%assign PLM16E_Dest_Offset (PLM16E_Dest_Offset + GfxBufferLinePitch)
+ mov [edi+PLM8x8_Dest_Offset],bl
+%assign PLM8x8_Dest_Offset (PLM8x8_Dest_Offset + GfxBufferLinePitch)
 %endrep
-%undef PLM16E_Dest_Offset
  inc edi
  dec eax
  jnz %%flip_x_next_pixel
@@ -779,49 +742,232 @@ ALIGNC
  ret
 %endmacro
 
-;%1 = depth, %2 = count
-%macro Generate_Line_Plotters_16M_Even 2
-%ifndef NO_NP_RENDER
- Plot_Lines_16M_Even_C%1 Plot_Lines_%2_NP_16M_Even_C%1,0,%2
+;for mosaic, keep track of # pixels done, return # tiles in next set skipped
+
+;%1 = label, %2 = priority - 0 = none, 1 = low, 2 = high, %3 = lines
+%macro Plot_Lines_8x8M_C8 3
+ALIGNC
+%if %2 > 0
+%%wrong_priority_last:
+%if %2 == 1 || %2 == 3
+ mov [Tile_Priority_Unused],cl
 %endif
- Plot_Lines_16M_Even_C%1 Plot_Lines_%2_V_16M_Even_C%1,3,%2
+ add edi,ecx
+ add ebp,ecx
+%%return:
+ ret
+
+ALIGNC
+%1_check:
+ mov eax,[Mosaic_Size]
+%%wrong_priority_same_tile:
+ cmp ecx,eax
+ jbe %%wrong_priority_last
+%if %2 == 1 || %2 == 3
+ mov [Tile_Priority_Unused],al
+%endif
+ add edi,eax
+ add ebp,eax
+ sub ecx,eax
+
+ cmp ebp,byte 8
+ jb %%wrong_priority_same_tile
+%endif
+
+%%next_tile:
+ mov eax,ebp
+ and ebp,byte 7
+ shr eax,3
+ add eax,eax
+ add ebx,eax        ; Update screen pointer
+
+EXPORT_C %1     ; Define label, entry point
+ mov al,[ebx+1]
+
+ Check_Tile_Priority %2, %1_check
+
+ push ebp
+ mov si,[ebx]       ; Get tile #
+ shl esi,3          ; 8
+ test al,al ; Check Y flip
+ mov ebp,[LineAddressY]
+ js %%flip_y
+ mov ebp,[LineAddress]
+
+%%flip_y:
+
+ add esi,ebp
+ mov ebp,[TilesetAddress]
+ and esi,0x3FF * 8 + 7  ; Clip to tileset
+ add esi,ebp
+ pop ebp
+ and esi,0xFFFF / 8 ; Clip to VRAM
+
+ add al,al      ; Get X flip (now in MSB)
+ mov eax,[Mosaic_Size]
+ js near %%xflip
+
+ lea esi,[C_LABEL(TileCache8)+esi*8]
+%%flip_none_same_tile:
+ cmp ecx,eax
+ ja %%flip_none_partial
+ mov eax,ecx
+%%flip_none_partial:
+ mov dl,[esi+ebp]
+%if %2 == 1 || %2 == 3
+ mov [Tile_Priority_Used],al
+%endif
+ test dl,dl
+ jz %%flip_none_empty_run
+
+;eax = count, esi = source base, ebp = offset, edi = dest, ecx = # left
+;ebx = screen map, dl = pixel
+ add ebp,eax
+ sub ecx,eax
+
+%%flip_none_next_pixel:
+%assign PLM8x8_Dest_Offset 0
+%rep %3
+ mov [edi+PLM8x8_Dest_Offset],dl
+%assign PLM8x8_Dest_Offset (PLM8x8_Dest_Offset + GfxBufferLinePitch)
+%endrep
+ inc edi
+ dec eax
+ jnz %%flip_none_next_pixel
+
+ mov eax,[Mosaic_Size]
+ test ecx,ecx
+ jz %%flip_none_return
+
+ cmp ebp,byte 8
+ jb %%flip_none_same_tile
+
+ jmp %%next_tile
+
+ALIGNC
+%%flip_none_empty_run:
+ add edi,eax
+ add ebp,eax
+ sub ecx,eax
+ jz %%flip_none_return
+
+ cmp ebp,byte 8
+ jb %%flip_none_same_tile
+
+ jmp %%next_tile
+
+%%flip_none_return:
+ ret
+
+ALIGNC
+%%xflip:
+ lea esi,[C_LABEL(TileCache8)+esi*8+8]
+ xor ebp,byte -1
+%%flip_x_same_tile:
+ cmp ecx,eax
+ ja %%flip_x_partial
+ mov eax,ecx
+%%flip_x_partial:
+ mov dl,[esi+ebp]
+%if %2 == 1 || %2 == 3
+ mov [Tile_Priority_Used],al
+%endif
+ test dl,dl
+ jz %%flip_x_empty_run
+
+;eax = count, esi = source base, ebp = offset, edi = dest, ecx = # left
+;ebx = screen map, dl = pixel
+ sub ebp,eax
+ sub ecx,eax
+
+%%flip_x_next_pixel:
+%assign PLM8x8_Dest_Offset 0
+%rep %3
+ mov [edi+PLM8x8_Dest_Offset],dl
+%assign PLM8x8_Dest_Offset (PLM8x8_Dest_Offset + GfxBufferLinePitch)
+%endrep
+ inc edi
+ dec eax
+ jnz %%flip_x_next_pixel
+
+ mov eax,[Mosaic_Size]
+ test ecx,ecx
+ jz %%flip_x_return
+
+ cmp ebp,byte ~8
+ ja %%flip_x_same_tile
+
+ xor ebp,byte -1
+ jmp %%next_tile
+
+ALIGNC
+%%flip_x_empty_run:
+ add edi,eax
+ sub ebp,eax
+ sub ecx,eax
+ jz %%flip_x_return
+
+ cmp ebp,byte ~8
+ ja %%flip_x_same_tile
+
+ xor ebp,byte -1
+ jmp %%next_tile
+
+%%flip_x_return:
+ ret
 %endmacro
 
-%macro Generate_Line_Plotters_16M_Even_Depth 1
-Generate_Line_Plotters_16M_Even %1,1
-Generate_Line_Plotters_16M_Even %1,2
-Generate_Line_Plotters_16M_Even %1,3
-Generate_Line_Plotters_16M_Even %1,4
-Generate_Line_Plotters_16M_Even %1,5
-Generate_Line_Plotters_16M_Even %1,6
-Generate_Line_Plotters_16M_Even %1,7
-Generate_Line_Plotters_16M_Even %1,8
+;%1 = depth, %2 = count
+%macro Generate_Line_Plotters_8x8M 2
+%ifndef NO_NP_RENDER
+ Plot_Lines_8x8M_C%1 Plot_Lines_%2_NP_8x8M_C%1,0,%2
+%endif
+ Plot_Lines_8x8M_C%1 Plot_Lines_%2_V_8x8M_C%1,3,%2
 %endmacro
 
-Generate_Line_Plotters_16M_Even_Depth 2
-Generate_Line_Plotters_16M_Even_Depth 4
+%macro Generate_Line_Plotters_8x8M_Depth 1
+Generate_Line_Plotters_8x8M %1,1
+Generate_Line_Plotters_8x8M %1,2
+Generate_Line_Plotters_8x8M %1,3
+Generate_Line_Plotters_8x8M %1,4
+Generate_Line_Plotters_8x8M %1,5
+Generate_Line_Plotters_8x8M %1,6
+Generate_Line_Plotters_8x8M %1,7
+Generate_Line_Plotters_8x8M %1,8
+%endmacro
+
+Generate_Line_Plotters_8x8M_Depth 2
+Generate_Line_Plotters_8x8M_Depth 4
+Generate_Line_Plotters_8x8M_Depth 8
 
 section .data
 ;%1 = type, %2 = depth
-%macro Generate_Line_Plotter_Table_16M_Even 2
+%macro Generate_Line_Plotter_Table_8x8M 2
 ALIGND
-EXPORT_C Plot_Lines_%1_16M_Even_Table_C%2
-dd C_LABEL(Plot_Lines_1_%1_16M_Even_C%2)
-dd C_LABEL(Plot_Lines_2_%1_16M_Even_C%2)
-dd C_LABEL(Plot_Lines_3_%1_16M_Even_C%2)
-dd C_LABEL(Plot_Lines_4_%1_16M_Even_C%2)
-dd C_LABEL(Plot_Lines_5_%1_16M_Even_C%2)
-dd C_LABEL(Plot_Lines_6_%1_16M_Even_C%2)
-dd C_LABEL(Plot_Lines_7_%1_16M_Even_C%2)
-dd C_LABEL(Plot_Lines_8_%1_16M_Even_C%2)
+EXPORT_C Plot_Lines_%1_8x8M_Table_C%2
+dd C_LABEL(Plot_Lines_1_%1_8x8M_C%2)
+dd C_LABEL(Plot_Lines_2_%1_8x8M_C%2)
+dd C_LABEL(Plot_Lines_3_%1_8x8M_C%2)
+dd C_LABEL(Plot_Lines_4_%1_8x8M_C%2)
+dd C_LABEL(Plot_Lines_5_%1_8x8M_C%2)
+dd C_LABEL(Plot_Lines_6_%1_8x8M_C%2)
+dd C_LABEL(Plot_Lines_7_%1_8x8M_C%2)
+dd C_LABEL(Plot_Lines_8_%1_8x8M_C%2)
 %endmacro
 
 %ifndef NO_NP_RENDER
-Generate_Line_Plotter_Table_16M_Even NP,2
-Generate_Line_Plotter_Table_16M_Even NP,4
+Generate_Line_Plotter_Table_8x8M NP,2
+Generate_Line_Plotter_Table_8x8M NP,4
+Generate_Line_Plotter_Table_8x8M NP,8
 %endif
 
-Generate_Line_Plotter_Table_16M_Even V,2
-Generate_Line_Plotter_Table_16M_Even V,4
+Generate_Line_Plotter_Table_8x8M V,2
+Generate_Line_Plotter_Table_8x8M V,4
+Generate_Line_Plotter_Table_8x8M V,8
 
 section .text
+ALIGNC
+section .data
+ALIGND
+section .bss
+ALIGNB

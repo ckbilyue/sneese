@@ -11,6 +11,14 @@ You must read and accept the license prior to use.
 
 %endif
 
+%define SNEeSe_ppu_bg8o_asm
+
+%include "misc.inc"
+%include "ppu/ppu.inc"
+%include "ppu/tiles.inc"
+%include "ppu/screen.inc"
+
+
 %define RO8x8_Local_Bytes 56+24
 %define RO8x8_Plotter_Table esp+52+24
 %define RO8x8_Clipped esp+48+24
@@ -978,4 +986,8 @@ Generate_Line_Plotter_Table_Offset_8x8 V,2
 Generate_Line_Plotter_Table_Offset_8x8 V,8
 
 section .text
-%include "ppu/bg8om.inc"
+ALIGNC
+section .data
+ALIGND
+section .bss
+ALIGNB
