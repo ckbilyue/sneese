@@ -175,13 +175,29 @@ ALIGNC
 %endif
 %endmacro
 
+;eax = sign-extended branch offset
+%macro short_branch 0
+%if S_8bit
+ mov edx,R_PBPC
+ add R_PC,ax
+ add R_Cycles,_5A22_FAST_CYCLE  ; branch taken
+ xor edx,R_PBPC
+ add dh,255
+ sbb edx,edx
+ and edx,_5A22_FAST_CYCLE   ;address page wrap?
+ add R_Cycles,edx
+%else
+ add R_PC,ax
+ add R_Cycles,_5A22_FAST_CYCLE  ; branch taken
+%endif
+%endmacro
+
 ;%1 = flag
 %macro _BFC 1
  READ8_Immediate
  JUMP_FLAG %1,C_LABEL(CPU_RETURN),near  ; flag set
  movsx eax,al                   ; sign extend for addition
- add R_Cycles,_5A22_FAST_CYCLE  ; branch taken
- add R_PC,ax
+ short_branch
 %endmacro
 
 ;%1 = flag
@@ -189,15 +205,13 @@ ALIGNC
  READ8_Immediate
  JUMP_NOT_FLAG %1,C_LABEL(CPU_RETURN),near  ; flag clear
  movsx eax,al                   ; sign extend for addition
- add R_Cycles,_5A22_FAST_CYCLE  ; branch taken
- add R_PC,ax
+ short_branch
 %endmacro
 
 %macro _BRA 0
  READ8_Immediate
  movsx eax,al                   ; sign extend for addition
- add R_Cycles,_5A22_FAST_CYCLE  ; branch taken
- add R_PC,ax
+ short_branch
 %endmacro
 
 ;%1 = addr
