@@ -137,7 +137,7 @@ static int unzip_seek_helper(FILE *file, int offset)
    return -1;
   n -= tmp;
  }
- return n;
+ return n > 0 ? -1 : 0;
 }
 #endif // ZLIB
 
@@ -271,15 +271,6 @@ int fseek2(FILE *file, long offset, int mode)
 #ifdef ZLIB
  else if (finfo->fmode == FM_GZIP)
  {
-  /*
-    The zlib documentation contains a major error. From the doc:
-      gzrewind(file) is equivalent to (int)gzseek(file, 0L, SEEK_SET)
-    That is not true for uncompressed files. gzrewind() doesn't change the
-    file pointer for uncompressed files in the ports I (dbjh) tested
-    (zlib 1.1.3, DJGPP, Cygwin & GNU/Linux). It clears the EOF indicator.
-  */
-  if (!finfo->compressed)
-   gzrewind(file);
   if (mode == SEEK_END)                         // zlib doesn't support SEEK_END
   {
    // Note that this is _slow_...
@@ -291,7 +282,16 @@ int fseek2(FILE *file, long offset, int mode)
    offset += gztell(file);
    mode = SEEK_SET;
   }
-  return gzseek(file, offset, mode);
+  /*
+    The zlib documentation contains a major error. From the doc:
+      gzrewind(file) is equivalent to (int)gzseek(file, 0L, SEEK_SET)
+    That is not true for uncompressed files. gzrewind() doesn't change the
+    file pointer for uncompressed files in the ports I (dbjh) tested
+    (zlib 1.1.3, DJGPP, Cygwin & GNU/Linux). It clears the EOF indicator.
+  */
+  if (!finfo->compressed)
+   gzrewind(file);
+  return gzseek(file, offset, mode) == -1 ? -1 : 0;
  }
  else if (finfo->fmode == FM_ZIP)
  {
