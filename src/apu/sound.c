@@ -929,9 +929,9 @@ void update_sound_block(void)
  static FILE *snd_dump = NULL;
 #endif
 
- if (!SPC_ENABLED || !sound_enabled) return;
+ if (!sound_enabled) return;
 
- if (block_written) return;
+ if (block_written && SPC_ENABLED) return;
 
 #ifdef DUMP_SOUND
  if (!block_dumped)
@@ -955,7 +955,7 @@ void update_sound_block(void)
 
   if (sound_bits == 8)
   {
-   if (snd_dump)
+   if (snd_dump && SPC_ENABLED)
    {
     fwrite(((output_sample_8 *) sound_buffer_preload) + data_block, 1,
      sizeof(output_sample_8[samples]), snd_dump);
@@ -963,7 +963,7 @@ void update_sound_block(void)
   }
   else
   {
-   if (snd_dump)
+   if (snd_dump && SPC_ENABLED)
    {
     fwrite(((output_sample_16 *) sound_buffer_preload) + data_block, 1,
      sizeof(output_sample_16[samples]), snd_dump);
@@ -989,15 +989,29 @@ void update_sound_block(void)
 
  if (sound_bits == 8)
  {
-  memcpy(sound_buffer,
-   ((output_sample_8 *) sound_buffer_preload) + data_block,
-   sizeof(output_sample_8[samples]));
+  if (SPC_ENABLED)
+  {
+   memcpy(sound_buffer,
+    ((output_sample_8 *) sound_buffer_preload) + data_block,
+    sizeof(output_sample_8[samples]));
+  }
+  else
+  {
+   memset(sound_buffer, 0, sizeof(output_sample_8[samples]));
+  }
  }
  else
  {
-  memcpy(sound_buffer,
-   ((output_sample_16 *) sound_buffer_preload) + data_block,
-   sizeof(output_sample_16[samples]));
+  if (SPC_ENABLED)
+  {
+   memcpy(sound_buffer,
+    ((output_sample_16 *) sound_buffer_preload) + data_block,
+    sizeof(output_sample_16[samples]));
+  }
+  else
+  {
+   memset(sound_buffer, 0, sizeof(output_sample_16[samples]));
+  }
  }
 
  free_audio_stream_buffer(stream_buffer);
