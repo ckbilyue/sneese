@@ -28,9 +28,15 @@ AFLAGS := -f elf
 GXX    := g++
 NO_SELF_MODIFY := 1
 
-#ZLIB   := 1 # comment this line to disable ZLIB support
+ZLIB   := 1 # comment this line to disable ZLIB support
 ifdef ZLIB
-MIOFLAGS := -lz
+# TODO: Fix the following problem. When dynamically linking to zlib I get the
+# error: "undefined reference to gzgets". This is strange, because I don't get
+# an error message for the other zlib functions. Even stranger, "ldd sneese"
+# doesn't show a reference to libz.so. For now the problem is "fixed" by
+# statically linking to zlib.
+#MIOFLAGS := -lz
+MIOFLAGS := /usr/lib/libz.a
 endif
 
 

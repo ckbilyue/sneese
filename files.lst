@@ -70,6 +70,12 @@ include/timers.h
 include/types.h
 include/scrmode.h
 include/wrapaleg.h
+src/unzip.c
+include/unzip.h
+src/map.c
+include/map.h
+src/multiio.c
+include/multiio.h
 src/guicore.cpp
 src/emugui.cpp
 include/cpu/cpu.h

@@ -92,7 +92,7 @@ int unzip_get_number_entries(const char *filename)
  {
   unz_global_info info;
 
-  file = unzOpen(filename);
+  file = (FILE *) unzOpen(filename);
   unzGetGlobalInfo(file, &info);
   unzClose(file);
   return info.number_entry;
@@ -215,10 +215,10 @@ FILE *fopen2(const char *filename, const char *mode)
   file = fopen(filename, mode);
 #ifdef ZLIB
  else if (fmode == FM_GZIP)
-  file = gzopen(filename, mode);
+  file = (FILE *) gzopen(filename, mode);
  else if (fmode == FM_ZIP)
  {
-  file = unzOpen(filename);
+  file = (FILE *) unzOpen(filename);
   if (file != NULL)
   {
    unzip_goto_file(file, unzip_current_file_nr);
@@ -361,27 +361,8 @@ char *fgets2(char *buffer, int maxlength, FILE *file)
 #ifdef ZLIB
  else if (fmode == FM_GZIP)
  {
-// WTF? "undefined reference to gzgets"! This code f*cking links in uCON64!
-// I'll try to fix this later... (dbjh)
-#if 0
   char *retval = gzgets(file, buffer, maxlength);
   return retval == Z_NULL ? NULL : retval;
-#else
-  int n = 0, c = 0;
-  while (n < maxlength - 1 && (c = fgetc2(file)) != EOF)
-  {
-   buffer[n] = c;                               // '\n' must also be stored in buffer
-   n++;
-   if (c == '\n')
-   {
-    buffer[n] = 0;
-    break;
-   }
-  }
-  if (n >= maxlength - 1 || c == EOF)
-   buffer[n] = 0;
-  return n > 0 ? buffer : NULL;
-#endif
  }
  else if (fmode == FM_ZIP)
  {
