@@ -48,7 +48,7 @@ Changes
   DMA: Corrected behavior of HDMA mode 5, thanks to anomie for the
    information [TRAC]
   Render: Added support for the undocumented OBJ size settings,
-   thanks to Charles MacDonald for research [TRAC]
+   thanks to Charles MacDonald and anomie for research [TRAC]
   Timing: Changed scanline length to 335 dots and adjusted frame timers
    to compensate, to match the 61.17Hz NTSC SGB framerate; fixes demon
    fusion in Shin Megami Tensei [TRAC]

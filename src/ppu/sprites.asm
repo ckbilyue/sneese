@@ -127,6 +127,9 @@ EXPORT_EQU sprsize_small_y,Sprite_Size_Current_Y
 EXPORT_EQU sprlim_small_y,Sprite_Size_Current_Y+1
 EXPORT_EQU sprsize_large_y,Sprite_Size_Current_Y+2
 EXPORT_EQU sprlim_large_y,Sprite_Size_Current_Y+3
+
+OBJ_vflip_fixup:skipb   ; value to XOR with OBJ current line for v-flip
+                        ; used for rectangular (undocumented) OBJ
 EXPORT Redo_OAM,skipb
 EXPORT SPRLatch   ,skipb    ; Sprite Priority Rotation latch flag
 EXPORT_C OBSEL    ,skipb    ; sssnnxbb  sss=sprite size,nn=upper 4k address,bb=offset
@@ -757,6 +760,7 @@ ALIGNC
 ;%define ASXP_X_Position    esp+1       ;planned but not yet used
 %define ASXP_Total_Size    esp+4
 %define ASXP_Visible_Width esp+5
+%define ASXP_Total_Lines   esp+6
 
 %define OAM_TIME_OVER (1 << 7)
 %define OAM_RANGE_OVER (1 << 6)
@@ -777,6 +781,7 @@ EXPORT_C Add_Sprite_X_Positive
  ; Save visible width and total size, these won't be changing
  push edi
  push edx
+ mov [ASXP_Total_Lines-4],cl
 
  ; Get base tile #
  mov ebp,[esi]
@@ -804,7 +809,7 @@ EXPORT_C Add_Sprite_X_Positive
 
 ;ebx = current line
 ;cl = lines left
-;dl = ASXP_Total_Size * 8
+;dl = ASXP_Total_Lines
 ;ebp = tile # (leftmost as shown)
 .next_line:
  ;If line never displayed, ignore line
@@ -825,9 +830,9 @@ EXPORT_C Add_Sprite_X_Positive
  mov ch,[ASXP_Visible_Width]
  mov [C_LABEL(OAM_Count)+ebx*2],al
 
- mov dl,[ASXP_Total_Size]
+ mov dl,[ASXP_Total_Lines]
  mov dh,[esi+3]
- shl dl,3
+;shl dl,3
  push ebp
  add dh,dh
  jc .flip_y
@@ -841,6 +846,7 @@ EXPORT_C Add_Sprite_X_Positive
  ; line in sprite = lines left - 1
  mov dl,[ASXP_Lines_Left+4]
  dec dl
+ xor dl,[OBJ_vflip_fixup]   ;*
  jz .adjust_y_done
 
 .adjust_y:
@@ -973,6 +979,7 @@ EXPORT_C Add_Sprite_X_Negative
  ; Save visible width and total size, these won't be changing
  push edi
  push edx
+ mov [ASXP_Total_Lines-4],cl
 
  ; Get base tile #
  mov ebp,[esi]
@@ -994,7 +1001,7 @@ EXPORT_C Add_Sprite_X_Negative
 
 ;ebx = current line
 ;cl = lines left
-;dl = ASXP_Total_Size * 8
+;dl = ASXP_Total_Lines
 ;ebp = tile # (leftmost as shown)
 .next_line:
  ;If line never displayed, ignore line
@@ -1015,9 +1022,9 @@ EXPORT_C Add_Sprite_X_Negative
  mov ch,[ASXP_Visible_Width]
  mov [C_LABEL(OAM_Count)+ebx*2],al
 
- mov dl,[ASXP_Total_Size]
+ mov dl,[ASXP_Total_Lines]
  mov dh,[esi+3]
- shl dl,3
+;shl dl,3
  push ebp
  add dh,dh
  jc .flip_y
@@ -1031,6 +1038,7 @@ EXPORT_C Add_Sprite_X_Negative
  ; line in sprite = lines left - 1
  mov dl,[ASXP_Lines_Left+4]
  dec dl
+ xor dl,[OBJ_vflip_fixup]   ;*
  jz .adjust_y_done
 
 .adjust_y:
@@ -1380,10 +1388,9 @@ EXPORT_C Recache_OAM
  mov [edi+8],eax
  mov [edi+12],eax
 
- mov al,[C_LABEL(OBSEL)]
-;and al,0xE0 ;???
- cmp al,0xC0    ; If invalid size selected, no sprites to plot
- jnb near .done
+;mov al,[C_LABEL(OBSEL)]
+;cmp al,0xC0    ; If invalid size selected, no sprites to plot
+;jnb near .done
 
  mov ecx,[C_LABEL(HiSpriteCnt1)]    ; Size of first set and bit offset
  mov eax,[C_LABEL(HiSpriteCnt2)]
@@ -1427,10 +1434,17 @@ ALIGNC
 
  ;dl = sprite size in tiles
  ;dh = lower limit for negative X position
- shr edx,16
- shr ebx,16
+ shr edx,16 ;X
+ shr ebx,16 ;Y
 
 .do_small:
+
+ cmp dl,bl  ;rectangular OBJ?
+ jne .rect_obj
+ mov al,0
+.have_vflip_fixup:
+ mov [OBJ_vflip_fixup],al
+
  ;dl = sprite size in tiles
  ;dh = lower limit for negative X position
  mov al,[esi]  ; ax = X
@@ -1479,6 +1493,11 @@ ALIGNC
 ;ecx, esi, edi must be preserved!
  call C_LABEL(Add_Sprite_X_Positive)
  jmp short .off_screen
+
+.rect_obj:
+ mov al,dl
+ shl al,3
+ jmp .have_vflip_fixup
 
 ALIGNC
 .off_screen:
