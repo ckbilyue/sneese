@@ -816,7 +816,7 @@ int FileWindow()
       FileListPos);
      continue;
     } else {
-     // rom_load() needs to construct the full path to the file
+     // open_rom() needs to construct the full path to the file
      getcwd(start_dir, MAXPATH);
      if (!open_rom(DirList[FileListPos + SelFile].Name)){
       //printf("Failed to load cartridge ROM.");

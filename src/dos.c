@@ -471,11 +471,11 @@ int platform_init(int argc, char **argv)
  }
 
 #ifdef ALLEGRO_WINDOWS
- fnmerge(cfg_name, f_drive, f_dir, "sneesew", "cfg");
+ strcpy(cfg_name, "sneesew.cfg");
 #else
- fnmerge(cfg_name, f_drive, f_dir, "sneese", "cfg");
+ strcpy(cfg_name, "sneese.cfg");
 #endif
- fnmerge(dat_name, f_drive, f_dir, "sneese", "dat");
+ strcpy(dat_name, "sneese.dat");
 
  set_config_file(cfg_name); /* Yup, config files exist */
 
