@@ -62,6 +62,7 @@ Changes
   Timing: Changed scanline length to 335 dots and adjusted frame timers
    to compensate, to match the 61.17Hz NTSC SGB framerate; fixes demon
    fusion in Shin Megami Tensei [TRAC]
+  5A22: Improved open bus behavior in several registers
  0.80
   Misc: Fixed a flaw where divide result registers were not changed
    by division-by-zero [TRAC]
