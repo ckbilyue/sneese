@@ -133,7 +133,7 @@ byte accessed.
  inc bx
  test bx,(8 << 10) - 1
  jnz %%single_block
- dec ebx
+ dec bx
  call C_LABEL(SNES_GET_WORD_WRAP)
 %endif
  jmp %%read_done
@@ -192,7 +192,7 @@ byte accessed.
  add ebx,2
  test ebx,(8 << 10) - 2
  jnz %%single_block
- sub bx,2
+ sub ebx,2
  call C_LABEL(SNES_GET_LONG)
 %else
  add bx,2

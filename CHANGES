@@ -43,6 +43,8 @@ Changes
    latency issues [TRAC]
   Misc: Added support for reading .jma files [Nach]
   ROM loader: Minor clean-up in ROM loading code [Nach]
+  Memory map: Fixed a few bugs that could cause bad addresses to be used,
+   sometimes leading to faults [TRAC]
  0.831
   5A22: Changed emulation-mode interrupts to NOT zero data bank
    register - thanks to Overload for pointing out that the SNES CPU
