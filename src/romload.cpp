@@ -373,26 +373,26 @@ inline void map_sram_4k(int bank, int block)
  BlockSpeed[bank * 8 + block] = 8;
 }
 
-inline void map_sram_64k(int bank, int sram_block, int mask,
+inline void map_sram_32k(int bank, int sram_block, int mask,
  void (*sram_write_handler)(void))
 {
- for (int i = 0; i < 8; i++) map_sram(bank, i, sram_block + (i & mask),
+ for (int i = 0; i < 4; i++) map_sram(bank, i, sram_block + (i & mask),
   sram_write_handler);
 }
 
-inline void map_no_sram_64k(int bank)
+inline void map_no_sram_32k(int bank)
 {
- for (int i = 0; i < 8; i++) map_no_sram(bank, i);
+ for (int i = 0; i < 4; i++) map_no_sram(bank, i);
 }
 
-inline void map_sram_2k_64k(int bank)
+inline void map_sram_2k_32k(int bank)
 {
- for (int i = 0; i < 8; i++) map_sram_2k(bank, i);
+ for (int i = 0; i < 4; i++) map_sram_2k(bank, i);
 }
 
-inline void map_sram_4k_64k(int bank)
+inline void map_sram_4k_32k(int bank)
 {
- for (int i = 0; i < 8; i++) map_sram_4k(bank, i);
+ for (int i = 0; i < 4; i++) map_sram_4k(bank, i);
 }
 
 inline void map_rom_32k_lorom(int bank)
@@ -555,22 +555,6 @@ bool Set_LoROM_Map()
   map_unmapped_64k(b);
  }
 
-/*
- enum SPECIAL_ROM {
-  SR_NOT_SPECIAL, SR_MEGAMANX
- };
-
- SPECIAL_ROM special_rom = SR_NOT_SPECIAL;
-
- if (!strcmp(rom_name, "MEGAMAN X            ")
-  || !strcmp(rom_name, "ROCKMAN X            "))
- {
-  // special: perform 00/80 -> 40/C0 mirroring similar to HiROM
-  special_rom = SR_MEGAMANX;
-  printf("Mega Man X detected\n");
- }
-*/
-
  /* Compute ROM bank masks for 32k banks */
  if (((rom_bank_count_32k * 2 - 1) & (rom_bank_count_32k - 1))
   == (rom_bank_count_32k - 1))
@@ -600,10 +584,10 @@ bool Set_LoROM_Map()
   map_rom_32k_lorom_40_C0(b + 0xC0);
  }
 
- // Limit to 8Mbit/1MB SRAM
- if (SaveRamLength > (1 << 20))
+ // Limit to 4Mbit/512kB SRAM
+ if (SaveRamLength > (512 << 10))
  {
-    SaveRamLength = (1 << 20);
+    SaveRamLength = (512 << 10);
  }
 
  SRAM_Mask = SaveRamLength - 1;
@@ -617,48 +601,44 @@ bool Set_LoROM_Map()
   switch (SaveRamLength)
   {
    case 0: // No SRAM
-    map_no_sram_64k(b);
-    map_no_sram_64k(b + 0x80);
+    map_no_sram_32k(b);
+    map_no_sram_32k(b + 0x80);
     break;
    case 0x800:  // 16kbit/2kB SRAM
-    map_sram_2k_64k(b);
-    map_sram_2k_64k(b + 0x80);
+    map_sram_2k_32k(b);
+    map_sram_2k_32k(b + 0x80);
     break;
    case 0x1000: // 32kbit/4kB SRAM
-    map_sram_4k_64k(b);
-    map_sram_4k_64k(b + 0x80);
+    map_sram_4k_32k(b);
+    map_sram_4k_32k(b + 0x80);
     break;
    case 0x2000: // 64kbit/8kB SRAM
-    map_sram_64k(b, 0, 0, SRAM_WRITE);
-    map_sram_64k(b + 0x80, 0, 0, SRAM_WRITE);
+    map_sram_32k(b       , 0, 0, SRAM_WRITE);
+    map_sram_32k(b + 0x80, 0, 0, SRAM_WRITE);
     break;
    case 0x4000: // 128kbit/16kB SRAM
-    map_sram_64k(b, 0, 1, SRAM_WRITE);
-    map_sram_64k(b + 0x80, 0, 1, SRAM_WRITE);
+    map_sram_32k(b       , 0, 1, SRAM_WRITE);
+    map_sram_32k(b + 0x80, 0, 1, SRAM_WRITE);
     break;
    case 0x8000: // 256kbit/32kB SRAM
-    map_sram_64k(b, 0, 3, SRAM_WRITE);
-    map_sram_64k(b + 0x80, 0, 3, SRAM_WRITE);
+    map_sram_32k(b       , 0, 3, SRAM_WRITE);
+    map_sram_32k(b + 0x80, 0, 3, SRAM_WRITE);
     break;
    case 0x10000: // 512kbit/64kB SRAM
-    map_sram_64k(b, (b & 1) * 4, 3, SRAM_WRITE_ALT);
-    map_sram_64k(b + 0x80, (b & 1) * 4, 3, SRAM_WRITE_ALT);
+    map_sram_32k(b       , (b & 1) * 4, 3, SRAM_WRITE_ALT);
+    map_sram_32k(b + 0x80, (b & 1) * 4, 3, SRAM_WRITE_ALT);
     break;
    case 0x20000: // 1Mbit/128kB SRAM
-    map_sram_64k(b, (b & 3) * 4, 3, SRAM_WRITE_ALT);
-    map_sram_64k(b + 0x80, (b & 3) * 4, 3, SRAM_WRITE_ALT);
+    map_sram_32k(b       , (b & 3) * 4, 3, SRAM_WRITE_ALT);
+    map_sram_32k(b + 0x80, (b & 3) * 4, 3, SRAM_WRITE_ALT);
     break;
    case 0x40000: // 2Mbit/256kB SRAM
-    map_sram_64k(b, (b & 3) * 8, 7, SRAM_WRITE);
-    map_sram_64k(b + 0x80, (b & 3) * 8, 7, SRAM_WRITE);
+    map_sram_32k(b       , (b & 7) * 4, 3, SRAM_WRITE_ALT);
+    map_sram_32k(b + 0x80, (b & 7) * 4, 3, SRAM_WRITE_ALT);
     break;
    case 0x80000: // 4Mbit/512kB SRAM
-    map_sram_64k(b, (b & 7) * 8, 7, SRAM_WRITE);
-    map_sram_64k(b + 0x80, (b & 7) * 8, 7, SRAM_WRITE);
-    break;
-   case 0x100000: // 8Mbit/1MB SRAM
-    map_sram_64k(b, (b & 15) * 8, 7, SRAM_WRITE);
-    map_sram_64k(b + 0x80, (b & 15) * 8, 7, SRAM_WRITE);
+    map_sram_32k(b       , (b & 15) * 4, 3, SRAM_WRITE_ALT);
+    map_sram_32k(b + 0x80, (b & 15) * 4, 3, SRAM_WRITE_ALT);
     break;
   }
  }
@@ -723,35 +703,35 @@ bool Set_HiROM_Map()
   switch (SaveRamLength) // Setup mapper for rest of 32k ROM banks + SRAM
   {
    case 0:       // No SRAM
-    map_no_sram(b, 3);
+    map_no_sram(b       , 3);
     map_no_sram(b + 0x80, 3);
     break;
    case 0x800:   // 16kbit/2kB SRAM
-    map_sram_2k(b, 3);
+    map_sram_2k(b       , 3);
     map_sram_2k(b + 0x80, 3);
     break;
    case 0x1000:  // 32kbit/4kB SRAM
-    map_sram_4k(b, 3);
+    map_sram_4k(b       , 3);
     map_sram_4k(b + 0x80, 3);
     break;
    case 0x2000:  // 64kbit/8kB SRAM
-    map_sram(b, 3, 0, SRAM_WRITE_HIROM);
+    map_sram(b       , 3, 0, SRAM_WRITE_HIROM);
     map_sram(b + 0x80, 3, 0, SRAM_WRITE_HIROM);
     break;
    case 0x4000:  // 128kbit/16kB SRAM
-    map_sram(b, 3, b & 1, SRAM_WRITE_HIROM);
+    map_sram(b       , 3, b & 1, SRAM_WRITE_HIROM);
     map_sram(b + 0x80, 3, b & 1, SRAM_WRITE_HIROM);
     break;
    case 0x8000:  // 256kbit/32kB SRAM
-    map_sram(b, 3, b & 3, SRAM_WRITE_HIROM);
+    map_sram(b       , 3, b & 3, SRAM_WRITE_HIROM);
     map_sram(b + 0x80, 3, b & 3, SRAM_WRITE_HIROM);
     break;
    case 0x10000: // 512kbit/64kB SRAM
-    map_sram(b, 3, b & 7, SRAM_WRITE_HIROM);
+    map_sram(b       , 3, b & 7, SRAM_WRITE_HIROM);
     map_sram(b + 0x80, 3, b & 7, SRAM_WRITE_HIROM);
     break;
    case 0x20000: // 1Mbit/128kB SRAM
-    map_sram(b, 3, b & 15, SRAM_WRITE_HIROM);
+    map_sram(b       , 3, b & 15, SRAM_WRITE_HIROM);
     map_sram(b + 0x80, 3, b & 15, SRAM_WRITE_HIROM);
     break;
   }

@@ -71,6 +71,8 @@ Changes
   Render: Added preliminary window clipping to mode 7 background [TRAC]
   Render: Improved layering order in mode 7, helps Final Fantasy 6
    world map [TRAC]
+  SRAM: Corrected LoROM SRAM address ranges, per a theory shared by
+   myself and MKendora [TRAC]
  0.776 [TRAC]
   Render: Added support for dual window clipping with all logic
    modes of backgrounds in modes 5 and 6
