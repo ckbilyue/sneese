@@ -111,7 +111,7 @@ int main(int argc, char **argv)
 
   while (!keypressed());
   readkey();
-  cout << " continueing" << endl;
+  cout << " continuing..." << endl;
 #endif
  }
 
