@@ -475,7 +475,7 @@ inline void map_rom_32k_lorom_40_C0(int bank)
 
  for (int i = 0; i < 4; i++)
  {
-  set_block_pointers(bank, i, (void *) (RomAddress - ((bank - needed_bank) << 16) - (needed_bank & 0x7F) * 0x8000), (void *) (Dummy - (bank << 16)));
+  set_block_pointers(bank, i, (void *) (RomAddress - ((bank - needed_bank) << 16) - (needed_bank) * 0x8000), (void *) (Dummy - (bank << 16)));
  }
 
  map_rom_32k_lorom(bank);
