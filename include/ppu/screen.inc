@@ -32,7 +32,7 @@ EXTERN_C Current_Line_Render,Last_Frame_Line
 EXTERN Ready_Line_Render,BaseDestPtr
 EXTERN Display_Needs_Update
 EXTERN Render_Select,Render_Mode
-EXTERN Redo_Windowing
+EXTERN Redo_Layering,Redo_Windowing
 EXTERN_C Render_Layering_Option_0
 EXTERN_C Render_Layering_Option_1
 EXTERN_C Render_Layering_Option_2

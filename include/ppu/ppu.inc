@@ -40,6 +40,7 @@ EXTERN_C Current_Line_Timing
 EXTERN_C SETINI
 EXTERN STAT78
 EXTERN Redo_Offset_Change,Redo_Offset_Change_VOffsets
+EXTERN TM_Allowed,TS_Allowed,Layers_In_Use
 EXTERN Window_Offset_First,Window_Offset_Second
 EXTERN SCR_TM,SCR_TS,SCR_TMW,SCR_TSW
 EXTERN_C Layer_Disable_Mask,Layering_Mode
@@ -87,6 +88,9 @@ EXTERN Priority_Unused_BG%1
 
 EXTERN_BG_WIN_DATA %1,Main
 EXTERN_BG_WIN_DATA %1,Sub
+EXTERN_BG_WIN_DATA %1,Low
+EXTERN_BG_WIN_DATA %1,High
+EXTERN_BG_WIN_DATA %1,Both
 %endmacro
 
 EXTERN_BG_DATA 1
@@ -166,15 +170,13 @@ EXTERN_C Update_Layering
 %define OC_Flag 0x3D
 
 %define BG_Win_Main 0x3E
-%define BG_Win_Main_Count (BG_Win_Main + Win_Count)
-%define BG_Win_Main_Bands (BG_Win_Main + Win_Bands)
-
 %define BG_Win_Sub 0x45
-%define BG_Win_Sub_Count (BG_Win_Sub + Win_Count)
-%define BG_Win_Sub_Bands (BG_Win_Sub + Win_Bands)
+%define BG_Win_Low 0x4C
+%define BG_Win_High 0x53
+%define BG_Win_Both 0x5A
 
-%define Priority_Used 0x4C
-%define Priority_Unused 0x4D
+%define Priority_Used 0x61
+%define Priority_Unused 0x62
 
 ; Offsets from _TableWin*
 %define Win_Count 0

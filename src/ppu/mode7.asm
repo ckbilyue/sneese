@@ -1,3 +1,4 @@
+
 %if 0
 
 SNEeSe, an Open Source Super NES emulator.
@@ -71,7 +72,7 @@ MPYH equ MPY+2  ; Mode 7 multiplication result: high byte
 
 EXPORT M7_Handler,skipl
 EXPORT M7_Handler_EXTBG,skipl
-EXPORT_C EXTBG_Mask,skipl   ; mask applied to BG enable for EXTBG
+EXPORT_C EXTBG_Mask,skipb   ; mask applied to BG enable for EXTBG
 EXPORT_C M7SEL,skipb    ; ab0000yx  ab=mode 7 repetition info,y=flip vertical,x=flip horizontal
 EXPORT Redo_M7,skipb    ; vhyxdcba
 M7_Used:    skipb
@@ -81,10 +82,6 @@ Redo_16x8:  skipb
 ; BG1 area |  BG2 area = displayed mode 7 background
 ; BG2 area = EXTBG, high priority
 
-; BG1 area on both screens
-MERGED_WIN_DATA BG1_Both,3
-; BG2 area on both screens
-MERGED_WIN_DATA BG2_Both,3
 ; BG1 area + BG2 area on main screen; both screens in 8-bit rendering
 MERGED_WIN_DATA Mode7_Main,4
 ; BG1 area + BG2 area on sub screen (currently unused)
@@ -141,11 +138,11 @@ EXTERN_C Layer_Disable_Mask
  and al,[C_LABEL(Layer_Disable_Mask)]
  and ah,[C_LABEL(Layer_Disable_Mask)]
  push ebp
- ; if SETINI:6 (EXTBG enable) is clear, ignore BG2 enable (EXTBG)
- mov ebx,[C_LABEL(EXTBG_Mask)]
- push eax
 
- and eax,ebx
+ ; we don't have to worry about if EXTBG is disabled, as BG2
+ ; will be masked off here if it is
+ ; if SETINI:6 (EXTBG enable) is clear, ignore BG2 enable (EXTBG)
+ push eax
 
  test eax,0x303
  jnz .background_on
@@ -525,6 +522,9 @@ Recalc_Mode7:
 ;mov [C_LABEL(M7V_13)],eax
  sub eax,edi
  mov [C_LABEL(M7Y_13)],edi
+ and eax,1023
+ xor eax,512
+ sub eax,512
  mov [Mode7_VY],eax  ;(V - Y)
 
 .end_recalc_vy:
@@ -542,6 +542,10 @@ Recalc_Mode7:
 ;mov [C_LABEL(M7H_13)],eax
  sub eax,edi
 ;mov [C_LABEL(M7X_13)],edi
+
+ and eax,1023
+ xor eax,512
+ sub eax,512
 
  test dl,0x51   ; Recalculate A, H, or X?
  jz .recalc_c
@@ -1198,15 +1202,16 @@ EXPORT SNES_W211A ; M7SEL   ; New for 0.12
  and edx,byte 1
  add ebx,edx
  add eax,edx
+ mov dl,[C_LABEL(M7SEL)]
  mov [C_LABEL(M7A_X)],ebx
- mov bl,[C_LABEL(M7SEL)]
+
+ shr edx,6
  mov [C_LABEL(M7C_X)],eax
 
- shr ebx,6
- and ebx,3
- mov eax,[M7_Handler_Table+ebx*4]
+ and edx,3
+ mov eax,[M7_Handler_Table+edx*4]
  mov [M7_Handler],eax
- mov ebx,[M7_Handler_Table+ebx*4+16]
+ mov ebx,[M7_Handler_Table+edx*4+16]
  pop eax
  mov [M7_Handler_EXTBG],ebx
  pop ebx
@@ -1278,9 +1283,6 @@ EXPORT SNES_W211F ; M7X
  mov al,[C_LABEL(M7X)+1]
  mov [C_LABEL(M7X)],ax
 
-;shl eax,0x13
-;sar eax,0x13
-;mov [C_LABEL(M7X_13)],eax
  mov al,0x10    ; Recalculate X
  or [Redo_M7],al
  pop eax
@@ -1294,9 +1296,6 @@ EXPORT SNES_W2120 ; M7Y
  mov al,[C_LABEL(M7Y)+1]
  mov [C_LABEL(M7Y)],ax
 
-;shl eax,0x13
-;sar eax,0x13
-;mov [C_LABEL(M7Y_13)],eax
  mov al,0x20    ; Recalculate Y
  or [Redo_M7],al
  pop eax

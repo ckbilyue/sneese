@@ -471,6 +471,14 @@ EXPORT STAT78,skipb     ; Enable support for field register
 EXPORT Redo_Offset_Change,skipb
 EXPORT Redo_Offset_Change_VOffsets,skipb
 
+EXPORT TM_Allowed,skipb ; allowed layer mask & layer disable mask & TM
+EXPORT TS_Allowed,skipb ; allowed layer mask & layer disable mask & TS
+EXPORT Layers_In_Use,skipb  ; TM_Allowed | TS_Allowed
+
+;Layering vars
+EXPORT Layers_Low       ; one of allowed TM, TS, or TM || TS
+EXPORT Layers_High      ; one of allowed TS, TM, or 0
+
 EXPORT SCR_TM,skipb     ; TM taken from here
 EXPORT SCR_TS,skipb     ; TS taken from here
 EXPORT SCR_TMW,skipb    ; TMW taken from here
@@ -528,8 +536,17 @@ EXPORT M0_Color_BG%1,skipl
 EXPORT BG_Flag_BG%1,skipb
 EXPORT OC_Flag_BG%1,skipb   ; Unused in BG3/4
 
+; Unclipped display area: main screen
 BG_WIN_DATA %1,Main
+; Unclipped display area: sub screen
 BG_WIN_DATA %1,Sub
+
+; Used in layering; first screen area (second screen removed in 16-bit)
+BG_WIN_DATA %1,Low
+; Used in layering; second screen area (first screen removed)
+BG_WIN_DATA %1,High
+; Used in layering; area to draw for both screens (16-bit only)
+BG_WIN_DATA %1,Both
 
 EXPORT Priority_Used_BG%1,skipb
 EXPORT Priority_Unused_BG%1,skipb
@@ -598,12 +615,11 @@ EXPORT Reset_Ports
  mov [Display_Needs_Update],al
 
  mov byte [Redo_Windowing],-1
+ mov byte [Redo_Layering],-1
  mov dword [Window_Offset_First],BG_Win_Main
  mov dword [Window_Offset_Second],BG_Win_Sub
- mov [SCR_TM],al
- mov [SCR_TS],al
- mov [SCR_TMW],al
- mov [SCR_TSW],al
+ mov [Layers_Low],al
+ mov [Layers_High],al
 
  mov [WMADDL],eax
 
@@ -676,7 +692,7 @@ EXPORT Reset_Ports
  mov [C_LABEL(TM)],al
  mov [C_LABEL(TS)],al
  mov [C_LABEL(SETINI)],al
- mov dword [C_LABEL(EXTBG_Mask)],~(2 | (2 << 8))
+ mov byte [C_LABEL(EXTBG_Mask)],~2
 
  mov [C_LABEL(COLDATA)],eax
  mov [C_LABEL(CGWSEL)],al
@@ -1366,10 +1382,16 @@ SNES_W2105: ; BGMODE
 ; BGMODE_Tile_Layer_Mask = BGMODE_Tile_Layer_Mask_Table[mode];
 ; Render_Mode = Screen_Mode[mode];
  xor ebx,ebx
- mov bl,[BGMODE_Allowed_Layer_Mask_Table+edx]
+
  mov cl,[BGMODE_Tile_Layer_Mask_Table+edx]
- mov [BGMODE_Allowed_Layer_Mask],bl
+ mov bl,[BGMODE_Allowed_Layer_Mask_Table+edx]
  mov [BGMODE_Tile_Layer_Mask],cl
+ and cl,0x0F
+ jnz .not_mode7
+ and bl,[C_LABEL(EXTBG_Mask)]
+.not_mode7:
+ mov [BGMODE_Allowed_Layer_Mask],bl
+
  mov bl,[BGMODE_Allowed_Offset_Change_Table+edx]
  mov ecx,[Screen_Mode+edx*4]
  lea edx,[BGMODE_Depth_Table+edx]
@@ -1464,7 +1486,7 @@ SNES_W2105: ; BGMODE
 
 
 .no_more_tile_layers:
- call C_LABEL(Update_Layering)
+ mov byte [Redo_Layering],-1
  mov al,[C_LABEL(BGMODE)]
 
  mov edx,eax
@@ -2590,9 +2612,26 @@ SNES_W212B: ; WOBJLOG
 ALIGNC
 EXPORT_C Update_Layering
  pusha
+
+ mov byte [Redo_Layering],0
+
  or byte [Redo_Windowing], \
   Redo_Win_BG(1) | Redo_Win_BG(2) | Redo_Win_BG(3) | Redo_Win_BG(4) | \
   Redo_Win_OBJ
+
+ mov al,[C_LABEL(TM)]
+ mov bl,[C_LABEL(TS)]
+ mov cl,[BGMODE_Allowed_Layer_Mask]
+ mov dl,[C_LABEL(Layer_Disable_Mask)]
+ and al,cl
+ and bl,cl
+ and al,dl
+ and bl,dl
+ mov [TM_Allowed],al
+ mov [TS_Allowed],bl
+ or al,bl
+ mov [Layers_In_Use],al
+
  cmp byte [C_LABEL(Layering_Mode)],1
  je .Update_Layering_1
  ja near .Update_Layering_2
@@ -2600,19 +2639,17 @@ EXPORT_C Update_Layering
  mov dword [Render_Select],C_LABEL(Render_Layering_Option_0)
  mov dword [Window_Offset_First],BG_Win_Sub
  mov dword [Window_Offset_Second],BG_Win_Main
- mov al,[C_LABEL(TM)]   ; layering option 0: main-on-sub
+
+ ; layering option 0: main-on-sub
+ mov al,[TM_Allowed]
  mov bl,[C_LABEL(TMW)]
- and al,[BGMODE_Allowed_Layer_Mask]
- and al,[C_LABEL(Layer_Disable_Mask)]
  mov [SCR_TM],al
  mov [SCR_TMW],bl
  xor al,0xFF
  mov bl,[C_LABEL(TSW)]
- and al,[C_LABEL(TS)]
- and al,[BGMODE_Allowed_Layer_Mask]
- and al,[C_LABEL(Layer_Disable_Mask)]
- mov [SCR_TS],al
+ and al,[TS_Allowed]
  mov [SCR_TSW],bl
+ mov [SCR_TS],al
  popa
  ret
 ALIGNC
@@ -2620,19 +2657,17 @@ ALIGNC
  mov dword [Render_Select],C_LABEL(Render_Layering_Option_1)
  mov dword [Window_Offset_First],BG_Win_Main
  mov dword [Window_Offset_Second],BG_Win_Sub
- mov al,[C_LABEL(TS)]   ; layering option 1: sub-on-main
+
+ ; layering option 1: sub-on-main
+ mov al,[TS_Allowed]
  mov bl,[C_LABEL(TSW)]
- and al,[BGMODE_Allowed_Layer_Mask]
- and al,[C_LABEL(Layer_Disable_Mask)]
  mov [SCR_TS],al
  mov [SCR_TSW],bl
  xor al,0xFF
  mov bl,[C_LABEL(TMW)]
- and al,[C_LABEL(TM)]
- and al,[BGMODE_Allowed_Layer_Mask]
- and al,[C_LABEL(Layer_Disable_Mask)]
- mov [SCR_TM],al
+ and al,[TM_Allowed]
  mov [SCR_TMW],bl
+ mov [SCR_TM],al
  popa
  ret
 ALIGNC
@@ -2640,16 +2675,16 @@ ALIGNC
  mov dword [Render_Select],C_LABEL(Render_Layering_Option_2)
  mov dword [Window_Offset_First],BG_Win_Main
  mov dword [Window_Offset_Second],BG_Win_Sub
- mov al,[C_LABEL(TM)]   ; layering option 2: main-with-sub
+
+ ; layering option 2: main-with-sub
+ mov al,[TM_Allowed]
  mov bl,[C_LABEL(TMW)]
- mov dl,[C_LABEL(TS)]
+ mov dl,[TS_Allowed]
  mov cl,[C_LABEL(TSW)]
  and bl,al
  and cl,dl
  or al,dl
  or bl,cl
- and al,[BGMODE_Allowed_Layer_Mask]
- and al,[C_LABEL(Layer_Disable_Mask)]
  mov byte [SCR_TS],0
  mov [SCR_TM],al
  mov [SCR_TMW],bl
@@ -2662,7 +2697,7 @@ SNES_W212C: ; TM
  je .no_change
  UpdateDisplay  ;*
  mov [C_LABEL(TM)],al
- call C_LABEL(Update_Layering)
+ mov byte [Redo_Layering],-1
  or byte [Redo_Windowing], \
   Redo_Win_BG(1) | Redo_Win_BG(2) | Redo_Win_BG(3) | Redo_Win_BG(4) | \
   Redo_Win_OBJ
@@ -2677,7 +2712,7 @@ SNES_W212D: ; TS
  je .no_change
  UpdateDisplay  ;*
  mov [C_LABEL(TS)],al
- call C_LABEL(Update_Layering)
+ mov byte [Redo_Layering],-1
  or byte [Redo_Windowing], \
   Redo_Win_BG(1) | Redo_Win_BG(2) | Redo_Win_BG(3) | Redo_Win_BG(4) | \
   Redo_Win_OBJ
@@ -2692,7 +2727,7 @@ SNES_W212E: ; TMW
  je .no_change
  UpdateDisplay  ;*windowing only
  mov [C_LABEL(TMW)],al
- call C_LABEL(Update_Layering)
+ mov byte [Redo_Layering],-1
  or byte [Redo_Windowing], \
   Redo_Win_BG(1) | Redo_Win_BG(2) | Redo_Win_BG(3) | Redo_Win_BG(4) | \
   Redo_Win_OBJ
@@ -2707,7 +2742,7 @@ SNES_W212F: ; TSW
  je .no_change
  UpdateDisplay  ;*windowing only
  mov [C_LABEL(TSW)],al
- call C_LABEL(Update_Layering)
+ mov byte [Redo_Layering],-1
  or byte [Redo_Windowing], \
   Redo_Win_BG(1) | Redo_Win_BG(2) | Redo_Win_BG(3) | Redo_Win_BG(4) | \
   Redo_Win_OBJ
@@ -2806,9 +2841,16 @@ SNES_W2133: ; SETINI
  shr al,7
  mov [C_LABEL(LastRenderLine)],edx
 
- sbb edx,edx
- or edx,~(2 | (2 << 8))
- mov [C_LABEL(EXTBG_Mask)],edx
+ sbb dl,dl
+ mov al,[BGMODE_Tile_Layer_Mask]
+ or dl,~2
+ and al,0x0F
+ mov [C_LABEL(EXTBG_Mask)],dl
+ jnz .not_mode7
+ mov al,[BGMODE_Allowed_Layer_Mask_Table+7]
+ and dl,al
+ mov [BGMODE_Allowed_Layer_Mask],dl
+.not_mode7:
 
  mov al,[C_LABEL(SETINI)]
 .no_change:

@@ -178,6 +178,7 @@ Tile_Priority_Unused:skipb
 EXPORT OffsetChangeDetect1,skipb
 EXPORT OffsetChangeDetect2,skipb
 EXPORT OffsetChangeDetect3,skipb
+EXPORT Redo_Layering,skipb
 EXPORT Redo_Windowing,skipb
 
 ;YXCS 4321
@@ -581,14 +582,19 @@ extern Tile_Recache_Set_End,Tile_Recache_Set_Begin,Recache_Tile_Set
  call C_LABEL(Recache_OAM)
 .no_oam_recache_needed:
 
+ SORT_OFFSET_CHANGE
+
+.no_tile_layers:
+
+ cmp byte [Redo_Layering],0
+ jz .no_layering_recalc_needed
+ call C_LABEL(Update_Layering)
+.no_layering_recalc_needed:
+
  cmp byte [Redo_Windowing],0
  jz .no_window_recalc_needed
  call C_LABEL(Recalc_Window_Effects)
 .no_window_recalc_needed:
-
- SORT_OFFSET_CHANGE
-
-.no_tile_layers:
 
  mov ebx,[C_LABEL(Current_Line_Render)]
  mov edi,[BaseDestPtr]
@@ -1131,36 +1137,54 @@ EXPORT_C Recalc_Window_Effects
  Recalc_Single_Window C_LABEL(WH2), C_LABEL(WH3), 2
 
 .win2_ok:
- test byte [Redo_Windowing],Redo_Win_BG(1)
+
+
+ mov al,[Redo_Windowing]
+ and al,[Layers_In_Use]
+
+ push eax
+ test al,Redo_Win_BG(1)
  jz .bg1_ok
 
  Recalc_Window_BG_Main 1
  Recalc_Window_BG_Sub 1
-
 .bg1_ok:
- test byte [Redo_Windowing],Redo_Win_BG(2)
+
+
+ mov al,[esp]
+ test al,Redo_Win_BG(2)
  jz .bg2_ok
 
  Recalc_Window_BG_Main 2
  Recalc_Window_BG_Sub 2
-
 .bg2_ok:
- test byte [Redo_Windowing],Redo_Win_BG(3)
+
+
+ mov al,[esp]
+ test al,Redo_Win_BG(3)
  jz .bg3_ok
 
  Recalc_Window_BG_Main 3
  Recalc_Window_BG_Sub 3
-
 .bg3_ok:
- test byte [Redo_Windowing],Redo_Win_BG(4)
+
+
+ mov al,[esp]
+ test al,Redo_Win_BG(4)
  jz .bg4_ok
 
  Recalc_Window_BG_Main 4
  Recalc_Window_BG_Sub 4
-
 .bg4_ok:
- and byte [Redo_Windowing],~(Redo_Win(1) | Redo_Win(2) | \
-  Redo_Win_BG(1) | Redo_Win_BG(2) | Redo_Win_BG(3) | Redo_Win_BG(4))
+
+
+ mov al,[Layers_In_Use]
+ xor al,0xFF
+ and al,[Redo_Windowing]
+ and al,~(Redo_Win(1) | Redo_Win(2))
+ mov [Redo_Windowing],al
+
+ pop eax
 
  pop edi
  pop esi
