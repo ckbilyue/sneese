@@ -29,6 +29,8 @@ Changes
   5A22: Added DMA setup delay of two slow bus-cycles [TRAC]
   Timing: Mostly corrected H-IRQ and H-counter timing for positions
    after the 'long' dots near the end of scanlines [TRAC]
+  Timing: Adjusted hardware interrupt timing, thanks to some info from
+   DMV27 [TRAC]
  0.832
   Documentation: Updated grossly insufficient copyright attributations
    [TRAC]

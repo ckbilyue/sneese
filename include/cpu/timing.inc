@@ -425,8 +425,13 @@ section .text
  push edi
  LOAD_BASE
  JUMP_FLAG SNES_FLAG_I,.irq_disabled    ; Interrupts disabled?
+ LOAD_PC
  LOAD_CYCLES
- add R_65c816_Cycles,byte 12    ; IRQ processing: 2 IO
+
+ GET_PBPC ebx
+ GET_BYTE               ; Get opcode
+
+ add R_Cycles,_5A22_FAST_CYCLE   ; hwint processing: 1 IO
  JUMP_NOT_FLAG SNES_FLAG_E,.native_irq
  call E1_IRQ
  jmp .irq_return
@@ -1058,10 +1063,13 @@ section .text
  mov byte [NMI_pin],NMI_Acknowledged    ;acknowledge NMI input
 
  push edi
- LOAD_BASE
+ LOAD_PC
  LOAD_CYCLES
+ LOAD_BASE
 
- add R_65c816_Cycles,byte 12    ; NMI processing: 2 IO
+ GET_PBPC ebx
+ GET_BYTE               ; Get opcode
+ add R_Cycles,_5A22_FAST_CYCLE   ; hwint processing: 1 IO
  JUMP_NOT_FLAG SNES_FLAG_E,.E0_NMI      ; Are we in emulation mode?
 
 .E1_NMI:
@@ -1149,8 +1157,14 @@ section .text
  push edi
  LOAD_BASE
  JUMP_FLAG SNES_FLAG_I,.irq_disabled    ; Interrupts disabled?
+
+ LOAD_PC
  LOAD_CYCLES
- add R_65c816_Cycles,byte 12    ; IRQ processing: 2 IO
+
+ GET_PBPC ebx
+ GET_BYTE               ; Get opcode
+
+ add R_Cycles,_5A22_FAST_CYCLE   ; hwint processing: 1 IO
  JUMP_NOT_FLAG SNES_FLAG_E,.native_irq
  call E1_IRQ
  jmp .irq_return
@@ -1751,10 +1765,13 @@ EXPORT SNES_W4200 ; NMITIMEN
 
 ALIGNC
 EXPORT SNES_W4201 ; WRIO
+ ;latch only on 1-to-0 transition
  mov dl,[C_LABEL(WRIO)]
  xor dl,al
  mov [C_LABEL(WRIO)],al
- jns .no_latch
+ jns .no_latch  ;no change?
+ test al,al
+ js .no_latch   ;not clearing?
 
  call SNES_R2137
 

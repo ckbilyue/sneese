@@ -1816,7 +1816,7 @@ EXPORT_C Reset_CPU
  mov dword [OpTable],OpTableE1  ; Set current opcode emulation table
 
  ; Clear cycle counts
- mov dword [C_LABEL(SNES_Cycles)],0x82  ;32.5 dots before reset (?)
+ mov dword [C_LABEL(SNES_Cycles)],0x80  ;32 dots before reset (?)
  mov [C_LABEL(EventTrip)],eax
 
  LOAD_BASE
@@ -1827,6 +1827,11 @@ EXPORT_C Reset_CPU
  mov [CPU_LABEL(D)],eax
  mov [CPU_LABEL(X)],eax
  mov [CPU_LABEL(Y)],eax
+
+ LOAD_PC
+
+ GET_PBPC ebx
+ GET_BYTE               ; Get opcode
 
  call E1_RESET
  SAVE_CYCLES
@@ -2119,7 +2124,7 @@ HANDLE_EVENT:
 ALIGNC
 EXPORT E1_RESET
  ; RESET (Emulation mode)
- add R_Cycles,_5A22_FAST_CYCLE * 2
+ add R_Cycles,_5A22_FAST_CYCLE   ; hwint processing: 1 IO
  mov ebx,B_S
  GET_BYTE       ;dummy stack access
  dec bl
