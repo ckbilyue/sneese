@@ -97,12 +97,18 @@ int GetDirList(char *Path, FILELIST *&Files, int Offset){
  do {
   if (FilesRead == max_listed_files - 26)
   {
-   Files = (FILELIST *) realloc(Files, sizeof(FILELIST[max_listed_files += 128]));
-   if (!Files)
+   FILELIST *tempFiles;
+
+   tempFiles = (FILELIST *) realloc(Files, sizeof(FILELIST[max_listed_files += 128]));
+   if (!tempFiles)
    {
     set_gfx_mode(GFX_TEXT, 0, 0, 0, 0);
     printf("Fatal error: Failure allocating memory for directory\n");
     exit(EXIT_FAILURE);
+   }
+   else
+   {
+    Files = tempFiles;
    }
   }
 
