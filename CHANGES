@@ -42,7 +42,9 @@ Changes
   GUI: Fixed some problems where text would be displayed outside a
    window [DBJH]
   65c816: Fixed a serious design flaw in ADC/SBC emulation which caused
-   the overflow flag to be set to an unexpected state
+   the overflow flag to be set to an unexpected state [TRAC]
+  Sound: Removed some extraneous and problematic compile-time directives
+   [TRAC]
  0.776 [TRAC]
   Render: Added support for dual window clipping with all logic
    modes of backgrounds in modes 5 and 6

@@ -1408,7 +1408,7 @@ EXPORT_C SPC_WRITE_CTRL
  test al,4
  jz  .no_enable_timer_2
  mov byte [C_LABEL(SPC_T2_counter)],0
-%ifdef SPC2MHz
+%ifdef FAST_SPC
  and edx,~31
 %else
  and edx,~15
@@ -1417,7 +1417,7 @@ EXPORT_C SPC_WRITE_CTRL
  mov [C_LABEL(SPC_T2_cycle_latch)],edx
 
 .no_enable_timer_2:
-%ifdef SPC2MHz
+%ifdef FAST_SPC
  mov dl,0
 %else
  and edx,~127

@@ -16,10 +16,6 @@ You must read and accept the license prior to use.
 
 #include "wrapaleg.h"
 
-#ifdef FAST_SPC
-#define SPC2MHz
-#endif
-
 #include "helper.h"
 #include "apu/sound.h"
 #include "apu/sounddef.h"
@@ -1267,15 +1263,14 @@ INLINE static void update_voice_pitch(int voice, struct voice_state *pvs,
  SAMPLE_CLIP_AND_WRITE(BITS,buf[i * 2 + 1],mrsample)
 
 #define GET_OUTX_GAUSS \
- (((((G4[-(pvs->pitch_counter >> 4)] * pvs->buf[(pvs->bufptr - 3) & 3]) \
+ ((((((int) G4[-(pvs->pitch_counter >> 4)] * pvs->buf[(pvs->bufptr - 3) & 3]) \
   & ~0x7FF) + \
- ((G3[-(pvs->pitch_counter >> 4)] * pvs->buf[(pvs->bufptr - 2) & 3]) \
+ (((int) G3[-(pvs->pitch_counter >> 4)] * pvs->buf[(pvs->bufptr - 2) & 3]) \
   & ~0x7FF) + \
- ((G2[(pvs->pitch_counter >> 4)] * pvs->buf[(pvs->bufptr - 1) & 3]) \
+ (((int) G2[(pvs->pitch_counter >> 4)] * pvs->buf[(pvs->bufptr - 1) & 3]) \
   & ~0x7FF) + \
- ((G1[(pvs->pitch_counter >> 4)] * pvs->buf[(pvs->bufptr) & 3]) \
+ (((int) G1[(pvs->pitch_counter >> 4)] * pvs->buf[(pvs->bufptr) & 3]) \
    & ~0x7FF)) >> 11) & ~1)
-//; printf("V%u C%04X S%04X\n", voice, (pvs->pitch_counter & 0xFFFF), pvs->last1)
 
 #define GET_OUTX_NO_GAUSS pvs->buf[(pvs->bufptr - 3) & 3]
 

@@ -95,7 +95,7 @@ typedef short output_sample_16;
 #define DSP_FLG_MUTE  (1 << 6)
 #define DSP_FLG_NECEN (1 << 5)
 
-#ifdef SPC2MHz
+#ifdef FAST_SPC
 #define SPC_CLOCK_HZ (2048000)
 #define TIMER_0_CYCLES_TO_TICKS_SHIFT 8
 #define TIMER_1_CYCLES_TO_TICKS_SHIFT 8

@@ -14,10 +14,6 @@ You must read and accept the license prior to use.
 %ifndef SNEeSe_apu_spc_inc
 %define SNEeSe_apu_spc_inc
 
-%ifdef FAST_SPC
-%define SPC2MHz
-%endif
-
 %include "cpu/regs.inc"
 %include "cycles.inc"
 
@@ -45,7 +41,7 @@ EXTERN_C SPC_T2_cycle_latch,SPC_T2_counter
  sub ecx,edx
  mov eax,ecx
 
-%ifdef SPC2MHz
+%ifdef FAST_SPC
 %if %1 != 2
  mov cl,0
  shr eax,8
