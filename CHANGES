@@ -21,42 +21,37 @@ Changes
   DBJH          Daniel Horchner
 
 
- 0.811
+ 0.83 [TRAC]
   Sound: Fixed a bug in envelope height reading of channels that weren't
    playing; value to be read wasn't being updated, fixes Secret of
-   Evermore [TRAC]
+   Evermore
   Sound: Improved envelope timing when envelope settings changed for
-   playing voices [TRAC]
+   playing voices
   Sound: Altered audio code to base timing on samples instead of cycles
-   [TRAC]
   Sound: Added countdown register emulation to envelope and noise
-   timing [TRAC]
+   timing
   5A22: Corrected emulation-mode interrupts to zero data bank register
-   [TRAC]
   Documentation: Corrected Win32 port compilation requirements, other
-   minor improvements [TRAC]
-  5A22: Corrected emulation-mode behavior of many opcodes [TRAC]
+   minor improvements
+  5A22: Corrected emulation-mode behavior of many opcodes
   5A22: Added variable bus speed emulation, and improved overall timing
-   [TRAC]
-  5A22: Fixed some bugs in DMA [TRAC]
+  5A22: Fixed some bugs in DMA
   5A22: Changed DMA to no longer be able to access internal CPU registers
-   [TRAC]
-  5A22: Added open bus emulation to A-bus [TRAC]
+  5A22: Added open bus emulation to A-bus
   Render: Fixed a serious bug which could have some pointers used by
-   offset-change rendering not be initialized [TRAC]
+   offset-change rendering not be initialized
   PPU: Corrected a behavior of the H/V latches; reading register $2137
-   (SLHV) does NOT reset which bits will be read next [TRAC]
+   (SLHV) does NOT reset which bits will be read next
   Timing: Changed scanline length back to 341 dots after research on the
    hardware gave this number; still stumped about SGB and Shin Megami
-   Tensei [TRAC]
+   Tensei
   Timing: Improved NMI emulation; now supports delayed NMI,
-   as well as re-acknowledgement of NMI [TRAC]
-  Timing: Added consumption of clock cycles by general DMA [TRAC]
-  Timing: Changed default SPC700 CPU clock to 1.024MHz [TRAC]
+   as well as re-acknowledgement of NMI
+  Timing: Added consumption of clock cycles by general DMA
+  Timing: Changed default SPC700 CPU clock to 1.024MHz
   Sound: Changed APU code to build with update-on-RAM-change by default
-   [TRAC]
   ROM loader: Added support for loading ROMs up to 64Mbit (autodetection
-   still needs work) [TRAC]
+   still needs work)
  0.81
   PPU: Greatly simplied VRAM read/write handling and readded VRAM read
    buffering, thanks to anomie for convincing me to give it another

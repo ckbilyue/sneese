@@ -15,6 +15,13 @@ src/cpu/65c816.asm
 include/cpu/cpuaddr.inc
 include/cpu/cpumacro.inc
 include/cpu/cpuops.inc
+include/cpu/ops_s.inc
+include/cpu/ops_sm.inc
+include/cpu/ops_smx.inc
+include/cpu/ops_sx.inc
+include/cpu/ops_m.inc
+include/cpu/ops_mx.inc
+include/cpu/ops_x.inc
 include/cpu/timing.inc
 include/cpu/regs.inc
 include/apu/spc.inc

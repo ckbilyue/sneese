@@ -15,7 +15,10 @@ You must read and accept the license prior to use.
 
 #include "wrapaleg.h"
 
-#include <iostream.h>
+#include <iostream>
+
+using namespace std;
+
 
 #include <stdio.h>
 

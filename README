@@ -9,8 +9,8 @@ The SNES emulator with the extra e's...
        SS   SS  NN   NNN  EE      ee      SS   SS  ee
         SSSSS   NN    NN  EEEEEE   eeee    SSSSS    eeee
 
-                                            v0.811 (Public BETA)
-                                            xx xxx 2004
+                                            v0.83 (Public BETA)
+                                            4 August 2004
 
   Please read the license (LICENSE file) before using or distributing
    SNEeSe in any way!
@@ -524,7 +524,8 @@ TO DO:
  CPU      : Getting timing inaccuracies eliminated, including interlace
              timing and dots dropped every other frame
 
- SPC      : Correct bus timing (need info)
+ SPC      : Clean up emulation
+            Correct bus timing (need info)
   Skipper  : Fails to work on MANY ROMs, need at least an alternate skipper
  Sound DSP: Correct noise, etc.
 

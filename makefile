@@ -19,8 +19,8 @@ PLATFORM := dos
 
 # How to call the tools we need to use
 
-NASM   := nasm -w+orphan-labels -w+macro-params -O3 -DC_LABELS_PREFIX=_
-GCC    := gcc -Werror -Wall -Wno-deprecated
+NASM   := nasm -w+orphan-labels -w+macro-params -O20 -DC_LABELS_PREFIX=_
+GCC    := gcc -Werror -Wall
 RM     := rm -f
 MD     := mkdir
 
