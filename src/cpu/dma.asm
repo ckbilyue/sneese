@@ -25,6 +25,7 @@ You must read and accept the license prior to use.
 %include "cpu/cpumem.inc"
 
 extern In_CPU,HVBJOY
+EXTERN_C SNES_Cycles
 
 section .text
 EXPORT_C DMA_text_start
@@ -352,6 +353,7 @@ extern C_LABEL(hdma_write__FUcUc)
  popa
 %endif
  call [edi+DMA_Wr0]
+ add dword [C_LABEL(SNES_Cycles)],byte 8   ; HDMA transfer
  cmp cl,2
  inc bx                 ; Adjust temporary table pointer
 ;jb .End_Transfer
@@ -371,6 +373,7 @@ extern C_LABEL(hdma_write__FUcUc)
  popa
 %endif
  call [edi+DMA_Wr1]
+ add dword [C_LABEL(SNES_Cycles)],byte 8   ; HDMA transfer
  cmp cl,4
  inc bx                 ; Adjust temporary table pointer
 ;jb .End_Transfer
@@ -390,6 +393,7 @@ extern C_LABEL(hdma_write__FUcUc)
  popa
 %endif
  call [edi+DMA_Wr2]
+ add dword [C_LABEL(SNES_Cycles)],byte 8   ; HDMA transfer
  inc bx
 
  GET_BYTE
@@ -406,6 +410,7 @@ extern C_LABEL(hdma_write__FUcUc)
  popa
 %endif
  call [edi+DMA_Wr3]
+ add dword [C_LABEL(SNES_Cycles)],byte 8   ; HDMA transfer
 
 .End_Transfer:
  add [edi+A2T],cx
@@ -433,6 +438,8 @@ Do_HDMA_Indirect:
  mov [edi+NTRL],al
  test al,al
  jz HDMA_End_Channel
+
+ add dword [C_LABEL(SNES_Cycles)],byte 16   ; Address load time
  mov ah,al
  GET_BYTE
  inc bx
@@ -456,6 +463,7 @@ Do_HDMA_Indirect:
  popa
 %endif
  call [edi+DMA_Wr0]
+ add dword [C_LABEL(SNES_Cycles)],byte 8   ; HDMA transfer
  cmp cl,2
  inc bx                 ; Adjust temporary table pointer
 ;jb .End_Transfer
@@ -475,6 +483,7 @@ Do_HDMA_Indirect:
  popa
 %endif
  call [edi+DMA_Wr1]
+ add dword [C_LABEL(SNES_Cycles)],byte 8   ; HDMA transfer
  cmp cl,4
  inc bx                 ; Adjust temporary table pointer
 ;jb .End_Transfer
@@ -494,6 +503,7 @@ Do_HDMA_Indirect:
  popa
 %endif
  call [edi+DMA_Wr2]
+ add dword [C_LABEL(SNES_Cycles)],byte 8   ; HDMA transfer
  inc bx
 
  GET_BYTE
@@ -510,6 +520,7 @@ Do_HDMA_Indirect:
  popa
 %endif
  call [edi+DMA_Wr3]
+ add dword [C_LABEL(SNES_Cycles)],byte 8   ; HDMA transfer
 
 .End_Transfer:
  add [edi+DAS],cx

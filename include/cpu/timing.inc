@@ -216,8 +216,8 @@ EXPORT IRQNewFrameReset
 
  mov dword [Last_Trip],0
 
- mov dword [C_LABEL(EventTrip)],CYCLES_HBLANK_START
- mov dword [FixedTrip],CYCLES_HBLANK_START
+ mov dword [C_LABEL(EventTrip)],CYCLES_HDMA_START
+ mov dword [FixedTrip],CYCLES_HDMA_START
  mov dword [Event_Handler],HDMA_Event
  mov dword [Fixed_Event],HDMA_Event
  mov dword [HDMA_Next_Event],C_LABEL(IRQFirstRender)
@@ -268,6 +268,7 @@ HDMA_Event:
  mov [Fixed_Event],eax
  cmp byte [HDMAON],0
  jz .no_HDMA
+ add dword [C_LABEL(SNES_Cycles)],byte 18   ; HDMA processing
  call do_HDMA
 %ifdef TRAP_HDMA_RELATCH
  pusha
@@ -422,8 +423,8 @@ EXTERN_C rest
 
  call C_LABEL(update_sound) ; Added by Butcha
 
-;mov dword [C_LABEL(EventTrip)],CYCLES_HBLANK_START
- mov dword [FixedTrip],CYCLES_HBLANK_START
+;mov dword [C_LABEL(EventTrip)],CYCLES_HDMA_START
+ mov dword [FixedTrip],CYCLES_HDMA_START
 ;mov dword [Event_Handler],HDMA_Event
  mov dword [Fixed_Event],HDMA_Event
 
@@ -560,7 +561,7 @@ EXPORT_C IRQFirstRender ; Check HDMA, IRQ, Render
 ;mov dword [Event_Handler],Render_Event
  mov dword [Fixed_Event],Render_Event
  mov dword [Render_Next_Event],HDMA_Event
- mov dword [Render_Next_Trip],CYCLES_HBLANK_START
+ mov dword [Render_Next_Trip],CYCLES_HDMA_START
  mov dword [HDMA_Next_Event],C_LABEL(IRQRender)
 
  Render_Start_Frame ; Reset framebuffer render address
@@ -638,8 +639,8 @@ ALIGNC
 EXPORT_C IRQFirst   ; Check HDMA, IRQ, Render
  mov dword [Last_Trip],0
 
-;mov dword [C_LABEL(EventTrip)],CYCLES_HBLANK_START
- mov dword [FixedTrip],CYCLES_HBLANK_START
+;mov dword [C_LABEL(EventTrip)],CYCLES_HDMA_START
+ mov dword [FixedTrip],CYCLES_HDMA_START
 ;mov dword [Event_Handler],HDMA_Event
  mov dword [Fixed_Event],HDMA_Event
  mov dword [HDMA_Next_Event],IRQNoRender
@@ -664,8 +665,8 @@ IRQNoRender:            ; Check HDMA, IRQ
  mov [C_LABEL(Current_Line_Timing)],eax
  cmp [C_LABEL(LastRenderLine)],eax
  jbe .end_of_display
-;mov dword [C_LABEL(EventTrip)],CYCLES_HBLANK_START
- mov dword [FixedTrip],CYCLES_HBLANK_START
+;mov dword [C_LABEL(EventTrip)],CYCLES_HDMA_START
+ mov dword [FixedTrip],CYCLES_HDMA_START
 ;mov dword [Event_Handler],HDMA_Event
  mov dword [Fixed_Event],HDMA_Event
  jmp near CPU_START_IRQ ; Return to CPU

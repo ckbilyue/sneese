@@ -22,6 +22,7 @@ Changes
 
 
  0.801
+  Timing: Implemented partial HDMA timing [TRAC]
   Render: Improved emulation of sprite priority rotation, thanks to
    anomie for research [TRAC]
   5A22: Improved RDIO emulation [TRAC]
