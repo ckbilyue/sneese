@@ -491,13 +491,13 @@ E0_ORA IdI,Direct_Indirect_Long
 
 ALIGNC
 EXPORT_C E0_PHP
- inc R_NativePC
+ ADDR_Implied
  E0_SETUPFLAGS
  E0_PUSH_B
  OPCODE_EPILOG
 ALIGNC
 EXPORT_C E1_PHP
- inc R_NativePC
+ ADDR_Implied
  E1_SETUPFLAGS
  E1_PUSH_B
  OPCODE_EPILOG
@@ -794,7 +794,7 @@ E0_AND IdI,Direct_Indirect_Long
 
 ALIGNC
 EXPORT_C E0_PLP
- inc R_NativePC
+ ADDR_Implied
  E0_PULL_B
  mov bl,B_I_flag
  E0_RESTOREFLAGS
@@ -815,7 +815,7 @@ EXPORT_C E0_PLP
  SET_TABLE_MX
 ALIGNC
 EXPORT_C E1_PLP
- inc R_NativePC
+ ADDR_Implied
  E1_PULL_B
  mov bl,B_I_flag
  E1_RESTOREFLAGS
@@ -1178,7 +1178,7 @@ E0_EOR IdI_y,Direct_Indirect_Indexed_Long
 
 ALIGNC
 EXPORT_C ALL_CLI
- inc R_NativePC
+ ADDR_Implied
  mov bl,B_I_flag
  STORE_FLAGS_I ah
 
@@ -2406,15 +2406,15 @@ E0_SBC i,Immediate
 
 ALIGNC
 EXPORT_C ALL_NOP
- inc R_NativePC
+ ADDR_Implied
  OPCODE_EPILOG
 
 ; EB
 
 ALIGNC
 EXPORT_C ALL_XBA
+ ADDR_Implied
  mov ah,B_A
- inc R_NativePC
  mov al,B_B
  STORE_FLAGS_NZ al
  mov B_A,eax
@@ -2497,7 +2497,7 @@ E1_PULL8 B_X,E1_PLX
 
 ALIGNC
 EXPORT_C E0_XCE
- inc R_NativePC
+ ADDR_Implied
 
  JUMP_NOT_FLAG SNES_FLAG_C,C_LABEL(CPU_RETURN),near
  mov B_XH,ah
@@ -2513,7 +2513,7 @@ EXPORT_C E0_XCE
 
 ALIGNC
 EXPORT_C E1_XCE
- inc R_NativePC
+ ADDR_Implied
 
  JUMP_FLAG SNES_FLAG_C,C_LABEL(CPU_RETURN),near
  STORE_FLAGS_E ah

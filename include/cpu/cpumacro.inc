@@ -974,7 +974,7 @@ EXPORT_C E0_TSB_%1
 %macro E0_PUSH8 2
 ALIGNC
 EXPORT_C %2
- inc R_NativePC
+ ADDR_Implied
  mov al,%1
  E0_PUSH_B
  OPCODE_EPILOG
@@ -984,7 +984,7 @@ EXPORT_C %2
 %macro E1_PUSH8 2
 ALIGNC
 EXPORT_C %2
- inc R_NativePC
+ ADDR_Implied
  mov al,%1
  E1_PUSH_B
  OPCODE_EPILOG
@@ -994,7 +994,7 @@ EXPORT_C %2
 %macro E0_PUSH16 2-3 0
 ALIGNC
 EXPORT_C %2
- inc R_NativePC
+ ADDR_Implied
  mov eax,%1
  E0_PUSH_W
  OPCODE_EPILOG
@@ -1004,7 +1004,7 @@ EXPORT_C %2
 %macro E1_PUSH16 2-3 0
 ALIGNC
 EXPORT_C %2
- inc R_NativePC
+ ADDR_Implied
  mov eax,%1
  E1_PUSH_W %3
  OPCODE_EPILOG
@@ -1014,7 +1014,7 @@ EXPORT_C %2
 %macro E0_PULL8 2
 ALIGNC
 EXPORT_C %2
- inc R_NativePC
+ ADDR_Implied
  E0_PULL_B
  mov %1,al
  STORE_FLAGS_NZ al
@@ -1025,7 +1025,7 @@ EXPORT_C %2
 %macro E1_PULL8 2
 ALIGNC
 EXPORT_C %2
- inc R_NativePC
+ ADDR_Implied
  E1_PULL_B
  mov %1,al
  STORE_FLAGS_NZ al
@@ -1036,7 +1036,7 @@ EXPORT_C %2
 %macro E0_PULL16 2-3 0
 ALIGNC
 EXPORT_C %2
- inc R_NativePC
+ ADDR_Implied
  E0_PULL_W
  STORE_FLAGS_N ah
  mov %1,eax
@@ -1049,7 +1049,7 @@ EXPORT_C %2
 %macro E1_PULL16 2-3 0
 ALIGNC
 EXPORT_C %2
- inc R_NativePC
+ ADDR_Implied
  E1_PULL_W %3
  STORE_FLAGS_N ah
  mov %1,eax
@@ -1062,8 +1062,8 @@ EXPORT_C %2
 %macro _TxS 3
 ALIGNC
 EXPORT_C %3
+ ADDR_Implied
  mov eax,%1
- inc R_NativePC
 %if (%2) == 8
  mov B_S,al
 %else
@@ -1076,8 +1076,8 @@ EXPORT_C %3
 %macro _Txx 4
 ALIGNC
 EXPORT_C %4
+ ADDR_Implied
  mov eax,%1
- inc R_NativePC
 %if (%3) == 8
  mov %2,al
  STORE_FLAGS_NZ al
@@ -1119,7 +1119,7 @@ EXPORT_C %4
 %macro _CLx 2
 ALIGNC
 EXPORT_C %2     ; Set flag
- inc R_NativePC
+ ADDR_Implied
  STORE_FLAGS_%1 0
  OPCODE_EPILOG
 %endmacro
@@ -1128,7 +1128,7 @@ EXPORT_C %2     ; Set flag
 %macro _SEx 2
 ALIGNC
 EXPORT_C %2     ; Set flag
- inc R_NativePC
+ ADDR_Implied
  STORE_FLAGS_%1 1
  OPCODE_EPILOG
 %endmacro
