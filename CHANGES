@@ -33,9 +33,19 @@ Changes
    timing [TRAC]
   5A22: Corrected emulation-mode interrupts to zero data bank register
    [TRAC]
-  5A22: Corrected emulation-mode stack behavior of PHD/PLD opcodes [TRAC]
   Documentation: Corrected Win32 port compilation requirements, other
    minor improvements [TRAC]
+  5A22: Corrected emulation-mode behavior of many opcodes [TRAC]
+  5A22: Added variable bus speed emulation, and improved overall timing
+   [TRAC]
+  5A22: Fixed some bugs in DMA [TRAC]
+  5A22: Changed DMA to no longer be able to access internal CPU registers
+   [TRAC]
+  5A22: Added open bus emulation to A-bus [TRAC]
+  Sound: Changed APU code to build with update-on-RAM-change by default
+   [TRAC]
+  ROM loader: Added support for loading ROMs up to 64Mbit (autodetection
+   still needs work) [TRAC]
  0.81
   PPU: Greatly simplied VRAM read/write handling and readded VRAM read
    buffering, thanks to anomie for convincing me to give it another
