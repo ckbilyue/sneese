@@ -65,6 +65,7 @@ Changes
   5A22: Improved open bus behavior in several registers [TRAC]
   Source: Eliminated need for building with a patched NASM on Win32
    port [TRAC]
+  Source: Fixed object tree autogeneration [TRAC]
  0.80
   Misc: Fixed a flaw where divide result registers were not changed
    by division-by-zero [TRAC]

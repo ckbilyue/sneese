@@ -70,9 +70,7 @@ EXE    := sneese$(SUFFIX)$(EXE_EXT)
 endif
 
 
-all: $(EXE)
-
-.PHONY: all maketree clean badplatform
+all: maketree $(EXE)
 
 
 ifdef OBJFIX_INCLUDE
@@ -296,3 +294,5 @@ $(OBJ)/map.$(OBJBASE): $(SRC)/map.c \
  $(addprefix $(INCLUDE)/, map.h version.h)
 $(OBJ)/multiio.$(OBJBASE): $(SRC)/multiio.c \
  $(addprefix $(INCLUDE)/, multiio.h map.h version.h)
+
+.PHONY: all maketree clean badplatform $(sort $(OBJDIRS))
