@@ -107,7 +107,6 @@ Changes
   Memory map: Corrected ROM mirroring [TRAC]
   ROM loader: Reduced some problems with starting the emulator in a path
    other than the one where it is located [TRAC]
-  Render: Added preliminary window clipping in mode 7 [TRAC]
   Render: Fixed some mode 7-related problems in Y's III and Illusion of
    Gaia; it appears that the intermediate values (BG1HOFS - M7X) and
    (BG1VOFS - M7Y) produce 10-bit signed results; thanks to SNES'9X
