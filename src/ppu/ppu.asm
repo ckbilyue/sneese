@@ -87,8 +87,8 @@ EXPORT_C Read_Map_21
     dd   SNES_R2136  ; MPYH
     dd   SNES_R2137  ; SLHV
     dd   SNES_R2138  ; OAMDATAREAD
-    dd   SNES_R2139_NORM ; VMDATALREAD
-    dd   SNES_R213A_NORM ; VMDATAHREAD
+    dd   SNES_R2139  ; VMDATALREAD
+    dd   SNES_R213A  ; VMDATAHREAD
     dd   SNES_R213B  ; CGDATAREAD     ; v0.14
     dd   SNES_R213C  ; OPHCT          ; v0.14
     dd   SNES_R213D  ; OPVCT
@@ -384,6 +384,8 @@ WMADDL:     skipb   ; Work RAM Address Lo Byte
 WMADDM:     skipb   ; Work RAM Address Mid Byte
 WMADDH:     skipb   ; Work RAM Address Hi Byte - Just bit 0 used!
             skipb
+VMDATAREAD_buffer:skipl
+VMDATAREAD_update:skipl ;funcptr
 CGHigh:     skipb   ; Holds whether writing to first or second byte
 CGReadHigh: skipb   ; Whether reading lo or high byte
 
@@ -527,7 +529,6 @@ EXPORT Reset_Ports
 
  mov [VRAMAddress],eax
  mov dword [SCINC],1
- mov [C_LABEL(VMAIN)],al
  mov [MOSAIC],al
  mov [MosaicBG1],al
  mov [MosaicBG2],al
@@ -665,14 +666,14 @@ EXPORT Reset_Ports
  mov dword [OffsetChangeMap_VOffset],0
  mov dword [OffsetChangeVMap_VOffset],0
 
+ mov [C_LABEL(VMAIN)],al
+ mov dword [VMDATAREAD_update],VMDATAREAD_update_NORM
+ Set_21_Write 0x18,SNES_W2118_NORM
+ Set_21_Write 0x19,SNES_W2119_NORM
+ mov [VMDATAREAD_buffer],eax
+
  mov eax,[Screen_Mode]
  mov [Render_Mode],eax
-
- Set_21_Read 0x39,SNES_R2139_NORM
- Set_21_Read 0x3A,SNES_R213A_NORM
- Set_21_Write 0x15,SNES_W2115
- Set_21_Write 0x18,SNES_W2118_NORM_First
- Set_21_Write 0x19,SNES_W2119_NORM_First
 
  popa
  ret
@@ -695,164 +696,44 @@ SNES_R2117: ; VMADDH
 ; SNES_R2137: ; SLHV in timing.inc
 ; SNES_R2138: ; OAMDATAREAD in sprites.asm
 
-%macro VRAM_Read_Reset 0-1 0
-%ifnidni %1,check_full
- mov ah,[C_LABEL(VMAIN)]
- Set_21_Write 0x15,SNES_W2115_Before_VRAM_read
- and ah,0x0C
- jz %%no_full
-
- cmp ah,2*4
- je %%full_64
- ja near %%full_128
-
-%%full_32:
- Set_21_Write 0x18,SNES_W2118_FULL_32
- Set_21_Write 0x19,SNES_W2119_FULL_32
- jmp %%full_done
+ALIGNC
+SNES_R2139: ; VMDATALREAD
+ mov al,[C_LABEL(VMAIN)]
+ test al,al
+ mov al,[VMDATAREAD_buffer]
+ jns VMDATAREAD_do_update
+ ret
 
 ALIGNC
-%%full_64:
- Set_21_Write 0x18,SNES_W2118_FULL_64
- Set_21_Write 0x19,SNES_W2119_FULL_64
- jmp %%full_done
+SNES_R213A: ; VMDATAHREAD
+ mov al,[C_LABEL(VMAIN)]
+ test al,al
+ mov al,[VMDATAREAD_buffer+1]
+ js VMDATAREAD_do_update
+ ret
 
 ALIGNC
-%%full_128:
- Set_21_Write 0x18,SNES_W2118_FULL_128
- Set_21_Write 0x19,SNES_W2119_FULL_128
- jmp short %%full_done
+VMDATAREAD_do_update:
+ jmp [VMDATAREAD_update]
 
 ALIGNC
-%%no_full:
- Set_21_Write 0x18,SNES_W2118_NORM
- Set_21_Write 0x19,SNES_W2119_NORM
-%%full_done:
-%endif
-;Set_21_Read 0x39,SNES_R2139_First
-;Set_21_Read 0x3A,SNES_R213A_First
-
-%ifndef NO_DMA_WRITE
- call C_LABEL(Update_DMA_PPU_Handlers)
-%endif
-%endmacro
-
-%macro VRAM_Read_Fixup 0    ; VMAIN register value must be in bl
- Set_21_Write 0x15,SNES_W2115
- and bl,0x0C
- jz near %%no_full
-
- cmp bl,2*4
- je %%full_64
- ja near %%full_128
-
-%%full_32:
- Set_21_Read 0x39,SNES_R2139_FULL_32
- Set_21_Read 0x3A,SNES_R213A_FULL_32
- Set_21_Write 0x18,SNES_W2118_FULL_32_First
- Set_21_Write 0x19,SNES_W2119_FULL_32_First
- jmp %%full_done
-
-ALIGNC
-%%full_64:
- Set_21_Read 0x39,SNES_R2139_FULL_64
- Set_21_Read 0x3A,SNES_R213A_FULL_64
- Set_21_Write 0x18,SNES_W2118_FULL_64_First
- Set_21_Write 0x19,SNES_W2119_FULL_64_First
- jmp %%full_done
-
-ALIGNC
-%%full_128:
- Set_21_Read 0x39,SNES_R2139_FULL_128
- Set_21_Read 0x3A,SNES_R213A_FULL_128
- Set_21_Write 0x18,SNES_W2118_FULL_128_First
- Set_21_Write 0x19,SNES_W2119_FULL_128_First
- jmp short %%full_done
-
-ALIGNC
-%%no_full:
- Set_21_Read 0x39,SNES_R2139_NORM
- Set_21_Read 0x3A,SNES_R213A_NORM
- Set_21_Write 0x18,SNES_W2118_NORM_First
- Set_21_Write 0x19,SNES_W2119_NORM_First
-%%full_done:
-
-%ifndef NO_DMA_WRITE
- call C_LABEL(Update_DMA_PPU_Handlers)
-%endif
-%endmacro
-
-ALIGNC
-SNES_R2139_First:   ; VMDATALREAD, first read
+VMDATAREAD_update_NORM: ; normal increment
  push ebx
  mov edx,[VRAMAddress]
- mov bl,[C_LABEL(VMAIN)]
- test bl,bl
- mov al,[C_LABEL(VRAM)+edx*2]
- js near .no_increment
+ mov bx,[C_LABEL(VRAM)+edx*2]
  add edx,[SCINC]
+ mov [VMDATAREAD_buffer],bx
  and edx,0x7FFF
- mov [VRAMAddress],edx
- VRAM_Read_Fixup
-.no_increment:
  pop ebx
- ret
-
-ALIGNC
-SNES_R2139_NORM:    ; VMDATALREAD, normal increment
- mov edx,[VRAMAddress]
- dec edx
- mov al,[C_LABEL(VMAIN)]
- and edx,0x7FFF
- test al,al
- mov al,[C_LABEL(VRAM)+edx*2]
- js .no_increment
- inc edx
- add edx,[SCINC]
- and edx,0x7FFF
  mov [VRAMAddress],edx
-.no_increment:
- ret
-
-ALIGNC
-SNES_R213A_First:   ; VMDATAHREAD, first read
- push ebx
- mov edx,[VRAMAddress]
- mov bl,[C_LABEL(VMAIN)]
- test bl,bl
- mov al,[C_LABEL(VRAM)+1+edx*2]
- jns near .no_increment
- add edx,[SCINC]
- and edx,0x7FFF
- mov [VRAMAddress],edx
- VRAM_Read_Fixup
-.no_increment:
- pop ebx
- ret
-
-ALIGNC
-SNES_R213A_NORM:    ; VMDATAHREAD, normal increment
- mov edx,[VRAMAddress]
- dec edx
- mov al,[C_LABEL(VMAIN)]
- and edx,0x7FFF
- test al,al
- mov al,[C_LABEL(VRAM)+1+edx*2]
- jns .no_increment
- inc edx
- add edx,[SCINC]
- and edx,0x7FFF
- mov [VRAMAddress],edx
-.no_increment:
  ret
 
 ;bitshift (%1), bitmask (1 << (%1)) - 1, topmask 0x7FFF & ~((1 << ((%1) + 3)) - 1)
 %macro GEN_SNES_R2139_213A_FULL 2
-ALIGNC
-SNES_R2139_FULL_%2: ; VMDATALREAD, full graphic increment
+VMDATAREAD_update_FULL_%2:  ; full graphic increment
  mov edx,[VRAMAddress]
- push edi
  push eax
+ push edi
  mov edi,edx
  mov eax,edx
  shr edi,(%1)   ;Bitshift
@@ -860,50 +741,17 @@ SNES_R2139_FULL_%2: ; VMDATALREAD, full graphic increment
  and edi,byte 7
  shl eax,3
  and edx,0x7FFF & ~((1 << ((%1) + 3)) - 1)  ;Topmask
- or edx,eax
- pop eax
  or edx,edi
+ or edx,eax
  pop edi
- dec edx
- and edx,0x7FFF
- mov al,[C_LABEL(VMAIN)]
- test al,al
- mov al,[C_LABEL(VRAM)+edx*2]
- js .no_increment
- mov edx,[SCINC]
- add edx,[VRAMAddress]  ; Always words (since <<1)!
- and edx,0x7FFF
- mov [VRAMAddress],edx
-.no_increment:
- ret
 
-ALIGNC
-SNES_R213A_FULL_%2: ; VMDATAHREAD, full graphic increment
- mov edx,[VRAMAddress]
- push edi
- push eax
- mov edi,edx
- mov eax,edx
- shr edi,(%1)   ;Bitshift
- and eax,byte (1 << (%1)) - 1   ;Bitmask
- and edi,byte 7
- shl eax,3
- and edx,0x7FFF & ~((1 << ((%1) + 3)) - 1)  ;Topmask
- or edx,eax
- pop eax
- or edx,edi
- pop edi
- dec edx
- and edx,0x7FFF
- mov al,[C_LABEL(VMAIN)]
- test al,al
- mov al,[C_LABEL(VRAM)+1+edx*2]
- jns .no_increment
+ mov ax,[C_LABEL(VRAM)+edx*2]
  mov edx,[SCINC]
+ mov [VMDATAREAD_buffer],ax
  add edx,[VRAMAddress]  ; Always words (since <<1)!
+ pop eax
  and edx,0x7FFF
  mov [VRAMAddress],edx
-.no_increment:
  ret
 %endmacro
 
@@ -1711,7 +1559,7 @@ SNES_W2114: ; BG4VOFS
  ret
 
 ALIGNC
-SNES_W2115_Before_VRAM_read: ; VMAIN
+SNES_W2115: ; VMAIN
  mov [C_LABEL(VMAIN)],al    ; Get our copy of this
  and al,0x0C
  jz near .no_full
@@ -1720,24 +1568,28 @@ SNES_W2115_Before_VRAM_read: ; VMAIN
  ja near .full_128
 
 .full_32:
+ mov dword [VMDATAREAD_update],VMDATAREAD_update_FULL_32
  Set_21_Write 0x18,SNES_W2118_FULL_32
  Set_21_Write 0x19,SNES_W2119_FULL_32
  jmp .full_done
 
 ALIGNC
 .full_64:
+ mov dword [VMDATAREAD_update],VMDATAREAD_update_FULL_64
  Set_21_Write 0x18,SNES_W2118_FULL_64
  Set_21_Write 0x19,SNES_W2119_FULL_64
  jmp .full_done
 
 ALIGNC
 .full_128:
+ mov dword [VMDATAREAD_update],VMDATAREAD_update_FULL_128
  Set_21_Write 0x18,SNES_W2118_FULL_128
  Set_21_Write 0x19,SNES_W2119_FULL_128
  jmp short .full_done
 
 ALIGNC
 .no_full:
+ mov dword [VMDATAREAD_update],VMDATAREAD_update_NORM
  Set_21_Write 0x18,SNES_W2118_NORM
  Set_21_Write 0x19,SNES_W2119_NORM
 .full_done:
@@ -1769,75 +1621,8 @@ ALIGNC
  ret
 
 ALIGNC
-SNES_W2115: ; VMAIN
- mov [C_LABEL(VMAIN)],al    ; Get our copy of this
- and al,0x0C
- jz near .no_full
- cmp al,2*4
- je .full_64
- ja near .full_128
-
-.full_32:
- Set_21_Read 0x39,SNES_R2139_FULL_32
- Set_21_Read 0x3A,SNES_R213A_FULL_32
- Set_21_Write 0x18,SNES_W2118_FULL_32_First
- Set_21_Write 0x19,SNES_W2119_FULL_32_First
- jmp .full_done
-
-ALIGNC
-.full_64:
- Set_21_Read 0x39,SNES_R2139_FULL_64
- Set_21_Read 0x3A,SNES_R213A_FULL_64
- Set_21_Write 0x18,SNES_W2118_FULL_64_First
- Set_21_Write 0x19,SNES_W2119_FULL_64_First
- jmp .full_done
-
-ALIGNC
-.full_128:
- Set_21_Read 0x39,SNES_R2139_FULL_128
- Set_21_Read 0x3A,SNES_R213A_FULL_128
- Set_21_Write 0x18,SNES_W2118_FULL_128_First
- Set_21_Write 0x19,SNES_W2119_FULL_128_First
- jmp short .full_done
-
-ALIGNC
-.no_full:
- Set_21_Read 0x39,SNES_R2139_NORM
- Set_21_Read 0x3A,SNES_R213A_NORM
- Set_21_Write 0x18,SNES_W2118_NORM_First
- Set_21_Write 0x19,SNES_W2119_NORM_First
-.full_done:
-%ifndef NO_DMA_WRITE
- call C_LABEL(Update_DMA_PPU_Handlers)
-%endif
- mov al,[C_LABEL(VMAIN)]
- and al,3
- jnz .not_1
-
- mov byte [SCINC],1
- mov al,[C_LABEL(VMAIN)]
- ret
-
-ALIGNC
-.not_1:
- cmp al,2
- jae .not_32
-
- mov byte [SCINC],32
- mov al,[C_LABEL(VMAIN)]
- ret
-
-ALIGNC
-.not_32:
- ; A bug in SNES makes mode 2 = 128
- mov byte [SCINC],128
- mov al,[C_LABEL(VMAIN)]
- ret
-
-ALIGNC
 SNES_W2116: ; VMADDL
  push eax
- VRAM_Read_Reset check_full
  mov [VRAMAddress],al
  pop eax
  ret
@@ -1846,7 +1631,6 @@ ALIGNC
 SNES_W2117: ; VMADDH
  push eax
  and al,0x7F
- VRAM_Read_Reset check_full
  mov [VRAMAddress+1],al
  pop eax
  ret
@@ -1908,14 +1692,10 @@ SNES_W2117: ; VMADDH
 
 
 ;bitshift (%1), bitmask (1 << (%1)) - 1, topmask 0x7FFF & ~((1 << ((%1) + 3)) - 1)
-%macro GEN_SNES_W2118_2119_FULL 2-3 0
+%macro GEN_SNES_W2118_2119_FULL 2 0
 ALIGNC
 ; VMDATAL, full graphic increment
-%ifidni %3,first
-SNES_W2118_FULL_%2_First:
-%else
 SNES_W2118_FULL_%2:
-%endif
  push ebx
 
  JUMP_NOT_VBLANK near .no_change
@@ -1954,23 +1734,12 @@ SNES_W2118_FULL_%2:
  and edx,0x7FFF
  mov [VRAMAddress],edx
 .no_increment:
-%ifidni %3,first
- Set_21_Write 0x18,SNES_W2118_FULL_%2
- Set_21_Write 0x19,SNES_W2119_FULL_%2
- mov ebx,eax
- VRAM_Read_Reset
- mov eax,ebx
-%endif
  pop ebx
  ret
 
 ALIGNC
 ; VMDATAH, full graphic increment
-%ifidni %3,first
-SNES_W2119_FULL_%2_First:
-%else
 SNES_W2119_FULL_%2:
-%endif
  push ebx
 
  JUMP_NOT_VBLANK near .no_change
@@ -2009,25 +1778,13 @@ SNES_W2119_FULL_%2:
  and edx,0x7FFF
  mov [VRAMAddress],edx
 .no_increment:
-%ifidni %3,first
- Set_21_Write 0x18,SNES_W2118_FULL_%2
- Set_21_Write 0x19,SNES_W2119_FULL_%2
- mov ebx,eax
- VRAM_Read_Reset
- mov eax,ebx
-%endif
  pop ebx
  ret
 %endmacro
 
-%macro GEN_SNES_W2118_2119 0-1 0
 ALIGNC
 ; VMDATAL, normal increment
-%ifidni %1,first
-SNES_W2118_NORM_First:
-%else
 SNES_W2118_NORM:
-%endif
  push ebx
 
  JUMP_NOT_VBLANK near .no_change
@@ -2053,23 +1810,12 @@ SNES_W2118_NORM:
  and edx,0x7FFF
  mov [VRAMAddress],edx
 .no_increment:
-%ifidni %1,first
- Set_21_Write 0x18,SNES_W2118_NORM
- Set_21_Write 0x19,SNES_W2119_NORM
- mov ebx,eax
- VRAM_Read_Reset
- mov eax,ebx
-%endif
  pop ebx
  ret
 
 ALIGNC
 ; VMDATAH, normal increment
-%ifidni %1,first
-SNES_W2119_NORM_First:
-%else
 SNES_W2119_NORM:
-%endif
  push ebx
 
  JUMP_NOT_VBLANK near .no_change
@@ -2095,25 +1841,12 @@ SNES_W2119_NORM:
  and edx,0x7FFF
  mov [VRAMAddress],edx
 .no_increment:
-%ifidni %1,first
- Set_21_Write 0x18,SNES_W2118_NORM
- Set_21_Write 0x19,SNES_W2119_NORM
- mov ebx,eax
- VRAM_Read_Reset
- mov eax,ebx
-%endif
  pop ebx
  ret
-%endmacro
 
-GEN_SNES_W2118_2119
-GEN_SNES_W2118_2119 first
 GEN_SNES_W2118_2119_FULL 5,32
-GEN_SNES_W2118_2119_FULL 5,32,first
 GEN_SNES_W2118_2119_FULL 6,64
-GEN_SNES_W2118_2119_FULL 6,64,first
 GEN_SNES_W2118_2119_FULL 7,128
-GEN_SNES_W2118_2119_FULL 7,128,first
 
 ; SNES_W211A: ; M7SEL in mode7.asm
 ; SNES_W211B: ; M7A in mode7.asm
