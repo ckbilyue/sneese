@@ -338,6 +338,12 @@ You must read and accept the license prior to use.
 
  mov R_NativePC,%1      ; PC = Native mode vector
  mov eax,%2
+
+;7.12.2 In the Emulation mode, the PBR and DBR registers are cleared to 00
+;when a hardware interrupt, BRK or COP is executed. In this case, previous
+;contents of the PBR are not automatically saved.
+ mov B_DB,byte 0
+
  mov B_PB,byte 0        ; Setup bank
  mov B_PBOffset,eax     ; Offset of bank 0 ROM
  STORE_FLAGS_I 1        ; Disable IRQs

@@ -4877,6 +4877,12 @@ EXPORT E1_IRQ
 
  mov eax,[C_LABEL(IRQ_Evector)] ; Get Emulation mode IRQ vector
  mov ebx,[C_LABEL(IRQ_Eoffset)]
+
+;7.12.2 In the Emulation mode, the PBR and DBR registers are cleared to 00
+;when a hardware interrupt, BRK or COP is executed. In this case, previous
+;contents of the PBR are not automatically saved.
+ mov byte [CPU_LABEL(DB)],0
+
  jmp IRQ_completion
 
 ALIGNC

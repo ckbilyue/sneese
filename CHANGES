@@ -31,6 +31,8 @@ Changes
    [TRAC]
   Sound: Added countdown register emulation to envelope and noise
    timing [TRAC]
+  5A22: Corrected emulation-mode interrupts to zero data bank register
+   [TRAC]
  0.81
   PPU: Greatly simplied VRAM read/write handling and readded VRAM read
    buffering, thanks to anomie for convincing me to give it another
