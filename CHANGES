@@ -32,6 +32,8 @@ Changes
   APU: Fixed a serious bug in OUTX reading [TRAC]
   Source: Changed memory access emulation code to be more cache-
    friendly [TRAC]
+  Source: Fixed format of include path specification argument for GCC
+   3.4.x [TRAC]
  0.831
   5A22: Changed emulation-mode interrupts to NOT zero data bank
    register - thanks to Overload for pointing out that the SNES CPU
