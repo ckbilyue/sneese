@@ -1263,16 +1263,22 @@ INLINE static void update_voice_pitch(int voice, struct voice_state *pvs,
  SAMPLE_CLIP_AND_WRITE(BITS,buf[i * 2 + 1],mrsample)
 
 #define GET_OUTX_GAUSS \
- ((((((int) G4[-(pvs->pitch_counter >> 4)] * pvs->buf[(pvs->bufptr - 3) & 3]) \
-  & ~0x7FF) + \
- (((int) G3[-(pvs->pitch_counter >> 4)] * pvs->buf[(pvs->bufptr - 2) & 3]) \
-  & ~0x7FF) + \
- (((int) G2[(pvs->pitch_counter >> 4)] * pvs->buf[(pvs->bufptr - 1) & 3]) \
-  & ~0x7FF) + \
- (((int) G1[(pvs->pitch_counter >> 4)] * pvs->buf[(pvs->bufptr) & 3]) \
-   & ~0x7FF)) >> 11) & ~1)
+ do \
+ { \
+  pvs->outx = \
+  ((((int) G4[-(pvs->pitch_counter >> 4)] * pvs->buf[(pvs->bufptr - 3) & 3]) \
+   & ~0x7FF) + \
+  (((int) G3[-(pvs->pitch_counter >> 4)] * pvs->buf[(pvs->bufptr - 2) & 3]) \
+   & ~0x7FF) + \
+  (((int) G2[(pvs->pitch_counter >> 4)] * pvs->buf[(pvs->bufptr - 1) & 3]) \
+   & ~0x7FF) + \
+  (((int) G1[(pvs->pitch_counter >> 4)] * pvs->buf[(pvs->bufptr) & 3]) \
+    & ~0x7FF)) >> 11; \
+  if (pvs->outx <= -32768) pvs->outx = -32768; \
+  else if (pvs->outx >= 32767) pvs->outx = 32767; \
+ } while (0)
 
-#define GET_OUTX_NO_GAUSS pvs->buf[(pvs->bufptr - 3) & 3]
+#define GET_OUTX_NO_GAUSS pvs->outx = pvs->buf[(pvs->bufptr - 3) & 3]
 
 #define MIX(BITS,CHANNELS,GAUSS,ECHO) \
      { \
@@ -1303,7 +1309,9 @@ INLINE static void update_voice_pitch(int voice, struct voice_state *pvs,
         if (SPC_DSP[DSP_NON] & voice_bit) \
          pvs->outx = noise_buffer [i]; \
         else \
-         pvs->outx = GET_OUTX_##GAUSS; \
+         GET_OUTX_##GAUSS; \
+ \
+        pvs->outx &= ~1; \
  \
         update_voice_pitch(voice, pvs, pitch_modulation_enable, voice_bit); \
  \

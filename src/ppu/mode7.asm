@@ -493,16 +493,16 @@ Recalc_Mode7:
  mov byte [Redo_M7],0   ; Done with recalculating
  ret
 
-;%1 = label, %2 = entrypoint
-%macro M7_PROLOG 2
+;%1 = mode, %2 = priority, %3 = label
+%macro M7_Generate_Handler 3
 ALIGNC
-%1:
+%3:
  mov eax,[Mode7_Line_X]
  mov ebx,[Mode7_Line_Y]
 
  mov cl,[MosaicBG1]
  test cl,cl
- jnz near %2_Mosaic
+ jnz near %3_Mosaic
 
  mov ecx,[C_LABEL(M7A_X)]
  imul ecx,edx
@@ -512,24 +512,24 @@ ALIGNC
 
  mov ecx,[C_LABEL(M7A_X)]
  mov esi,[C_LABEL(M7C_X)]
- jmp short %2
-%endmacro
+ jmp .first_pixel
 
-;%1 = mode, %2 = priority, %3 = label
-%macro M7_Generate_Handler 3
-M7_PROLOG %3,ENTRY_%3
-M7_HANDLE_%1 %2,0,ENTRY_%3
+M7_HANDLE_%1 %2,0
 
 ALIGNC
-ENTRY_%3_Mosaic:
+%3_Mosaic:
  mov ecx,[C_LABEL(M7A_X)]
  mov esi,[C_LABEL(M7C_X)]
  imul ecx,[Mosaic_Size]
  imul esi,[Mosaic_Size]
  push ecx
- jmp short ENTRYM_%3
+%if 0
+;note - precalc mosaic A_X/C_X if in use
+ jb .check_partial
+%endif
+ jmp .first_pixel
 
-M7_HANDLE_%1 %2,1,ENTRYM_%3
+M7_HANDLE_%1 %2,1
 %endmacro
 
 ;%1 = mode
@@ -545,17 +545,16 @@ M7_Generate_Handler %1, 1, M7P_%1
 ;eax,ebx = X,Y
 ;X + M7A, Y + M7C
 
-;%1 = priority, %2 = mosaic, %3 = label
-%macro M7_HANDLE_REPEAT 3
-%3:
+;%1 = priority, %2 = mosaic
+%macro M7_HANDLE_REPEAT 2
 .pixel_loop:
  add eax,ecx
  add ebx,esi
-;mov ecx,[Mosaic_Size]
 .first_pixel:
 %if %2
 ;ecx = max repetition count of first pixel from MosaicSize lookup
  mov ecx,[Mosaic_Size]
+.check_partial:
  cmp ebp,ecx
  ja .partial
  mov ecx,ebp
@@ -689,15 +688,15 @@ ALIGNC
 %endmacro
 
 ; New for v0.16, tile 0 repeat support
-;%1 = priority, %2 = mosaic, %3 = label
-%macro M7_HANDLE_CHAR0 3
-%3:
+;%1 = priority, %2 = mosaic
+%macro M7_HANDLE_CHAR0 2
 .pixel_loop:
  add eax,ecx
  add ebx,esi
 .first_pixel:
 %if %2
  mov ecx,[Mosaic_Size]
+.check_partial:
  cmp ebp,ecx
  ja .partial
  mov ecx,ebp
@@ -888,15 +887,15 @@ ALIGNC
 
 %endmacro
 
-;%1 = priority, %2 = mosaic, %3 = label
-%macro M7_HANDLE_CLIP 3
-%3:
+;%1 = priority, %2 = mosaic
+%macro M7_HANDLE_CLIP 2
 .pixel_loop:
  add eax,ecx
  add ebx,esi
 .first_pixel:
 %if %2
  mov ecx,[Mosaic_Size]
+.check_partial:
  cmp ebp,ecx
  ja .partial
  mov ecx,ebp
