@@ -80,6 +80,21 @@ BITMAP *SetGUIScreen(int ScreenMode)
 extern BITMAP *sneese;
 extern BITMAP *joypad;
 
+void fill_backdrop(BITMAP *gui_screen)
+{
+#ifndef NO_LOGO
+ if (sneese)
+ {  // Prevent a crash if file not found!
+  stretch_blit(sneese, gui_screen, 0, 0,
+   GUI_ScreenWidth, GUI_ScreenHeight, 0, 0, SCREEN_W, SCREEN_H);
+ }
+ else
+#endif
+ {
+  clear_to_color(Allegro_Bitmap, 240);
+ }
+}
+
 const char *GUI_init()
 {
  char *errormsg;
@@ -139,10 +154,7 @@ void UpdateGUI(int Selected)
   if(a!=Selected) PlotMenuItem(Main_window,default_font,Main_Options[a],0,default_font->get_heightspace()*a,16);
   else PlotSelectedMenuItem(Main_window,default_font,Main_Options[a],0,default_font->get_heightspace()*a,16);
 
-#ifndef NO_LOGO
- if(sneese)
-  stretch_blit(sneese,Allegro_Bitmap,0,0,GUI_ScreenWidth,GUI_ScreenHeight,0,0,SCREEN_W,SCREEN_H);
-#endif
+ fill_backdrop(Allegro_Bitmap);
  draw_sprite(Allegro_Bitmap, GUI_Bitmap, 0, 0);
  vsync();
 }
@@ -181,10 +193,7 @@ void UpdateScreenWindow(int Selected)
  for(int a=0;a<NUM_SCREEN_OPTIONS;a++)
   if(a!=Selected) PlotMenuItem(Screen_window,default_font,Screen_Options[a],0,default_font->get_heightspace()*a,20);
   else PlotSelectedMenuItem(Screen_window,default_font,Screen_Options[a],0,default_font->get_heightspace()*a,20);
-#ifndef NO_LOGO
- if(sneese)
-  stretch_blit(sneese,Allegro_Bitmap,0,0,GUI_ScreenWidth,GUI_ScreenHeight,0,0,SCREEN_W,SCREEN_H);
-#endif
+ fill_backdrop(Allegro_Bitmap);
  draw_sprite(Allegro_Bitmap, GUI_Bitmap, 0, 0);
  vsync();
  CopyGUIScreen();
@@ -253,10 +262,7 @@ void UpdateSoundWindow(int Selected)
  for(int a=0;a<SOUND_NUM_OPTIONS;a++)
   if(a!=Selected) PlotMenuItem(Sound_window,default_font,Sound_Options[a],0,default_font->get_heightspace()*a,24);
   else PlotSelectedMenuItem(Sound_window,default_font,Sound_Options[a],0,default_font->get_heightspace()*a,24);
-#ifndef NO_LOGO
- if(sneese)
-  stretch_blit(sneese,Allegro_Bitmap,0,0,GUI_ScreenWidth,GUI_ScreenHeight,0,0,SCREEN_W,SCREEN_H);
-#endif
+ fill_backdrop(Allegro_Bitmap);
  draw_sprite(Allegro_Bitmap, GUI_Bitmap, 0, 0);
  vsync();
  CopyGUIScreen();
@@ -531,10 +537,7 @@ void UpdateControlsWindow(int Selected)
  for(int a=0;a<CONTROLS_NUM_OPTIONS;a++)
   if(a!=Selected) PlotMenuItem(Controls_window,default_font,Controls_Options[a],0,default_font->get_heightspace()*a,24);
   else PlotSelectedMenuItem(Controls_window,default_font,Controls_Options[a],0,default_font->get_heightspace()*a,24);
-#ifndef NO_LOGO
- if(sneese)
-  stretch_blit(sneese,Allegro_Bitmap,0,0,GUI_ScreenWidth,GUI_ScreenHeight,0,0,SCREEN_W,SCREEN_H);
-#endif
+ fill_backdrop(Allegro_Bitmap);
  draw_sprite(Allegro_Bitmap, GUI_Bitmap, 0, 0);
  vsync();
  CopyGUIScreen();
@@ -618,11 +621,7 @@ int AskKey(const char *msg, int *whatkey, SNES_CONTROLLER_INPUTS *input)
  PlotStringShadow(ControlSetup_window, default_font,
   msg, 84, 96, 15, 8);
 
-#ifndef NO_LOGO
- if(sneese)
-  stretch_blit(sneese, Allegro_Bitmap, 0, 0,
-   GUI_ScreenWidth, GUI_ScreenHeight, 0, 0, SCREEN_W, SCREEN_H);
-#endif
+ fill_backdrop(Allegro_Bitmap);
  draw_sprite(Allegro_Bitmap, GUI_Bitmap, 0, 0);
  CopyGUIScreen();
 
@@ -659,10 +658,7 @@ void AskControllerInputs(SNES_CONTROLLER_INPUTS *input)
   if (AskKey("Press key for START", &input->start, input))
  {
   PlotStringShadow(ControlSetup_window,default_font,"Press ESC to exit",84,96,15,8);
-#ifndef NO_LOGO
-  if(sneese)
-   stretch_blit(sneese,Allegro_Bitmap,0,0,GUI_ScreenWidth,GUI_ScreenHeight,0,0,SCREEN_W,SCREEN_H);
-#endif
+  fill_backdrop(Allegro_Bitmap);
   draw_sprite(Allegro_Bitmap, GUI_Bitmap, 0, 0);
   CopyGUIScreen();
 
@@ -830,10 +826,7 @@ void UpdateConfigWindow(int Selected)
  for(int a=0;a<CONFIG_NUM_OPTIONS;a++)
   if(a!=Selected) PlotMenuItem(Config_window,default_font,Config_Options[a],0,default_font->get_heightspace()*a,24);
   else PlotSelectedMenuItem(Config_window,default_font,Config_Options[a],0,default_font->get_heightspace()*a,24);
-#ifndef NO_LOGO
- if(sneese)
-  stretch_blit(sneese,Allegro_Bitmap,0,0,GUI_ScreenWidth,GUI_ScreenHeight,0,0,SCREEN_W,SCREEN_H);
-#endif
+ fill_backdrop(Allegro_Bitmap);
  draw_sprite(Allegro_Bitmap, GUI_Bitmap, 0, 0);
  vsync();
  CopyGUIScreen();
@@ -1066,13 +1059,15 @@ int ConfigWindow()
 
       Config_Options[CONFIG_SCREEN_MODE] = Screen_Options[SCREEN_MODE];
 #ifndef NO_LOGO
-      if(sneese)   // Prevent a crash if file not found!
-      {
+      if (sneese)
+      { // Prevent a crash if file not found!
        set_palette(sneesepal);
-       stretch_blit(sneese,Allegro_Bitmap,0,0,GUI_ScreenWidth,GUI_ScreenHeight,0,0,SCREEN_W,SCREEN_H);
       }
-#endif
+
       set_palette_range(&GUIPal[-240],240,255,1);    // Set the GUI palette up.
+#endif
+
+      fill_backdrop(Allegro_Bitmap);
      }
      UpdateGUI(MAIN_CONFIGURE);
      break;
@@ -1082,14 +1077,7 @@ int ConfigWindow()
     {
      while((temp = ControlsWindow()) != -1)
      {
-#ifndef NO_LOGO
-      if(sneese)   // Prevent a crash if file not found!
-      {
-       set_palette(sneesepal);
-       stretch_blit(sneese,Allegro_Bitmap,0,0,GUI_ScreenWidth,GUI_ScreenHeight,0,0,SCREEN_W,SCREEN_H);
-      }
-#endif
-      set_palette_range(&GUIPal[-240],240,255,1);    // Set the GUI palette up.
+      fill_backdrop(Allegro_Bitmap);
      }
      UpdateGUI(MAIN_CONFIGURE);
      break;
@@ -1111,14 +1099,7 @@ int ConfigWindow()
     {
      while((temp = SoundWindow()) != -1)
      {
-#ifndef NO_LOGO
-      if(sneese)   // Prevent a crash if file not found!
-      {
-       set_palette(sneesepal);
-       stretch_blit(sneese,Allegro_Bitmap,0,0,GUI_ScreenWidth,GUI_ScreenHeight,0,0,SCREEN_W,SCREEN_H);
-      }
-#endif
-      set_palette_range(&GUIPal[-240],240,255,1);    // Set the GUI palette up.
+      fill_backdrop(Allegro_Bitmap);
      }
      UpdateGUI(MAIN_CONFIGURE);
      break;
@@ -1168,10 +1149,7 @@ void RomInfo(void)
  PlotString(ROMInfo_window,default_font,"Country: ",0,default_font->get_heightspace()*6);
  PlotString(ROMInfo_window,default_font,rom_country,default_font->get_widthspace()*9,default_font->get_heightspace()*6);
 
-#ifndef NO_LOGO
- if(sneese)
-  stretch_blit(sneese,Allegro_Bitmap,0,0,GUI_ScreenWidth,GUI_ScreenHeight,0,0,SCREEN_W,SCREEN_H);
-#endif
+ fill_backdrop(Allegro_Bitmap);
  draw_sprite(Allegro_Bitmap, GUI_Bitmap, 0, 0);
  vsync();
  CopyGUIScreen();
@@ -1305,10 +1283,7 @@ void HWStatus(void)
  sprintf(Number, "%02X", (unsigned) Win2_Bands_Out[3]);
  PlotString(HWStatus_window,default_font,Number,default_font->get_widthspace()*24,default_font->get_heightspace()*8);
 
-#ifndef NO_LOGO
- if(sneese)
-  stretch_blit(sneese,Allegro_Bitmap,0,0,GUI_ScreenWidth,GUI_ScreenHeight,0,0,SCREEN_W,SCREEN_H);
-#endif
+ fill_backdrop(Allegro_Bitmap);
  draw_sprite(Allegro_Bitmap, GUI_Bitmap, 0, 0);
  vsync();
  CopyGUIScreen();
@@ -1412,10 +1387,7 @@ void DMAStatus(void)
  (unsigned) DASB_7,(unsigned) DASH_7,(unsigned) DASL_7);
  PlotString(DMAStatus_window,default_font,Line,0,default_font->get_heightspace()*8);
 
-#ifndef NO_LOGO
- if(sneese)
-  stretch_blit(sneese,Allegro_Bitmap,0,0,GUI_ScreenWidth,GUI_ScreenHeight,0,0,SCREEN_W,SCREEN_H);
-#endif
+ fill_backdrop(Allegro_Bitmap);
  draw_sprite(Allegro_Bitmap, GUI_Bitmap, 0, 0);
  vsync();
  CopyGUIScreen();
@@ -1449,10 +1421,7 @@ void APUStatus(void)
   }
  }
 
-#ifndef NO_LOGO
- if(sneese)
-  stretch_blit(sneese,Allegro_Bitmap,0,0,GUI_ScreenWidth,GUI_ScreenHeight,0,0,SCREEN_W,SCREEN_H);
-#endif
+ fill_backdrop(Allegro_Bitmap);
  draw_sprite(Allegro_Bitmap, GUI_Bitmap, 0, 0);
  vsync();
  CopyGUIScreen();
@@ -1567,10 +1536,7 @@ void BGWinStatus(void)
  PlotString(BGWinStatus_window,default_font,Line,
   0, 7 * default_font->get_heightspace());
 
-#ifndef NO_LOGO
- if(sneese)
-  stretch_blit(sneese,Allegro_Bitmap,0,0,GUI_ScreenWidth,GUI_ScreenHeight,0,0,SCREEN_W,SCREEN_H);
-#endif
+ fill_backdrop(Allegro_Bitmap);
  draw_sprite(Allegro_Bitmap, GUI_Bitmap, 0, 0);
  vsync();
  CopyGUIScreen();
@@ -1662,19 +1628,20 @@ GUI_ERROR GUI()
 
 #ifndef NO_LOGO
  if (sneese)
- { // Prevent a crash if file not found!
+ {  // Prevent a crash if file not found!
   set_palette(sneesepal);
-  stretch_blit(sneese,Allegro_Bitmap,0,0,GUI_ScreenWidth,GUI_ScreenHeight,0,0,SCREEN_W,SCREEN_H);
  }
 #endif
 
  set_palette_range(&GUIPal[-240],240,255,1);    // Set the GUI palette up.
 
+ fill_backdrop(Allegro_Bitmap);
+
  clear_keybuf();
 
  int CursorAt = 0;
 
- for(;;)
+ for (;;)
  {
   int keypress, key_asc, key_scan;
 
@@ -1687,25 +1654,25 @@ GUI_ERROR GUI()
 
   switch (key_scan)
   {
-   case KEY_UP:
-    CursorAt--;
-    if(CursorAt == -1) // so it wraps
-     CursorAt = MAIN_NUM_OPTIONS-1;
-    break;
+  case KEY_UP:
+   CursorAt--;
+   if(CursorAt == -1) // so it wraps
+    CursorAt = MAIN_NUM_OPTIONS-1;
+   break;
 
-   case KEY_DOWN:
-    CursorAt++;
-    if(CursorAt == MAIN_NUM_OPTIONS) // so it wraps
-     CursorAt=0;
-    break;
+  case KEY_DOWN:
+   CursorAt++;
+   if(CursorAt == MAIN_NUM_OPTIONS) // so it wraps
+    CursorAt=0;
+   break;
 
-   case KEY_ESC:
-    if (snes_rom_loaded)
-    {
-     while (key[KEY_ESC]);
-     goto resume_emulation;
-    }
-    break;
+  case KEY_ESC:
+   if (snes_rom_loaded)
+   {
+    while (key[KEY_ESC]);
+    goto resume_emulation;
+   }
+   break;
 
   case KEY_ENTER:
   case KEY_ENTER_PAD:
@@ -1756,13 +1723,14 @@ GUI_ERROR GUI()
 
    if (CursorAt == MAIN_CONFIGURE)
     ConfigWindow();
+
    if (CursorAt == MAIN_EXIT)
    {
     free_windows();
     return GUI_EXIT;
    }
-  }
- }
+  } //switch (key_scan)
+ } //for (;;)
 
 resume_emulation:
 
