@@ -54,7 +54,7 @@ You must read and accept the license prior to use.
 ;
 ; 65c816 opcodes 0x20-0x2F:
 ;    20: JSR a       3,6 T(E)
-;    21: ORA (d,x)   2,6
+;    21: AND (d,x)   2,6
 ;    22: JSL al      4,8 T(E)
 ;    23: AND d,s     2,4 T(M) M(NZ)
 ;    24: BIT d       2,3 T(M) M(NVZ)
