@@ -21,6 +21,7 @@ Changes
   DBJH          Daniel Horchner
 
 
+ 0.811
  0.81
   PPU: Greatly simplied VRAM read/write handling and readded VRAM read
    buffering, thanks to anomie for convincing me to give it another
