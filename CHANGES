@@ -66,6 +66,7 @@ Changes
    similar to keyboard input [TRAC]
   Configuration: Changed format of scancodes for input mappings to
    decimal [TRAC]
+  Timing: Improved PPU counter latch accuracy [TRAC]
  0.776 [TRAC]
   Render: Added support for dual window clipping with all logic
    modes of backgrounds in modes 5 and 6

@@ -591,7 +591,7 @@ VBL:
  mov eax,[C_LABEL(Current_Line_Timing)] ; Get current scanline
  inc eax
  mov [C_LABEL(Current_Line_Timing)],eax
- cmp [C_LABEL(LastVBLLine)],eax ; Needs adjustment for odd line
+ cmp [C_LABEL(LastVBLLine)],eax ; Needs adjustment for odd line?
  ja .not_end_of_frame
  mov dword [Event_Handler],IRQNewFrame
  mov dword [Fixed_Event],IRQNewFrame
@@ -1001,6 +1001,8 @@ EXPORT SNES_R2137 ; SLHV  ; This latches the counter for horizontal/vertical dat
  mov ebx,[C_LABEL(SNES_Cycles)]
 .got_cycles:
 
+ xor edx,edx
+
  ; Set up H counters to cycles executed / 4, V counter to current scanline
  ; All this below ensures bits 9-15 to be same as bits 1-7
  shr ebx,2
@@ -1009,6 +1011,13 @@ EXPORT SNES_R2137 ; SLHV  ; This latches the counter for horizontal/vertical dat
  jb .before_refresh
  add ebx,byte 10    ; Adjust for memory refresh cycles
 .before_refresh:
+
+ cmp ebx,DOTS_PER_SCANLINE
+ jb .before_next_line
+ sub ebx,DOTS_PER_SCANLINE
+ inc edx            ; Adjust if we're on the next line
+.before_next_line:
+
  and bh,1
  and al,bl
  or bh,al
@@ -1016,6 +1025,14 @@ EXPORT SNES_R2137 ; SLHV  ; This latches the counter for horizontal/vertical dat
 
  mov ebx,[C_LABEL(Current_Line_Timing)]
  mov al,0xFE
+ add ebx,edx        ; fixup for next line
+
+ mov edx,[C_LABEL(LastVBLLine)]
+ cmp ebx,edx
+ jbe .before_next_frame
+ sub ebx,edx        ; fixup for next frame
+.before_next_frame:
+
  and bh,1
  and al,bl
  or bh,al
