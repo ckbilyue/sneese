@@ -115,50 +115,34 @@ section .text
  add ebx,0x2100
 %endmacro
 
-;macro for reading a byte without affecting timing - for parallel/fixed
-; speed accesses (DMA)
-%macro GET_BYTE_NO_UPDATE_CYCLES 0
- push R_65c816_Cycles
- GET_BYTE
- pop R_65c816_Cycles
-%endmacro
-
-;macro for writing a byte without affecting timing - for parallel/fixed
-; speed accesses (DMA)
-%macro SET_BYTE_NO_UPDATE_CYCLES 0
- push R_65c816_Cycles
- SET_BYTE
- pop R_65c816_Cycles
-%endmacro
-
 ;macro for performing DMA B bus accesses
-%macro ACCESS_B_BUS 2
+%macro ACCESS_B_BUS 3
  push ebx
- GET_B_BUS_ADDRESS %2
- %1
+ GET_B_BUS_ADDRESS %3
+ %1 %2
  pop ebx
 %endmacro
 
 ;macro for DMA reads from B bus
-%macro GET_BYTE_B_BUS 1
- ACCESS_B_BUS GET_BYTE_NO_UPDATE_CYCLES,%1
+%macro GET_BYTE_B_BUS 2
+ ACCESS_B_BUS GET_BYTE,%2,%1
 %endmacro
 
 ;macro for DMA writes to B bus
-%macro SET_BYTE_B_BUS 1
- ACCESS_B_BUS SET_BYTE_NO_UPDATE_CYCLES,%1
+%macro SET_BYTE_B_BUS 2
+ ACCESS_B_BUS SET_BYTE,%2,%1
 %endmacro
 
 ;macro for HDMA transfers
 %macro HDMA_TRANSFER_A_TO_B 1
- GET_BYTE_NO_UPDATE_CYCLES
- SET_BYTE_B_BUS %1
+ GET_BYTE 0
+ SET_BYTE_B_BUS %1,0
 %endmacro
 
 
 ;macro for DMA transfers in PPU write mode
 %macro DMA_TRANSFER_A_TO_B 3
- GET_BYTE_NO_UPDATE_CYCLES
+ GET_BYTE 0
  mov [DMA_Pending_Data],al
  mov byte [DMA_Pending_B_Address],%1
 
@@ -166,13 +150,12 @@ section .text
  jge %3
 %2:
 
- add R_65c816_Cycles,_5A22_SLOW_CYCLE
- SET_BYTE_B_BUS [edi+DMA_B%1]
+ SET_BYTE_B_BUS [edi+DMA_B%1],_5A22_SLOW_CYCLE
 %endmacro
 
 ;macro for DMA transfers in PPU read mode
 %macro DMA_TRANSFER_B_TO_A 3
- GET_BYTE_B_BUS [edi+DMA_B%1]
+ GET_BYTE_B_BUS [edi+DMA_B%1],0
  mov [DMA_Pending_Data],al
  mov byte [DMA_Pending_B_Address],%1
 
@@ -180,8 +163,25 @@ section .text
  jge %3
 %2:
 
- add R_65c816_Cycles,_5A22_SLOW_CYCLE
- SET_BYTE_NO_UPDATE_CYCLES
+ SET_BYTE _5A22_SLOW_CYCLE
+%endmacro
+
+
+;macro for processing a channel during HDMA transfer
+%macro HDMAOPERATION 1
+  mov al,[HDMAON]
+  test al,(1<<%1)
+  jz %%no_hdma
+
+  add dword R_65c816_Cycles,byte 8  ; HDMA processing
+
+  mov byte [In_DMA],(%1) | DMA_IN_PROGRESS
+  LOAD_DMA_TABLE %1
+  call C_LABEL(Do_HDMA_Channel) ; CF clear if channel disabled
+
+  jc %%no_hdma
+  and byte [HDMAON],~(1<<%1)    ; Disable this channel
+%%no_hdma:
 %endmacro
 
 
@@ -313,7 +313,7 @@ Do_HDMA_Absolute:
  jmp .Continue
 
 .Next_Set:
- GET_BYTE_NO_UPDATE_CYCLES
+ GET_BYTE 0
  inc bx                 ; Adjust table address
  test al,al             ; Check for zero-length set
  mov [edi+NTRL],al      ; Save length of set
@@ -365,19 +365,17 @@ Do_HDMA_Indirect:
  jmp .Continue
 
 .Next_Set:
- GET_BYTE_NO_UPDATE_CYCLES
+ GET_BYTE 0
  inc bx
  mov [edi+NTRL],al
  test al,al
  jz HDMA_End_Channel
 
  mov ah,al
- add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; Address load low
- GET_BYTE_NO_UPDATE_CYCLES
+ GET_BYTE _5A22_SLOW_CYCLE      ; Address load low
  inc bx
  mov [edi+DASL],al
- add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; Address load high
- GET_BYTE_NO_UPDATE_CYCLES
+ GET_BYTE _5A22_SLOW_CYCLE      ; Address load high
  inc bx
  mov [edi+DASH],al
  mov [edi+A2T],ebx
@@ -424,6 +422,44 @@ EXPORT SNES_W420C ; HDMAEN      ; Actually handled within screen core!
 ;ret
 
  mov [HDMAON],al
+ ret
+
+;macro for processing a channel during HDMA init
+%macro RELATCH_HDMA_CHANNEL 1
+ test byte [C_LABEL(HDMAEN)],(1<<%1)
+ jz %%no_relatch
+
+ mov eax,[A1T_%1]        ; Src Address in ebx
+ mov [A2T_%1],eax
+
+ mov byte [NTRL_%1],0
+
+%%no_relatch:
+%endmacro
+
+ALIGNC
+EXPORT init_HDMA
+ mov al,[C_LABEL(HDMAEN)]
+ mov [HDMAON],al
+ test al,al
+ jz .no_hdma
+
+ mov al,[In_DMA]
+ push eax
+
+ add R_65c816_Cycles,byte _5A22_FAST_CYCLE * 3  ; HDMA processing
+ RELATCH_HDMA_CHANNEL 0
+ RELATCH_HDMA_CHANNEL 1
+ RELATCH_HDMA_CHANNEL 2
+ RELATCH_HDMA_CHANNEL 3
+ RELATCH_HDMA_CHANNEL 4
+ RELATCH_HDMA_CHANNEL 5
+ RELATCH_HDMA_CHANNEL 6
+ RELATCH_HDMA_CHANNEL 7
+
+ pop eax
+ mov [In_DMA],al
+.no_hdma:
  ret
 
 ALIGNC

@@ -58,24 +58,39 @@ byte accessed.
 
 %endif
 
-%macro GET_BYTE 0
+;%1 = fixed cycle cost
+%macro GET_BYTE 0-1
  mov edx,ebx
  shr edx,13
  push edx
+%if %0
+%if %1
+ add R_65c816_Cycles,%1
+%endif
+ push R_65c816_Cycles
+%else
  movzx edx,byte [C_LABEL(BlockSpeed)+edx]
  add R_65c816_Cycles,edx
  mov edx,[esp]
+%endif
  mov edx,[C_LABEL(Read_Bank8Offset)+edx*4]
  test edx,edx
  jnz %%read_direct
 
+%if %0
+ mov edx,[esp+4]
+%else
  mov edx,[esp]
+%endif
  call [C_LABEL(Read_Bank8Mapping)+edx*4]
  jmp %%read_done
 %%read_direct:
  mov al,[edx+ebx]
  mov [C_LABEL(Last_Bus_Value_A)],al
 %%read_done:
+%if %0
+ pop R_65c816_Cycles
+%endif
  pop edx
 %endmacro
 
@@ -207,23 +222,38 @@ byte accessed.
 %%read_done:
 %endmacro
 
-%macro SET_BYTE 0
+;%1 = fixed cycle cost
+%macro SET_BYTE 0-1
  mov [C_LABEL(Last_Bus_Value_A)],al
  mov edx,ebx
  shr edx,13
  push edx
+%if %0
+%if %1
+ add R_65c816_Cycles,%1
+%endif
+ push R_65c816_Cycles
+%else
  movzx edx,byte [C_LABEL(BlockSpeed)+edx]
  add R_65c816_Cycles,edx
  mov edx,[esp]
+%endif
  mov edx,[C_LABEL(Write_Bank8Offset)+edx*4]
  test edx,edx
  jnz %%write_direct
+%if %0
+ mov edx,[esp+4]
+%else
  mov edx,[esp]
+%endif
  call [C_LABEL(Write_Bank8Mapping)+edx*4]
  jmp %%write_done
 %%write_direct:
  mov [edx+ebx],al
 %%write_done:
+%if %0
+ pop R_65c816_Cycles
+%endif
  pop edx
 %endmacro
 

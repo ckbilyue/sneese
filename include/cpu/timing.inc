@@ -267,7 +267,7 @@ EXTERN_C Dump_DMA
  pop edi
  popa
  LOAD_CYCLES
- RELATCH_HDMA
+ call init_HDMA
  SAVE_CYCLES
  pusha
  push byte 1
@@ -276,7 +276,7 @@ EXTERN_C Dump_DMA
  popa
 %else
  LOAD_CYCLES
- RELATCH_HDMA
+ call init_HDMA
  SAVE_CYCLES
 %endif
 
@@ -637,7 +637,7 @@ EXTERN_C Profiler_Start
  pop edi
  popa
  LOAD_CYCLES
- RELATCH_HDMA
+ call init_HDMA
  SAVE_CYCLES
  pusha
  push byte 1
@@ -646,7 +646,7 @@ EXTERN_C Profiler_Start
  popa
 %else
  LOAD_CYCLES
- RELATCH_HDMA
+ call init_HDMA
  SAVE_CYCLES
 %endif
 

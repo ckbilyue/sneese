@@ -64,7 +64,7 @@ EXTERN HDMAON,In_DMA
 EXTERN DMA_Pending_B_Address,DMA_Pending_Data
 EXTERN_C Do_DMA_Channel,Do_HDMA_Channel
 EXTERN SNES_W420C
-EXTERN do_HDMA
+EXTERN init_HDMA,do_HDMA
 EXTERN Reset_DMA
 
 %macro EXTERN_MAP_READ_DMA 1
@@ -199,65 +199,6 @@ EXTERN_MAP_WRITE_DMA 7
  and byte [C_LABEL(MDMAEN)],~(1 << (%1))
 
 %%no_dma:
-%endmacro
-
-%macro HDMAOPERATION 1
-  mov al,[HDMAON]
-  test al,(1<<%1)
-  jz %%no_hdma
-
-  add dword R_65c816_Cycles,byte 8  ; HDMA processing
-
-  mov byte [In_DMA],(%1) | DMA_IN_PROGRESS
-  LOAD_DMA_TABLE %1
-  call C_LABEL(Do_HDMA_Channel) ; CF clear if channel disabled
-
-  jc %%no_hdma
-  and byte [HDMAON],~(1<<%1)    ; Disable this channel
-%%no_hdma:
-%endmacro
-
-%macro RELATCH_HDMA_CHANNEL 1
- test byte [C_LABEL(HDMAEN)],(1<<%1)
- jz %%no_relatch
-
- mov byte [NTRL_%1],0
-
- mov eax,[A1T_%1]        ; Src Address in ebx
- mov [A2T_%1],eax
-
-
-%%no_relatch:
-%endmacro
-
-%macro RELATCH_HDMA_IN_FRAME 1
-%if 0
- mov al,[HDMAON]
- not al
- and al,[esp]
- test al,(1<<%1)
- jz %%no_relatch
-
- mov byte [NTRL_%1],0
-%%no_relatch:
-%endif
-%endmacro
-
-%macro RELATCH_HDMA 0
- mov al,[C_LABEL(HDMAEN)]
- mov [HDMAON],al
- test al,al
- jz %%no_hdma
- add R_65c816_Cycles,byte _5A22_FAST_CYCLE * 3  ; HDMA processing
- RELATCH_HDMA_CHANNEL 0
- RELATCH_HDMA_CHANNEL 1
- RELATCH_HDMA_CHANNEL 2
- RELATCH_HDMA_CHANNEL 3
- RELATCH_HDMA_CHANNEL 4
- RELATCH_HDMA_CHANNEL 5
- RELATCH_HDMA_CHANNEL 6
- RELATCH_HDMA_CHANNEL 7
-%%no_hdma:
 %endmacro
 
 %endif ; !defined(SNEeSe_dma_inc)
