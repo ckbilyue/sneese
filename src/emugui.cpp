@@ -128,8 +128,6 @@ char *Main_Options[MAIN_NUM_OPTIONS]={
  "BG window status",
  "Exit SNEeSe :("};
 
-WINDOW *Credits_window=0;
-
 void UpdateGUI(int Selected)
 {
  clear(GUI_Bitmap);
@@ -137,10 +135,6 @@ void UpdateGUI(int Selected)
  for(int a=0;a<MAIN_NUM_OPTIONS;a++)
   if(a!=Selected) PlotMenuItem(Main_window,default_font,Main_Options[a],0,default_font->get_heightspace()*a,16);
   else PlotSelectedMenuItem(Main_window,default_font,Main_Options[a],0,default_font->get_heightspace()*a,16);
- Credits_window->refresh();
- PlotString(Credits_window,default_font," Code by: Charles Bilyue'      ",0,0);
- PlotString(Credits_window,default_font,"          Brad Martin          ",0,default_font->get_heightspace());
- PlotString(Credits_window,default_font," Logo by: neptron              ",0,default_font->get_heightspace()*2);
 
 #ifndef NO_LOGO
  if(sneese)
@@ -1064,6 +1058,9 @@ int ConfigWindow()
     {
      while((temp = ScreenWindow()) != -1)
      {
+      // Setup screen mode (SCREEN_MODE is set here so following works)
+      SetGUIScreen(temp);
+
       Config_Options[CONFIG_SCREEN_MODE] = Screen_Options[SCREEN_MODE];
 #ifndef NO_LOGO
       if(sneese)   // Prevent a crash if file not found!
@@ -1586,7 +1583,6 @@ CTL *joypad_bitmap=0;
 
 CTL_CLEAR GUI_clear;
 CTL_CLEAR Main_clear;
-CTL_CLEAR Credits_clear;
 CTL_CLEAR Screen_clear;
 CTL_CLEAR Config_clear;
 CTL_CLEAR Sound_clear;
@@ -1605,7 +1601,6 @@ int allocate_windows()
 
  GUI_window=new BORDER_WINDOW(-1,-1,320,240);
  Main_window=new BORDER_WINDOW(0,0,16*default_font->get_widthspace(),MAIN_NUM_OPTIONS*default_font->get_heightspace());
- Credits_window=new BORDER_WINDOW(10,160,32*default_font->get_widthspace(),3*default_font->get_heightspace());
  Screen_window=new BORDER_WINDOW(100,30,21*default_font->get_widthspace(),NUM_SCREEN_OPTIONS*default_font->get_heightspace());
  Config_window=new BORDER_WINDOW(70,15,24*default_font->get_widthspace(),CONFIG_NUM_OPTIONS*default_font->get_heightspace());
  Controls_window=new BORDER_WINDOW(90,105,24*default_font->get_widthspace(),CONTROLS_NUM_OPTIONS*default_font->get_heightspace());
@@ -1616,13 +1611,12 @@ int allocate_windows()
  DMAStatus_window=new BORDER_WINDOW(10,70,33*default_font->get_widthspace(),9*default_font->get_heightspace());
  APUStatus_window=new BORDER_WINDOW(8,70,48*default_font->get_widthspace(),9*default_font->get_heightspace());
  BGWinStatus_window=new BORDER_WINDOW(8,70,48*default_font->get_widthspace(),9*default_font->get_heightspace());
- if(!(GUI_window && Main_window && Credits_window &&
-    Screen_window && Config_window && Controls_window && Sound_window &&
-    ControlSetup_window && ROMInfo_window && HWStatus_window &&
-    DMAStatus_window && APUStatus_window && BGWinStatus_window)) return 1;
+ if(!(GUI_window && Main_window && Screen_window && Config_window &&
+    Controls_window && Sound_window && ControlSetup_window &&
+    ROMInfo_window && HWStatus_window && DMAStatus_window &&
+    APUStatus_window && BGWinStatus_window)) return 1;
  *GUI_window+=GUI_clear;
  *Main_window+=Main_clear;
- *Credits_window+=Credits_clear;
  *Screen_window+=Screen_clear;
  *Config_window+=Config_clear;
  *Controls_window+=Config_clear;
@@ -1641,7 +1635,7 @@ int allocate_windows()
 void free_windows()
 {
  delete GUI_window;
- delete Main_window; delete Credits_window;
+ delete Main_window;
  delete joypad_bitmap;
  delete Screen_window; delete Config_window; delete Sound_window;
  delete ControlSetup_window; delete ROMInfo_window;
@@ -1649,7 +1643,7 @@ void free_windows()
  delete APUStatus_window; delete BGWinStatus_window;
 
  GUI_window=0;
- Main_window=0; Credits_window=0;
+ Main_window=0;
  joypad_bitmap=0;
  Screen_window=0; Config_window=0; Sound_window=0;
  ControlSetup_window=0; ROMInfo_window=0; HWStatus_window=0;
