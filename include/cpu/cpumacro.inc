@@ -166,6 +166,22 @@ EXPORT_C E0_ASL_%1
  OPCODE_EPILOG
 %endmacro
 
+%macro _ASL 0
+%if M_8bit
+ add al,al
+ sbb cl,cl
+ STORE_FLAGS_NZC al,cl
+%else
+ add ax,ax
+ sbb cl,cl
+ mov dl,ah
+ STORE_FLAGS_C cl
+ or dl,al
+ STORE_FLAGS_N ah
+ STORE_FLAGS_Z dl
+%endif
+%endmacro
+
 ;%1 = label, %2 = flag
 %macro BFC 2
 ALIGNC
@@ -513,6 +529,22 @@ EXPORT_C E0_LSR_%1
  OPCODE_EPILOG
 %endmacro
 
+%macro _LSR 0
+%if M_8bit
+ shr al,1
+ sbb cl,cl
+ STORE_FLAGS_NZC al,cl
+%else
+ shr ax,1
+ sbb cl,cl
+ mov dl,ah
+ STORE_FLAGS_C cl
+ or dl,al
+ STORE_FLAGS_N ah
+ STORE_FLAGS_Z dl
+%endif
+%endmacro
+
 ;%1 = X flag, %2 = direction (0 = MVP, backward, 1 = MVN, forward)
 %macro ALL_MVX 2
  push ebx           ; Cycles per instruction iteration
@@ -635,6 +667,26 @@ EXPORT_C E0_ROL_%1
  OPCODE_EPILOG
 %endmacro
 
+%macro _ROL 0
+%if M_8bit
+ mov cl,B_C_flag
+ add cl,255 ;MAKE_CARRY
+ adc al,al
+ sbb cl,cl
+ STORE_FLAGS_NZC al,cl
+%else
+ mov cl,B_C_flag
+ add cl,255 ;MAKE_CARRY
+ adc ax,ax
+ sbb cl,cl
+ mov dl,ah
+ STORE_FLAGS_C cl
+ or dl,al
+ STORE_FLAGS_N ah
+ STORE_FLAGS_Z dl
+%endif
+%endmacro
+
 ;%1 = label, %2 = addr
 %macro EM_ROR 2
 ALIGNC
@@ -664,6 +716,26 @@ EXPORT_C E0_ROR_%1
  STORE_FLAGS_N ah
  STORE_FLAGS_Z al
  OPCODE_EPILOG
+%endmacro
+
+%macro _ROR 0
+%if M_8bit
+ mov cl,B_C_flag
+ add cl,255 ;MAKE_CARRY
+ rcr al,1
+ sbb cl,cl
+ STORE_FLAGS_NZC al,cl
+%else
+ mov cl,B_C_flag
+ add cl,255 ;MAKE_CARRY
+ rcr ax,1
+ sbb cl,cl
+ mov dl,ah
+ STORE_FLAGS_C cl
+ or dl,al
+ STORE_FLAGS_N ah
+ STORE_FLAGS_Z dl
+%endif
 %endmacro
 
 ;%1 = label, %2 = addr

@@ -506,30 +506,6 @@ EXPORT_C E1_PHP
 EM_ORA i,Immediate
 E0_ORA i,Immediate
 
-; 0A
-
-ALIGNC
-EXPORT_C EM_SLA
- inc R_NativePC
- mov al,B_A
- add al,al
- sbb cl,cl
- mov B_A,al
- STORE_FLAGS_NZC al,cl
- OPCODE_EPILOG
-ALIGNC
-EXPORT_C E0_SLA
- inc R_NativePC
- mov eax,B_A
- add ax,ax
- sbb cl,cl
- STORE_FLAGS_N ah
- mov B_A,eax
- or al,ah
- STORE_FLAGS_C cl
- STORE_FLAGS_Z al
- OPCODE_EPILOG
-
 ; 0B
 E0_PUSH16 B_D,E0_PHD,New
 E1_PUSH16 B_D,E1_PHD,New
@@ -863,35 +839,6 @@ EXPORT_C E1_PLP
 EM_AND i,Immediate
 E0_AND i,Immediate
 
-; 2A
-
-ALIGNC
-EXPORT_C EM_RLA
- mov cl,B_C_flag
- mov al,B_A
- inc R_NativePC
- add cl,255 ;MAKE_CARRY
- adc al,al
- sbb cl,cl
- mov B_A,al
- STORE_FLAGS_NZC al,cl
- OPCODE_EPILOG
-
-ALIGNC
-EXPORT_C E0_RLA
- mov cl,B_C_flag
- mov eax,B_A
- inc R_NativePC
- add cl,255 ;MAKE_CARRY
- adc ax,ax
- sbb cl,cl
- STORE_FLAGS_N ah
- mov B_A,eax
- or al,ah
- STORE_FLAGS_C cl
- STORE_FLAGS_Z al
- OPCODE_EPILOG
-
 ; 2B
 E0_PULL16 B_D,E0_PLD
 E1_PULL16 B_D,E1_PLD
@@ -1136,30 +1083,6 @@ E1_PUSH8 B_A,E1_PHA
 ; 49
 EM_EOR i,Immediate
 E0_EOR i,Immediate
-
-; 4A
-
-ALIGNC
-EXPORT_C EM_SRA
- mov al,B_A
- inc R_NativePC
- shr al,byte 1
- sbb cl,cl
- mov B_A,al
- STORE_FLAGS_NZC al,cl
- OPCODE_EPILOG
-ALIGNC
-EXPORT_C E0_SRA
- mov eax,B_A
- inc R_NativePC
- shr eax,byte 1
- sbb cl,cl
- STORE_FLAGS_N ah
- mov B_A,eax
- or al,ah
- STORE_FLAGS_C cl
- STORE_FLAGS_Z al
- OPCODE_EPILOG
 
 ; 4B
 E0_PUSH8 B_PB,E0_PHK    ; Push PB(K) onto stack
@@ -1475,35 +1398,6 @@ E1_PULL8 B_A,E1_PLA
 ; 69
 EM_ADC i,Immediate
 E0_ADC i,Immediate
-
-; 6A    ; Fixed 0.25: RRA8 didn't set NZ flags correctly
-
-ALIGNC
-EXPORT_C EM_RRA
- mov cl,B_C_flag
- mov al,B_A
- inc R_NativePC
- add cl,255 ;MAKE_CARRY
- rcr al,1
- sbb cl,cl
- mov B_A,al
- STORE_FLAGS_NZC al,cl
- OPCODE_EPILOG
-
-ALIGNC
-EXPORT_C E0_RRA
- mov cl,B_C_flag
- mov eax,B_A
- inc R_NativePC
- add cl,255 ;MAKE_CARRY
- rcr ax,1
- sbb cl,cl
- STORE_FLAGS_N ah
- mov B_A,eax
- or al,ah
- STORE_FLAGS_C cl
- STORE_FLAGS_Z al
- OPCODE_EPILOG
 
 ; 6B
 
