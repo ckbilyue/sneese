@@ -107,10 +107,10 @@ static struct voice_state {
     int pitch_counter;
     int bufptr;
     unsigned brrptr;
-    unsigned char brr_header, env_state, adsr_state;
+    unsigned char brr_header, env_state, adsr_state, key_wait;
 } SNDvoices[8];
 
-unsigned char SNDkeys;
+unsigned char SNDkeys, keying_on;
 
 static const short gauss[]={
 	0x000, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000, 
@@ -564,25 +564,45 @@ INLINE static void SPC_KeyOn(int voices)
  unsigned short *samp_dir = (unsigned short *)
   &SPCRAM[(int) SPC_DSP[DSP_DIR] << 8];
 
- /* Ignore voices forcibly disabled */
- voices &= SPC_MASK;
+ if (voices)
+ {
+  /* Ignore voices forcibly disabled */
+  voices &= SPC_MASK;
 
- /* Clear key-on bits when acknowledged */
- SPC_DSP[DSP_KON] = voices & SPC_DSP[DSP_KOF];
+  /* Clear key-on bits when acknowledged */
+  SPC_DSP[DSP_KON] = voices & SPC_DSP[DSP_KOF];
 
- /* Don't acknowledge key-on when key-off is set */
- voices &= ~SPC_DSP[DSP_KOF];
+  /* Don't acknowledge key-on when key-off is set */
+  voices &= ~SPC_DSP[DSP_KOF];
 
- /* Clear sample-end-block-decoded flag for voices being keyed on */
- SPC_DSP[DSP_ENDX] &= ~voices;
+  /* 8-sample delay before key on */
+  keying_on |= voices;
+
+  for (voice = 0; voice < 8; voice++)
+  {
+   if (!(voices & (1 << voice))) continue;
+
+   SNDvoices[voice].key_wait = 8;
+  }
+ }
+
+ if (!keying_on) return;
 
  for (voice = 0; voice < 8; voice++)
  {
   struct voice_state *pvs;
 
-  if (!(voices & (1 << voice))) continue;
+  if (!(keying_on & (1 << voice))) continue;
 
   pvs = &SNDvoices[voice];
+
+  if (pvs->key_wait--) continue;
+
+  keying_on &= ~(1 << voice);
+
+  /* Clear sample-end-block-decoded flag for voices being keyed on */
+  SPC_DSP[DSP_ENDX] &= ~(1 << voice);
+
   cursamp = SPC_DSP[(voice << 4) + DSP_VOICE_SRCN];
   pvs->brrptr = pvs->sample_start_address = samp_dir[cursamp * 2];
   pvs->pitch_counter = 0x1000*3;
@@ -647,8 +667,9 @@ INLINE static void SPC_KeyOn(int voices)
     pvs->env_state = DIRECT;
    }
   }
+
+  SNDkeys |= (1 << voice);
  }
- SNDkeys |= voices;
 }
 
 INLINE static void SPC_KeyOff(int voices)
