@@ -643,14 +643,15 @@ EXTERN_C BreaksLast
  xor eax,-1
  xor ecx,ecx
  xor ebx,ebx
- mov cl,[C_LABEL(MosaicCount)+esi+eax+1]
- mov bl,[C_LABEL(MosaicLine)+esi+eax+1-1]
- mov eax,[Mosaic_Size]
- add ebx,ebp
- cmp ecx,eax
+ mov cl,[C_LABEL(MosaicCount)+esi+eax+1]  ;1
+ mov bl,[C_LABEL(MosaicLine)+esi+eax+1-1] ;6c
+ mov eax,[Mosaic_Size] ;1
+ add ebx,ebp           ;6c
+ cmp ecx,eax           ;
  sbb eax,eax
- and ecx,eax
- mov [MosaicCountdown],cl
+ and eax,ecx
+.mosaic_fixup_done:
+ mov [MosaicCountdown],eax
 
  mov al,[MOSAIC]
  mov ebx,[LineCounter_BG1]
@@ -675,8 +676,6 @@ EXTERN_C BreaksLast
  add [LineCounter_BG4],ebp
 .no_mosaic_bg4:
 
-.mosaic_fixup_done:
- mov [MosaicCountdown],eax
  pop esi
  pop ebp
  pop edi
