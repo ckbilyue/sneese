@@ -2,6 +2,7 @@ makefile
 makefile.all
 makefile.dos
 makefile.win
+objfix.win
 makefile.unix
 makefile.beos
 LICENSE
@@ -93,6 +94,4 @@ src/helper.c
 src/apu/sound.c
 src/input.c
 include/input.h
-nasmming/nasmming.txt
-nasmming/outcoff.c.diff
-nasmming/outform.h.diff
+src/win/objfix.c
