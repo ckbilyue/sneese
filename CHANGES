@@ -27,6 +27,10 @@ Changes
    Evermore [TRAC]
   Sound: Improved envelope timing when envelope settings changed for
    playing voices [TRAC]
+  Sound: Altered audio code to base timing on samples instead of cycles
+   [TRAC]
+  Sound: Added countdown register emulation to envelope and noise
+   timing [TRAC]
  0.81
   PPU: Greatly simplied VRAM read/write handling and readded VRAM read
    buffering, thanks to anomie for convincing me to give it another
