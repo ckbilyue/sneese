@@ -494,10 +494,6 @@ EXPORT_C E1_PHP
 E0_PUSH16 B_D,E0_PHD,New
 E1_PUSH16 B_D,E1_PHD,New
 
-; 0D
-EM_ORA a,Absolute
-E0_ORA a,Absolute
-
 ; 0F
 EM_ORA al,Absolute_Long
 E0_ORA al,Absolute_Long
@@ -787,14 +783,6 @@ EXPORT_C E1_PLP
 E0_PULL16 B_D,E0_PLD
 E1_PULL16 B_D,E1_PLD
 
-; 2C
-EM_BIT a,Absolute
-E0_BIT a,Absolute
-
-; 2D
-EM_AND a,Absolute
-E0_AND a,Absolute
-
 ; 2F
 EM_AND al,Absolute_Long
 E0_AND al,Absolute_Long
@@ -1040,10 +1028,6 @@ EXPORT_C ALL_JMP_a
  mov eax,C_LABEL(Blank)
  jmp short .read_direct
 %endif
-
-; 4D
-EM_EOR a,Absolute
-E0_EOR a,Absolute
 
 ; 4F
 EM_EOR al,Absolute_Long
@@ -1421,10 +1405,6 @@ EXPORT_C ALL_JMP_OaO
  jmp short .read_direct
 %endif
 
-; 6D
-EM_ADC a,Absolute
-E0_ADC a,Absolute
-
 ; 6F
 EM_ADC al,Absolute_Long
 E0_ADC al,Absolute_Long
@@ -1629,18 +1609,6 @@ _TxX B_A,16,E0_TAX
 ; AB
 E0_PULL8 B_DB,E0_PLB    ; Pull DB(B) from stack
 E1_PULL8 B_DB,E1_PLB
-
-; AC
-EX_LDY a,Absolute
-E0_LDY a,Absolute
-
-; AD
-EM_LDA a,Absolute
-E0_LDA a,Absolute
-
-; AE
-EX_LDX a,Absolute
-E0_LDX a,Absolute
 
 ; AF
 EM_LDA al,Absolute_Long
@@ -1867,14 +1835,6 @@ ALIGNC
 %endif
 
  OPCODE_EPILOG
-
-; CC
-EX_CPY a,Absolute
-E0_CPY a,Absolute
-
-; CD
-EM_CMP a,Absolute
-E0_CMP a,Absolute
 
 ; CF
 EM_CMP al,Absolute_Long
@@ -2126,14 +2086,6 @@ EXPORT_C ALL_XBA
  STORE_FLAGS_NZ al
  mov B_A,eax
  OPCODE_EPILOG
-
-; EC
-EX_CPX a,Absolute
-E0_CPX a,Absolute
-
-; ED
-EM_SBC a,Absolute
-E0_SBC a,Absolute
 
 ; EF
 EM_SBC al,Absolute_Long
