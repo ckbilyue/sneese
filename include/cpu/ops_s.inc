@@ -66,6 +66,54 @@ OPCODE_PROLOG(0x20) ; JSR a
 %endif
 OPCODE_EPILOG
 
+OPCODE_PROLOG(0x22) ; JSL al
+%ifdef TRAP_INVALID_JUMP
+ mov [C_LABEL(Map_Byte)],eax
+%endif
+ ADDR_Absolute_Long_JSR
+
+ mov ebx,eax
+ shr ebx,16
+ and eax,(1 << 16) - 1
+
+ mov B_PB,bl
+ mov R_NativePC,eax
+ test [MEMSEL],bl       ; Check bus speed against PB
+ mov al,[C_LABEL(FastROM_offset)]
+ jnz .fastrom
+ mov al,4
+.fastrom:
+%ifndef NO_FASTROM
+ mov [C_LABEL(CycleTable)],al   ; Update bus speed
+%endif
+ mov edx,R_NativePC
+ shl ebx,16
+ add edx,ebx
+
+ shr edx,13
+ mov edx,[C_LABEL(Read_Bank8Offset)+edx*4]
+ test edx,edx
+ jz .read_non_linear
+
+ add edx,ebx
+.read_direct:
+
+ add R_NativePC,edx
+ mov B_PBOffset,edx
+
+ OPCODE_EPILOG
+
+.read_non_linear:
+%ifdef TRAP_INVALID_JUMP
+ mov byte [C_LABEL(Map_Byte)+3],0x22
+ mov [C_LABEL(Map_Address)],ebx
+ jmp _InvalidJump
+%else
+ mov edx,C_LABEL(Blank)
+ jmp short .read_direct
+%endif
+OPCODE_EPILOG
+
 OPCODE_PROLOG(0x28) ; PLP s
  ADDR_Implied
  PULL_B

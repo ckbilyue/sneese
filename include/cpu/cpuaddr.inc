@@ -143,12 +143,29 @@ You must read and accept the license prior to use.
 %endmacro
 
 %macro READ24_Immediate 0-1 0
+%ifnidni %1,JSR
  mov al,[3+R_NativePC]
  shl eax,16
  mov al,[1+R_NativePC]
  mov ah,[2+R_NativePC]
 %ifnidni %1,JMP
  add R_NativePC,byte 4
+%endif
+%else
+ READ16_Immediate
+ push eax
+ mov al,B_PB
+ E0_PUSH_B
+;add R_Cycles,_5A22_FAST_CYCLE
+ mov al,[R_NativePC]
+ movzx ecx,al
+ shl ecx,16
+ pop eax
+ add ecx,eax
+ GET_PC eax
+ E0_PUSH_W
+ mov eax,ecx
+ Stack_Fixup
 %endif
 %endmacro
 
@@ -944,3 +961,6 @@ You must read and accept the license prior to use.
  READ24_Immediate JMP
 %endmacro
 
+%macro ADDR_Absolute_Long_JSR 0
+ READ24_Immediate JSR
+%endmacro
