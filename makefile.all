@@ -98,7 +98,6 @@ DFLAGS = -DDEBUG
 
 
 ifneq ($(NO_SELF_MODIFY),0)
-DFLAGS += -DNO_FASTROM
 endif
 
 ifneq ($(FAST_SPC),0)

@@ -4713,11 +4713,6 @@ EXPORT_C Reset_CPU
  mov [C_LABEL(HTIMEL)],eax
  mov [C_LABEL(VTIMEL)],eax
 
- ; Reset bus speed
-%ifndef NO_FASTROM
- mov byte [C_LABEL(CycleTable)],4
-%endif
-
  ; Reset other registers
  mov byte [C_LABEL(WRIO)],0xFF
  mov byte [C_LABEL(RDIO)],0xFF
@@ -4748,15 +4743,15 @@ EXPORT_C Reset_CPU
  mov [SPC_cycles_left],eax
  mov [SPC_CPU_cycles_mul],eax
 
+ ; Clear interrupt inputs
+ mov [IRQ_pin],al
+ mov [NMI_pin],al
+
  ; Reset CPU
 
  mov [In_CPU],al
  mov [CPU_Execution_Mode],al ;CEM_Normal_Execution == 0
  mov dword [OpTable],OpTableE1  ; Set current opcode emulation table
-
- ; clear interrupt inputs
- mov [IRQ_pin],al
- mov [NMI_pin],al
 
  ; Clear cycle counts
  mov dword [C_LABEL(SNES_Cycles)],0x82  ;32.5 dots before reset (?)
@@ -5081,9 +5076,6 @@ EXPORT E1_RESET
  mov byte [CPU_LABEL(PB)],0 ; Setup bank
 ;SET_FLAG SNES_FLAG_I   ; Disable IRQs
  STORE_FLAGS_I 1
-%ifndef NO_FASTROM
- mov byte [C_LABEL(CycleTable)],4   ; SlowROM bank
-%endif
 ;CLR_FLAG SNES_FLAG_D   ; Disable decimal mode
  STORE_FLAGS_D 0
  ret
@@ -5125,9 +5117,6 @@ IRQ_completion:
  mov byte [CPU_LABEL(PB)],0 ; Setup bank
 ;SET_FLAG SNES_FLAG_I   ; Disable IRQs
  STORE_FLAGS_I 1
-%ifndef NO_FASTROM
- mov byte [C_LABEL(CycleTable)],4   ; SlowROM bank
-%endif
 ;CLR_FLAG SNES_FLAG_D   ; Disable decimal mode
  STORE_FLAGS_D 0
  ret

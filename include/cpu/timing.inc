@@ -948,9 +948,6 @@ ALIGNC
  mov byte [CPU_LABEL(PB)],0     ; Setup bank
 ;SET_FLAG SNES_FLAG_I   ; Disable IRQs
  STORE_FLAGS_I 1
-%ifndef NO_FASTROM
- mov byte [C_LABEL(CycleTable)],4   ; SlowROM bank
-%endif
 ;CLR_FLAG SNES_FLAG_D   ; Disable decimal mode
  STORE_FLAGS_D 0
  SAVE_CYCLES
