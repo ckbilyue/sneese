@@ -304,16 +304,17 @@ EXTERN_C Layer_Disable_Mask
  inc dword [SM7_Current_Line]
 
 .first_line:
- ; Handle vertical mosaic
  mov edx,[SM7_Current_Line]
+%if 1
+ ; Handle vertical mosaic
  mov al,[MosaicBG1]
  test al,al
  jz .no_mosaic
  mov eax,[Mosaic_Size_Select]
- mov dl,[C_LABEL(MosaicLine)+ebx+eax]
+ mov dl,[C_LABEL(MosaicLine)+edx+eax]
 .no_mosaic:
  ; End vertical mosaic
-
+%endif
 
  mov al,[C_LABEL(M7SEL)]
  test al,2
