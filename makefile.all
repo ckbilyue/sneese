@@ -96,7 +96,6 @@ endif
 CFLAGS = $(OFLAGS) -ggdb3 -I$(INCLUDE)/
 ifdef ZLIB
 CFLAGS += -DZLIB
-SFLAGS += -DZLIB
 endif
 
 ifneq ($(SAVE_ASM_OUTPUT),0)
@@ -148,7 +147,7 @@ $(OBJ)/%.$(ASM_OBJ_EXT): $(SRC)/%.asm
 	$(NASM) $(AFLAGS) $(DFLAGS) -o $@ $<
 
 $(OBJ)/%.o: $(OBJ)/%.s
-	$(GCC) -c $(SFLAGS) $(DFLAGS) -o $@ $<
+	$(GCC) -c $(DFLAGS) -o $@ $<
 
 $(OBJ)/%.s: $(SRC)/%.c
 	$(GCC) -S $(CFLAGS) $(DFLAGS) -o $@ $<
@@ -163,7 +162,7 @@ $(OBJ)/%.o: $(SRC)/%.cpp
 	$(GCC) -c $(CFLAGS) $(DFLAGS) -o $@ $<
 
 $(EXE): $(addprefix $(OBJ)/, $(OBJS))
-	$(GXX) $(PFLAGS) $(DFLAGS) -o $(EXE) $(addprefix $(OBJ)/, $(OBJS)) $(ALLEG) $(MIOFLAGS)
+	$(GXX) $(PFLAGS) $(DFLAGS) -o $(EXE) $(addprefix $(OBJ)/, $(OBJS)) $(MIOFLAGS) $(ALLEG)
 # Note that the order of arguments matters for libraries!
 
 
