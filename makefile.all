@@ -105,7 +105,7 @@ DFLAGS += -DFAST_SPC
 endif
 
 
-CFLAGS = $(OFLAGS) -ggdb3 -I$(INCLUDE)/
+CFLAGS = $(OFLAGS) -ggdb3 -I$(INCLUDE)
 ifdef ZLIB
 CFLAGS += -DZLIB
 endif
