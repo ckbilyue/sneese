@@ -24,7 +24,7 @@ EXPORT_C mode7_start
 ;%define old_sprites
 EXTERN Ready_Line_Render,BaseDestPtr
 EXTERN_C SNES_Screen8
-EXTERN_C MosaicLine
+EXTERN_C MosaicCount,MosaicLine
 EXTERN Tile_priority_bit
 
 section .data
@@ -58,6 +58,11 @@ EXPORT_C M7Y    ,skipl
 ;M7A, M7C are taken from here to help handle X-flip
 EXPORT_C M7A_X  ,skipl
 EXPORT_C M7C_X  ,skipl
+
+;M7A, M7C are taken from here to help handle X-flip and mosaic
+EXPORT_C M7A_XM ,skipl
+EXPORT_C M7C_XM ,skipl
+
 
 MPY:    skipl   ; Mode 7 multiplication result
 MPYL equ MPY    ; Mode 7 multiplication result: low byte
@@ -433,6 +438,15 @@ Recalc_Mode7:
  mov [C_LABEL(M7A_X)],ebx
  mov [C_LABEL(M7C_X)],eax
 
+ mov dl,[MosaicBG1]
+ test dl,dl
+ jz .end_recalc_ac
+
+ imul ebx,[Mosaic_Size]
+ imul eax,[Mosaic_Size]
+ mov [C_LABEL(M7A_XM)],ebx
+ mov [C_LABEL(M7C_XM)],eax
+
 .end_recalc_ac:
  mov dl,[Redo_M7]
  and dl,0xF5    ; Need to do any recalculating?
@@ -501,6 +515,7 @@ ALIGNC
  mov ebx,[Mode7_Line_Y]
 
  mov cl,[MosaicBG1]
+ add edi,edx
  test cl,cl
  jnz near %3_Mosaic
 
@@ -518,16 +533,21 @@ M7_HANDLE_%1 %2,0
 
 ALIGNC
 %3_Mosaic:
- mov ecx,[C_LABEL(M7A_X)]
- mov esi,[C_LABEL(M7C_X)]
- imul ecx,[Mosaic_Size]
- imul esi,[Mosaic_Size]
+ mov esi,[Mosaic_Size_Select]
+ xor ecx,ecx
+ mov cl,[C_LABEL(MosaicLine)+edx+esi]
+ mov dl,[C_LABEL(MosaicCount)+edx+esi]
+ mov esi,[C_LABEL(M7A_X)]
+ imul esi,ecx
+ imul ecx,[C_LABEL(M7C_X)]
+ add eax,esi
+ add ebx,ecx
+
+ mov ecx,[C_LABEL(M7A_XM)]
+ mov esi,[C_LABEL(M7C_XM)]
  push ecx
-%if 0
-;note - precalc mosaic A_X/C_X if in use
- jb .check_partial
-%endif
- jmp .first_pixel
+ mov ecx,edx
+ jmp .check_partial
 
 M7_HANDLE_%1 %2,1
 %endmacro
