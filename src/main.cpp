@@ -100,10 +100,10 @@ int main(int argc, char **argv)
   //  (i.e., the two just below)
 #if defined(ALLEGRO_UNIX)
   if (set_gfx_mode(GFX_XWINDOWS, 300, 80, 0, 0) == 0)
-   textout(screen, font, "Press any key to continue...", 38, 36, makecol(220, 220, 220));
+   textout_ex(screen, font, "Press any key to continue...", 38, 36, makecol(220, 220, 220), -1);
 #elif defined(ALLEGRO_BEOS)
   if (set_gfx_mode(GFX_BWINDOW, 300, 80, 0, 0) == 0)
-   textout(screen, font, "Press any key to continue...", 38, 36, makecol(220, 220, 220));
+   textout_ex(screen, font, "Press any key to continue...", 38, 36, makecol(220, 220, 220), -1);
 #endif
 
   while (!keypressed());
