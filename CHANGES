@@ -27,6 +27,8 @@ Changes
    disabled [TRAC]
   5A22: Fixed a bug in timing code that could cause crashes [TRAC]
   5A22: Fixed a bug which broke H-IRQ timing [TRAC]
+  Timing: Moved display start to H=1 and hblank start to H=274, per
+   recent research [TRAC]
  0.831
   5A22: Changed emulation-mode interrupts to NOT zero data bank
    register - thanks to Overload for pointing out that the SNES CPU
