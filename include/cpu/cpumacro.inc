@@ -24,6 +24,63 @@ You must read and accept the license prior to use.
 ;  EM_LDA Direct = 8-bit LDA using "direct" address mode
 ;  BFC SNES_FLAG_C = Branch if carry flag clear (BCC)
 
+;%1 = emulation mode vector, %2 = native mode vector
+%macro SoftwareInterrupt 2
+ ud2
+ READ8_Immediate
+%if S_8bit == 0 ; native mode interrupt
+ mov al,B_PB
+ PUSH_B
+%endif
+ GET_PC eax
+ PUSH_W
+ SETUPFLAGS     ; Put flags into true 65c816 format
+ PUSH_B
+
+ xor eax,eax
+
+%if S_8bit      ; emulation mode interrupt
+;7.12.2 In the Emulation mode, the PBR and DBR registers are cleared to 00
+;when a hardware interrupt, BRK or COP is executed. In this case, previous
+;contents of the PBR are not automatically saved.
+ mov B_DB,byte 0
+
+ mov ebx,%1
+%else           ; native mode interrupt
+ mov ebx,%2
+%endif
+
+ GET_WORD
+ mov R_NativePC,eax     ; PC = vector
+ mov B_PB,byte 0        ; Setup bank
+
+ STORE_FLAGS_I 1        ; Disable IRQs
+ STORE_FLAGS_D 0        ; Disable decimal mode
+
+ shr eax,13
+ mov eax,[C_LABEL(Read_Bank8Offset)+eax*4]
+ test eax,eax
+ jz %%read_non_linear
+
+%%read_direct:
+
+ add R_NativePC,eax
+ mov B_PBOffset,eax
+
+ OPCODE_EPILOG
+
+%%read_non_linear:
+%ifdef TRAP_INVALID_JUMP
+ mov byte [C_LABEL(Map_Byte)+3],0x00
+ mov [C_LABEL(Map_Address)],ebx
+ jmp _InvalidJump
+%else
+ mov eax,C_LABEL(Blank)
+ jmp short %%read_direct
+%endif
+%endmacro
+
+
 ;%1 = addr
 %macro _ADC 1
 %if M_8bit
@@ -606,43 +663,11 @@ ALIGNC
  PUSH_B
 %endmacro
 
-; label, value
-%macro E0_PUSH8 2
-ALIGNC
-EXPORT_C %2
- _PUSH8 %1
- OPCODE_EPILOG
-%endmacro
-
-; label, value
-%macro E1_PUSH8 2
-ALIGNC
-EXPORT_C %2
- _PUSH8 %1
- OPCODE_EPILOG
-%endmacro
-
 ;%1 = value, %2 = new
 %macro _PUSH16 1-2 0
  ADDR_Implied
  mov eax,%1
  PUSH_W %2
-%endmacro
-
-; label, value, new
-%macro E0_PUSH16 2-3 0
-ALIGNC
-EXPORT_C %2
- _PUSH16 %1,%3
- OPCODE_EPILOG
-%endmacro
-
-; label, value, new
-%macro E1_PUSH16 2-3 0
-ALIGNC
-EXPORT_C %2
- _PUSH16 %1,%3
- OPCODE_EPILOG
 %endmacro
 
 ;%1 = register
@@ -653,22 +678,6 @@ EXPORT_C %2
  STORE_FLAGS_NZ al
 %endmacro
 
-; label, value
-%macro E0_PULL8 2
-ALIGNC
-EXPORT_C %2
- _PULL8 %1
- OPCODE_EPILOG
-%endmacro
-
-; label, value
-%macro E1_PULL8 2
-ALIGNC
-EXPORT_C %2
- _PULL8 %1
- OPCODE_EPILOG
-%endmacro
-
 ;%1 = register, %2 = new
 %macro _PULL16 1-2 0
  ADDR_Implied
@@ -677,22 +686,6 @@ EXPORT_C %2
  mov %1,eax
  or al,ah
  STORE_FLAGS_Z al
-%endmacro
-
-; label, value, new
-%macro E0_PULL16 2-3 0
-ALIGNC
-EXPORT_C %2
- _PULL16 %1,%3
- OPCODE_EPILOG
-%endmacro
-
-; label, value, new
-%macro E1_PULL16 2-3 0
-ALIGNC
-EXPORT_C %2
- _PULL16 %1,%3
- OPCODE_EPILOG
 %endmacro
 
 

@@ -1,6 +1,20 @@
 %define OPCODE_PROLOG(op) OPCODE_LABEL OpE %+ S_8bit %+ _ %+ op
 
 
+OPCODE_PROLOG(0x00) ; BRK #
+ SoftwareInterrupt 0xFFFE,0xFFE6
+OPCODE_EPILOG
+
+OPCODE_PROLOG(0x02) ; COP #
+ SoftwareInterrupt 0xFFF4,0xFFE4
+OPCODE_EPILOG
+
+OPCODE_PROLOG(0x08) ; PHP s
+ ADDR_Implied
+ SETUPFLAGS
+ PUSH_B
+OPCODE_EPILOG
+
 OPCODE_PROLOG(0x0B) ; PHD s
  _PHD
 OPCODE_EPILOG
@@ -11,6 +25,35 @@ OPCODE_EPILOG
 
 OPCODE_PROLOG(0x1B) ; TCS i
  _TxS B_A
+OPCODE_EPILOG
+
+OPCODE_PROLOG(0x28) ; PLP s
+ ADDR_Implied
+ PULL_B
+ mov bl,B_I_flag
+ RESTOREFLAGS
+
+ test bl,bl
+%if S_8bit
+ jz C_LABEL(CPU_RETURN)
+ JUMP_FLAG SNES_FLAG_I,C_LABEL(CPU_RETURN),near
+%else
+ jz .no_irq_enable
+ JUMP_FLAG SNES_FLAG_I,.no_irq_enable
+%endif
+ mov al,CEM_Instruction_After_IRQ_Enable
+ mov [CPU_Execution_Mode],al
+ xor edx,edx
+ SAVE_CYCLES
+ mov [C_LABEL(EventTrip)],edx
+ mov edx,Enabling_IRQ_Event
+ LOAD_CYCLES
+ mov [Event_Handler],edx
+
+%if S_8bit == 0
+.no_irq_enable:
+ SET_TABLE_MX
+%endif
 OPCODE_EPILOG
 
 OPCODE_PROLOG(0x2B) ; PLD s

@@ -367,11 +367,11 @@ section .data
 
 ALIGND
 OpTableE0:
-dd  C_LABEL(E0_BRK)       ,C_LABEL(OpE0M0_0x01)     ; 00
-dd  C_LABEL(E0_COP)       ,C_LABEL(OpM0_0x03)
+dd  C_LABEL(OpE0_0x00)    ,C_LABEL(OpE0M0_0x01)     ; 00
+dd  C_LABEL(OpE0_0x02)    ,C_LABEL(OpM0_0x03)
 dd  C_LABEL(OpE0M0_0x04)  ,C_LABEL(OpE0M0_0x05)
 dd  C_LABEL(OpE0M0_0x06)  ,C_LABEL(OpE0M0_0x07)
-dd  C_LABEL(E0_PHP)       ,C_LABEL(OpM0_0x09)
+dd  C_LABEL(OpE0_0x08)    ,C_LABEL(OpM0_0x09)
 dd  C_LABEL(OpM0_0x0A)    ,C_LABEL(OpE0_0x0B)
 dd  C_LABEL(OpM0_0x0C)    ,C_LABEL(OpM0_0x0D)
 dd  C_LABEL(OpM0_0x0E)    ,C_LABEL(OpM0_0x0F)
@@ -387,7 +387,7 @@ dd  C_LABEL(E0_JSR_a)     ,C_LABEL(OpE0M0_0x21)     ; 20
 dd  C_LABEL(E0_JSL_al)    ,C_LABEL(OpM0_0x23)
 dd  C_LABEL(OpE0M0_0x24)  ,C_LABEL(OpE0M0_0x25)
 dd  C_LABEL(OpE0M0_0x26)  ,C_LABEL(OpE0M0_0x27)
-dd  C_LABEL(E0_PLP)       ,C_LABEL(OpM0_0x29)
+dd  C_LABEL(OpE0_0x28)    ,C_LABEL(OpM0_0x29)
 dd  C_LABEL(OpM0_0x2A)    ,C_LABEL(OpE0_0x2B)
 dd  C_LABEL(OpM0_0x2C)    ,C_LABEL(OpM0_0x2D)
 dd  C_LABEL(OpM0_0x2E)    ,C_LABEL(OpM0_0x2F)
@@ -1078,11 +1078,11 @@ db opcode_clocks(3, 2, 0, 4, 1) ; FE INC a,x
 db opcode_clocks(4, 0, 0, 2, 1) ; FF SBC al,x
 
 OpTablePm:
-dd  C_LABEL(E0_BRK)       ,C_LABEL(OpE0M1_0x01)     ; 00
-dd  C_LABEL(E0_COP)       ,C_LABEL(OpM1_0x03)
+dd  C_LABEL(OpE0_0x00)    ,C_LABEL(OpE0M1_0x01)     ; 00
+dd  C_LABEL(OpE0_0x02)    ,C_LABEL(OpM1_0x03)
 dd  C_LABEL(OpE0M1_0x04)  ,C_LABEL(OpE0M1_0x05)
 dd  C_LABEL(OpE0M1_0x06)  ,C_LABEL(OpE0M1_0x07)
-dd  C_LABEL(E0_PHP)       ,C_LABEL(OpM1_0x09)
+dd  C_LABEL(OpE0_0x08)    ,C_LABEL(OpM1_0x09)
 dd  C_LABEL(OpM1_0x0A)    ,C_LABEL(OpE0_0x0B)
 dd  C_LABEL(OpM1_0x0C)    ,C_LABEL(OpM1_0x0D)
 dd  C_LABEL(OpM1_0x0E)    ,C_LABEL(OpM1_0x0F)
@@ -1098,7 +1098,7 @@ dd  C_LABEL(E0_JSR_a)     ,C_LABEL(OpE0M1_0x21)     ; 20
 dd  C_LABEL(E0_JSL_al)    ,C_LABEL(OpM1_0x23)
 dd  C_LABEL(OpE0M1_0x24)  ,C_LABEL(OpE0M1_0x25)
 dd  C_LABEL(OpE0M1_0x26)  ,C_LABEL(OpE0M1_0x27)
-dd  C_LABEL(E0_PLP)       ,C_LABEL(OpM1_0x29)
+dd  C_LABEL(OpE0_0x28)    ,C_LABEL(OpM1_0x29)
 dd  C_LABEL(OpM1_0x2A)    ,C_LABEL(OpE0_0x2B)
 dd  C_LABEL(OpM1_0x2C)    ,C_LABEL(OpM1_0x2D)
 dd  C_LABEL(OpM1_0x2E)    ,C_LABEL(OpM1_0x2F)
@@ -1789,11 +1789,11 @@ db opcode_clocks(3, 2, 0, 2, 1) ; FE INC a,x
 db opcode_clocks(4, 0, 0, 1, 1) ; FF SBC al,x
 
 OpTablePx:
-dd  C_LABEL(E0_BRK)       ,C_LABEL(OpE0M0_0x01)     ; 00
-dd  C_LABEL(E0_COP)       ,C_LABEL(OpM0_0x03)
+dd  C_LABEL(OpE0_0x00)    ,C_LABEL(OpE0M0_0x01)     ; 00
+dd  C_LABEL(OpE0_0x02)    ,C_LABEL(OpM0_0x03)
 dd  C_LABEL(OpE0M0_0x04)  ,C_LABEL(OpE0M0_0x05)
 dd  C_LABEL(OpE0M0_0x06)  ,C_LABEL(OpE0M0_0x07)
-dd  C_LABEL(E0_PHP)       ,C_LABEL(OpM0_0x09)
+dd  C_LABEL(OpE0_0x08)    ,C_LABEL(OpM0_0x09)
 dd  C_LABEL(OpM0_0x0A)    ,C_LABEL(OpE0_0x0B)
 dd  C_LABEL(OpM0_0x0C)    ,C_LABEL(OpM0_0x0D)
 dd  C_LABEL(OpM0_0x0E)    ,C_LABEL(OpM0_0x0F)
@@ -1809,7 +1809,7 @@ dd  C_LABEL(E0_JSR_a)     ,C_LABEL(OpE0M0_0x21)     ; 20
 dd  C_LABEL(E0_JSL_al)    ,C_LABEL(OpM0_0x23)
 dd  C_LABEL(OpE0M0_0x24)  ,C_LABEL(OpE0M0_0x25)
 dd  C_LABEL(OpE0M0_0x26)  ,C_LABEL(OpE0M0_0x27)
-dd  C_LABEL(E0_PLP)       ,C_LABEL(OpM0_0x29)
+dd  C_LABEL(OpE0_0x28)    ,C_LABEL(OpM0_0x29)
 dd  C_LABEL(OpM0_0x2A)    ,C_LABEL(OpE0_0x2B)
 dd  C_LABEL(OpM0_0x2C)    ,C_LABEL(OpM0_0x2D)
 dd  C_LABEL(OpM0_0x2E)    ,C_LABEL(OpM0_0x2F)
@@ -2500,11 +2500,11 @@ db opcode_clocks(3, 2, 0, 4, 1) ; FE INC a,x
 db opcode_clocks(4, 0, 0, 2, 1) ; FF SBC al,x
 
 OpTableMX:
-dd  C_LABEL(E0_BRK)       ,C_LABEL(OpE0M1_0x01)     ; 00
-dd  C_LABEL(E0_COP)       ,C_LABEL(OpM1_0x03)
+dd  C_LABEL(OpE0_0x00)    ,C_LABEL(OpE0M1_0x01)     ; 00
+dd  C_LABEL(OpE0_0x02)    ,C_LABEL(OpM1_0x03)
 dd  C_LABEL(OpE0M1_0x04)  ,C_LABEL(OpE0M1_0x05)
 dd  C_LABEL(OpE0M1_0x06)  ,C_LABEL(OpE0M1_0x07)
-dd  C_LABEL(E0_PHP)       ,C_LABEL(OpM1_0x09)
+dd  C_LABEL(OpE0_0x08)    ,C_LABEL(OpM1_0x09)
 dd  C_LABEL(OpM1_0x0A)    ,C_LABEL(OpE0_0x0B)
 dd  C_LABEL(OpM1_0x0C)    ,C_LABEL(OpM1_0x0D)
 dd  C_LABEL(OpM1_0x0E)    ,C_LABEL(OpM1_0x0F)
@@ -2520,7 +2520,7 @@ dd  C_LABEL(E0_JSR_a)     ,C_LABEL(OpE0M1_0x21)     ; 20
 dd  C_LABEL(E0_JSL_al)    ,C_LABEL(OpM1_0x23)
 dd  C_LABEL(OpE0M1_0x24)  ,C_LABEL(OpE0M1_0x25)
 dd  C_LABEL(OpE0M1_0x26)  ,C_LABEL(OpE0M1_0x27)
-dd  C_LABEL(E0_PLP)       ,C_LABEL(OpM1_0x29)
+dd  C_LABEL(OpE0_0x28)    ,C_LABEL(OpM1_0x29)
 dd  C_LABEL(OpM1_0x2A)    ,C_LABEL(OpE0_0x2B)
 dd  C_LABEL(OpM1_0x2C)    ,C_LABEL(OpM1_0x2D)
 dd  C_LABEL(OpM1_0x2E)    ,C_LABEL(OpM1_0x2F)
@@ -3211,11 +3211,11 @@ db opcode_clocks(3, 2, 0, 2, 1) ; FE INC a,x
 db opcode_clocks(4, 0, 0, 1, 1) ; FF SBC al,x
 
 OpTableE1:
-dd  C_LABEL(E1_BRK)       ,C_LABEL(OpE1_0x01)       ; 00
-dd  C_LABEL(E1_COP)       ,C_LABEL(OpM1_0x03)
+dd  C_LABEL(OpE1_0x00)    ,C_LABEL(OpE1_0x01)       ; 00
+dd  C_LABEL(OpE1_0x02)    ,C_LABEL(OpM1_0x03)
 dd  C_LABEL(OpE1_0x04)    ,C_LABEL(OpE1_0x05)
 dd  C_LABEL(OpE1_0x06)    ,C_LABEL(OpE1_0x07)
-dd  C_LABEL(E1_PHP)       ,C_LABEL(OpM1_0x09)
+dd  C_LABEL(OpE1_0x08)    ,C_LABEL(OpM1_0x09)
 dd  C_LABEL(OpM1_0x0A)    ,C_LABEL(OpE1_0x0B)
 dd  C_LABEL(OpM1_0x0C)    ,C_LABEL(OpM1_0x0D)
 dd  C_LABEL(OpM1_0x0E)    ,C_LABEL(OpM1_0x0F)
@@ -3231,7 +3231,7 @@ dd  C_LABEL(E1_JSR_a)     ,C_LABEL(OpE1_0x21)       ; 20
 dd  C_LABEL(E1_JSL_al)    ,C_LABEL(OpM1_0x23)
 dd  C_LABEL(OpE1_0x24)    ,C_LABEL(OpE1_0x25)
 dd  C_LABEL(OpE1_0x26)    ,C_LABEL(OpE1_0x27)
-dd  C_LABEL(E1_PLP)       ,C_LABEL(OpM1_0x29)
+dd  C_LABEL(OpE1_0x28)    ,C_LABEL(OpM1_0x29)
 dd  C_LABEL(OpM1_0x2A)    ,C_LABEL(OpE1_0x2B)
 dd  C_LABEL(OpM1_0x2C)    ,C_LABEL(OpM1_0x2D)
 dd  C_LABEL(OpM1_0x2E)    ,C_LABEL(OpM1_0x2F)
@@ -4231,6 +4231,14 @@ section .text
  adc byte %3,%3
 %endmacro
 
+%macro SETUPFLAGS 0-3 1,cl,al
+%if S_8bit
+ E1_SETUPFLAGS %1,%2,%3
+%else
+ E0_SETUPFLAGS %2,%3
+%endif
+%endmacro
+
 
 ;%macro Flags_65c816_to_Native_E0 0-1 R_P_B
 ; Restore the flags from 65c816 flag format to PC format
@@ -4309,6 +4317,15 @@ section .text
  sbb byte %1,%1
  mov byte B_C_flag,%1
 %endmacro
+
+%macro RESTOREFLAGS 0-2 cl,al
+%if S_8bit
+ E1_RESTOREFLAGS %1,%2
+%else
+ E0_RESTOREFLAGS %1,%2
+%endif
+%endmacro
+
 
 ; Set the current opcode execution and timing table pointers based
 ; on the M and X bits of flag register. This returns control to the

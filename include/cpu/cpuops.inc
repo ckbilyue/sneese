@@ -400,10 +400,10 @@ Clear_Opcode_Sizes
 
 ;%1 = vector, %2 = offset
 %macro NativeInterrupt 2
+ READ8_Immediate
  mov al,B_PB
  E0_PUSH_B
  GET_PC eax
- add eax,byte 2
  E0_PUSH_W
  E0_SETUPFLAGS          ; Put flags into true 65c816 format
  E0_PUSH_B
@@ -423,8 +423,8 @@ Clear_Opcode_Sizes
 
 ;%1 = vector, %2 = offset
 %macro Emu6502Interrupt 2
+ READ8_Immediate
  GET_PC eax
- add eax,byte 2
  E1_PUSH_W
  E1_SETUPFLAGS          ; Put flags into true 65c816 format
  E1_PUSH_B
