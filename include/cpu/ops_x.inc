@@ -1,4 +1,4 @@
-%define OPCODE_PROLOG(op) EXPORT_C OpX %+ X_8bit %+ _ %+ op
+%define OPCODE_PROLOG(op) OPCODE_LABEL OpX %+ X_8bit %+ _ %+ op
 
 
 OPCODE_PROLOG(0x88) ; DEY i

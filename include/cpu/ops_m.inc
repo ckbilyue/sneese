@@ -1,4 +1,4 @@
-%define OPCODE_PROLOG(op) EXPORT_C OpM %+ M_8bit %+ _ %+ op
+%define OPCODE_PROLOG(op) OPCODE_LABEL OpM %+ M_8bit %+ _ %+ op
 
 
 OPCODE_PROLOG(0x03) ; ORA d,s

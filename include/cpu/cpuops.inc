@@ -340,6 +340,11 @@ You must read and accept the license prior to use.
 %undef X_8bit
 %endmacro
 
+%macro OPCODE_LABEL 1
+ALIGNC
+EXPORT_C %1
+%endmacro
+
 
 Setup_Opcode_Sizes 8,8,8
 %include "cpu/ops_s.inc"
@@ -390,7 +395,7 @@ Setup_Opcode_Sizes 16,16,8
 Clear_Opcode_Sizes
 
 
-%define OPCODE_PROLOG(op) EXPORT_C Op_ %+ op
+%define OPCODE_PROLOG(op) OPCODE_LABEL Op_ %+ op
 
 
 ;%1 = vector, %2 = offset
@@ -452,10 +457,6 @@ EXPORT_C E0_BRK
 ALIGNC
 EXPORT_C E1_BRK
  Emu6502Interrupt B_IRQ_Evector,B_IRQ_Eoffset
-
-; 01
-EM_ORA Od_xO,Direct_Indexed_Indirect
-E0_ORA Od_xO,Direct_Indexed_Indirect
 
 ; 02
 
@@ -571,10 +572,6 @@ EXPORT_C E1_JSR_a
  mov eax,C_LABEL(Blank)
  jmp short .read_direct
 %endif
-
-; 21
-EM_AND Od_xO,Direct_Indexed_Indirect
-E0_AND Od_xO,Direct_Indexed_Indirect
 
 ; 22
 
@@ -863,10 +860,6 @@ EXPORT_C E1_RTI
  jmp .read_direct
 %endif
 
-; 41
-EM_EOR Od_xO,Direct_Indexed_Indirect
-E0_EOR Od_xO,Direct_Indexed_Indirect
-
 ; 42
 ALIGNC
 EXPORT_C ALL_WDM
@@ -1094,10 +1087,6 @@ EXPORT_C E1_RTS
  mov eax,C_LABEL(Blank)
  jmp short .read_direct
 %endif
-
-; 61
-EM_ADC Od_xO,Direct_Indexed_Indirect
-E0_ADC Od_xO,Direct_Indexed_Indirect
 
 ; 62
 
@@ -1406,10 +1395,6 @@ _TxS B_X,8,E1_TXS
 _TxY B_X,8,EX_TXY
 _TxY B_X,16,E0_TXY
 
-; A1
-EM_LDA Od_xO,Direct_Indexed_Indirect
-E0_LDA Od_xO,Direct_Indexed_Indirect
-
 ; A8
 _TxY B_A,8,EX_TAY
 _TxY B_A,16,E0_TAY
@@ -1435,10 +1420,6 @@ _TxX B_S,16,E0_TSX
 ; BB
 _TxX B_Y,8,EX_TYX
 _TxX B_Y,16,E0_TYX
-
-; C1
-EM_CMP Od_xO,Direct_Indexed_Indirect
-E0_CMP Od_xO,Direct_Indexed_Indirect
 
 ; C2
 
@@ -1684,10 +1665,6 @@ EXPORT_C ALL_JML_OaO
  jmp short .read_direct
 %endif
 
-; E1
-EM_SBC Od_xO,Direct_Indexed_Indirect
-E0_SBC Od_xO,Direct_Indexed_Indirect
-
 ; E2
 
 ALIGNC
@@ -1776,12 +1753,9 @@ EXPORT_C E1_SEP
 
  OPCODE_EPILOG
 
-; EA
-
-ALIGNC
-EXPORT_C ALL_NOP
+OPCODE_PROLOG(0xEA)
  ADDR_Implied
- OPCODE_EPILOG
+OPCODE_EPILOG
 
 ; EB
 

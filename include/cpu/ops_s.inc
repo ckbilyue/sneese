@@ -1,4 +1,4 @@
-%define OPCODE_PROLOG(op) EXPORT_C OpE %+ S_8bit %+ _ %+ op
+%define OPCODE_PROLOG(op) OPCODE_LABEL OpE %+ S_8bit %+ _ %+ op
 
 
 

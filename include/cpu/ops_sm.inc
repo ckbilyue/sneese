@@ -1,7 +1,7 @@
 %if S_size == 8
-%define OPCODE_PROLOG(op) EXPORT_C OpE1_ %+ op
+%define OPCODE_PROLOG(op) OPCODE_LABEL OpE1_ %+ op
 %else
-%define OPCODE_PROLOG(op) EXPORT_C OpE0M %+ M_8bit %+ _ %+ op
+%define OPCODE_PROLOG(op) OPCODE_LABEL OpE0M %+ M_8bit %+ _ %+ op
 %endif
 
 
