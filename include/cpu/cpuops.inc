@@ -1622,17 +1622,9 @@ EXPORT_C ALL_BRL        ; Branch always long (-32768 to 32767)
 EM_STA d_s,Stack_Relative
 E0_STA d_s,Stack_Relative
 
-; 84
-EX_STY d,Direct
-E0_STY d,Direct
-
 ; 85
 EM_STA d,Direct
 E0_STA d,Direct
-
-; 86
-EX_STX d,Direct
-E0_STX d,Direct
 
 ; 87
 EM_STA IdI,Direct_Indirect_Long
@@ -1664,17 +1656,9 @@ _TxA B_X,16,E0_TXA
 E0_PUSH8 B_DB,E0_PHB    ; Push DB(B) onto stack
 E1_PUSH8 B_DB,E1_PHB
 
-; 8C
-EX_STY a,Absolute
-E0_STY a,Absolute
-
 ; 8D
 EM_STA a,Absolute
 E0_STA a,Absolute
-
-; 8E
-EX_STX a,Absolute
-E0_STX a,Absolute
 
 ; 8F
 EM_STA al,Absolute_Long
@@ -1695,17 +1679,9 @@ E0_STA OdO,Direct_Indirect
 EM_STA Od_sO_y,Stack_Relative_Indirect_Indexed
 E0_STA Od_sO_y,Stack_Relative_Indirect_Indexed
 
-; 94
-EX_STY d_x,Direct_Index_X
-E0_STY d_x,Direct_Index_X
-
 ; 95
 EM_STA d_x,Direct_Index_X
 E0_STA d_x,Direct_Index_X
-
-; 96
-EX_STX d_y,Direct_Index_Y
-E0_STX d_y,Direct_Index_Y
 
 ; 97
 EM_STA IdI_y,Direct_Indirect_Indexed_Long
