@@ -51,7 +51,7 @@ db  0,0,1,1
 
 HDMA_Size:
 db  1,2,2,4
-db  4,2,2,4
+db  4,4,2,4
 
 section .bss
 %macro DMA_DATA 1

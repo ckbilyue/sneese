@@ -45,6 +45,8 @@ Changes
   SPC700: Implemented correct RAM initialization pattern (fill each
    byte with bit 5 of its address); thanks to Overload for research,
    and MKendora for informing me of the findings [TRAC]
+  DMA: Corrected behavior of HDMA mode 5, thanks to anomie for the
+   information [TRAC]
  0.80
   Misc: Fixed a flaw where divide result registers were not changed
    by division-by-zero [TRAC]
