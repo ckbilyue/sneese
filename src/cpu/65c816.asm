@@ -4989,6 +4989,8 @@ EXTERN_C DisplayStatus,readkey,keypressed
  popa
 .off:
 %endif
+;GET_PC ebx
+;GET_BYTE
  mov al,[R_NativePC]    ; Get opcode
  mov edx,B_OpTable
  xor ebx,ebx

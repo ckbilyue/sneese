@@ -199,25 +199,25 @@ ALIGNC
 
 ;%1 = flag
 %macro _BFC 1
- add R_NativePC,byte 2
+ READ8_Immediate
  JUMP_FLAG %1,C_LABEL(CPU_RETURN),near  ; flag set
- movsx eax,byte [R_NativePC - 1]    ; sign extend for addition
+ movsx eax,al                   ; sign extend for addition
  add R_Cycles,byte 6            ; branch taken
  add R_NativePC,eax
 %endmacro
 
 ;%1 = flag
 %macro _BFS 1
- add R_NativePC,byte 2
+ READ8_Immediate
  JUMP_NOT_FLAG %1,C_LABEL(CPU_RETURN),near  ; flag clear
- movsx eax,byte [R_NativePC - 1]    ; sign extend for addition
+ movsx eax,al                   ; sign extend for addition
  add R_Cycles,byte 6            ; branch taken
  add R_NativePC,eax
 %endmacro
 
 %macro _BRA 0
- add R_NativePC,byte 2
- movsx eax,byte [R_NativePC - 1]    ; sign extend for addition
+ READ8_Immediate
+ movsx eax,al                   ; sign extend for addition
 ;add R_Cycles,byte 6            ; branch taken
  add R_NativePC,eax
 %endmacro
@@ -397,14 +397,10 @@ ALIGNC
 %macro _MVX 1
  push ebx           ; Cycles per instruction iteration
 .again:
- mov al,[1+R_NativePC]  ; Dest bank
- mov bl,[2+R_NativePC]  ; Src bank
- mov B_DB,al
-%if X_8bit
- mov al,B_X         ; Source address, 8-bit
-%else
- mov eax,B_X        ; Source address, 16-bit
-%endif
+ READ16_Immediate
+ mov B_DB,al            ; Dest bank
+ movzx ebx,ah           ; Src bank
+ mov eax,B_X        ; Source address
  shl ebx,16
  add ebx,eax
 %ifidni %1,MVN
@@ -421,11 +417,7 @@ ALIGNC
 %endif
  GET_BYTE
  mov ebx,B_DB_Shifted
-%if X_8bit
- mov bl,B_Y         ; Dest address, 8-bit
-%else
- mov bx,B_Y         ; Dest address, 16-bit
-%endif
+ add ebx,B_Y        ; Dest address
  SET_BYTE
  mov eax,B_A
 %ifidni %1,MVN
@@ -442,16 +434,16 @@ ALIGNC
  mov B_Y,bx
 %endif
  jc  .done
+ sub R_NativePC,byte 3
  test R_Cycles,R_Cycles
  jge .event
  mov B_A,ax
  add R_Cycles,[esp]
- xor eax,eax
- xor ebx,ebx
+ GET_PC ebx
+ GET_BYTE
  jmp .again
 ALIGNC
 .done:
- add R_NativePC,byte 3
 .event:
  mov B_A,ax
  pop edx
