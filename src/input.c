@@ -28,6 +28,7 @@ You must read and accept the license prior to use.
  */
 
 #include <ctype.h>
+#include <string.h>
 
 #include "wrapaleg.h"
 
