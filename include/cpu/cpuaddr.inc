@@ -130,10 +130,26 @@ You must read and accept the license prior to use.
  add R_NativePC,byte 2
 %endmacro
 
-%macro READ16_Immediate 0
+%macro READ16_Immediate 0-1 0
  mov al,[1+R_NativePC]
  mov ah,[2+R_NativePC]
+%ifnidni %1,JSR
+%ifnidni %1,JMP
  add R_NativePC,byte 3
+%endif
+%else
+ add R_NativePC,byte 2
+%endif
+%endmacro
+
+%macro READ24_Immediate 0-1 0
+ mov al,[3+R_NativePC]
+ shl eax,16
+ mov al,[1+R_NativePC]
+ mov ah,[2+R_NativePC]
+%ifnidni %1,JMP
+ add R_NativePC,byte 4
+%endif
 %endmacro
 
 ; Absolute
@@ -899,26 +915,20 @@ You must read and accept the license prior to use.
 ;  Address = a16
 ;  Address set to PC
 ;    JSR-20
-;
 ; 3 bytes, 6 cycles
 ;
-;       1   1  1   1  1 PBR,PC      Op Code     1
-;       2   1  1   0  1 PBA,PC+1    NEW FCC     1
-;       3   1  1   0  1 PBR,PC+2    NEW PCH     1
-;       4   1  1   0  0 PBR,PC+2    IO          1
-;       5   1  1   1  0 0,S         PCH         0
-;       6   1  1   1  0 0,S-1       PCL         0
-;       1   1  1   1  1 PBA,NEWPC   New Op Code 1
-;
 ;    JMP-4C
-;
 ; 3 bytes, 3 cycles
 ;
-;       1   1  1   1  1 PBR,PC      Op Code     1
-;       2   1  1   0  1 PBR,PC+1    NEW PCL     1
-;       3   1  1   0  1 PBR,PC+2    NEW PCH     1
-;       1   1  1   1  1 PBR,NEWPC   New Op Code 1
 %macro ADDR_Absolute_JMP 0
- mov al,[1+R_NativePC]
- mov ah,[2+R_NativePC]
+ READ16_Immediate JMP
 %endmacro
+
+%macro ADDR_Absolute_JSR 0
+ READ16_Immediate JSR
+%endmacro
+
+%macro ADDR_Absolute_Long_JMP 0
+ READ24_Immediate JMP
+%endmacro
+

@@ -27,6 +27,45 @@ OPCODE_PROLOG(0x1B) ; TCS i
  _TxS B_A
 OPCODE_EPILOG
 
+OPCODE_PROLOG(0x20) ; JSR a
+%ifdef TRAP_INVALID_JUMP
+ mov [C_LABEL(Map_Byte)],eax
+%endif
+ ADDR_Absolute_JSR
+
+ push eax
+ GET_PC eax          ; last instruction byte PC in ax
+ PUSH_W              ; Address of last byte, not next instruction
+ pop eax
+
+ mov ebx,B_PB_Shifted
+ mov R_NativePC,eax
+ add eax,ebx
+
+ shr eax,13
+ mov eax,[C_LABEL(Read_Bank8Offset)+eax*4]
+ test eax,eax
+ jz .read_non_linear
+
+ add eax,ebx
+.read_direct:
+
+ add R_NativePC,eax
+ mov B_PBOffset,eax
+
+ OPCODE_EPILOG
+
+.read_non_linear:
+%ifdef TRAP_INVALID_JUMP
+ mov byte [C_LABEL(Map_Byte)+3],0x20
+ mov [C_LABEL(Map_Address)],ebx
+ jmp _InvalidJump
+%else
+ mov eax,C_LABEL(Blank)
+ jmp short .read_direct
+%endif
+OPCODE_EPILOG
+
 OPCODE_PROLOG(0x28) ; PLP s
  ADDR_Implied
  PULL_B

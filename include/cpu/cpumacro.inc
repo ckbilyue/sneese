@@ -26,7 +26,6 @@ You must read and accept the license prior to use.
 
 ;%1 = emulation mode vector, %2 = native mode vector
 %macro SoftwareInterrupt 2
- ud2
  READ8_Immediate
 %if S_8bit == 0 ; native mode interrupt
  mov al,B_PB

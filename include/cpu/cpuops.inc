@@ -402,82 +402,6 @@ OPCODE_PROLOG(0x18) ; CLC i
  _CLx C         ; Clear Carry flag
 OPCODE_EPILOG
 
-; 20
-
-ALIGNC
-EXPORT_C E0_JSR_a
- GET_PC eax
-%ifdef TRAP_INVALID_JUMP
- mov [C_LABEL(Map_Byte)],eax
-%endif
- add eax,byte 2      ; last instruction byte PC in ax
- E0_PUSH_W           ; Address of last byte not next instruction (huh!)
- ADDR_Absolute_JMP
-
- mov ebx,B_PB_Shifted
- mov R_NativePC,eax
- or eax,ebx
-
- shr eax,13
- mov eax,[C_LABEL(Read_Bank8Offset)+eax*4]
- test eax,eax
- jz .read_non_linear
-
- add eax,ebx
-.read_direct:
-
- add R_NativePC,eax
- mov B_PBOffset,eax
-
- OPCODE_EPILOG
-
-.read_non_linear:
-%ifdef TRAP_INVALID_JUMP
- mov byte [C_LABEL(Map_Byte)+3],0x20
- mov [C_LABEL(Map_Address)],ebx
- jmp _InvalidJump
-%else
- mov eax,C_LABEL(Blank)
- jmp short .read_direct
-%endif
-
-ALIGNC
-EXPORT_C E1_JSR_a
- GET_PC eax
-%ifdef TRAP_INVALID_JUMP
- mov [C_LABEL(Map_Byte)],eax
-%endif
- add eax,byte 2      ; last instruction byte PC in ax
- E1_PUSH_W           ; Address of last byte not next instruction (huh!)
- ADDR_Absolute_JMP
-
- mov ebx,B_PB_Shifted
- mov R_NativePC,eax
- or eax,ebx
-
- shr eax,13
- mov eax,[C_LABEL(Read_Bank8Offset)+eax*4]
- test eax,eax
- jz .read_non_linear
-
- add eax,ebx
-.read_direct:
-
- add R_NativePC,eax
- mov B_PBOffset,eax
-
- OPCODE_EPILOG
-
-.read_non_linear:
-%ifdef TRAP_INVALID_JUMP
- mov byte [C_LABEL(Map_Byte)+3],0x20
- mov [C_LABEL(Map_Address)],ebx
- jmp _InvalidJump
-%else
- mov eax,C_LABEL(Blank)
- jmp short .read_direct
-%endif
-
 ; 22
 
 ALIGNC
@@ -719,10 +643,7 @@ OPCODE_PROLOG(0x42) ; WDM
  READ8_Immediate
 OPCODE_EPILOG
 
-; 4C
-
-ALIGNC
-EXPORT_C ALL_JMP_a
+OPCODE_PROLOG(0x4C) ; JMP a
 %ifdef TRAP_INVALID_JUMP
  GET_PC eax
  mov [C_LABEL(Map_Byte)],eax
@@ -755,6 +676,7 @@ EXPORT_C ALL_JMP_a
  mov eax,C_LABEL(Blank)
  jmp short .read_direct
 %endif
+OPCODE_EPILOG
 
 OPCODE_PROLOG(0x58) ; CLI i
  mov cl,B_I_flag
@@ -778,20 +700,18 @@ OPCODE_PROLOG(0x5B) ; TCD i
  _TCD
 OPCODE_EPILOG
 
-; 5C
-
-ALIGNC
-EXPORT_C ALL_JML_al
+OPCODE_PROLOG(0x5C) ; JML al
 %ifdef TRAP_INVALID_JUMP
  GET_PC eax
  mov [C_LABEL(Map_Byte)],eax
 %endif
- mov al,[1+R_NativePC]
- xor ebx,ebx
- mov ah,[2+R_NativePC]
- mov bl,[3+R_NativePC]
+ ADDR_Absolute_Long_JMP
+ mov ebx,eax
+ shr ebx,16
+
  mov B_PB,bl
- mov R_NativePC,eax
+ mov R_NativePC,(1 << 16) - 1
+ and R_NativePC,eax
  test [MEMSEL],bl       ; Check bus speed against PB
  mov al,[C_LABEL(FastROM_offset)]
  jnz .fastrom
@@ -826,6 +746,7 @@ EXPORT_C ALL_JML_al
  mov edx,C_LABEL(Blank)
  jmp short .read_direct
 %endif
+OPCODE_EPILOG
 
 ; 60
 
