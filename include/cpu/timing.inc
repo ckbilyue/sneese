@@ -43,6 +43,8 @@ You must read and accept the license prior to use.
 
 EXTERN_C FPSTicks
 EXTERN_C UPDATE_KEYS
+EXTERN_C CONTROLLER_1_TYPE,CONTROLLER_2_TYPE
+EXTERN_C MickeyMouse,MickeyRead,MouseButtons
 
 %define FRAME_LIMIT 0
 ; Set this to force emulation loop to break after x frames have been
@@ -68,6 +70,36 @@ ALIGND
 EXPORT LineM7       ,skipw 6*239
 EXPORT ScreenLineHoles  ,skipb (256+128)/8
 %endif
+
+JOYC1:      skipb   ; This holds the controller read control byte
+EXPORT_C Controller1_Pos,skipb  ; Shift count for controller 1 read
+EXPORT_C Controller23_Pos,skipb ; Shift count for controller 2/3 read
+EXPORT_C Controller45_Pos,skipb ; Shift count for controller 4/5 read
+
+ALIGNB
+; These are updated per VBL rather than per read!
+EXPORT_C JOY1L,skipb
+EXPORT_C JOY1H,skipb 3
+EXPORT_C JOY2L,skipb
+EXPORT_C JOY2H,skipb 3
+; These are not updated yet
+EXPORT_C JOY3L,skipb
+EXPORT_C JOY3H,skipb 3
+EXPORT_C JOY4L,skipb
+EXPORT_C JOY4H,skipb 3
+
+RDDIV:
+RDDIVL:     skipb   ; Quotient of divide
+RDDIVH:     skipb
+RDMPY:
+RDMPYL:     skipb   ; Multiplication or remainder
+RDMPYH:     skipb
+WRMPY:
+WRMPYA:     skipb   ; Multiplicand A
+WRMPYB:     skipb   ; Multiplicand B
+WRDIV:
+WRDIVL:     skipb   ; Dividend C
+WRDIVH:     skipb
 
 EXPORT_C LastRenderLine ,skipl
 EXPORT_C LastVBLLine    ,skipl
@@ -109,7 +141,11 @@ EXPORT OPHCT,skipb  ; Whether reading lo or high byte
 EXPORT OPVCT,skipb  ; Whether reading lo or high byte
 RDNMI:      skipb   ; x000vvvv  x=disable/enable NMI,vvvv=version
 EXPORT_C NMITIMEN,skipb ; a0yx000b  a=NMI on/off,y=vert count,x=horiz count,b=joy read
-EXPORT_C WRIO,skipb     ; lxxxxxxx  l=counter latched when set, x=unknown
+; I/O port register - bit 7 affects H/V counter, all bits used for output
+EXPORT_C WRIO,skipb     ; lxxxxxxx  l=counter latched when set
+; I/O port register - value CPU is receiving
+; RDIO register reads return this value ANDed with value in WRIO
+EXPORT_C RDIO,skipb
 EXPORT HVBJOY,skipb
 ; Nonzero if an IRQ set for current line has not been reached yet
 ;IRQ_set_this_line:skipb
@@ -1064,30 +1100,146 @@ EXPORT SNES_R213D ; OPVCT
  mov al,[Latched_V+1]
  ret
 
+; Write to 40xx handlers
+ALIGNC
+EXPORT SNES_W4016 ; JOYC1
+ test al,1
+ jnz .no_ready_reset
+ push eax
+ mov al,[JOYC1]
+ test al,1
+ jz .no_reset
+ mov al,16
+ mov [C_LABEL(Controller1_Pos)],al
+ mov [C_LABEL(Controller23_Pos)],al
+ mov [C_LABEL(Controller45_Pos)],al
+.no_reset:
+ pop eax
+.no_ready_reset:
+ mov [JOYC1],al
+ ret
+
+ALIGNC
+EXPORT SNES_W4017 ; JOYC2
+ ret
+
+; Read from 40xx handlers
+%if 0
+ SNEeSe 0.13, random speculation time, this register or at least bit 0
+  handles input for controller 1
+
+ v0.15 17th bit is an indication of joypad connected status
+
+ $4016 is very similar in function (almost identical) to the register at
+  the same address on the NES/Famicom
+
+%endif
+
+ALIGNC
+EXPORT SNES_R4016 ; JOYC1
+ test byte [JOYC1],1
+ jz .read_enabled
+ mov al,0
+ ret
+
+.read_enabled:
+ push ecx
+ push ebx
+ cmp byte [C_LABEL(CONTROLLER_1_TYPE)],1    ; Is mouse plugged in?
+ je .do_mouse
+
+ mov cl,[C_LABEL(Controller1_Pos)]
+ dec cl
+ mov ebx,[C_LABEL(JOY1L)]
+ mov [C_LABEL(Controller1_Pos)],cl
+ ror ebx,cl
+ mov al,1
+ and al,bl
+ pop ebx
+ pop ecx
+ ret
+
+.unused:
+ mov byte [C_LABEL(Controller1_Pos)],16
+ mov al,1           ; Joypad connected
+ pop ebx
+ pop ecx
+ ret
+
+ALIGNC
+.do_mouse:
+ mov cl,[C_LABEL(Controller1_Pos)]
+ dec cl
+ and cl,0x0F
+ mov [C_LABEL(Controller1_Pos)],cl
+ mov bx,[C_LABEL(MickeyRead)]
+ shr bx,cl
+ mov al,1
+ and al,bl
+ pop ebx
+ pop ecx
+ ret
+
+ALIGNC
+EXPORT SNES_R4017 ; JOYC2
+ test byte [JOYC1],1
+ jz .read_enabled
+ mov al,0
+ ret
+
+.read_enabled:
+ push ecx
+ push ebx
+ cmp byte [C_LABEL(CONTROLLER_2_TYPE)],1    ; Is mouse plugged in?
+ je .do_mouse
+
+ mov cl,[C_LABEL(Controller23_Pos)]
+ dec cl
+ mov ebx,[C_LABEL(JOY2L)]
+ mov [C_LABEL(Controller23_Pos)],cl
+ ror ebx,cl
+ mov al,bl
+ and al,1
+ pop ebx
+ pop ecx
+ ret
+
+.unused:
+ mov byte [C_LABEL(Controller23_Pos)],16
+ mov al,1           ; (???) Return 0 this bit is for mtap I think
+ pop ebx
+ pop ecx
+ ret
+
+ALIGNC
+.do_mouse:
+ mov cl,[C_LABEL(Controller23_Pos)]
+ dec cl
+ and cl,0x0F
+ mov [C_LABEL(Controller23_Pos)],cl
+ mov bx,[C_LABEL(MickeyRead)]
+ shr bx,cl
+ mov al,bl
+ and al,1
+ pop ebx
+ pop ecx
+ ret
+
+
+; Read from 42xx handlers
 ALIGNC
 EXPORT SNES_R4200 ; NMITIMEN
  mov al,[C_LABEL(NMITIMEN)]
  ret
 
 ALIGNC
-EXPORT SNES_W4201 ; WRIO
- mov dl,[C_LABEL(WRIO)]
- cmp dl,al
- je .no_change
+EXPORT SNES_R4202 ; WRMPYA
+ mov al,[WRMPYA]
+ ret
 
- xor dl,al
- mov [C_LABEL(WRIO)],al
-
- test al,al
- jns .no_latch
-
- test dl,dl
- jns .no_latch
-
- call SNES_R2137
-.no_latch:
-
-.no_change:
+ALIGNC
+EXPORT SNES_R4203 ; WRMPYB
+ mov al,[WRMPYB]
  ret
 
 ALIGNC
@@ -1156,6 +1308,87 @@ EXPORT SNES_R4212 ; HVBJOY
  ret
 
 ALIGNC
+EXPORT SNES_R4213 ; RDIO
+ mov al,[C_LABEL(RDIO)]
+ and al,[C_LABEL(WRIO)]
+ ret
+
+ALIGNC
+EXPORT SNES_R4214 ; RDDIVL
+ mov al,[RDDIVL]
+ ret
+
+ALIGNC
+EXPORT SNES_R4215 ; RDDIVH
+ mov al,[RDDIVH]
+ ret
+
+ALIGNC
+EXPORT SNES_R4216 ; RDMPYL
+ mov al,[RDMPYL]
+ ret
+
+ALIGNC
+EXPORT SNES_R4217 ; RDMPYH
+ mov al,[RDMPYH]
+ ret
+
+ALIGNC
+EXPORT SNES_R4218 ; JOY1L
+ cmp byte [C_LABEL(CONTROLLER_1_TYPE)],1    ; Is mouse plugged in?
+ je .mouse
+ mov al,[C_LABEL(JOY1L)]
+ ret
+
+.mouse:
+ mov al,[C_LABEL(MouseButtons)]
+ or al,0x01
+ ret
+
+ALIGNC
+EXPORT SNES_R4219 ; JOY1H
+ mov al,[C_LABEL(JOY1H)]
+ ret
+
+ALIGNC
+EXPORT SNES_R421A ; JOY2L
+ cmp byte [C_LABEL(CONTROLLER_2_TYPE)],1    ; Is mouse plugged in?
+ je .mouse
+ mov al,[C_LABEL(JOY2L)]
+ ret
+
+.mouse:
+ mov al,[C_LABEL(MouseButtons)]
+ or al,0x01
+ ret
+
+ALIGNC
+EXPORT SNES_R421B ; JOY2H
+ mov al,[C_LABEL(JOY2H)]
+ ret
+
+ALIGNC
+EXPORT SNES_R421C ; JOY3L
+ mov al,[C_LABEL(JOY3L)]
+ ret
+
+ALIGNC
+EXPORT SNES_R421D ; JOY3H
+ mov al,[C_LABEL(JOY3H)]
+ ret
+
+ALIGNC
+EXPORT SNES_R421E ; JOY4L
+ mov al,[C_LABEL(JOY4L)]
+ ret
+
+ALIGNC
+EXPORT SNES_R421F ; JOY4H
+ mov al,[C_LABEL(JOY4H)]
+ ret
+
+; Write to 42xx handlers
+ALIGNC
 EXPORT SNES_W4200 ; NMITIMEN
 ; a0yx000b  a=NMI on/off,y=vert count,x=horiz count,b=joy read
  cmp [C_LABEL(NMITIMEN)],al
@@ -1171,6 +1404,79 @@ EXPORT SNES_W4200 ; NMITIMEN
  pop ebx
 .no_change:
  and byte [IRQ_pin],0x1F
+ ret
+
+ALIGNC
+EXPORT SNES_W4201 ; WRIO
+ mov dl,[C_LABEL(WRIO)]
+ cmp dl,al
+ je .no_change
+
+ xor dl,al
+ mov [C_LABEL(WRIO)],al
+
+ test al,al
+ jns .no_latch
+
+ test dl,dl
+ jns .no_latch
+
+ call SNES_R2137
+.no_latch:
+
+.no_change:
+ ret
+
+ALIGNC
+EXPORT SNES_W4202 ; WRMPYA
+ mov [WRMPYA],al
+ ret
+
+ALIGNC
+EXPORT SNES_W4203 ; WRMPYB
+ push eax
+ mov [WRMPYB],al
+ mul byte [WRMPYA]  ; Do the multiplication
+ mov [RDMPY],ax
+ pop eax
+ ret
+
+ALIGNC
+EXPORT SNES_W4204 ; WRDIVL
+ mov [WRDIVL],al
+ ret
+
+ALIGNC
+EXPORT SNES_W4205 ; WRDIVH
+ mov [WRDIVH],al
+ ret
+
+ALIGNC
+EXPORT SNES_W4206 ; WRDIVB
+ push eax
+ push ebx
+;push edx
+ test al,al
+ jz .divide_by_zero
+ xor ebx,ebx
+ xor edx,edx    ; Divide uses DX:AX / BX
+ mov bl,al
+ mov ax,[WRDIV]
+ div bx         ; Result is ax=quotient,dx=remainder
+ mov [RDDIV],ax
+ mov [RDMPY],dx
+;pop edx
+ pop ebx
+ pop eax
+ ret
+
+.divide_by_zero:
+ mov ax,[WRDIV]
+ mov [RDMPY],ax
+ mov word [RDDIV],0xFFFF
+;pop edx
+ pop ebx
+ pop eax
  ret
 
 ALIGNC

@@ -4549,7 +4549,7 @@ ALIGNC
 EXPORT_C Reset_CPU
  pusha
 
- call Invalidate_Tile_Caches
+ call Reset_DMA
 
  ; Reset timing registers
  xor eax,eax
@@ -4561,7 +4561,6 @@ EXPORT_C Reset_CPU
  mov [MEMSEL],al
  mov [HVBJOY],al
  mov [C_LABEL(NMITIMEN)],al
- mov byte [C_LABEL(WRIO)],0xFF
  mov [C_LABEL(HTIMEL)],eax
  mov [C_LABEL(VTIMEL)],eax
 
@@ -4569,6 +4568,26 @@ EXPORT_C Reset_CPU
 %ifndef NO_FASTROM
  mov byte [C_LABEL(CycleTable)],4
 %endif
+
+ ; Reset other registers
+ mov byte [C_LABEL(WRIO)],0xFF
+ mov byte [C_LABEL(RDIO)],0xFF
+ mov [WRMPYA],al
+ mov [WRDIVL],al
+ mov [WRDIVH],al
+ mov [RDDIVL],al
+ mov [RDDIVH],al
+ mov [RDMPYL],al
+ mov [RDMPYH],al
+
+ mov [JOYC1],al
+ mov byte [C_LABEL(Controller1_Pos)],16
+ mov byte [C_LABEL(Controller23_Pos)],16
+ mov byte [C_LABEL(Controller45_Pos)],16
+ mov dword [C_LABEL(JOY1L)],(1<<31)
+ mov dword [C_LABEL(JOY2L)],(1<<31)
+ mov dword [C_LABEL(JOY3L)],(1<<31)
+ mov dword [C_LABEL(JOY4L)],(1<<31)
 
  ; Reset hardware ports
  call Reset_Ports

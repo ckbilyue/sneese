@@ -33,24 +33,23 @@ You must read and accept the license prior to use.
 
 EXTERN SNES_R2137,SNES_R213C,SNES_R213D
 
-EXTERN SNES_R4200,SNES_R4210,SNES_R4211,SNES_R4212
+EXTERN SNES_R4016,SNES_R4017
+EXTERN SNES_R4200,SNES_R4202,SNES_R4203
+EXTERN SNES_R4210,SNES_R4211,SNES_R4212,SNES_R4213
+EXTERN SNES_R4214,SNES_R4215,SNES_R4216,SNES_R4217
+EXTERN SNES_R4218,SNES_R4219,SNES_R421A,SNES_R421B
+EXTERN SNES_R421C,SNES_R421D,SNES_R421E,SNES_R421F
 
-EXTERN SNES_W4200,SNES_W4201,SNES_W4207,SNES_W4208
-EXTERN SNES_W4209,SNES_W420A,SNES_W420D,SNES_W4210
-EXTERN SNES_W4211
+EXTERN SNES_W4016,SNES_W4017
+EXTERN SNES_W4200,SNES_W4201,SNES_W4202,SNES_W4203
+EXTERN SNES_W4204,SNES_W4205,SNES_W4206,SNES_W4207
+EXTERN SNES_W4208,SNES_W4209,SNES_W420A,SNES_W420D
+EXTERN SNES_W4210,SNES_W4211
 EXTERN HVBJOY
 
 EXTERN_C LastRenderLine
 EXTERN_C BrightnessLevel
 EXTERN_C NMITIMEN
-EXTERN_C CONTROLLER_1_TYPE,CONTROLLER_2_TYPE
-EXTERN_C MickeyMouse,MickeyRead,MouseButtons
-EXTERN_C KEY_A_1,KEY_X_1,KEY_L_1,KEY_R_1
-EXTERN_C KEY_B_1,KEY_Y_1,KEY_SELECT_1,KEY_START_1
-EXTERN_C KEY_UP_1,KEY_DOWN_1,KEY_LEFT_1,KEY_RIGHT_1
-EXTERN_C KEY_A_2,KEY_X_2,KEY_L_2,KEY_R_2
-EXTERN_C KEY_B_2,KEY_Y_2,KEY_SELECT_2,KEY_START_2
-EXTERN_C KEY_UP_2,KEY_DOWN_2,KEY_LEFT_2,KEY_RIGHT_2
 EXTERN_C Real_SNES_Palette
 EXTERN OPHCT,OPVCT
 EXTERN_C SNES_COUNTRY
@@ -385,40 +384,10 @@ WMADDL:     skipb   ; Work RAM Address Lo Byte
 WMADDM:     skipb   ; Work RAM Address Mid Byte
 WMADDH:     skipb   ; Work RAM Address Hi Byte - Just bit 0 used!
             skipb
-JOYC1:      skipb   ; This holds the controller read control byte
-EXPORT_C Controller1_Pos,skipb  ; Shift count for controller 1 read
-EXPORT_C Controller23_Pos,skipb ; Shift count for controller 2/3 read
-EXPORT_C Controller45_Pos,skipb ; Shift count for controller 4/5 read
-
-RDDIV:
-RDDIVL:     skipb   ; Quotient of divide
-RDDIVH:     skipb
-RDMPY:
-RDMPYL:     skipb   ; Multiplication or remainder
-RDMPYH:     skipb
-WRMPY:
-WRMPYA:     skipb   ; Multiplicand A
-WRMPYB:     skipb   ; Multiplicand B
-WRDIV:
-WRDIVL:     skipb   ; Dividend C
-WRDIVH:     skipb
-
 CGHigh:     skipb   ; Holds whether writing to first or second byte
 CGReadHigh: skipb   ; Whether reading lo or high byte
 
 BGOFS_Last_Write:skipb
-
-ALIGNB
-; These are updated per VBL rather than per read!
-EXPORT_C JOY1L,skipb
-EXPORT_C JOY1H,skipb 3
-EXPORT_C JOY2L,skipb
-EXPORT_C JOY2H,skipb 3
-; These are not updated yet
-EXPORT_C JOY3L,skipb
-EXPORT_C JOY3H,skipb 3
-EXPORT_C JOY4L,skipb
-EXPORT_C JOY4H,skipb 3
 
 EXPORT_C Current_Line_Timing,skipl
 
@@ -524,18 +493,8 @@ EXPORT Reset_Ports
  pusha
 
  call C_LABEL(Reset_Sprites)
- call Reset_DMA
  call C_LABEL(Reset_Mode_7)
-
-; cld
-; mov edi,C_LABEL(PortRAM)
-; mov ecx,0x6000 / 4
-; mov eax,-1     ; Reset to 0xFF
-; push es
-; push ds
-; pop es
-; rep stosd
-; pop es
+ call Invalidate_Tile_Caches
 
  ; Reset renderer
  mov byte [C_LABEL(Layer_Disable_Mask)],0xFF
@@ -613,14 +572,6 @@ EXPORT Reset_Ports
  mov [NBABG3],al
  mov [NBABG4],al
 
- mov [WRMPYA],al
- mov [WRDIVL],al
- mov [WRDIVH],al
- mov [RDDIVL],al
- mov [RDDIVH],al
- mov [RDMPYL],al
- mov [RDMPYH],al
-
  mov [C_LABEL(WH0)],al
  mov [C_LABEL(WH2)],al
  inc eax
@@ -640,15 +591,6 @@ EXPORT Reset_Ports
  mov [C_LABEL(COLDATA)],eax
  mov [C_LABEL(CGWSEL)],al
  mov [C_LABEL(CGADSUB)],al
-
- mov [JOYC1],al
- mov byte [C_LABEL(Controller1_Pos)],16
- mov byte [C_LABEL(Controller23_Pos)],16
- mov byte [C_LABEL(Controller45_Pos)],16
- mov dword [C_LABEL(JOY1L)],(1<<31)
- mov dword [C_LABEL(JOY2L)],(1<<31)
- mov dword [C_LABEL(JOY3L)],(1<<31)
- mov dword [C_LABEL(JOY4L)],(1<<31)
 
  mov [C_LABEL(BrightnessLevel)],al
  mov byte [C_LABEL(INIDISP)],0x80
@@ -1049,201 +991,29 @@ SNES_R21C3: ; Unknown? SNES test cart reads it, returning same value as 9X
  ret
 
 ; Read from 40xx handlers
-%if 0
- SNEeSe 0.13, random speculation time, this register or at least bit 0
-  handles input for controller 1
-
- v0.15 17th bit is an indication of joypad connected status
-
- $4016 is very similar in function (almost identical) to the register at
-  the same address on the NES/Famicom
-
-%endif
-
-ALIGNC
-SNES_R4016: ; JOYC1
- test byte [JOYC1],1
- jz .read_enabled
- mov al,0
- ret
-
-.read_enabled:
- push ecx
- push ebx
- cmp byte [C_LABEL(CONTROLLER_1_TYPE)],1    ; Is mouse plugged in?
- je .do_mouse
-
- mov cl,[C_LABEL(Controller1_Pos)]
- dec cl
- mov ebx,[C_LABEL(JOY1L)]
- mov [C_LABEL(Controller1_Pos)],cl
- ror ebx,cl
- mov al,1
- and al,bl
- pop ebx
- pop ecx
- ret
-
-.unused:
- mov byte [C_LABEL(Controller1_Pos)],16
- mov al,1           ; Joypad connected
- pop ebx
- pop ecx
- ret
-
-ALIGNC
-.do_mouse:
- mov cl,[C_LABEL(Controller1_Pos)]
- dec cl
- and cl,0x0F
- mov [C_LABEL(Controller1_Pos)],cl
- mov bx,[C_LABEL(MickeyRead)]
- shr bx,cl
- mov al,1
- and al,bl
- pop ebx
- pop ecx
- ret
-
-ALIGNC
-SNES_R4017: ; JOYC2
- test byte [JOYC1],1
- jz .read_enabled
- mov al,0
- ret
-
-.read_enabled:
- push ecx
- push ebx
- cmp byte [C_LABEL(CONTROLLER_2_TYPE)],1    ; Is mouse plugged in?
- je .do_mouse
-
- mov cl,[C_LABEL(Controller23_Pos)]
- dec cl
- mov ebx,[C_LABEL(JOY2L)]
- mov [C_LABEL(Controller23_Pos)],cl
- ror ebx,cl
- mov al,bl
- and al,1
- pop ebx
- pop ecx
- ret
-
-.unused:
- mov byte [C_LABEL(Controller23_Pos)],16
- mov al,1           ; (???) Return 0 this bit is for mtap I think
- pop ebx
- pop ecx
- ret
-
-ALIGNC
-.do_mouse:
- mov cl,[C_LABEL(Controller23_Pos)]
- dec cl
- and cl,0x0F
- mov [C_LABEL(Controller23_Pos)],cl
- mov bx,[C_LABEL(MickeyRead)]
- shr bx,cl
- mov al,bl
- and al,1
- pop ebx
- pop ecx
- ret
+; SNES_R4016: ; JOYC1 in timing.inc
+; SNES_R4017: ; JOYC2 in timing.inc
 
 ; Read from 42xx handlers
-ALIGNC
-SNES_R4202: ; WRMPYA
- mov al,[WRMPYA]
- ret
-
-ALIGNC
-SNES_R4203: ; WRMPYB
- mov al,[WRMPYB]
- ret
-
 ; SNES_R4200: ; NMITIMEN in timing.inc
+; SNES_R4202: ; WRMPYA in timing.inc
+; SNES_R4203: ; WRMPYB in timing.inc
 ; SNES_R4210: ; RDNMI in timing.inc
 ; SNES_R4211: ; TIMEUP in timing.inc
 ; SNES_R4212: ; HVBJOY in timing.inc
-
-ALIGNC
-SNES_R4213: ; RDIO
- mov al,0xFF    ; v0.14 - not supported but returns a value
- ret
-
-ALIGNC
-SNES_R4214: ; RDDIVL
- mov al,[RDDIVL]
- ret
-
-ALIGNC
-SNES_R4215: ; RDDIVH
- mov al,[RDDIVH]
- ret
-
-ALIGNC
-SNES_R4216: ; RDMPYL
- mov al,[RDMPYL]
- ret
-
-ALIGNC
-SNES_R4217: ; RDMPYH
- mov al,[RDMPYH]
- ret
-
-ALIGNC
-SNES_R4218: ; JOY1L
- cmp byte [C_LABEL(CONTROLLER_1_TYPE)],1    ; Is mouse plugged in?
- je .mouse
- mov al,[C_LABEL(JOY1L)]
- ret
-
-.mouse:
- mov al,[C_LABEL(MouseButtons)]
- or al,0x01
- ret
-
-ALIGNC
-SNES_R4219: ; JOY1H
- mov al,[C_LABEL(JOY1H)]
- ret
-
-ALIGNC
-SNES_R421A: ; JOY2L
- cmp byte [C_LABEL(CONTROLLER_2_TYPE)],1    ; Is mouse plugged in?
- je .mouse
- mov al,[C_LABEL(JOY2L)]
- ret
-
-.mouse:
- mov al,[C_LABEL(MouseButtons)]
- or al,0x01
- ret
-
-ALIGNC
-SNES_R421B: ; JOY2H
- mov al,[C_LABEL(JOY2H)]
- ret
-
-ALIGNC
-SNES_R421C: ; JOY3L
- mov al,[C_LABEL(JOY3L)]
- ret
-
-ALIGNC
-SNES_R421D: ; JOY3H
- mov al,[C_LABEL(JOY3H)]
- ret
-
-ALIGNC
-SNES_R421E: ; JOY4L
- mov al,[C_LABEL(JOY4L)]
- ret
-
-ALIGNC
-SNES_R421F: ; JOY4H
- mov al,[C_LABEL(JOY4H)]
- ret
+; SNES_R4213: ; RDIO in timing.inc
+; SNES_R4214: ; RDDIVL in timing.inc
+; SNES_R4215: ; RDDIVH in timing.inc
+; SNES_R4216: ; RDMPYL in timing.inc
+; SNES_R4217: ; RDMPYH in timing.inc
+; SNES_R4218: ; JOY1L in timing.inc
+; SNES_R4219: ; JOY1H in timing.inc
+; SNES_R421A: ; JOY2L in timing.inc
+; SNES_R421B: ; JOY2H in timing.inc
+; SNES_R421C: ; JOY3L in timing.inc
+; SNES_R421D: ; JOY3H in timing.inc
+; SNES_R421E: ; JOY4L in timing.inc
+; SNES_R421F: ; JOY4H in timing.inc
 
 ; Read from 43xx handlers
 ; SNES_R43xx: ; in DMA.asm
@@ -2823,85 +2593,17 @@ SNES_W2183: ; WMADDH
  ret
 
 ; Write to 40xx handlers
-ALIGNC
-SNES_W4016: ; JOYC1
- test al,1
- jnz .no_ready_reset
- push eax
- mov al,[JOYC1]
- test al,1
- jz .no_reset
- mov al,16
- mov [C_LABEL(Controller1_Pos)],al
- mov [C_LABEL(Controller23_Pos)],al
- mov [C_LABEL(Controller45_Pos)],al
-.no_reset:
- pop eax
-.no_ready_reset:
- mov [JOYC1],al
- ret
-
-ALIGNC
-SNES_W4017: ; JOYC2
- ret
+; SNES_W4016: ; JOYC1 in timing.inc
+; SNES_W4017: ; JOYC2 in timing.inc
 
 ; Write to 42xx handlers
-
 ; SNES_W4200: ; NMITIMEN in timing.inc
 ; SNES_W4201: ; WRIO in timing.inc
-
-ALIGNC
-SNES_W4202: ; WRMPYA
- mov [WRMPYA],al
- ret
-
-ALIGNC
-SNES_W4203: ; WRMPYB
- push eax
- mov [WRMPYB],al
- mul byte [WRMPYA]  ; Do the multiplication
- mov [RDMPY],ax
- pop eax
- ret
-
-ALIGNC
-SNES_W4204: ; WRDIVL
- mov [WRDIVL],al
- ret
-
-ALIGNC
-SNES_W4205: ; WRDIVH
- mov [WRDIVH],al
- ret
-
-ALIGNC
-SNES_W4206: ; WRDIVB
- push eax
- push ebx
-;push edx
- test al,al
- jz .divide_by_zero
- xor ebx,ebx
- xor edx,edx    ; Divide uses DX:AX / BX
- mov bl,al
- mov ax,[WRDIV]
- div bx         ; Result is ax=quotient,dx=remainder
- mov [RDDIV],ax
- mov [RDMPY],dx
-;pop edx
- pop ebx
- pop eax
- ret
-
-.divide_by_zero:
- mov ax,[WRDIV]
- mov [RDMPY],ax
- mov word [RDDIV],0xFFFF
-;pop edx
- pop ebx
- pop eax
- ret
-
+; SNES_W4202: ; WRMPYA in timing.inc
+; SNES_W4203: ; WRMPYB in timing.inc
+; SNES_W4204: ; WRDIVL in timing.inc
+; SNES_W4205: ; WRDIVH in timing.inc
+; SNES_W4206: ; WRDIVB in timing.inc
 ; SNES_W4207: ; HTIMEL in timing.inc
 ; SNES_W4208: ; HTIMEH in timing.inc
 ; SNES_W4209: ; VTIMEL in timing.inc

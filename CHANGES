@@ -22,6 +22,9 @@ Changes
 
 
  0.801
+  5A22: Improved RDIO emulation [TRAC]
+  Source: Moved emulation code for registers internal to the main CPU
+   ($4xxx) to main CPU source files [TRAC]
   Screenshots: Fixed a bug where screenshots were not properly saved in
    some screen modes [TRAC]
   SPC700: Fixed a serious bug in the handling of some 16-bit reads,
