@@ -22,6 +22,8 @@ Changes
 
 
  0.801
+  Screenshots: Fixed a bug where screenshots were not properly saved in
+   some screen modes [TRAC]
   SPC700: Fixed a serious bug in the handling of some 16-bit reads,
    thanks to Brad Martin for alerting me to the problem [TRAC]
   Render: Added countdown register support to mosaic effect in

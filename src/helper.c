@@ -172,10 +172,14 @@ unsigned char use_mmx;
 unsigned char use_fpu_copies;
 unsigned char preload_cache, preload_cache_2;
 
+BITMAP *screenshot_source = NULL;
+
 void OutputScreen()
 {
  static int ScreenCount = 0;    /* Used to determine screen filename */
  char filename[13];
+
+ if (!screenshot_source) return;
 
  while (ScreenCount <= 999)
  {
@@ -184,12 +188,7 @@ void OutputScreen()
  }
  if (ScreenCount > 999){ ScreenCount = 0; return; }
 
- if (SCREEN_MODE < 4)
- {
-  save_pcx(filename, (BITMAP *) gbSNES_Screen8.subbitmap, SNES_Palette);
- } else {
-  save_pcx(filename, Allegro_Bitmap, SNES_Palette);
- }
+ save_pcx(filename, screenshot_source, SNES_Palette);
 }
 
 int qsort_int(const void *i1, const void *i2)
@@ -330,6 +329,8 @@ void Copy_Screen()
   case 1:   /* VESA2 - linear 320x240 */
   case 2:   /* VGA mode-x - planar 320x240 */
   case 3:   /* VGA - linear 256x239 */
+   screenshot_source = gbSNES_Screen8.subbitmap;
+
    switch (stretch_x)
    {
     case 0:
@@ -479,6 +480,8 @@ void Copy_Screen()
 
    if (stretch_x || stretch_y)
    {
+    screenshot_source = gbSNES_Screen16.subbitmap;
+
     if (Current_Line_Render < 239 && Current_Line_Render < Last_Frame_Line)
     {
      /* fill unrendered area with black */
@@ -501,6 +504,8 @@ void Copy_Screen()
    }
    else
    {
+    screenshot_source = gbSNES_Screen8.subbitmap;
+
     acquire_screen();
 
     blit(gbSNES_Screen8.subbitmap, screen, 0, 0, out_position_x, out_position_y,
@@ -523,6 +528,8 @@ void Copy_Screen()
 #endif
 
   default:
+   screenshot_source = gbSNES_Screen8.subbitmap;
+
    acquire_screen();
 
    blit(gbSNES_Screen8.subbitmap, screen, 0, 0, 0, 0, ScreenX, ScreenY);
