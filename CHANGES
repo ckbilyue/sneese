@@ -59,6 +59,13 @@ Changes
   Render: Fixed a bug where dual-window AND logic would result in
    an entire line being clipped if either window covered the
    whole display [TRAC]
+  GUI: Cleaned up some usage of constants in the source [TRAC]
+  GUI: Moved some input-related code out of the GUI source [TRAC]
+  Input: Added support for using joysticks/joypads to emulate
+   controllers; must be set up in controller configuration in GUI
+   similar to keyboard input [TRAC]
+  Configuration: Changed format of scancodes for input mappings to
+   decimal [TRAC]
  0.776 [TRAC]
   Render: Added support for dual window clipping with all logic
    modes of backgrounds in modes 5 and 6

@@ -15,14 +15,11 @@ The SNES emulator with the extra e's...
   Please read the license (LICENSE file) before using or distributing
    SNEeSe in any way!
 
-  This release is dedicated to Lord_Nightmare and MKendora, for bugging
-   me to attempt porting of SNEeSe...
+  This release is dedicated to the memory of the departed Scape, a young
+   Korat kitty with a sense of fairness, who showed love to all, and
+   malice to none, even to cats who showed aggression towards him...
+   you will be missed...
 
-  THIS IS NOT SHAREWARE NEVER HAS BEEN...ITS FREE AND SHOWS ;-)
-
-- In memory of the Emu News Service/Emu News World, which served as a strong
-  backbone for emulation, and will not be soon forgotten...
-                                        http://www.emunews.net/
 
 NOTE:
  This release has SPC emulation, it may get some ROMs to work that would
@@ -192,6 +189,7 @@ There is no exclusion by extension, and no jump-to-pressed-letter in
 the file loader yet, and LFNs are truncated... sorry, but will fix
 all of these soon!
 
+
  The CONFIGURATION menu allows you to change some features of the
 emulation as follows:
 
@@ -201,6 +199,10 @@ emulation as follows:
                              allowing you to choose a new resolution.
                              If the resolution cannot be set, it will
                              revert to standard 320x200x256 mode.
+
+  Configure Controllers    - Brings up the CONTROLLER CONFIGURATION menu.
+
+  Configure Sound          - Brings up the SOUND CONFIGURATION menu.
 
   Min Frameskip: ?         - You can modify the amount of frames to
   Max Frameskip: ?           skip by pressing left or right arrow.
@@ -218,37 +220,44 @@ emulation as follows:
    Setting Min Frameskip and Max Frameskip to the same number effectively
     disables all speed-throttling.
 
-  Keyboard on player 1     - This option toggles joystick or keyboard
-                             mode for controller 1. Now toggles to
-                             mouse support, in mouse mode joypad will
-                             still function using keyboard controls.
-
-  Keyboard on player 2     - This option toggles joystick or keyboard
-                             mode for controller 2.
-                             Only 1 joystick/joypad is supported,
-                             don't map it to both unless you want
-                             mirrored controls for some reason...
-                             Also toggles to mouse support.
-
-  Define keys for player 1 - This option lets you redefine the
-                             keys for controller 1. Since version 0.15
-                             this has been done through the GUI, it
-                             shows a nice picture of the SNES joypad
-                             and asks the keys. You can press ESC
-                             anytime to stop redefining.
-
-  Define keys for player 1 - This option lets you redefine the
-                             keys for controller 2.
-
   Emulate SPC              - Toggle SPC emulation/skipper. SPC emulation
   Skip SPC                   must be enabled with below option for sound.
-
-  Configure Sound          - Brings up the SOUND CONFIGURATION menu.
 
   FPS counter: on or off   - Toggles the on-screen FPS counter in the
                              top-right corner of the screen (note:
                              this counter is sometimes difficult
                              or impossible to see).
+
+
+ The CONTROLLER CONFIGURATION menu allows you to change some features of
+the controller emulation as follows:
+
+  Joypad on player 1       - This option toggles emulation of joypad
+  Joypad on player 2       - or mouse for the respective controller
+                             port.
+
+  Define keys for player 1 - These option lets you redefine the keys
+  Define keys for player 2 - for the joypad on the respective controller
+                             port.  It shows a nice picture of the SNES
+                             joypad and asks the keys. You can press
+                             ESC anytime to stop redefining.
+                             If you have a joystick/joypad connected to
+                             your computer, and it is currently
+                             supported by Allegro and SNEeSe under
+                             your platform, you can press directions or
+                             buttons on the controller to map to it
+                             instead of the keyboard.
+
+                             Key mappings are shown as a name for the
+                             key.  Joystick mappings are a bit more
+                             complicated, few examples follow.
+
+                             'J1S1A2-' would eb the negative direction
+                             of axis 2 on joystick 1, stick 1; typically,
+                             the vertical axis of the main stick.
+
+                             'J2B4' would be button 4 on joystick 2.
+
 
  The SOUND CONFIGURATION menu allows you to change some features of
 the sound emulation as follows:
@@ -470,9 +479,10 @@ Extras:
      E,D     - A/B buttons
      [,]     - Select/Start buttons
 
- - A 4 or 6 button joystick/joypad can be used in place of the keyboard,
-   selectable from the GUI.
-   *** Joystick/joypad support is not available in this release.
+ - A joystick/joypad may be supported in place of the keyboard,
+   depending on your controller and platform.  Details are listed
+   under the 'CONTROLLER CONFIGURATION' menu in the GUI documentation
+   earlier in this document.
 
 What is left to do in this emulator?
 """"""""""""""""""""""""""""""""""""
@@ -485,20 +495,19 @@ TO DO:
 ~~~~~~
  Screen rendering
   OBJ limitations: Time/range over flag emulation
-  Performance: Implement tile-based rendering + more
-  Windowing: Used to cut holes in layers, as well as determining area of
-   color arithmetic
-  Color +/-: This relies on windowing, and allows overlaying BGs like the
-             rain in Zelda
+  Performance: Improve tile-based rendering + more
+  Window clipping: Used to cut holes in layers; not yet supported on OBJ
+   and BG mode 7; support limited in other BG modes
+  Color window: Used for color arithmetic, allows overlaying BGs like the
+   rain in Zelda
   Direct color mode: Used in ActRaiser 2, Secret of Mana, others
   Priority per pixel in mode 7: May have priority problems
   Plenty of other missing stuff...
 
  Source   : More source cleanup/clarity/commentation
  Keyboard : Replace or extend keyboard handler to help with interface
- Joypad   : Implement joystick/joypad support
-             (could some kind soul help out with this???)
-            Button reconfig
+ Joypad   : Better interface for mapping of controls
+            Multiple mappings for each control
             Better joypad hardware emulation
 
  Command-line interface: More control, especially over configuration

@@ -263,8 +263,6 @@ BITMAP *SetGUIScreen(int);
 
 int WaitForKeyPress();
 
-void scantotext(unsigned scanc, char *text);
-
 extern BORDER_WINDOW File_window;
 
 void UpdateFileWindow(int SelFile, int NumFiles, int FirstFile = 0);

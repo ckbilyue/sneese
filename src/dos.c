@@ -43,6 +43,7 @@ END_COLOR_DEPTH_LIST
 
 #include "platform.h"
 #include "helper.h"
+#include "input.h"
 #include "romload.h"
 #include "apu/sound.h"
 #include "cpu/cpu.h"
@@ -62,8 +63,8 @@ AL_VAR(int,_sound_hq);
 
 void LoadConfigCurrent(void)
 {
- char default_keymap[] = "2D 27 29 2B  5  4 17 13 11  1 41 42";
- char keymapbuf[41];
+ char default_keymap[] = "45 39 41 43  5  4 23 19 17  1 65 66";
+ char keymapbuf[81];
 
  SCREEN_MODE = get_config_int("display", "screenmode", 2);
 #if defined(ALLEGRO_DOS)
@@ -152,36 +153,36 @@ void LoadConfigCurrent(void)
    /* Pentium class CPU */
    (cpu_family == 5)));
 
- JOYSTICK_ENABLED = get_config_int("input", "joystick", 0);
- if (JOYSTICK_ENABLED > 2 || (JOYSTICK_ENABLED == 2 && !mouse_available))
-  JOYSTICK_ENABLED = 0;
+ CONTROLLER_1_TYPE = get_config_int("input", "controller_1_type", 0);
+ if (CONTROLLER_1_TYPE > 2 || (CONTROLLER_1_TYPE == 2 && !mouse_available))
+  CONTROLLER_1_TYPE = 0;
 
- JOYSTICK_ENABLED2 = get_config_int("input", "joystick2", 0);
- if (JOYSTICK_ENABLED2 > 2 || (JOYSTICK_ENABLED2 == 2 && !mouse_available))
-  JOYSTICK_ENABLED2 = 0;
+ CONTROLLER_2_TYPE = get_config_int("input", "controller_2_type", 0);
+ if (CONTROLLER_2_TYPE > 2 || (CONTROLLER_2_TYPE == 2 && !mouse_available))
+  CONTROLLER_2_TYPE = 0;
 
- memset(keymapbuf, 0, 41);
- strncpy(keymapbuf, get_config_string("input", "snes_pad_1_keys", default_keymap), 40);
+ memset(keymapbuf, 0, 81);
+ strncpy(keymapbuf, get_config_string("input", "snes_pad_1_keys", default_keymap), 80);
  if (
-  sscanf(keymapbuf, "%X%X%X%X%X%X%X%X%X%X%X%X",
+  sscanf(keymapbuf, "%d%d%d%d%d%d%d%d%d%d%d%d",
    &input_player1.up, &input_player1.down, &input_player1.left, &input_player1.right,
    &input_player1.a, &input_player1.b, &input_player1.x, &input_player1.y, &input_player1.l, &input_player1.r,
    &input_player1.select, &input_player1.start) < 12)
  {
-  sscanf(default_keymap, "%X%X%X%X%X%X%X%X%X%X%X%X",
+  sscanf(default_keymap, "%d%d%d%d%d%d%d%d%d%d%d%d",
    &input_player1.up, &input_player1.down, &input_player1.left, &input_player1.right,
    &input_player1.a, &input_player1.b, &input_player1.x, &input_player1.y, &input_player1.l, &input_player1.r,
    &input_player1.select, &input_player1.start);
  }
 
- strncpy(keymapbuf, get_config_string("input", "snes_pad_2_keys", default_keymap), 40);
+ strncpy(keymapbuf, get_config_string("input", "snes_pad_2_keys", default_keymap), 80);
  if (
-  sscanf(keymapbuf, "%X%X%X%X%X%X%X%X%X%X%X%X",
+  sscanf(keymapbuf, "%d%d%d%d%d%d%d%d%d%d%d%d",
    &input_player2.up, &input_player2.down, &input_player2.left, &input_player2.right,
    &input_player2.a, &input_player2.b, &input_player2.x, &input_player2.y, &input_player2.l, &input_player2.r,
    &input_player2.select, &input_player2.start) < 12)
  {
-  sscanf(default_keymap, "%X%X%X%X%X%X%X%X%X%X%X%X",
+  sscanf(default_keymap, "%d%d%d%d%d%d%d%d%d%d%d%d",
    &input_player2.up, &input_player2.down, &input_player2.left, &input_player2.right,
    &input_player2.a, &input_player2.b, &input_player2.x, &input_player2.y, &input_player2.l, &input_player2.r,
    &input_player2.select, &input_player2.start);
@@ -355,29 +356,25 @@ void SaveConfig(void)
 
  fprintf(cfg, "# Input and controller options\n");
  fprintf(cfg, "[input]\n");
- fprintf(cfg, "# You can select joystick or keyboard (0-keyboard,1-joystick)\n");
- fprintf(cfg, "# joystick2 is used to enable joystick for controller 2\n");
- fprintf(cfg, "# enabling for both currently uses the same joystick for\n");
- fprintf(cfg, "# both, not the desired effect!\n");
- fprintf(cfg, "# Mouse can be selected (for those roms that use one!!) by using\n");
- fprintf(cfg, "# value 2 e.g. joystick = 2.\n");
- fprintf(cfg, "joystick=%d\n", JOYSTICK_ENABLED);
- fprintf(cfg, "joystick2=%d\n", JOYSTICK_ENABLED2);
+ fprintf(cfg, "# You can select joypad, mouse, or none for emulation on\n");
+ fprintf(cfg, "# each controller.\n");
+ fprintf(cfg, "controller_1_type=%d\n", CONTROLLER_1_TYPE);
+ fprintf(cfg, "controller_2_type=%d\n", CONTROLLER_2_TYPE);
  fprintf(cfg, "\n");
 
- fprintf(cfg, "# Here you will find the keyboard definitions for controller 1\n");
+ fprintf(cfg, "# Here you will find the control mappings for controller 1\n");
  fprintf(cfg, "# the numbers you see are scan codes, use the \"Define Keys\"\n");
  fprintf(cfg, "# option in the GUI to alter the keys, it's far easier!\n");
  fprintf(cfg, "\n");
  fprintf(cfg, "# Up Down Left Right A B X Y L R Select Start\n");
- fprintf(cfg,"snes_pad_1_keys=%X %X %X %X %X %X %X %X %X %X %X %X\n",
+ fprintf(cfg, "snes_pad_1_keys=%d %d %d %d %d %d %d %d %d %d %d %d\n",
   input_player1.up, input_player1.down, input_player1.left, input_player1.right,
   input_player1.a, input_player1.b, input_player1.x, input_player1.y, input_player1.l, input_player1.r,
   input_player1.select, input_player1.start);
 
  fprintf(cfg, "\n");
- fprintf(cfg, "# Player 2's keys are found here, see above.\n");
- fprintf(cfg, "snes_pad_2_keys=%X %X %X %X %X %X %X %X %X %X %X %X\n",
+ fprintf(cfg, "# Player 2's mappings are found here, see above.\n");
+ fprintf(cfg, "snes_pad_2_keys=%d %d %d %d %d %d %d %d %d %d %d %d\n",
   input_player2.up, input_player2.down, input_player2.left, input_player2.right,
   input_player2.a, input_player2.b, input_player2.x, input_player2.y, input_player2.l, input_player2.r,
   input_player2.select, input_player2.start);
@@ -485,7 +482,21 @@ int platform_init(int argc, char **argv)
  install_keyboard();
  install_key_release_callback();
 
-// install_joystick(JOY_TYPE_6BUTTON);
+#if 0
+#ifdef ALLEGRO_DOS
+ if (load_joystick_data(NULL))
+ {
+   install_joystick(JOY_TYPE_6BUTTON);
+ }
+#else
+#endif
+#endif
+ if (load_joystick_data(NULL))
+ {
+   install_joystick(JOY_TYPE_AUTODETECT);
+ }
+#if 0
+#endif
 
 #ifndef NO_GUI
 #if GUI_DEFAULT

@@ -19,13 +19,6 @@ You must read and accept the license prior to use.
 
 #include "misc.h"
 
-typedef struct {
- unsigned up, down, left, right;
- unsigned a, b, x, y, l, r, select, start;
-} SNES_CONTROLLER_INPUTS;
-
-extern SNES_CONTROLLER_INPUTS input_player1, input_player2;
-
 EXTERN unsigned char WRAM[131072];  /* Buffer for Work RAM */
 EXTERN unsigned char VRAM[65536];   /* Buffer for Video RAM */
 EXTERN unsigned SaveRamLength;      /* Size of Save RAM */
@@ -35,7 +28,6 @@ EXTERN unsigned char Blank[65536];  /* Blank ROM buffer */
 EXTERN unsigned char OAM[512+32];   /* Buffer for OAM */
 
 EXTERN unsigned short ScreenX,ScreenY;
-EXTERN signed char mouse_available;
 
 typedef struct {
  unsigned short blue  :5;
@@ -59,7 +51,6 @@ EXTERN colorRGB565 HICOLOUR_Palette[256];      /* values in here are plotted dir
 
 EXTERN void SetupTables(void);
 EXTERN void Reset_CGRAM(void);
-EXTERN void install_key_release_callback();
 
 #ifdef DEBUG
 EXTERN unsigned Frames;
@@ -96,17 +87,12 @@ EXTERN BITMAP *Internal_Bitmap_blitsrc;
 EXTERN unsigned FRAME_SKIP_MIN;     /* Min frames waited until refresh */
 EXTERN unsigned FRAME_SKIP_MAX;     /* Max frames waited until refresh */
 EXTERN unsigned char SNES_COUNTRY;  /* Used for PAL/NTSC protection checks */
-EXTERN unsigned char JOYSTICK_ENABLED;
-EXTERN unsigned char JOYSTICK_ENABLED2;
 EXTERN unsigned char SPC_ENABLED;
 EXTERN unsigned char use_mmx;
 EXTERN unsigned char use_fpu_copies;
 EXTERN unsigned char preload_cache, preload_cache_2;
 
-EXTERN unsigned short MickeyRead;   /* MSB = Yyyyyyyy  LSB = Xxxxxxxx */
-EXTERN unsigned char MouseButts;
-
-EXTERN void MickeyMouse(void);
+EXTERN void OutputScreen();
 
 EXTERN unsigned char BrightnessLevel;   /* SNES Brightness level, set up in PPU.asm */
 EXTERN char fixedpalettecheck;

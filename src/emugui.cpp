@@ -30,6 +30,7 @@ You must read and accept the license prior to use.
 
 #include "types.h"
 #include "font.h"
+#include "input.h"
 #include "cpu/cpu.h"
 #include "apu/spc.h"
 #include "apu/sound.h"
@@ -100,8 +101,22 @@ const char *GUI_init()
 WINDOW *GUI_window=0;
 
 WINDOW *Main_window=0;
-#define NUM_OPTIONS 10
-char *Options[NUM_OPTIONS]={
+
+enum {
+ MAIN_RESUME_EMULATION,
+ MAIN_RESET_EMULATION,
+ MAIN_LOAD_ROM,
+ MAIN_CONFIGURE,
+ MAIN_ROM_INFO,
+ MAIN_HW_STATUS,
+ MAIN_DMA_STATUS,
+ MAIN_APU_STATUS,
+ MAIN_BGWIN_STATUS,
+ MAIN_EXIT,
+ MAIN_NUM_OPTIONS
+};
+
+char *Main_Options[MAIN_NUM_OPTIONS]={
  "Resume emulation",
  "Reset emulation",
  "Load ROM",
@@ -119,9 +134,9 @@ void UpdateGUI(int Selected)
 {
  clear(GUI_Bitmap);
  Main_window->refresh();
- for(int a=0;a<NUM_OPTIONS;a++)
-  if(a!=Selected) PlotMenuItem(Main_window,default_font,Options[a],0,default_font->get_heightspace()*a,16);
-  else PlotSelectedMenuItem(Main_window,default_font,Options[a],0,default_font->get_heightspace()*a,16);
+ for(int a=0;a<MAIN_NUM_OPTIONS;a++)
+  if(a!=Selected) PlotMenuItem(Main_window,default_font,Main_Options[a],0,default_font->get_heightspace()*a,16);
+  else PlotSelectedMenuItem(Main_window,default_font,Main_Options[a],0,default_font->get_heightspace()*a,16);
  Credits_window->refresh();
  PlotString(Credits_window,default_font," Code by: Charles Bilyue'      ",0,0);
  PlotString(Credits_window,default_font,"          Brad Martin          ",0,default_font->get_heightspace());
@@ -403,53 +418,122 @@ int SoundWindow()
  return 1;          // Signify normal exit
 }
 
-char min_frameskip_str[] = "Min Frameskip: ???????";
-char max_frameskip_str[] = "Max Frameskip: ???????";
-
-WINDOW *Config_window=0;
-
-char fps_counter_str[] = "FPS counter: off";
-char stretch_h_str[] = "H stretch: full";
-char stretch_v_str[] = "V stretch: full";
+WINDOW *Controls_window=0;
 
 enum {
- CONFIG_SCREEN_MODE,
- CONFIG_STRETCH_H,
- CONFIG_STRETCH_V,
- CONFIG_FRAMESKIP_MIN,
- CONFIG_FRAMESKIP_MAX,
- CONFIG_CONTROLLER_1,
- CONFIG_CONTROLLER_2,
- CONFIG_CONTROLS_1,
- CONFIG_CONTROLS_2,
- CONFIG_ENABLE_SPC,
- CONFIG_SOUND,
- CONFIG_ENABLE_FPS_COUNTER,
- CONFIG_NUM_OPTIONS
+#if 0
+#ifdef ALLEGRO_DOS
+ CONTROLS_JOYSTICK_DRIVER,
+#endif
+#endif
+ CONTROLS_CONTROLLER_1,
+ CONTROLS_CONTROLLER_2,
+ CONTROLS_MAP_1,
+ CONTROLS_MAP_2,
+ CONTROLS_NUM_OPTIONS
 };
 
-const char *Config_Options[CONFIG_NUM_OPTIONS]={
- 0,                             // screen mode
- stretch_h_str,                 // screen stretch settings
- stretch_v_str,
- min_frameskip_str,
- max_frameskip_str,
+const char *Controls_Options[CONTROLS_NUM_OPTIONS]=
+{
+#if 0
+#ifdef ALLEGRO_DOS
+ "Joystick: **************",    // joystick driver
+#endif
+#endif
  "-------- on player 1",        // controls: first player
  "-------- on player 2",        // controls: second player
  "Define keys for player 1",
- "Define keys for player 2",
- 0,                             // SPC enable setting
- "Configure sound",
- fps_counter_str
+ "Define keys for player 2"
+};
+
+#if 0
+const int joydriver_id[] =
+{
+ JOY_TYPE_NONE,
+ JOY_TYPE_STANDARD,
+ JOY_TYPE_2PADS,
+ JOY_TYPE_4BUTTON,
+ JOY_TYPE_6BUTTON,
+ JOY_TYPE_8BUTTON,
+ JOY_TYPE_FSPRO,
+ JOY_TYPE_WINGEX,
+ JOY_TYPE_SIDEWINDER,
+ JOY_TYPE_SIDEWINDER_AG,
+ JOY_TYPE_GAMEPAD_PRO,
+ JOY_TYPE_GRIP,
+ JOY_TYPE_SNESPAD_LPT1,
+ JOY_TYPE_SNESPAD_LPT2,
+ JOY_TYPE_SNESPAD_LPT3,
+ JOY_TYPE_PSXPAD_LPT1,
+ JOY_TYPE_PSXPAD_LPT2,
+ JOY_TYPE_PSXPAD_LPT3,
+ JOY_TYPE_N64PAD_LPT1,
+ JOY_TYPE_N64PAD_LPT2,
+ JOY_TYPE_N64PAD_LPT3,
+ JOY_TYPE_DB9_LPT1,
+ JOY_TYPE_DB9_LPT2,
+ JOY_TYPE_DB9_LPT3,
+ JOY_TYPE_TURBOGRAFIX_LPT1,
+ JOY_TYPE_TURBOGRAFIX_LPT2,
+ JOY_TYPE_TURBOGRAFIX_LPT3,
+ JOY_TYPE_WINGWARRIOR,
+ JOY_TYPE_IFSEGA_ISA,
+ JOY_TYPE_IFSEGA_PCI,
+ JOY_TYPE_IFSEGA_PCI_FAST,
+ JOY_TYPE_AUTODETECT
 };
 
 
-void UpdateConfigWindow(int Selected)
+const int joydriver_count = sizeof(joydriver_id) / sizeof(int);
+
+const char *get_joydriver_str(int driver)
 {
- Config_window->refresh();
- for(int a=0;a<CONFIG_NUM_OPTIONS;a++)
-  if(a!=Selected) PlotMenuItem(Config_window,default_font,Config_Options[a],0,default_font->get_heightspace()*a,24);
-  else PlotSelectedMenuItem(Config_window,default_font,Config_Options[a],0,default_font->get_heightspace()*a,24);
+ switch (driver)
+ {
+ case JOY_TYPE_NONE: return "None";
+ case JOY_TYPE_STANDARD: return "2-button";
+ case JOY_TYPE_2PADS: return "two 2-button";
+ case JOY_TYPE_4BUTTON: return "4-button";
+ case JOY_TYPE_6BUTTON: return "6-button";
+ case JOY_TYPE_8BUTTON: return "8-button";
+ case JOY_TYPE_FSPRO: return "Flightstick";
+ case JOY_TYPE_WINGEX: return "WM Extreme";
+ case JOY_TYPE_SIDEWINDER: return "Sidewinder";
+ case JOY_TYPE_SIDEWINDER_AG: return "Sidewinder Alt";
+ case JOY_TYPE_GAMEPAD_PRO: return "Gravis Pro";
+ case JOY_TYPE_GRIP: return "Gravis GrIP";
+ case JOY_TYPE_SNESPAD_LPT1: return "SNES pad, LPT1";
+ case JOY_TYPE_SNESPAD_LPT2: return "SNES pad, LPT2";
+ case JOY_TYPE_SNESPAD_LPT3: return "SNES pad, LPT3";
+ case JOY_TYPE_PSXPAD_LPT1: return "PSX pad, LPT1";
+ case JOY_TYPE_PSXPAD_LPT2: return "PSX pad, LPT2";
+ case JOY_TYPE_PSXPAD_LPT3: return "PSX pad, LPT3";
+ case JOY_TYPE_N64PAD_LPT1: return "N64 pad, LPT1";
+ case JOY_TYPE_N64PAD_LPT2: return "N64 pad, LPT2";
+ case JOY_TYPE_N64PAD_LPT3: return "N64 pad, LPT3";
+ case JOY_TYPE_DB9_LPT1: return "DB9stick, LPT1";
+ case JOY_TYPE_DB9_LPT2: return "DB9stick, LPT2";
+ case JOY_TYPE_DB9_LPT3: return "DB9stick, LPT3";
+ case JOY_TYPE_TURBOGRAFIX_LPT1: return "TG16 pad, LPT1";
+ case JOY_TYPE_TURBOGRAFIX_LPT2: return "TG16 pad, LPT2";
+ case JOY_TYPE_TURBOGRAFIX_LPT3: return "TG16 pad, LPT3";
+ case JOY_TYPE_WINGWARRIOR: return "WM Warrior";
+ case JOY_TYPE_IFSEGA_ISA: return "IF-SEGA ISA";
+ case JOY_TYPE_IFSEGA_PCI: return "IF-SEGA PCI";
+ case JOY_TYPE_IFSEGA_PCI_FAST: return "IF-SEGA PCI2";
+ case JOY_TYPE_AUTODETECT: return "Autodetect";
+ }
+
+ return "";
+}
+#endif
+
+void UpdateControlsWindow(int Selected)
+{
+ Controls_window->refresh();
+ for(int a=0;a<CONTROLS_NUM_OPTIONS;a++)
+  if(a!=Selected) PlotMenuItem(Controls_window,default_font,Controls_Options[a],0,default_font->get_heightspace()*a,24);
+  else PlotSelectedMenuItem(Controls_window,default_font,Controls_Options[a],0,default_font->get_heightspace()*a,24);
 #ifndef NO_LOGO
  if(sneese)
   stretch_blit(sneese,Allegro_Bitmap,0,0,GUI_ScreenWidth,GUI_ScreenHeight,0,0,SCREEN_W,SCREEN_H);
@@ -461,9 +545,11 @@ void UpdateConfigWindow(int Selected)
 
 WINDOW *ControlSetup_window=0;
 
+
+
 void UpdateControllerScreen(const SNES_CONTROLLER_INPUTS *input)
 {
- char tempch[5];
+ char tempch[9];
 
  ControlSetup_window->refresh();
 
@@ -472,9 +558,9 @@ void UpdateControllerScreen(const SNES_CONTROLLER_INPUTS *input)
  scantotext(input->down,tempch);
  PlotStringShadow(ControlSetup_window,default_font,tempch,38,65,15,8);
  scantotext(input->left,tempch);
- PlotStringShadow(ControlSetup_window,default_font,tempch,20,48,15,8);
+ PlotStringShadow(ControlSetup_window,default_font,tempch,24,44,15,8);
  scantotext(input->right,tempch);
- PlotStringShadow(ControlSetup_window,default_font,tempch,55,48,15,8);
+ PlotStringShadow(ControlSetup_window,default_font,tempch,55,52,15,8);
  scantotext(input->a,tempch);
  PlotStringShadow(ControlSetup_window,default_font,tempch,151,46,15,8);
  scantotext(input->b,tempch);
@@ -490,7 +576,7 @@ void UpdateControllerScreen(const SNES_CONTROLLER_INPUTS *input)
  scantotext(input->select,tempch);
  PlotStringShadow(ControlSetup_window,default_font,tempch,68,40,15,8);
  scantotext(input->start,tempch);
- PlotStringShadow(ControlSetup_window,default_font,tempch,91,40,15,8);
+ PlotStringShadow(ControlSetup_window,default_font,tempch,91,73,15,8);
 }
 
 signed char lastkeypress_locked = 0;
@@ -511,14 +597,14 @@ END_OF_STATIC_FUNCTION(lastkeypress_callback);
 
 int lastkeypressed()
 {
- if (!last_scancode_valid) return 0;
+ if (!last_scancode_valid) return update_joystick_vkeys();
  last_scancode_valid = 0;
  return last_scancode;
 }
 
-int AskKey(const char *msg, unsigned *whatkey, SNES_CONTROLLER_INPUTS *input)
+int AskKey(const char *msg, int *whatkey, SNES_CONTROLLER_INPUTS *input)
 {
- unsigned tmp;
+ int tmp;
 
  if (!lastkeypress_locked)
  {
@@ -590,7 +676,170 @@ void AskControllerInputs(SNES_CONTROLLER_INPUTS *input)
   }
  }
 
- UpdateGUI(3);
+ UpdateGUI(MAIN_CONFIGURE);
+}
+
+int ControlsWindow()
+{
+//int temp;
+
+ switch(CONTROLLER_1_TYPE)
+ {
+  case 1:
+   if (mouse_available)
+   {
+    Controls_Options[CONTROLS_CONTROLLER_1] = "Mouse on player 1";
+    break;
+   }
+  default:
+   Controls_Options[CONTROLS_CONTROLLER_1] = "Joypad on player 1";
+   CONTROLLER_1_TYPE=0;
+ }
+
+ switch(CONTROLLER_2_TYPE)
+ {
+  case 1:
+   if (mouse_available)
+   {
+    Controls_Options[CONTROLS_CONTROLLER_2] = "Mouse on player 2";
+    break;
+   }
+  default:
+   Controls_Options[CONTROLS_CONTROLLER_2] = "Joypad on player 2";
+   CONTROLLER_2_TYPE=0;
+ }
+
+ int CursorAt=0;
+ int keypress, key_asc, key_scan;
+ clear_keybuf();
+
+ for(;;)
+ {
+  UpdateControlsWindow(CursorAt);
+  while (!keypressed());
+  keypress = readkey();
+  key_asc = keypress & 0xFF;
+  key_scan = keypress >> 8;
+
+  switch (key_scan)
+  {
+   case KEY_UP:
+    CursorAt--;
+    if(CursorAt == -1) // so it wraps
+     CursorAt = CONTROLS_NUM_OPTIONS-1;
+    break;
+   case KEY_DOWN:
+    CursorAt++;
+    if(CursorAt == CONTROLS_NUM_OPTIONS) // so it wraps
+    CursorAt=0;
+    break;
+
+   case KEY_ESC:
+    return -1;
+
+   case KEY_ENTER:
+   case KEY_ENTER_PAD:
+
+    if (CursorAt == CONTROLS_CONTROLLER_1)
+    {
+     switch(++CONTROLLER_1_TYPE)
+     {
+      case 1:
+       if (mouse_available)
+       {
+        Controls_Options[CONTROLS_CONTROLLER_1] = "Mouse on player 1";
+        break;
+       }
+      default:
+       Controls_Options[CONTROLS_CONTROLLER_1] = "Joypad on player 1";
+       CONTROLLER_1_TYPE=0;
+     }
+    break;
+    }
+
+    if (CursorAt == CONTROLS_CONTROLLER_2)
+    {
+     switch(++CONTROLLER_2_TYPE)
+     {
+      case 1:
+       if (mouse_available)
+       {
+        Controls_Options[CONTROLS_CONTROLLER_2] = "Mouse on player 2";
+        break;
+       }
+      default:
+       Controls_Options[CONTROLS_CONTROLLER_2] = "Joypad on player 2";
+       CONTROLLER_2_TYPE=0;
+     }
+     break;
+    }
+
+    if (CursorAt == CONTROLS_MAP_1)
+    {
+     AskControllerInputs(&input_player1);
+     break;
+    }
+
+    if (CursorAt == CONTROLS_MAP_2)
+    {
+     AskControllerInputs(&input_player2);
+     break;
+    }
+
+  }
+ }
+ return 1;          // Signify normal exit
+}
+
+
+char min_frameskip_str[] = "Min Frameskip: ???????";
+char max_frameskip_str[] = "Max Frameskip: ???????";
+
+WINDOW *Config_window=0;
+
+char fps_counter_str[] = "FPS counter: off";
+char stretch_h_str[] = "H stretch: full";
+char stretch_v_str[] = "V stretch: full";
+
+enum {
+ CONFIG_SCREEN_MODE,
+ CONFIG_CONTROLLERS,
+ CONFIG_SOUND,
+ CONFIG_ENABLE_SPC,
+ CONFIG_STRETCH_H,
+ CONFIG_STRETCH_V,
+ CONFIG_FRAMESKIP_MIN,
+ CONFIG_FRAMESKIP_MAX,
+ CONFIG_ENABLE_FPS_COUNTER,
+ CONFIG_NUM_OPTIONS
+};
+
+const char *Config_Options[CONFIG_NUM_OPTIONS]={
+ 0,                             // screen mode
+ "Configure controllers",       // controller configuration menu
+ "Configure sound",
+ 0,                             // SPC enable setting
+ stretch_h_str,                 // screen stretch settings
+ stretch_v_str,
+ min_frameskip_str,
+ max_frameskip_str,
+ fps_counter_str
+};
+
+
+void UpdateConfigWindow(int Selected)
+{
+ Config_window->refresh();
+ for(int a=0;a<CONFIG_NUM_OPTIONS;a++)
+  if(a!=Selected) PlotMenuItem(Config_window,default_font,Config_Options[a],0,default_font->get_heightspace()*a,24);
+  else PlotSelectedMenuItem(Config_window,default_font,Config_Options[a],0,default_font->get_heightspace()*a,24);
+#ifndef NO_LOGO
+ if(sneese)
+  stretch_blit(sneese,Allegro_Bitmap,0,0,GUI_ScreenWidth,GUI_ScreenHeight,0,0,SCREEN_W,SCREEN_H);
+#endif
+ draw_sprite(Allegro_Bitmap, GUI_Bitmap, 0, 0);
+ vsync();
+ CopyGUIScreen();
 }
 
 int ConfigWindow()
@@ -598,42 +847,6 @@ int ConfigWindow()
  int temp;
 
  Config_Options[CONFIG_SCREEN_MODE] = Screen_Options[SCREEN_MODE];
-
- switch(JOYSTICK_ENABLED)
- {
-  case 1:
-// Config_Options[CONFIG_CONTROLLER_1] = "Joystick on player 1";
-// JOYSTICK_ENABLED=1;
-// break;
-  case 2:
-   if (mouse_available)
-   {
-    Config_Options[CONFIG_CONTROLLER_1] = "Mouse on player 1";
-    JOYSTICK_ENABLED=2;
-    break;
-   }
-  default:
-   Config_Options[CONFIG_CONTROLLER_1] = "Keyboard on player 1";
-   JOYSTICK_ENABLED=0;
- }
-
- switch(JOYSTICK_ENABLED2)
- {
-  case 1:
-// Config_Options[CONFIG_CONTROLLER_2] = "Joystick on player 2";
-// JOYSTICK_ENABLED2=1;
-// break;
-  case 2:
-   if (mouse_available)
-   {
-    Config_Options[CONFIG_CONTROLLER_2] = "Mouse on player 2";
-    JOYSTICK_ENABLED2=2;
-    break;
-   }
-  default:
-   Config_Options[CONFIG_CONTROLLER_2] = "Keyboard on player 2";
-   JOYSTICK_ENABLED2=0;
- }
 
  if(SPC_ENABLED) Config_Options[CONFIG_ENABLE_SPC] = "Emulate SPC";
  else Config_Options[CONFIG_ENABLE_SPC] = "Skip SPC";
@@ -851,8 +1064,6 @@ int ConfigWindow()
     {
      while((temp = ScreenWindow()) != -1)
      {
-      SetGUIScreen(temp);    // Setup screen mode (SCREEN_MODE is set here so following works)
-
       Config_Options[CONFIG_SCREEN_MODE] = Screen_Options[SCREEN_MODE];
 #ifndef NO_LOGO
       if(sneese)   // Prevent a crash if file not found!
@@ -863,63 +1074,24 @@ int ConfigWindow()
 #endif
       set_palette_range(&GUIPal[-240],240,255,1);    // Set the GUI palette up.
      }
-     UpdateGUI(3);
+     UpdateGUI(MAIN_CONFIGURE);
      break;
     }
 
-    if (CursorAt == CONFIG_CONTROLLER_1)
+    if (CursorAt == CONFIG_CONTROLLERS)
     {
-     switch(++JOYSTICK_ENABLED)
+     while((temp = ControlsWindow()) != -1)
      {
-      case 1:
-//     Config_Options[CONFIG_CONTROLLER_1] = "Joystick on player 1";
-//     JOYSTICK_ENABLED=1;
-//     break;
-      case 2:
-       if (mouse_available)
-       {
-        Config_Options[CONFIG_CONTROLLER_1] = "Mouse on player 1";
-        JOYSTICK_ENABLED=2;
-        break;
-       }
-      default:
-       Config_Options[CONFIG_CONTROLLER_1] = "Keyboard on player 1";
-       JOYSTICK_ENABLED=0;
+#ifndef NO_LOGO
+      if(sneese)   // Prevent a crash if file not found!
+      {
+       set_palette(sneesepal);
+       stretch_blit(sneese,Allegro_Bitmap,0,0,GUI_ScreenWidth,GUI_ScreenHeight,0,0,SCREEN_W,SCREEN_H);
+      }
+#endif
+      set_palette_range(&GUIPal[-240],240,255,1);    // Set the GUI palette up.
      }
-    break;
-    }
-
-    if (CursorAt == CONFIG_CONTROLLER_2)
-    {
-     switch(++JOYSTICK_ENABLED2)
-     {
-      case 1:
-//     Config_Options[CONFIG_CONTROLLER_2] = "Joystick on player 2";
-//     JOYSTICK_ENABLED2=1;
-//     break;
-      case 2:
-       if (mouse_available)
-       {
-        Config_Options[CONFIG_CONTROLLER_2] = "Mouse on player 2";
-        JOYSTICK_ENABLED2=2;
-        break;
-       }
-      default:
-       Config_Options[CONFIG_CONTROLLER_2] = "Keyboard on player 2";
-       JOYSTICK_ENABLED2=0;
-     }
-     break;
-    }
-
-    if (CursorAt == CONFIG_CONTROLS_1)
-    {
-     AskControllerInputs(&input_player1);
-     break;
-    }
-
-    if (CursorAt == CONFIG_CONTROLS_2)
-    {
-     AskControllerInputs(&input_player2);
+     UpdateGUI(MAIN_CONFIGURE);
      break;
     }
 
@@ -937,7 +1109,19 @@ int ConfigWindow()
 
     if (CursorAt == CONFIG_SOUND)
     {
-     SoundWindow();
+     while((temp = SoundWindow()) != -1)
+     {
+#ifndef NO_LOGO
+      if(sneese)   // Prevent a crash if file not found!
+      {
+       set_palette(sneesepal);
+       stretch_blit(sneese,Allegro_Bitmap,0,0,GUI_ScreenWidth,GUI_ScreenHeight,0,0,SCREEN_W,SCREEN_H);
+      }
+#endif
+      set_palette_range(&GUIPal[-240],240,255,1);    // Set the GUI palette up.
+     }
+     UpdateGUI(MAIN_CONFIGURE);
+     break;
     }
 
     if (CursorAt == CONFIG_ENABLE_FPS_COUNTER)
@@ -1420,10 +1604,11 @@ int allocate_windows()
  if(!file_cleared) File_window+=File_clear;
 
  GUI_window=new BORDER_WINDOW(-1,-1,320,240);
- Main_window=new BORDER_WINDOW(0,0,16*default_font->get_widthspace(),NUM_OPTIONS*default_font->get_heightspace());
+ Main_window=new BORDER_WINDOW(0,0,16*default_font->get_widthspace(),MAIN_NUM_OPTIONS*default_font->get_heightspace());
  Credits_window=new BORDER_WINDOW(10,160,32*default_font->get_widthspace(),3*default_font->get_heightspace());
  Screen_window=new BORDER_WINDOW(100,30,21*default_font->get_widthspace(),NUM_SCREEN_OPTIONS*default_font->get_heightspace());
  Config_window=new BORDER_WINDOW(70,15,24*default_font->get_widthspace(),CONFIG_NUM_OPTIONS*default_font->get_heightspace());
+ Controls_window=new BORDER_WINDOW(90,105,24*default_font->get_widthspace(),CONTROLS_NUM_OPTIONS*default_font->get_heightspace());
  Sound_window=new BORDER_WINDOW(90,105,24*default_font->get_widthspace(),SOUND_NUM_OPTIONS*default_font->get_heightspace());
  ControlSetup_window=new BORDER_WINDOW(29,34,168,104);
  ROMInfo_window=new BORDER_WINDOW(10,70,33*default_font->get_widthspace(),7*default_font->get_heightspace());
@@ -1432,7 +1617,7 @@ int allocate_windows()
  APUStatus_window=new BORDER_WINDOW(8,70,48*default_font->get_widthspace(),9*default_font->get_heightspace());
  BGWinStatus_window=new BORDER_WINDOW(8,70,48*default_font->get_widthspace(),9*default_font->get_heightspace());
  if(!(GUI_window && Main_window && Credits_window &&
-    Screen_window && Config_window && Sound_window &&
+    Screen_window && Config_window && Controls_window && Sound_window &&
     ControlSetup_window && ROMInfo_window && HWStatus_window &&
     DMAStatus_window && APUStatus_window && BGWinStatus_window)) return 1;
  *GUI_window+=GUI_clear;
@@ -1440,6 +1625,7 @@ int allocate_windows()
  *Credits_window+=Credits_clear;
  *Screen_window+=Screen_clear;
  *Config_window+=Config_clear;
+ *Controls_window+=Config_clear;
  *Sound_window+=Sound_clear;
  *ControlSetup_window+=ControlSetup_clear;
  if(joypad)
@@ -1509,12 +1695,12 @@ GUI_ERROR GUI()
    case KEY_UP:
     CursorAt--;
     if(CursorAt == -1) // so it wraps
-     CursorAt = NUM_OPTIONS-1;
+     CursorAt = MAIN_NUM_OPTIONS-1;
     break;
 
    case KEY_DOWN:
     CursorAt++;
-    if(CursorAt == NUM_OPTIONS) // so it wraps
+    if(CursorAt == MAIN_NUM_OPTIONS) // so it wraps
      CursorAt=0;
     break;
 
@@ -1530,30 +1716,31 @@ GUI_ERROR GUI()
   case KEY_ENTER_PAD:
    if(snes_rom_loaded)
    {
-    if (CursorAt == 0) goto resume_emulation;
-    if (CursorAt == 1)
+
+    if (CursorAt == MAIN_RESUME_EMULATION) goto resume_emulation;
+    if (CursorAt == MAIN_RESET_EMULATION)
     {
      snes_reset();
      goto resume_emulation;
     }
 
-    if (CursorAt == 4)
+    if (CursorAt == MAIN_ROM_INFO)
      RomInfo();
 
-    if (CursorAt == 5)
+    if (CursorAt == MAIN_HW_STATUS)
      HWStatus();
 
-    if (CursorAt == 6)
+    if (CursorAt == MAIN_DMA_STATUS)
      DMAStatus();
 
-    if (CursorAt == 7)
+    if (CursorAt == MAIN_APU_STATUS)
      APUStatus();
 
-    if (CursorAt == 8)
+    if (CursorAt == MAIN_BGWIN_STATUS)
      BGWinStatus();
    }
 
-   if (CursorAt == 2)
+   if (CursorAt == MAIN_LOAD_ROM)
    {
     char TempBufferP[MAXPATH]; // For saving the current directory to use!
 
@@ -1567,9 +1754,9 @@ GUI_ERROR GUI()
     break;
    }
 
-   if (CursorAt == 3)
+   if (CursorAt == MAIN_CONFIGURE)
     ConfigWindow();
-   if (CursorAt == 9)
+   if (CursorAt == MAIN_EXIT)
    {
     free_windows();
     return GUI_EXIT;

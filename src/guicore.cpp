@@ -50,7 +50,6 @@ You must read and accept the license prior to use.
 
 #include <unistd.h>
 #include <string.h>
-#include <ctype.h>
 
 EXTERN char start_dir[MAXPATH]; /* defined in dos.c */
 
@@ -632,37 +631,6 @@ void PlotCharBorder(unsigned char Character,int x,int y){
   }
  }
 }*/
-
-void scantotext(unsigned scanc, char *text){
- text[0]=toupper(scancode_to_ascii(scanc));
- text[1]=0;
- switch(scanc){
-  case KEY_ALT: strcpy(text,"Alt"); break;
-  case KEY_ALTGR: strcpy(text,"AltG"); break;
-  case KEY_BACKSPACE: strcpy(text,"Bksp"); break;
-  case KEY_CAPSLOCK: strcpy(text,"Caps"); break;
-  case KEY_DEL: strcpy(text,"Del"); break;
-  case KEY_DOWN: strcpy(text,"Down"); break;
-  case KEY_END: strcpy(text,"End"); break;
-  case KEY_ENTER: strcpy(text,"Ent"); break;
-  case KEY_HOME: strcpy(text,"Home"); break;
-  case KEY_INSERT: strcpy(text,"Ins"); break;
-  case KEY_LCONTROL: strcpy(text,"LCtl"); break;
-  case KEY_LEFT: strcpy(text,"Left"); break;
-  case KEY_LSHIFT: strcpy(text,"LShf"); break;
-  case KEY_LWIN: strcpy(text,"LWin"); break;
-  case KEY_MENU: strcpy(text,"Menu"); break;
-  case KEY_PGDN: strcpy(text,"PgDn"); break;
-  case KEY_PGUP: strcpy(text,"PgUp"); break;
-  case KEY_RCONTROL: strcpy(text,"RCtl"); break;
-  case KEY_RIGHT: strcpy(text,"Rght"); break;
-  case KEY_RSHIFT: strcpy(text,"RShf"); break;
-  case KEY_RWIN: strcpy(text,"RWin"); break;
-  case KEY_SPACE: strcpy(text,"Spc"); break;
-  case KEY_TAB: strcpy(text,"Tab"); break;
-  case KEY_UP: strcpy(text,"Up"); break;
- }
-}
 
 BORDER_WINDOW File_window(20,0,38*default_font->get_widthspace(),15*default_font->get_heightspace());
 

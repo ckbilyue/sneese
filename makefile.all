@@ -110,10 +110,11 @@ endif
 
 
 OBJS   := $(addsuffix .$(ASM_OBJ_EXT), \
-            $(addprefix cpu/, 65c816 memmap dma) $(addprefix apu/, spc700 apuskip) \
+            $(addprefix cpu/, 65c816 memmap dma) \
+            $(addprefix apu/, spc700 apuskip) \
             $(addprefix ppu/, screen mode7 tiles sprites ppu) clear scrmode font) \
-          main.o romload.o snes.o timers.o debug.o helper.o apu/sound.o dos.o \
-          guicore.o emugui.o map.o multiio.o
+          main.o romload.o snes.o timers.o debug.o input.o helper.o \
+          apu/sound.o dos.o guicore.o emugui.o map.o multiio.o
 ifdef ZLIB
 OBJS += unzip.o
 endif
@@ -227,10 +228,13 @@ $(OBJ)/debug.$(OBJBASE): $(SRC)/debug.c \
  $(addprefix $(INCLUDE)/, debug.h misc.h cpu/cpu.h apu/sound.h apu/spc.h \
  helper.h snes.h wrapaleg.h)
 $(OBJ)/dos.$(OBJBASE): $(SRC)/dos.c \
- $(addprefix $(INCLUDE)/, platform.h misc.h helper.h romload.h apu/sound.h \
- cpu/cpu.h apu/spc.h guicore.h wrapaleg.h version.h)
+ $(addprefix $(INCLUDE)/, platform.h misc.h helper.h input.h romload.h \
+ apu/sound.h cpu/cpu.h apu/spc.h guicore.h wrapaleg.h version.h)
 $(OBJ)/helper.$(OBJBASE): $(SRC)/helper.c \
  $(addprefix $(INCLUDE)/, helper.h apu/sound.h apu/spc.h misc.h cpu/cpu.h \
+ wrapaleg.h)
+$(OBJ)/input.$(OBJBASE): $(SRC)/input.c \
+ $(addprefix $(INCLUDE)/, input.h helper.h cpu/cpu.h apu/sound.h misc.h \
  wrapaleg.h)
 $(OBJ)/apu/sound.$(OBJBASE): $(SRC)/apu/sound.c \
  $(addprefix $(INCLUDE)/, helper.h apu/sound.h apu/sounddef.h apu/spc.h \
