@@ -496,7 +496,7 @@ EXPORT_C Update_Display
  mov edx,[Ready_Line_Render]
  push eax
  sub edx,[C_LABEL(Current_Line_Render)]
- mov [Display_Needs_Update],dh
+ mov byte [Display_Needs_Update],0
 
  push ebx
  push ecx
@@ -1308,6 +1308,7 @@ EXPORT_C SCREEN_MODE_1
 
 %%bg2_lo_priority:
 %endif
+
  RENDER_LINE 2,0
 
 %%bg2_lo_done:

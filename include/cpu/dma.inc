@@ -179,16 +179,14 @@ EXTERN_MAP_WRITE_DMA 7
   test al,(1<<%1)
   jz %%no_hdma
 
-  add dword [C_LABEL(SNES_Cycles)],byte 8   ; HDMA processing
+  add dword R_65c816_Cycles,byte 8  ; HDMA processing
 
   mov byte [In_DMA],((%1) << 2) | DMA_IN_PROGRESS
   LOAD_DMA_TABLE %1
   call C_LABEL(Do_HDMA_Channel) ; CF clear if channel disabled
 
   jc %%no_hdma
-  mov al,[HDMAON]
-  and al,~(1<<%1)
-  mov [HDMAON],al       ; Disable this channel
+  and byte [HDMAON],~(1<<%1)    ; Disable this channel
 %%no_hdma:
 %endmacro
 

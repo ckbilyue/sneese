@@ -896,6 +896,7 @@ SNES_W2105: ; BGMODE
  ; Note: Render_Mode is declared in screen.asm
  cmp [C_LABEL(BGMODE)],al
  je near .no_change
+
  UpdateDisplay  ;*
 
  mov [C_LABEL(BGMODE)],al

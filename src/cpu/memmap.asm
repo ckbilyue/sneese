@@ -199,6 +199,7 @@ EXPORT_C PPU_READ
 
     cmp dh,0x21
     je .b_bus_read
+
     cmp byte [In_DMA],0
     jz .access_ok
     cmp dh,0x40

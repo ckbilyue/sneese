@@ -572,13 +572,6 @@ DMA_Fix_B_Addresses:
  mov [DAS_%1],eax
  mov [A2T_%1],eax
 
- push ebx
- push ecx
- mov ebx,C_LABEL(UNSUPPORTED_READ)
- mov ecx,C_LABEL(UNSUPPORTED_WRITE)
- pop ecx
- pop ebx
-
  mov byte [DMA_Inc_%1],0
 
  mov edx,%1 * 4
