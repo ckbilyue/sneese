@@ -52,6 +52,9 @@ Changes
   Timing: Moved display period to the start of scanlines [TRAC]
   DMA: Fixed a bug where the B-bus address could not be changed to a value
    equal to the DMA parameter for the same channel [TRAC]
+  Timing: Corrected normal display to 224 lines [TRAC]
+  Timing: Added support for latching 213C/213D counter registers via
+   register 4201 [TRAC]
  0.776 [TRAC]
   Render: Added support for dual window clipping with all logic
    modes of backgrounds in modes 5 and 6

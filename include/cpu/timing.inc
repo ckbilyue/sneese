@@ -17,10 +17,10 @@ You must read and accept the license prior to use.
 
 ; Fixed events (always at same time in frame):
 ; Scanline 0: hidden
-; Scanline 1-223/239, dots   0- 21: Hblank
-; Scanline 1-223/239, dots  22-277: Displayed screen
-; Scanline 1-223/239, dots 278-339: Hblank, HDMA start
-; Scanline 224/240: Hblank, HDMA start
+; Scanline 1-224/239, dots   0- 21: Hblank
+; Scanline 1-224/239, dots  22-277: Displayed screen
+; Scanline 1-224/239, dots 278-339: Hblank, HDMA start
+; Scanline 225/240: Vblank, NMI
 
 ; Variable events (software-specified time in frame):
 ;  H-IRQ - on a specific point on every scanline
@@ -109,6 +109,7 @@ EXPORT OPHCT,skipb  ; Whether reading lo or high byte
 EXPORT OPVCT,skipb  ; Whether reading lo or high byte
 RDNMI:      skipb   ; x000vvvv  x=disable/enable NMI,vvvv=version
 EXPORT_C NMITIMEN,skipb ; a0yx000b  a=NMI on/off,y=vert count,x=horiz count,b=joy read
+EXPORT_C WRIO,skipb     ; lxxxxxxx  l=counter latched when set, x=unknown
 EXPORT HVBJOY,skipb
 ; Nonzero if an IRQ set for current line has not been reached yet
 ;IRQ_set_this_line:skipb
@@ -554,27 +555,9 @@ EXPORT_C IRQRender  ; Check HDMA, IRQ, Render
  jmp near CPU_START_IRQ ; Return to CPU
 ALIGNC
 .end_of_display:
- mov dword [Render_Next_Event],VBL_First_Line
- mov dword [Render_Next_Trip],CYCLES_NEW_SCANLINE
- jmp near CPU_START_IRQ ; Return to CPU
-
-ALIGNC
-VBL_First_Line:
- mov dword [Last_Trip],0
-
- Update_Cycles
-
  mov eax,[NMI_Event_Handler]
-;mov dword [C_LABEL(EventTrip)],CYCLES_NEW_SCANLINE
- mov dword [FixedTrip],CYCLES_NEW_SCANLINE
-;mov [Event_Handler],eax
- mov [Fixed_Event],eax
-
- mov eax,[C_LABEL(Current_Line_Timing)] ; Get current scanline
- inc eax
- mov [C_LABEL(Current_Line_Timing)],eax
- mov [Vblank_Start],eax
-
+ mov [Render_Next_Event],eax
+ mov dword [Render_Next_Trip],CYCLES_NEW_SCANLINE
  jmp near CPU_START_IRQ ; Return to CPU
 
 ALIGNC
@@ -652,8 +635,9 @@ IRQNoRender:            ; Check HDMA, IRQ
  jmp near CPU_START_IRQ ; Return to CPU
 ALIGNC
 .end_of_display:
- mov dword [Event_Handler],VBL_First_Line
- mov dword [Fixed_Event],VBL_First_Line
+ mov eax,[NMI_Event_Handler]
+ mov [Event_Handler],eax
+ mov [Fixed_Event],eax
  jmp near CPU_START_IRQ ; Return to CPU
 
 ALIGNC
@@ -1065,6 +1049,27 @@ EXPORT SNES_R213D ; OPVCT
 ALIGNC
 EXPORT SNES_R4200 ; NMITIMEN
  mov al,[C_LABEL(NMITIMEN)]
+ ret
+
+ALIGNC
+EXPORT SNES_W4201 ; WRIO
+ mov dl,[C_LABEL(WRIO)]
+ cmp dl,al
+ je .no_change
+
+ xor dl,al
+ mov [C_LABEL(WRIO)],al
+
+ test al,al
+ jns .no_latch
+
+ test dl,dl
+ jns .no_latch
+
+ call SNES_R2137
+.no_latch:
+
+.no_change:
  ret
 
 ALIGNC

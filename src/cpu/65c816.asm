@@ -4562,6 +4562,7 @@ EXPORT_C Reset_CPU
  mov [MEMSEL],al
  mov [HVBJOY],al
  mov [C_LABEL(NMITIMEN)],al
+ mov byte [C_LABEL(WRIO)],0xFF
  mov [C_LABEL(HTIMEL)],eax
  mov [C_LABEL(VTIMEL)],eax
 
