@@ -957,6 +957,15 @@ You must read and accept the license prior to use.
  READ16_Immediate JSR
 %endmacro
 
+; Absolute Long (corrupts eax,ebx)
+;  Address = a24
+;  Address set to PB:PC
+;    JSL-22
+; 4 bytes, 7 cycles
+;
+;    JML-5C
+; 4 bytes, 4 cycles
+;
 %macro ADDR_Absolute_Long_JMP 0
  READ24_Immediate JMP
 %endmacro
@@ -964,3 +973,28 @@ You must read and accept the license prior to use.
 %macro ADDR_Absolute_Long_JSR 0
  READ24_Immediate JSR
 %endmacro
+
+; Absolute Indirect (corrupts eax,ebx)
+;  Address = (00:a16)
+;  Address set to PC
+;    JMP-6C
+; 3 bytes, 5 cycles
+;
+%macro ADDR_Absolute_Indirect_JMP 0
+ READ16_Immediate JMP
+ mov ebx,eax
+ GET_WORD
+%endmacro
+
+; Absolute Indirect Long (corrupts eax,ebx)
+;  Address = [00:a16]
+;  Address set to PB:PC
+;    JML-DC
+; 3 bytes, 5 cycles
+;
+%macro ADDR_Absolute_Indirect_Long_JMP 0
+ READ16_Immediate JMP
+ mov ebx,eax
+ GET_LONG
+%endmacro
+
