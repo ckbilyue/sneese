@@ -1117,8 +1117,10 @@ SPC_SHOW_REGISTERS:
 
 ALIGNC
 EXPORT_C get_SPC_PSW
+ push dword R_Base
  LOAD_BASE
  SETUPFLAGS_SPC
+ pop dword R_Base
  ret
 
 ALIGNC
