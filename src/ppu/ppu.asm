@@ -1119,8 +1119,8 @@ SNES_R4016: ; JOYC1
  mov ebx,[C_LABEL(JOY1L)]
  mov [C_LABEL(Controller1_Pos)],cl
  ror ebx,cl
- mov al,bl
- and al,1
+ mov al,1
+ and al,bl
  pop ebx
  pop ecx
  ret
@@ -1140,8 +1140,8 @@ ALIGNC
  mov [C_LABEL(Controller1_Pos)],cl
  mov bx,[C_LABEL(MickeyRead)]
  shr bx,cl
- mov al,bl
- and al,1
+ mov al,1
+ and al,bl
  pop ebx
  pop ecx
  ret
