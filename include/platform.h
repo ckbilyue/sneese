@@ -67,12 +67,6 @@ EXTERN void fnsplit(const char *in, char *drive, char *dir, char *file,
 #endif
 
 
-typedef struct {
- int depth, width, height, hslack, vslack, needed_w, needed_h;
- void *bitmap, *subbitmap; /* platform-dependent pointers */
- void *buffer; /* start of actual drawing area that we'll be using */
-} SNEESE_GFX_BUFFER;
-
 
 EXTERN char home_dir[MAXPATH];
 EXTERN char cfg_name[MAXPATH];
@@ -86,8 +80,42 @@ EXTERN void cmdhelp(void);
 EXTERN int platform_init(int argc, char **argv);
 EXTERN void platform_exit(void);
 EXTERN int parse_args(int argc, char **argv, char **names, int maxnames);
+
+
+/* video abstraction */
+typedef struct {
+ int depth, width, height, hslack, vslack, needed_w, needed_h;
+ void *bitmap, *subbitmap; /* platform-dependent pointers */
+ void *buffer; /* start of actual drawing area that we'll be using */
+} SNEESE_GFX_BUFFER;
+
+
+#define NULL_GFX_BUFFER { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
 EXTERN void *platform_get_gfx_buffer(
  int depth, int width, int height, int hslack, int vslack,
  SNEESE_GFX_BUFFER *gfx_buffer);
+
+
+/* audio abstraction */
+typedef struct {
+ int samples, bits, stereo, freq;
+ void *platform_interface;
+} SNEESE_AUDIO_VOICE;
+#define NULL_AUDIO_VOICE { 0, 0, 0, 0, 0 }
+
+
+signed char platform_sound_available;
+
+EXTERN void *platform_get_audio_voice(
+ int samples, int bits, int stereo, int freq,
+ SNEESE_AUDIO_VOICE *audio_voice);
+EXTERN void platform_free_audio_voice(SNEESE_AUDIO_VOICE *audio_voice);
+
+EXTERN void *platform_get_audio_buffer(SNEESE_AUDIO_VOICE *audio_voice);
+EXTERN void platform_free_audio_buffer(SNEESE_AUDIO_VOICE *audio_voice);
+
+EXTERN void platform_pause_audio_voice(SNEESE_AUDIO_VOICE *audio_voice);
+EXTERN void platform_resume_audio_voice(SNEESE_AUDIO_VOICE *audio_voice);
+
 
 #endif /* !defined(SNEeSe_platform_h) */

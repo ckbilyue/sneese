@@ -75,7 +75,7 @@ unsigned sound_cycle_latch;
 unsigned sound_output_position;
 unsigned sound_sample_latch;
 
-static AUDIOSTREAM *stream_buffer = NULL;
+static SNEESE_AUDIO_VOICE audio_voice = NULL_AUDIO_VOICE;
 static void *sound_buffer_preload = NULL;
 static output_sample_16 *noise_buffer = NULL;
 static signed char *outx_buffer = NULL;    /* for pitch modulation */
@@ -706,6 +706,8 @@ void Reset_Sound_DSP()
 {
  int i, samples;
 
+ srand(0);
+
  samples = 2 * SOUND_FREQ / SOUND_LAG;
 
  if (sound_enable_mode == 2) samples <<= 1;
@@ -792,50 +794,33 @@ void Remove_Sound()
   free(sound_buffer_preload);
   sound_buffer_preload = 0;
  }
- if (stream_buffer)
+ if (audio_voice.platform_interface)
  {
-  stop_audio_stream(stream_buffer);
-  stream_buffer = 0;
+  platform_free_audio_voice(&audio_voice);
  }
 
- remove_sound();
  sound_enabled = sound_enable_mode = 0;
 }
 
 int Install_Sound(int stereo)
 {
  int samples;
+ if (!platform_sound_available) return 0;
+
  if (sound_enable_mode) Remove_Sound();
- srand(0);
-
- set_volume_per_voice(0);
-#ifdef ALLEGRO_WINDOWS
- if (install_sound(DIGI_DIRECTX(0), MIDI_NONE, NULL))
-#endif
- if (install_sound(DIGI_AUTODETECT, MIDI_NONE, NULL))
- {
-  return sound_enabled = sound_enable_mode = 0;
- }
-
- if (digi_driver->id == DIGI_NONE)
- {
-  Remove_Sound();
-  return sound_enabled = sound_enable_mode = 0;
- }
 
  samples = 2 * SOUND_FREQ / SOUND_LAG;
 
+ platform_get_audio_voice(samples / 2, sound_bits, stereo, SOUND_FREQ,
+  &audio_voice);
+
  if (sound_bits == 8)
  {
-  stream_buffer = play_audio_stream(samples / 2, 8,
-   stereo ? TRUE : FALSE, SOUND_FREQ, 255, 128);
   sound_buffer_preload =
    malloc(sizeof(output_sample_8[(stereo ? 2 : 1) * samples]));
  }
  else
  {
-  stream_buffer = play_audio_stream(samples / 2, 16,
-   stereo ? TRUE : FALSE, SOUND_FREQ, 255, 128);
   sound_buffer_preload =
    malloc(sizeof(output_sample_16[(stereo ? 2 : 1) * samples]));
  }
@@ -847,14 +832,13 @@ int Install_Sound(int stereo)
 
  mix_buffer = (int *) malloc(sizeof(int [(stereo ? 2 : 1) * samples]));
 
- if (!stream_buffer || !sound_buffer_preload || !noise_buffer || !outx_buffer
-  || !mix_buffer)
+ if (!audio_voice.platform_interface || !sound_buffer_preload ||
+  !noise_buffer || !outx_buffer || !mix_buffer)
  {
   Remove_Sound();
   return sound_enabled = sound_enable_mode = 0;
  }
 
- set_volume(255, -1);
  sound_enabled = sound_enable_mode = stereo + 1;
 
  return sound_enabled;
@@ -914,7 +898,7 @@ void update_sound_block(void)
  }
 #endif
 
- sound_buffer = get_audio_stream_buffer(stream_buffer);
+ sound_buffer = platform_get_audio_buffer(&audio_voice);
  if (!sound_buffer) return;
 
  block_written = TRUE;
@@ -956,7 +940,7 @@ void update_sound_block(void)
   }
  }
 
- free_audio_stream_buffer(stream_buffer);
+ platform_free_audio_buffer(&audio_voice);
 }
 
 unsigned samples_output = 0;
@@ -1905,12 +1889,12 @@ void SPC_WRITE_DSP()
 
 void sound_pause(void)
 {
- if (sound_enabled) voice_stop(stream_buffer->voice);
+ if (sound_enabled) platform_pause_audio_voice(&audio_voice);
 }
 
 void sound_resume(void)
 {
- if (sound_enabled) voice_start(stream_buffer->voice);
+ if (sound_enabled) platform_resume_audio_voice(&audio_voice);
 }
 
 #ifdef ALLEGRO_DOS

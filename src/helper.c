@@ -165,8 +165,8 @@ signed char stretch_x, stretch_y;
 /* This flag is set when palette recomputation is necessary */
 signed char PaletteChanged;
 
-SNEESE_GFX_BUFFER gbSNES_Screen8;
-SNEESE_GFX_BUFFER gbSNES_Screen16;
+SNEESE_GFX_BUFFER gbSNES_Screen8 = NULL_GFX_BUFFER;
+SNEESE_GFX_BUFFER gbSNES_Screen16 = NULL_GFX_BUFFER;
 
 unsigned char *SNES_Screen8;
 unsigned short *SNES_Screen16;

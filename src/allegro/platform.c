@@ -443,6 +443,7 @@ int platform_init(int argc, char **argv)
 
  set_display_switch_mode(SWITCH_BACKGROUND);
 
+
 #ifdef ALLEGRO_WINDOWS
  set_window_title("SNEeSeW");
 #else
@@ -514,6 +515,27 @@ int platform_init(int argc, char **argv)
  GUI_ENABLED = 0;
 #endif
 #endif
+
+ platform_sound_available = 1;
+#ifdef ALLEGRO_WINDOWS
+ if (install_sound(DIGI_DIRECTX(0), MIDI_NONE, NULL))
+#endif
+ if (install_sound(DIGI_AUTODETECT, MIDI_NONE, NULL))
+ {
+  platform_sound_available = 0;
+ }
+
+ if (digi_driver->id == DIGI_NONE)
+ {
+  remove_sound();
+  platform_sound_available = 0;
+ }
+
+ if (platform_sound_available)
+ {
+  set_volume_per_voice(0);
+  set_volume(255, -1);
+ }
 
  return 0;
 }
@@ -818,6 +840,8 @@ int parse_args(int argc, char **argv, char **names, int maxnames)
  /* End: command line parser */
 }
 
+
+/* video abstraction */
 void *platform_get_gfx_buffer(
  int depth, int width, int height, int hslack, int vslack,
  SNEESE_GFX_BUFFER *gfx_buffer)
@@ -864,3 +888,50 @@ void *platform_get_gfx_buffer(
 
  return gfx_buffer->buffer = ((BITMAP *) gfx_buffer->subbitmap)->line[0];
 }
+
+
+/* audio abstraction */
+void *platform_get_audio_voice(
+ int samples, int bits, int stereo, int freq,
+ SNEESE_AUDIO_VOICE *audio_voice)
+{
+ audio_voice->samples = samples;
+ audio_voice->bits = bits;
+ audio_voice->stereo = stereo;
+ audio_voice->freq = freq;
+ audio_voice->platform_interface = play_audio_stream(samples, bits, stereo,
+  freq, 255, 128);
+
+ return audio_voice->platform_interface;
+}
+
+void platform_free_audio_voice(SNEESE_AUDIO_VOICE *audio_voice)
+{
+ if (!audio_voice->platform_interface) return;
+ stop_audio_stream((AUDIOSTREAM *) audio_voice->platform_interface);
+ audio_voice->platform_interface = NULL;
+}
+
+void *platform_get_audio_buffer(SNEESE_AUDIO_VOICE *audio_voice)
+{
+ return get_audio_stream_buffer((AUDIOSTREAM *)
+  audio_voice->platform_interface);
+}
+
+void platform_free_audio_buffer(SNEESE_AUDIO_VOICE *audio_voice)
+{
+ free_audio_stream_buffer((AUDIOSTREAM *) audio_voice->platform_interface);
+}
+
+void platform_pause_audio_voice(SNEESE_AUDIO_VOICE *audio_voice)
+{
+ if (audio_voice->platform_interface)
+  voice_stop(((AUDIOSTREAM *) audio_voice->platform_interface)->voice);
+}
+
+void platform_resume_audio_voice(SNEESE_AUDIO_VOICE *audio_voice)
+{
+ if (audio_voice->platform_interface)
+  voice_start(((AUDIOSTREAM *) (audio_voice->platform_interface))->voice);
+}
+
