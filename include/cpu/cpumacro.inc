@@ -239,8 +239,8 @@ EXPORT_C E0_BIT_%1
 %macro EM_CMP 2
 ALIGNC
 EXPORT_C EM_CMP_%1
- mov cl,B_A
  READ8_%2
+ mov cl,B_A
  sub cl,al
  sbb al,al
  STORE_FLAGS_N cl
@@ -270,8 +270,8 @@ EXPORT_C E0_CMP_%1
 %macro EX_CPX 2
 ALIGNC
 EXPORT_C EX_CPX_%1
- mov cl,B_X
  READ8_%2
+ mov cl,B_X
  sub cl,al
  sbb al,al
  STORE_FLAGS_N cl
@@ -301,8 +301,8 @@ EXPORT_C E0_CPX_%1
 %macro EX_CPY 2
 ALIGNC
 EXPORT_C EX_CPY_%1
- mov cl,B_Y
  READ8_%2
+ mov cl,B_Y
  sub cl,al
  sbb al,al
  STORE_FLAGS_N cl
@@ -640,8 +640,8 @@ EXPORT_C E0_ORA_%1
 %macro EM_ROL 2
 ALIGNC
 EXPORT_C EM_ROL_%1
- mov cl,B_C_flag
  READ8_%2
+ mov cl,B_C_flag
  add cl,255 ;MAKE_CARRY
  adc al,al
  sbb cl,cl
@@ -691,8 +691,8 @@ EXPORT_C E0_ROL_%1
 %macro EM_ROR 2
 ALIGNC
 EXPORT_C EM_ROR_%1
- mov cl,B_C_flag
  READ8_%2
+ mov cl,B_C_flag
  add cl,255 ;MAKE_CARRY
  rcr al,1
  sbb cl,cl
@@ -916,8 +916,8 @@ EXPORT_C E0_STZ_%1
 %macro EM_TRB 2
 ALIGNC
 EXPORT_C EM_TRB_%1
- mov cl,B_A
  READ8_%2
+ mov cl,B_A
  mov ah,cl
  xor cl,0xFF
  and ah,al      ; Z set for: mem & A
@@ -947,8 +947,8 @@ EXPORT_C E0_TRB_%1
 %macro EM_TSB 2
 ALIGNC
 EXPORT_C EM_TSB_%1
- mov cl,B_A
  READ8_%2
+ mov cl,B_A
  mov ah,cl
  and cl,al      ; Z set for: mem & A
  STORE_FLAGS_Z cl

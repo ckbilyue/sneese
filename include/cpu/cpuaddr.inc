@@ -35,6 +35,27 @@ You must read and accept the license prior to use.
 %endmacro
 
 
+;helper macro for nonzero DL fixup/quirks
+%macro Check_DL_Not_Zero 0
+%ifdef S_8bit
+%if S_8bit
+ test dl,dl
+ jz %%fixup
+ add R_Cycles,byte _5A22_FAST_CYCLE
+ jmp %%no_fixup
+%%fixup:
+ mov bh,dh 
+%%no_fixup:
+%else
+ add dl,255
+ sbb edx,edx
+ and edx,_5A22_FAST_CYCLE
+ add R_Cycles,edx
+%endif
+%endif
+%endmacro
+
+
 ; Implied
 %macro ADDR_Implied 0
  inc R_NativePC
@@ -191,13 +212,17 @@ You must read and accept the license prior to use.
 
 ; if present, argument specifies index
 %macro ADDR_Direct 0-1 0
- mov bl,[1+R_NativePC]
- add R_NativePC,byte 2
- mov edx,B_D
- add bx,dx
+ READ8_Immediate
 %ifnidni %1,0
- mov edx,%1
- add bx,dx
+ add eax,%1             ;helper: index
+%endif
+ mov edx,B_D
+ mov ebx,0xFFFF
+ add eax,edx            ;(D + byte (+ index, if present))
+ and ebx,eax            ;bank 00
+ Check_DL_Not_Zero
+%ifnidni %1,0
+;add R_Cycles,_5A22_FAST_CYCLE
 %endif
 %endmacro
 
@@ -250,7 +275,7 @@ You must read and accept the license prior to use.
 %macro ADDR_Direct_Indirect_Indexed 0
  READ16_Direct
  mov ebx,B_DB_Shifted
- add ebx,eax
+ mov bx,ax
  mov edx,B_Y
  add ebx,edx
  and ebx,0x00FFFFFF ; Ensure 24-bit address
@@ -384,7 +409,7 @@ You must read and accept the license prior to use.
 %macro ADDR_Direct_Indexed_Indirect 0
  READ16_Direct_Index_X
  mov ebx,B_DB_Shifted
- add ebx,eax
+ mov bx,ax
 %endmacro
 
 %macro READ8_Direct_Indexed_Indirect 0
@@ -532,7 +557,7 @@ You must read and accept the license prior to use.
 %macro ADDR_Direct_Indirect 0
  READ16_Direct
  mov ebx,B_DB_Shifted
- add ebx,eax
+ mov bx,ax
 %endmacro
 
 %macro READ8_Direct_Indirect 0

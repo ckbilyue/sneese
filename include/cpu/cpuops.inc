@@ -549,10 +549,6 @@ E0_TRB d,Direct
 EM_ORA d_x,Direct_Index_X
 E0_ORA d_x,Direct_Index_X
 
-; 16
-EM_ASL d_x,Direct_Index_X
-E0_ASL d_x,Direct_Index_X
-
 ; 17
 EM_ORA IdI_y,Direct_Indirect_Indexed_Long
 E0_ORA IdI_y,Direct_Indirect_Indexed_Long
@@ -878,10 +874,6 @@ E0_BIT d_x,Direct_Index_X
 EM_AND d_x,Direct_Index_X
 E0_AND d_x,Direct_Index_X
 
-; 36
-EM_ROL d_x,Direct_Index_X
-E0_ROL d_x,Direct_Index_X
-
 ; 37
 EM_AND IdI_y,Direct_Indirect_Indexed_Long
 E0_AND IdI_y,Direct_Indirect_Indexed_Long
@@ -1157,10 +1149,6 @@ EXPORT_C EX_MVN
 ; 55
 EM_EOR d_x,Direct_Index_X
 E0_EOR d_x,Direct_Index_X
-
-; 56
-EM_LSR d_x,Direct_Index_X
-E0_LSR d_x,Direct_Index_X
 
 ; 57
 EM_EOR IdI_y,Direct_Indirect_Indexed_Long
@@ -1560,10 +1548,6 @@ E0_STZ d_x,Direct_Index_X
 ; 75
 EM_ADC d_x,Direct_Index_X
 E0_ADC d_x,Direct_Index_X
-
-; 76
-EM_ROR d_x,Direct_Index_X
-E0_ROR d_x,Direct_Index_X
 
 ; 77
 EM_ADC IdI_y,Direct_Indirect_Indexed_Long
@@ -2162,10 +2146,6 @@ EXPORT_C E1_PEI
 EM_CMP d_x,Direct_Index_X
 E0_CMP d_x,Direct_Index_X
 
-; D6
-EM_DEC d_x,Direct_Index_X
-E0_DEC d_x,Direct_Index_X
-
 ; D7
 EM_CMP IdI_y,Direct_Indirect_Indexed_Long
 E0_CMP IdI_y,Direct_Indirect_Indexed_Long
@@ -2452,10 +2432,6 @@ EXPORT_C E1_PEA
 ; F5
 EM_SBC d_x,Direct_Index_X
 E0_SBC d_x,Direct_Index_X
-
-; F6
-EM_INC d_x,Direct_Index_X
-E0_INC d_x,Direct_Index_X
 
 ; F7
 EM_SBC IdI_y,Direct_Indirect_Indexed_Long

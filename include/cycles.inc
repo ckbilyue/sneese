@@ -14,6 +14,8 @@ You must read and accept the license prior to use.
 %ifndef SNEeSe_cycles_inc
 %define SNEeSe_cycles_inc
 
+%define _5A22_FAST_CYCLE 6
+
 %define CYCLES_PER_DOT 4
 %define DOTS_PER_SCANLINE 335
 %define DOTS_IN_REFRESH 10
