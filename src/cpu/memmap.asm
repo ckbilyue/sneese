@@ -71,15 +71,6 @@ EXPORT_C SNES_GET_WORD
  ret
 
 ALIGNC
-EXPORT_C SNES_GET_WORD_00
- GET_BYTE_00
- mov ah,al
- inc bx
- GET_BYTE_00
- ror ax,8
- ret
-
-ALIGNC
 EXPORT_C SNES_GET_LONG
  xor eax,eax
  GET_BYTE
