@@ -809,13 +809,22 @@ EXPORT_C Recalc_Window_Area_BG
 .intersect:
  and ah,3
  cmp ah,1
- je .intersect_and
- ja .intersect_xor
+ je .intersect_and_setup
+ ja .intersect_xor_check
 
-.intersect_or:
+;each intersect setup code chains to an intersect handler
+;each intersect handler expects the following register state:
+; edx = address of window 1 bands
+; esi = address of window 2 bands
+; cl = count of window 1 bands
+; ch = count of window 2 bands
+; ebp = 0
+; edi = address for output window area (BG_WIN_DATA)
+
+;for OR window logic, we use AND of inverted (outside) areas
+.intersect_or_setup:
  add edi,esi
 
- ; or   = and of outside
  LOAD_WIN_TABLE 1
  LOAD_WIN_TABLE 2,esi
  xor ebp,ebp
@@ -827,9 +836,9 @@ EXPORT_C Recalc_Window_Area_BG
  mov cl,[Win_Count_In+edx]
  add edx,byte Win_Bands_In - Win_Bands_Out
 .or_draw_outside_1:
-
- test cl,cl
- jz .or_no_more_bands
+%if Win_Bands_Out
+ add edx,Win_Bands_Out
+%endif
 
  test al,4
  mov ch,[Win_Count_Out+esi]
@@ -837,37 +846,44 @@ EXPORT_C Recalc_Window_Area_BG
  mov ch,[Win_Count_In+esi]
  add esi,byte Win_Bands_In - Win_Bands_Out
 .or_draw_outside_2:
+%if Win_Bands_Out
+ add esi,Win_Bands_Out
+%endif
+
+.intersect_and_entry:
+ test cl,cl
+ jz .and_no_more_bands
 
  test ch,ch
- jz .or_no_more_bands
+ jz .and_no_more_bands
 
-.or_win1_loop:
+.and_win1_loop:
  push ecx
  mov ax,[edx+Win_Bands_Out]
  dec ah
  push esi
 
-.or_win2_loop:
+.and_win2_loop:
  mov bx,[esi+Win_Bands_Out]
  dec bh
 
  cmp al,bh      ;win1left, win2right
- ja .or_no_intersect
+ ja .and_no_intersect
 
  cmp bl,ah      ;win2left, win1right
- ja .or_no_more_intersect
+ ja .and_no_more_intersect
 
  cmp bl,al
- ja .or_max_left
+ ja .and_max_left
  mov bl,al
-.or_max_left:
+.and_max_left:
 
  mov [edi+ebp*2+BG_Win_Bands],bl
 
  cmp bh,ah
- jb .or_min_right
+ jb .and_min_right
  mov bh,ah
-.or_min_right:
+.and_min_right:
 
  inc bh
  mov [edi+ebp*2+BG_Win_Bands+1],bh
@@ -875,35 +891,35 @@ EXPORT_C Recalc_Window_Area_BG
 
  add esi,byte 2
  dec ch
- jnz .or_win2_loop
+ jnz .and_win2_loop
 
-.or_no_more_intersect:
+.and_no_more_intersect:
  pop esi
  pop ecx
 
  add edx,byte 2
  dec cl
- jnz .or_win1_loop
+ jnz .and_win1_loop
 
-.or_no_more_bands:
+.and_no_more_bands:
  mov eax,ebp
  mov [edi+BG_Win_Count],al
  ret
 
-.or_no_intersect:
+.and_no_intersect:
  add esi,byte 2
  dec ch
  mov [esp],esi
  mov [esp+4],ecx
- jnz .or_win2_loop
+ jnz .and_win2_loop
  add esp,byte 8
- jmp .or_no_more_bands
+ jmp .and_no_more_bands
 
 
-.intersect_and:
+;for AND window logic, we use OR of inverted (outside) areas
+.intersect_and_setup:
  add edi,esi
 
- ; and  = or of outside
  LOAD_WIN_TABLE 1
  LOAD_WIN_TABLE 2,esi
  xor ebp,ebp
@@ -915,9 +931,9 @@ EXPORT_C Recalc_Window_Area_BG
  mov cl,[Win_Count_In+edx]
  add edx,byte Win_Bands_In - Win_Bands_Out
 .and_draw_outside_1:
-
- test cl,cl
- jz .and_no_bands
+%if Win_Bands_Out
+ add edx,Win_Bands_Out
+%endif
 
  test al,4
  mov ch,[Win_Count_Out+esi]
@@ -925,62 +941,69 @@ EXPORT_C Recalc_Window_Area_BG
  mov ch,[Win_Count_In+esi]
  add esi,byte Win_Bands_In - Win_Bands_Out
 .and_draw_outside_2:
+%if Win_Bands_Out
+ add esi,Win_Bands_Out
+%endif
+
+.intersect_or_entry:
+ test cl,cl
+ jz .or_copy_win2
 
  test ch,ch
- jz .and_no_bands
+ jz .or_copy_win1
 
-.and_win1_loop:
+.or_win1_loop:
  ; start with leftmost window bands
  mov al,[edx+Win_Bands_Out]
  mov bl,[esi+Win_Bands_Out]
  cmp al,bl
- jbe .and_no_swap
+ jbe .or_no_swap
  rol cx,8
  mov ebx,edx
  mov edx,esi
  mov esi,ebx
-.and_no_swap:
+.or_no_swap:
 
  mov ax,[edx+Win_Bands_Out]
 
-.and_win2_loop:
+.or_win2_loop:
  mov bx,[esi+Win_Bands_Out]
 
  ; compare left edges against right edges
  test bh,bh
- jz .and_win2right_edge
+ jz .or_win2right_edge
 
  cmp al,bh      ;win1left, win2right
- ja .and_no_intersect
+ ja .or_no_intersect
 
-.and_win2right_edge:
+.or_win2right_edge:
  test ah,ah
- jz .and_win1right_edge
+ jz .or_win1right_edge
 
  cmp bl,ah      ;win2left, win1right
- ja .and_no_intersect
+ ja .or_no_intersect
 
-.and_win1right_edge:
+.or_win1right_edge:
  cmp al,bl
- jb .and_min_left
+ jb .or_min_left
  mov al,bl
-.and_min_left:
+.or_min_left:
 
  dec ah
  dec bh
  cmp ah,bh
- ja .and_max_right
+ ja .or_max_right
  mov ah,bh
-.and_max_right:
+.or_max_right:
  inc ah
 
  add esi,byte 2
  dec ch
- jnz .and_win2_loop
+ jnz .or_win2_loop
 
-.and_no_intersect:
+.or_no_intersect:
  dec cl
- jz .and_last_band
+ jz .or_last_band
 
  mov bx,[edx+Win_Bands_Out+2]
  add edx,byte 2
@@ -988,37 +1011,37 @@ EXPORT_C Recalc_Window_Area_BG
  ; compare left edges against right edges
 
  test bh,bh
- jz .and_win2right_edge2
+ jz .or_win2right_edge2
 
  cmp al,bh      ;win1left, win2right
- ja .and_no_intersect2
+ ja .or_no_intersect2
 
-.and_win2right_edge2:
+.or_win2right_edge2:
  test ah,ah
- jz .and_win1right_edge2
+ jz .or_win1right_edge2
 
  cmp bl,ah      ;win2left, win1right
- ja .and_no_intersect2
+ ja .or_no_intersect2
 
-.and_win1right_edge2:
+.or_win1right_edge2:
  cmp al,bl
- jb .and_min_left2
+ jb .or_min_left2
  mov al,bl
-.and_min_left2:
+.or_min_left2:
 
  dec ah
  dec bh
  cmp ah,bh
- ja .and_max_right2
+ ja .or_max_right2
  mov ah,bh
-.and_max_right2:
+.or_max_right2:
  inc ah
 
  test ch,ch
- jnz .and_win2_loop
- jmp .and_no_intersect
+ jnz .or_win2_loop
+ jmp .or_no_intersect
 
-.and_swap_windows:
+.or_swap_windows:
  rol cx,8
  mov ebx,edx
  mov edx,esi
@@ -1026,34 +1049,51 @@ EXPORT_C Recalc_Window_Area_BG
  mov bx,[edx+Win_Bands_Out]
  dec bh
 
-.and_no_intersect2:
+.or_no_intersect2:
  mov [edi+ebp*2+BG_Win_Bands],al
  mov [edi+ebp*2+BG_Win_Bands+1],ah
  inc ebp
 
  test ch,ch
- jnz .and_win1_loop
+ jnz .or_win1_loop
  mov ax,bx
- jmp .and_no_intersect
+ jmp .or_no_intersect
 
-.and_last_band:
+.or_last_band:
  test ch,ch
- jnz .and_swap_windows
+ jnz .or_swap_windows
 
- mov [edi+ebp*2+BG_Win_Bands],al
- mov [edi+ebp*2+BG_Win_Bands+1],ah
+ mov [edi+ebp*2+BG_Win_Bands],ax
  inc ebp
 
-.and_no_bands:
  mov eax,ebp
  mov [edi+BG_Win_Count],al
+.or_done:
  ret
 
-.intersect_xor:
+.or_copy_win2:
+ mov cl,ch
+ mov edx,esi
+.or_copy_win1:
+ mov [edi+BG_Win_Count],cl
+ dec cl
+ js .or_done
+.or_copy_another:
+ mov ax,[edx+ebp*2+Win_Bands_Out]
+ mov [edi+ebp*2+BG_Win_Bands],ax
+ inc ebp
+ dec cl
+ jns .or_copy_another
+ ret
+
+
+;if we're doing xor, we flip the inversion of one of the windows
+.intersect_xor_check:
  ;fixup for xor/xnor
  and ah,1
  xor al,ah
 
+.intersect_xor_setup:
  add edi,esi
 
  LOAD_WIN_TABLE 1
@@ -1066,6 +1106,9 @@ EXPORT_C Recalc_Window_Area_BG
  mov cl,[Win_Count_In+edx]
  add edx,byte Win_Bands_In - Win_Bands_Out
 .xor_draw_outside_1:
+%if Win_Bands_Out
+ add edx,Win_Bands_Out
+%endif
 
  test al,4
  mov ch,[Win_Count_Out+esi]
@@ -1073,7 +1116,11 @@ EXPORT_C Recalc_Window_Area_BG
  mov ch,[Win_Count_In+esi]
  add esi,byte Win_Bands_In - Win_Bands_Out
 .xor_draw_outside_2:
+%if Win_Bands_Out
+ add esi,Win_Bands_Out
+%endif
 
+.intersect_xor_entry:
 EXTERN_C xor_bands
  push edi
  xor eax,eax
