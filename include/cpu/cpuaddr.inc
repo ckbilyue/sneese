@@ -142,6 +142,18 @@ You must read and accept the license prior to use.
  GET_WORD
 %endmacro
 
+%macro RMW_Absolute 1
+ READ %+ M_size %+ _Absolute
+;add R_Cycles,_5A22_FAST_CYCLE
+ %1
+%if M_8bit
+ SET_BYTE
+%else
+ SET_WORD_HL
+%endif
+%endmacro
+
+
 ; Absolute Long (corrupts eax)
 ;  Address = a24
 ;  Read 8-bit and 16-bit
@@ -203,6 +215,18 @@ You must read and accept the license prior to use.
  ADDR_Direct
  GET_LONG
 %endmacro
+
+%macro RMW_Direct 1
+ READ %+ M_size %+ _Direct
+;add R_Cycles,_5A22_FAST_CYCLE
+ %1
+%if M_8bit
+ SET_BYTE
+%else
+ SET_WORD_HL
+%endif
+%endmacro
+
 
 ; Direct Indirect Indexed (corrupts eax)
 ;  Read 8-bit and 16-bit
@@ -280,36 +304,9 @@ You must read and accept the license prior to use.
 ;    SBC-F5
 ;  Write 8-bit and 16-bit
 ;    STZ-74  STY-94  STA-95
-;
-; 2 bytes, 4-6 clocks
-;
-;       1   1  1   1  1 PBR,PC      Op Code     1
-;       2   1  1   0  1 PBR,PC+1    DO          1
-;   (if DL != 0)
-;   (2) 2a  1  1   0  0 PBR,PC+1    IO          1
-;       3   1  1   0  0 PBR,PC+1    IO          1
-;       4   1  1   1  0 0,D+DO+X    Data Low    1/0
-;   (if 16-bit data)
-;   (1) 4a  1  1   1  0 0,D+DO+X+1  Data High   1/0
-;
 ;  RMW 8-bit and 16-bit
 ;    ASL-16  ROL-36  LSR-56  ROR-76  DEC-D6  INC-F6
 ;
-; 2 bytes, 6-9 clocks
-;
-;       1   1  1   1  1 PBR,PC      Op Code     1
-;       2   1  1   0  1 PBR,PC+1    DO          1
-;   (if DL != 0)
-;   (2) 2a  1  1   0  0 PBR,PC+1    IO          1
-;       3   1  1   0  0 PBR,PC+1    IO          1
-;       4   1  0   1  0 0,D+DO+X    Data Low    1
-;   (if 16-bit data)
-;   (1) 4a  1  0   1  0 0,D+DO+X+1  Data High   1
-;   (3) 5   1  0   0  0 0,D+DO+X+1  IO          1
-;   (if 16-bit data)
-;   (1) 6a  1  0   1  0 0,D+DO+X+1  Data High   0
-;       6   1  0   1  0 0,D+DO+X    Data Low    0
-
 %macro ADDR_Direct_Index_X 0
  ADDR_Direct B_X
 %endmacro
@@ -323,6 +320,18 @@ You must read and accept the license prior to use.
  ADDR_Direct_Index_X
  GET_WORD
 %endmacro
+
+%macro RMW_Direct_Index_X 1
+ READ %+ M_size %+ _Direct_Index_X
+;add R_Cycles,_5A22_FAST_CYCLE
+ %1
+%if M_8bit
+ SET_BYTE
+%else
+ SET_WORD_HL
+%endif
+%endmacro
+
 
 ; Direct index Y (corrupts eax)
 ;  Read 8-bit and 16-bit
@@ -394,34 +403,9 @@ You must read and accept the license prior to use.
 ;    SBC-FD
 ;  Write 8-bit and 16-bit
 ;    STZ-9E  STA-9D
-;
-; 3 bytes, 4-6 clocks
-;
-;       1   1  1   1  1 PBR,PC      Op code     1
-;       2   1  1   0  1 PBR,PC+1    AAL         1
-;       3   1  1   0  1 PBR,PC+2    AAH         1
-;   (if index across page boundary, write, or X=0)
-;   (4) 3a  1  1   0  0 DBR,AAH,AAL+XL  IO      1
-;       4   1  1   1  0 DBR,AA+X    Data Low    1/0
-;   (if 16-bit data)
-;   (1) 4a  1  1   1  0 DBR,AA+X+1  Data High   1/0
-;
 ;  RMW 8-bit and 16-bit
 ;    ASL-1E  ROL-3E  LSR-5E  ROR-7E  DEC-DE  INC-FE
 ;
-; 3 bytes, 7 or 9 clocks
-;
-;       1   1  1   1  1 PBR,PC      Op Code     1
-;       2   1  1   0  1 PBR,PC+1    AAL         1
-;       3   1  1   0  1 PBR,PC+2    AAH         1
-;       4   1  1   0  0 DBR,AAH,AAL+XL  IO      1
-;       5   1  0   1  0 DBR,AA+X    Data Low    1
-;   (if 16-bit data)
-;   (1) 5a  1  0   1  0 DBR,AA+X+1  Data High   1
-;   (3) 6   1  0   0  0 DBR,AA+X+1  lO          1
-;   (if 16-bit data)
-;   (1) 7a  1  0   1  0 DBR,AA+X+1  Data High   0
-;       7   1  0   1  0 DBR,AA+X    Data Low    0
 %macro ADDR_Absolute_Index_X 0
  mov ebx,B_DB_Shifted
  mov bl,[1+R_NativePC]
@@ -441,6 +425,18 @@ You must read and accept the license prior to use.
  ADDR_Absolute_Index_X
  GET_WORD
 %endmacro
+
+%macro RMW_Absolute_Index_X 1
+ READ %+ M_size %+ _Absolute_Index_X ;_5A22_FAST_CYCLE
+;add R_Cycles,_5A22_FAST_CYCLE
+ %1
+%if M_8bit
+ SET_BYTE
+%else
+ SET_WORD_HL
+%endif
+%endmacro
+
 
 ; Absolute Index Y (corrupts eax)
 ;  Read 8-bit and 16-bit
