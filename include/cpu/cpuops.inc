@@ -471,17 +471,9 @@ EXPORT_C E1_COP
 EM_ORA d_s,Stack_Relative
 E0_ORA d_s,Stack_Relative
 
-; 04
-EM_TSB d,Direct
-E0_TSB d,Direct
-
 ; 05
 EM_ORA d,Direct
 E0_ORA d,Direct
-
-; 06
-EM_ASL d,Direct
-E0_ASL d,Direct
 
 ; 07
 EM_ORA IdI,Direct_Indirect_Long
@@ -510,17 +502,9 @@ E0_ORA i,Immediate
 E0_PUSH16 B_D,E0_PHD,New
 E1_PUSH16 B_D,E1_PHD,New
 
-; 0C
-EM_TSB a,Absolute
-E0_TSB a,Absolute
-
 ; 0D
 EM_ORA a,Absolute
 E0_ORA a,Absolute
-
-; 0E
-EM_ASL a,Absolute
-E0_ASL a,Absolute
 
 ; 0F
 EM_ORA al,Absolute_Long
@@ -541,10 +525,6 @@ E0_ORA OdO,Direct_Indirect
 EM_ORA Od_sO_y,Stack_Relative_Indirect_Indexed
 E0_ORA Od_sO_y,Stack_Relative_Indirect_Indexed
 
-; 14
-EM_TRB d,Direct
-E0_TRB d,Direct
-
 ; 15
 EM_ORA d_x,Direct_Index_X
 E0_ORA d_x,Direct_Index_X
@@ -563,10 +543,6 @@ E0_ORA a_y,Absolute_Index_Y
 ; 1B
 _TxS B_A,16,E0_TCS
 _TxS B_A,8,E1_TCS
-
-; 1C
-EM_TRB a,Absolute
-E0_TRB a,Absolute
 
 ; 1D
 EM_ORA a_x,Absolute_Index_X
@@ -774,10 +750,6 @@ E0_BIT d,Direct
 EM_AND d,Direct
 E0_AND d,Direct
 
-; 26
-EM_ROL d,Direct
-E0_ROL d,Direct
-
 ; 27
 EM_AND IdI,Direct_Indirect_Long
 E0_AND IdI,Direct_Indirect_Long
@@ -842,10 +814,6 @@ E0_BIT a,Absolute
 ; 2D
 EM_AND a,Absolute
 E0_AND a,Absolute
-
-; 2E
-EM_ROL a,Absolute
-E0_ROL a,Absolute
 
 ; 2F
 EM_AND al,Absolute_Long
@@ -1051,10 +1019,6 @@ EXPORT_C EX_MVP
 EM_EOR d,Direct
 E0_EOR d,Direct
 
-; 46
-EM_LSR d,Direct
-E0_LSR d,Direct
-
 ; 47
 EM_EOR IdI,Direct_Indirect_Long
 E0_EOR IdI,Direct_Indirect_Long
@@ -1112,10 +1076,6 @@ EXPORT_C ALL_JMP_a
 ; 4D
 EM_EOR a,Absolute
 E0_EOR a,Absolute
-
-; 4E
-EM_LSR a,Absolute
-E0_LSR a,Absolute
 
 ; 4F
 EM_EOR al,Absolute_Long
@@ -1358,10 +1318,6 @@ E0_STZ d,Direct
 EM_ADC d,Direct
 E0_ADC d,Direct
 
-; 66
-EM_ROR d,Direct
-E0_ROR d,Direct
-
 ; 67
 EM_ADC IdI,Direct_Indirect_Long
 E0_ADC IdI,Direct_Indirect_Long
@@ -1517,10 +1473,6 @@ EXPORT_C ALL_JMP_OaO
 ; 6D
 EM_ADC a,Absolute
 E0_ADC a,Absolute
-
-; 6E
-EM_ROR a,Absolute
-E0_ROR a,Absolute
 
 ; 6F
 EM_ADC al,Absolute_Long
@@ -2053,10 +2005,6 @@ E0_CPY d,Direct
 EM_CMP d,Direct
 E0_CMP d,Direct
 
-; C6
-EM_DEC d,Direct
-E0_DEC d,Direct
-
 ; C7
 EM_CMP IdI,Direct_Indirect_Long
 E0_CMP IdI,Direct_Indirect_Long
@@ -2104,10 +2052,6 @@ E0_CPY a,Absolute
 ; CD
 EM_CMP a,Absolute
 E0_CMP a,Absolute
-
-; CE
-EM_DEC a,Absolute
-E0_DEC a,Absolute
 
 ; CF
 EM_CMP al,Absolute_Long
@@ -2350,10 +2294,6 @@ E0_CPX d,Direct
 EM_SBC d,Direct
 E0_SBC d,Direct
 
-; E6
-EM_INC d,Direct
-E0_INC d,Direct
-
 ; E7
 EM_SBC IdI,Direct_Indirect_Long
 E0_SBC IdI,Direct_Indirect_Long
@@ -2387,10 +2327,6 @@ E0_CPX a,Absolute
 ; ED
 EM_SBC a,Absolute
 E0_SBC a,Absolute
-
-; EE
-EM_INC a,Absolute
-E0_INC a,Absolute
 
 ; EF
 EM_SBC al,Absolute_Long

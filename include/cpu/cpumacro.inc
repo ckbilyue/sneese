@@ -139,33 +139,6 @@ EXPORT_C E0_AND_%1
  OPCODE_EPILOG
 %endmacro
 
-;%1 = label, %2 = addr
-%macro EM_ASL 2
-ALIGNC
-EXPORT_C EM_ASL_%1
- READ8_%2
- add al,al
- sbb cl,cl
- STORE_FLAGS_NZC al,cl
- SET_BYTE
- OPCODE_EPILOG
-%endmacro
-
-;%1 = label, %2 = addr
-%macro E0_ASL 2
-ALIGNC
-EXPORT_C E0_ASL_%1
- READ16_%2
- add ax,ax
- sbb cl,cl
- SET_WORD_HL
- or al,ah
- STORE_FLAGS_C cl
- STORE_FLAGS_N ah
- STORE_FLAGS_Z al
- OPCODE_EPILOG
-%endmacro
-
 %macro _ASL 0
 %if M_8bit
  add al,al
@@ -328,30 +301,6 @@ EXPORT_C E0_CPY_%1
  OPCODE_EPILOG
 %endmacro
 
-;%1 = label, %2 = addr
-%macro EM_DEC 2
-ALIGNC
-EXPORT_C EM_DEC_%1
- READ8_%2
- dec al
- SET_BYTE
- STORE_FLAGS_NZ al
- OPCODE_EPILOG
-%endmacro
-
-;%1 = label, %2 = addr
-%macro E0_DEC 2
-ALIGNC
-EXPORT_C E0_DEC_%1
- READ16_%2
- dec eax
- SET_WORD_HL
- or al,ah
- STORE_FLAGS_N ah
- STORE_FLAGS_Z al
- OPCODE_EPILOG
-%endmacro
-
 ;size
 %macro _DEC 1
 %if (%1) == 8
@@ -392,30 +341,6 @@ EXPORT_C E0_EOR_%1
  or bl,bh
  STORE_FLAGS_N bh
  STORE_FLAGS_Z bl
- OPCODE_EPILOG
-%endmacro
-
-;%1 = label, %2 = addr
-%macro EM_INC 2
-ALIGNC
-EXPORT_C EM_INC_%1
- READ8_%2
- inc al
- SET_BYTE
- STORE_FLAGS_NZ al
- OPCODE_EPILOG
-%endmacro
-
-;%1 = label, %2 = addr
-%macro E0_INC 2
-ALIGNC
-EXPORT_C E0_INC_%1
- READ16_%2
- inc eax
- SET_WORD_HL
- or al,ah
- STORE_FLAGS_N ah
- STORE_FLAGS_Z al
  OPCODE_EPILOG
 %endmacro
 
@@ -497,33 +422,6 @@ EXPORT_C E0_LDY_%1
  READ16_%2
  mov B_Y,ax
  or al,ah
- STORE_FLAGS_N ah
- STORE_FLAGS_Z al
- OPCODE_EPILOG
-%endmacro
-
-;%1 = label, %2 = addr
-%macro EM_LSR 2
-ALIGNC
-EXPORT_C EM_LSR_%1
- READ8_%2
- shr al,byte 1
- sbb cl,cl
- STORE_FLAGS_NZC al,cl
- SET_BYTE
- OPCODE_EPILOG
-%endmacro
-
-;%1 = label, %2 = addr
-%macro E0_LSR 2
-ALIGNC
-EXPORT_C E0_LSR_%1
- READ16_%2
- shr ax,byte 1
- sbb cl,cl
- SET_WORD_HL
- or al,ah
- STORE_FLAGS_C cl
  STORE_FLAGS_N ah
  STORE_FLAGS_Z al
  OPCODE_EPILOG
@@ -636,37 +534,6 @@ EXPORT_C E0_ORA_%1
  OPCODE_EPILOG
 %endmacro
 
-;%1 = label, %2 = addr
-%macro EM_ROL 2
-ALIGNC
-EXPORT_C EM_ROL_%1
- READ8_%2
- mov cl,B_C_flag
- add cl,255 ;MAKE_CARRY
- adc al,al
- sbb cl,cl
- STORE_FLAGS_NZC al,cl
- SET_BYTE
- OPCODE_EPILOG
-%endmacro
-
-;%1 = label, %2 = addr
-%macro E0_ROL 2
-ALIGNC
-EXPORT_C E0_ROL_%1
- mov cl,B_C_flag
- READ16_%2
- add cl,255 ;MAKE_CARRY
- adc ax,ax
- sbb cl,cl
- SET_WORD_HL
- or al,ah
- STORE_FLAGS_C cl
- STORE_FLAGS_N ah
- STORE_FLAGS_Z al
- OPCODE_EPILOG
-%endmacro
-
 %macro _ROL 0
 %if M_8bit
  mov cl,B_C_flag
@@ -685,37 +552,6 @@ EXPORT_C E0_ROL_%1
  STORE_FLAGS_N ah
  STORE_FLAGS_Z dl
 %endif
-%endmacro
-
-;%1 = label, %2 = addr
-%macro EM_ROR 2
-ALIGNC
-EXPORT_C EM_ROR_%1
- READ8_%2
- mov cl,B_C_flag
- add cl,255 ;MAKE_CARRY
- rcr al,1
- sbb cl,cl
- STORE_FLAGS_NZC al,cl
- SET_BYTE
- OPCODE_EPILOG
-%endmacro
-
-;%1 = label, %2 = addr
-%macro E0_ROR 2
-ALIGNC
-EXPORT_C E0_ROR_%1
- mov cl,B_C_flag
- READ16_%2
- add cl,255 ;MAKE_CARRY
- rcr ax,1
- sbb cl,cl
- SET_WORD_HL
- or al,ah
- STORE_FLAGS_C cl
- STORE_FLAGS_N ah
- STORE_FLAGS_Z al
- OPCODE_EPILOG
 %endmacro
 
 %macro _ROR 0
@@ -912,62 +748,37 @@ EXPORT_C E0_STZ_%1
 %endmacro
 
 ; TRB set flag Z on A & Memory Operand not A & !Memory Operand!
-;%1 = label, %2 = addr
-%macro EM_TRB 2
-ALIGNC
-EXPORT_C EM_TRB_%1
- READ8_%2
+%macro _TRB 0
+%if M_8bit
  mov cl,B_A
  mov ah,cl
- xor cl,0xFF
+ xor cl,-1
  and ah,al      ; Z set for: mem & A
  STORE_FLAGS_Z ah
- and al,cl
- SET_BYTE       ; mem &= ~A
- OPCODE_EPILOG
-%endmacro
-
-;%1 = label, %2 = addr
-%macro E0_TRB 2
-ALIGNC
-EXPORT_C E0_TRB_%1
- READ16_%2
+ and al,cl      ; mem &= ~A
+%else
  mov ecx,B_A
  test ecx,eax
  setnz B_Z_flag ; Z set for: mem & A
  xor ecx,-1
- and eax,ecx
- SET_WORD_HL    ; mem &= ~A
- OPCODE_EPILOG
+ and eax,ecx    ; mem &= ~A
+%endif
 %endmacro
 
 ; TSB set flag Z on A & Memory Operand not A | Memory Operand!
-
-;%1 = label, %2 = addr
-%macro EM_TSB 2
-ALIGNC
-EXPORT_C EM_TSB_%1
- READ8_%2
+%macro _TSB 0
+%if M_8bit
  mov cl,B_A
  mov ah,cl
  and cl,al      ; Z set for: mem & A
  STORE_FLAGS_Z cl
- or al,ah
- SET_BYTE       ; mem |= A
- OPCODE_EPILOG
-%endmacro
-
-;%1 = label, %2 = addr
-%macro E0_TSB 2-3 0
-ALIGNC
-EXPORT_C E0_TSB_%1
- READ16_%2
+ or al,ah       ; mem |= A
+%else
  mov ecx,B_A
  test ecx,eax
  setnz B_Z_flag ; Z set for: mem & A
- or eax,ecx
- SET_WORD_HL    ; mem |= A
- OPCODE_EPILOG
+ or eax,ecx     ; mem |= A
+%endif
 %endmacro
 
 ; label, value
