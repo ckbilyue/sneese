@@ -61,12 +61,6 @@ unsigned SPC_CPU_cycle_divisor, SPC_CPU_cycle_multiplicand;
 static signed char SPC_SAFE = TRUE;
 
 
-#ifdef FAST_SPC
-signed char spc700_clockdoubled = TRUE;
-#else
-signed char spc700_clockdoubled = FALSE;
-#endif
-
 static int Setup_Memory(void)
 {
 #ifdef DEBUG
@@ -151,8 +145,7 @@ void set_snes_pal(void)
  FPSMaxTicks = 50;
  LastVBLLine = 311;
 
- SPC_CPU_cycle_multiplicand = SPC_CPU_CYCLE_MULTIPLICAND_PAL *
-  (spc700_clockdoubled ? 2 : 1);
+ SPC_CPU_cycle_multiplicand = SPC_CPU_CYCLE_MULTIPLICAND_PAL;
  SPC_CPU_cycle_divisor = SPC_CPU_CYCLE_DIVISOR_PAL;
 }
 
@@ -163,14 +156,8 @@ void set_snes_ntsc(void)
  FPSMaxTicks = 60;
  LastVBLLine = 261;
 
- SPC_CPU_cycle_multiplicand = SPC_CPU_CYCLE_MULTIPLICAND_NTSC *
-  (spc700_clockdoubled ? 2 : 1);
+ SPC_CPU_cycle_multiplicand = SPC_CPU_CYCLE_MULTIPLICAND_NTSC;
  SPC_CPU_cycle_divisor = SPC_CPU_CYCLE_DIVISOR_NTSC;
-}
-
-void set_spc700_clockdouble(int new_state)
-{
- spc700_clockdoubled = new_state;
 }
 
 void snes_exec(void)

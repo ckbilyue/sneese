@@ -350,7 +350,7 @@ EXPORT_C SPC_READ_FUNC
 
 ALIGNC
 EXPORT_C SPC_READ_INVALID
- mov al,0xFF    ; v0.15
+ mov al,0
 %ifdef TRAP_INVALID_READ
 %ifdef DEBUG
 EXTERN_C InvalidSPCHWRead
@@ -838,15 +838,15 @@ EXPORT_C SPC_ROM_CODE
 ALIGND
 Read_Func_Map:              ; Mappings for SPC Registers
  dd C_LABEL(SPC_READ_INVALID)
- dd C_LABEL(SPC_READ_CTRL)
+ dd C_LABEL(SPC_READ_INVALID)
  dd C_LABEL(SPC_READ_DSP_ADDR)
  dd C_LABEL(SPC_READ_DSP_DATA)
  dd C_LABEL(SPC_READ_PORT0R)
  dd C_LABEL(SPC_READ_PORT1R)
  dd C_LABEL(SPC_READ_PORT2R)
  dd C_LABEL(SPC_READ_PORT3R)
- dd C_LABEL(SPC_READ_INVALID)
- dd C_LABEL(SPC_READ_INVALID)
+ dd C_LABEL(SPC_READ_RAM)
+ dd C_LABEL(SPC_READ_RAM)
  dd C_LABEL(SPC_READ_INVALID)
  dd C_LABEL(SPC_READ_INVALID)
  dd C_LABEL(SPC_READ_INVALID)
@@ -864,14 +864,14 @@ Write_Func_Map:             ; Mappings for SPC Registers
  dd C_LABEL(SPC_WRITE_PORT1W)
  dd C_LABEL(SPC_WRITE_PORT2W)
  dd C_LABEL(SPC_WRITE_PORT3W)
- dd C_LABEL(SPC_WRITE_INVALID)
- dd C_LABEL(SPC_WRITE_INVALID)
+ dd C_LABEL(SPC_WRITE_RAM)
+ dd C_LABEL(SPC_WRITE_RAM)
  dd C_LABEL(SPC_WRITE_TIMER_0)
  dd C_LABEL(SPC_WRITE_TIMER_1)
  dd C_LABEL(SPC_WRITE_TIMER_2)
- dd C_LABEL(SPC_WRITE_INVALID)
- dd C_LABEL(SPC_WRITE_INVALID)
- dd C_LABEL(SPC_WRITE_INVALID)
+ dd C_LABEL(SPC_CLEAR_COUNTER_0)
+ dd C_LABEL(SPC_CLEAR_COUNTER_1)
+ dd C_LABEL(SPC_CLEAR_COUNTER_2)
 
 offset_to_bit:  db 0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80
 offset_to_not:  db 0xFE,0xFD,0xFB,0xF7,0xEF,0xDF,0xBF,0x7F
@@ -881,16 +881,16 @@ ALIGNB
 EXPORT_C TotalCycles,skipl
 
 EXPORT_C SPC_T0_cycle_latch,skipl
-EXPORT_C SPC_T0_position,skipw
-EXPORT_C SPC_T0_target,skipw
+EXPORT_C SPC_T0_position,skipl
+EXPORT_C SPC_T0_target,skipl
 
 EXPORT_C SPC_T1_cycle_latch,skipl
-EXPORT_C SPC_T1_position,skipw
-EXPORT_C SPC_T1_target,skipw
+EXPORT_C SPC_T1_position,skipl
+EXPORT_C SPC_T1_target,skipl
 
 EXPORT_C SPC_T2_cycle_latch,skipl
-EXPORT_C SPC_T2_position,skipw
-EXPORT_C SPC_T2_target,skipw
+EXPORT_C SPC_T2_position,skipl
+EXPORT_C SPC_T2_target,skipl
 
 SPC_FFC0_Address:   skipl
 
@@ -1092,12 +1092,12 @@ EXPORT_C Reset_SPC
  mov [C_LABEL(SPC_T0_counter)],al
  mov [C_LABEL(SPC_T1_counter)],al
  mov [C_LABEL(SPC_T2_counter)],al
- mov word [C_LABEL(SPC_T0_target)],256
- mov word [C_LABEL(SPC_T1_target)],256
- mov word [C_LABEL(SPC_T2_target)],256
- mov [C_LABEL(SPC_T0_position)],ax
- mov [C_LABEL(SPC_T1_position)],ax
- mov [C_LABEL(SPC_T2_position)],ax
+ mov dword [C_LABEL(SPC_T0_target)],256
+ mov dword [C_LABEL(SPC_T1_target)],256
+ mov dword [C_LABEL(SPC_T2_target)],256
+ mov [C_LABEL(SPC_T0_position)],eax
+ mov [C_LABEL(SPC_T1_position)],eax
+ mov [C_LABEL(SPC_T2_position)],eax
  mov [C_LABEL(SPC_T0_cycle_latch)],eax
  mov [C_LABEL(SPC_T1_cycle_latch)],eax
  mov [C_LABEL(SPC_T2_cycle_latch)],eax
@@ -1326,7 +1326,6 @@ EXPORT_C SPC_BBC
 
 %include "apu/spcops.inc"   ; Include opcodes
 
-EXPORT_C SPC_READ_CTRL
 EXPORT_C SPC_READ_DSP_ADDR
  mov al,[C_LABEL(SPCRAM)+ebx]
  ret
@@ -1361,6 +1360,12 @@ EXPORT_C SPC_READ_PORT3R
 
 ; COUNTERS ARE 4 BIT, upon read they reset to 0 status
 
+EXPORT_C SPC_CLEAR_COUNTER_0
+ push eax
+ call C_LABEL(SPC_READ_COUNTER_0)
+ pop eax
+ ret
+
 EXPORT_C SPC_READ_COUNTER_0
  push ecx
 ;push edx
@@ -1372,6 +1377,12 @@ EXPORT_C SPC_READ_COUNTER_0
  pop ecx
  mov al,[C_LABEL(SPC_T0_counter)]
  mov [C_LABEL(SPC_T0_counter)],bh
+ ret
+
+EXPORT_C SPC_CLEAR_COUNTER_1
+ push eax
+ call C_LABEL(SPC_READ_COUNTER_1)
+ pop eax
  ret
 
 EXPORT_C SPC_READ_COUNTER_1
@@ -1387,6 +1398,12 @@ EXPORT_C SPC_READ_COUNTER_1
  mov byte [C_LABEL(SPC_T1_counter)],bh
  ret
 
+EXPORT_C SPC_CLEAR_COUNTER_2
+ push eax
+ call C_LABEL(SPC_READ_COUNTER_2)
+ pop eax
+ ret
+
 EXPORT_C SPC_READ_COUNTER_2
  push ecx
 ;push edx
@@ -1400,10 +1417,9 @@ EXPORT_C SPC_READ_COUNTER_2
  mov byte [C_LABEL(SPC_T2_counter)],bh
  ret
 
-; | ROMEN | TURBO | PC32  | PC10  | ----- |  ST2  |  ST1  |  ST0  |
+; | ROMEN | ----- | PC32  | PC10  | ----- |  ST2  |  ST1  |  ST0  |
 ;
 ; ROMEN - enable mask ROM in top 64-bytes of address space for CPU read
-; TURBO - enable turbo CPU clock ???
 ; PC32  - clear SPC read ports 2 & 3
 ; PC10  - clear SPC read ports 0 & 1
 ; ST2   - start timer 2 (64kHz)
@@ -1438,27 +1454,19 @@ EXPORT_C SPC_WRITE_CTRL
  jnz .no_enable_timer_2
  test al,4
  jz  .no_enable_timer_2
+ and edx,byte ~127
  mov byte [C_LABEL(SPC_T2_counter)],0
-%ifdef FAST_SPC
- and edx,~31
-%else
- and edx,~15
-%endif
- mov word [C_LABEL(SPC_T2_position)],0
+ mov dword [C_LABEL(SPC_T2_position)],0
  mov [C_LABEL(SPC_T2_cycle_latch)],edx
 
 .no_enable_timer_2:
-%ifdef FAST_SPC
- mov dl,0
-%else
- and edx,~127
-%endif
+ and edx,byte ~15
  test byte [C_LABEL(SPCRAM)+ebx],2
  jnz .no_enable_timer_1
  test al,2
  jz .no_enable_timer_1
  mov byte [C_LABEL(SPC_T1_counter)],0
- mov word [C_LABEL(SPC_T1_position)],0
+ mov dword [C_LABEL(SPC_T1_position)],0
  mov [C_LABEL(SPC_T1_cycle_latch)],edx
 
 .no_enable_timer_1:
@@ -1467,7 +1475,7 @@ EXPORT_C SPC_WRITE_CTRL
  test al,1
  jz .no_enable_timer_0
  mov byte [C_LABEL(SPC_T0_counter)],0
- mov word [C_LABEL(SPC_T0_position)],0
+ mov dword [C_LABEL(SPC_T0_position)],0
  mov [C_LABEL(SPC_T0_cycle_latch)],edx
 
 .no_enable_timer_0:
@@ -1514,9 +1522,19 @@ EXPORT_C SPC_WRITE_TIMER_0
  pop eax
 ;pop edx
  pop ecx
+
  test al,al
- mov [C_LABEL(SPC_T0_target)],al    ; (0.32) Butcha - timer targets are writable
- setz [C_LABEL(SPC_T0_target)+1]    ; 0 = 256
+ movzx edx,al
+ setz dh    ; 0 = 256
+
+ cmp edx,[C_LABEL(SPC_T0_position)]
+ ;does setting target for current position raise counter? assuming not
+ jb .no_fixup ;jbe?
+ ;handle 'delay' where new target is set below position
+ sub dword [C_LABEL(SPC_T0_position)],256
+.no_fixup:
+
+ mov [C_LABEL(SPC_T0_target)],edx   ; (0.32) Butcha - timer targets are writable
 .no_change:
  ret
 
@@ -1531,9 +1549,19 @@ EXPORT_C SPC_WRITE_TIMER_1
  pop eax
 ;pop edx
  pop ecx
+
  test al,al
- mov [C_LABEL(SPC_T1_target)],al    ; (0.32) Butcha - timer targets are writable
- setz [C_LABEL(SPC_T1_target)+1]    ; 0 = 256
+ movzx edx,al
+ setz dh    ; 0 = 256
+
+ cmp edx,[C_LABEL(SPC_T1_position)]
+ ;does setting target for current position raise counter? assuming not
+ jb .no_fixup ;jbe?
+ ;handle 'delay' where new target is set below position
+ sub dword [C_LABEL(SPC_T1_position)],256
+.no_fixup:
+
+ mov [C_LABEL(SPC_T1_target)],edx   ; (0.32) Butcha - timer targets are writable
 .no_change:
  ret
 
@@ -1548,9 +1576,19 @@ EXPORT_C SPC_WRITE_TIMER_2
  pop eax
 ;pop edx
  pop ecx
+
  test al,al
- mov [C_LABEL(SPC_T2_target)],al    ; (0.32) Butcha - timer targets are writable
- setz [C_LABEL(SPC_T2_target)+1]    ; 0 = 256
+ movzx edx,al
+ setz dh    ; 0 = 256
+
+ cmp edx,[C_LABEL(SPC_T2_position)]
+ ;does setting target for current position raise counter? assuming not
+ jb .no_fixup ;jbe?
+ ;handle 'delay' where new target is set below position
+ sub dword [C_LABEL(SPC_T2_position)],256
+.no_fixup:
+
+ mov [C_LABEL(SPC_T2_target)],edx   ; (0.32) Butcha - timer targets are writable
 .no_change:
  ret
 
