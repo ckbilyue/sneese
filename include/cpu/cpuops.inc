@@ -721,16 +721,6 @@ EXPORT_C ALL_WDM
  add R_NativePC,byte 2
  OPCODE_EPILOG
 
-; 44
-
-ALIGNC
-EXPORT_C E0_MVP
- ALL_MVX 0,MVP
-	
-ALIGNC
-EXPORT_C EX_MVP
- ALL_MVX 1,MVP
-
 ; 4C
 
 ALIGNC
@@ -767,16 +757,6 @@ EXPORT_C ALL_JMP_a
  mov eax,C_LABEL(Blank)
  jmp short .read_direct
 %endif
-
-; 54
-
-ALIGNC
-EXPORT_C E0_MVN
- ALL_MVX 0,MVN
-	
-ALIGNC
-EXPORT_C EX_MVN
- ALL_MVX 1,MVN
 
 OPCODE_PROLOG(0x58) ; CLI i
  mov cl,B_I_flag

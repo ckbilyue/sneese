@@ -383,50 +383,50 @@ ALIGNC
 %endif
 %endmacro
 
-;%1 = X flag, %2 = direction (0 = MVP, backward, 1 = MVN, forward)
-%macro ALL_MVX 2
+;%1 = direction (0 = MVP, backward, 1 = MVN, forward)
+%macro _MVX 1
  push ebx           ; Cycles per instruction iteration
 .again:
  mov al,[1+R_NativePC]  ; Dest bank
  mov bl,[2+R_NativePC]  ; Src bank
  mov B_DB,al
-%if %1
+%if X_8bit
  mov al,B_X         ; Source address, 8-bit
 %else
  mov eax,B_X        ; Source address, 16-bit
 %endif
  shl ebx,16
  add ebx,eax
-%ifidni %2,MVN
+%ifidni %1,MVN
  inc eax            ; MVN, Forward copy
-%elifidni %2,MVP
+%elifidni %1,MVP
  dec eax            ; MVP, Backward copy
 %else
 %error Invalid instruction ID for ALL_MVX
 %endif
-%if %1
+%if X_8bit
  mov B_X,al
 %else
  mov B_X,ax
 %endif
  GET_BYTE
  mov ebx,B_DB_Shifted
-%if %1
+%if X_8bit
  mov bl,B_Y         ; Dest address, 8-bit
 %else
  mov bx,B_Y         ; Dest address, 16-bit
 %endif
  SET_BYTE
  mov eax,B_A
-%ifidni %2,MVN
+%ifidni %1,MVN
  inc ebx            ; MVN, Forward copy
-%elifidni %2,MVP
+%elifidni %1,MVP
  dec ebx            ; MVP, Backward copy
 %else
 %error Invalid instruction ID for ALL_MVX
 %endif
  sub eax,byte 1
-%if %1
+%if X_8bit
  mov B_Y,bl
 %else
  mov B_Y,bx
