@@ -2083,12 +2083,15 @@ EXPORT_C Update_Layering
  mov [SCR_TM],al
  mov [SCR_TMW],bl
  mov bl,[C_LABEL(TSW)]
+ mov dl,0x20    ;back area
  mov [SCR_TSW],bl
+ or dl,al
+
  ;ignore TM layers in TS
  xor al,0xFF
 
- ;ignore TS if arithmetic disabled for all layers
- test byte [C_LABEL(CGADSUB)],0x3F
+ ;ignore TS if arithmetic disabled for all main screen layers
+ test byte [C_LABEL(CGADSUB)],dl
  setz bl
  dec bl
  and al,bl
@@ -2119,10 +2122,12 @@ ALIGNC
  mov dword [Window_Offset_Second],BG_Win_Sub
 
  ; layering option 1: sub-on-main
+ mov dl,[TM_Allowed]
  mov al,[TS_Allowed]
+ or dl,0x20     ;back area
 
  ;ignore TS if arithmetic disabled for all layers
- test byte [C_LABEL(CGADSUB)],0x3F
+ test byte [C_LABEL(CGADSUB)],dl
  setz bl
  dec bl
  and al,bl
@@ -2160,11 +2165,12 @@ ALIGNC
  mov dword [Window_Offset_Second],BG_Win_Sub
 
  ; layering option 2: main-with-sub
- mov al,[TS_Allowed]
  mov dl,[TM_Allowed]
+ mov al,[TS_Allowed]
+ or dl,0x20     ;back area
 
  ;ignore TS if arithmetic disabled for all layers
- test byte [C_LABEL(CGADSUB)],0x3F
+ test byte [C_LABEL(CGADSUB)],dl
  setz bl
  dec bl
  and al,bl
@@ -2183,6 +2189,7 @@ ALIGNC
  dec bl
  and al,bl
 
+ mov dl,[TM_Allowed]
  mov bl,[C_LABEL(TMW)]
  mov cl,[C_LABEL(TSW)]
  and bl,dl
