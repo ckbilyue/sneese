@@ -373,7 +373,7 @@ inline void map_wram_128k(int bank)
 
 inline void map_unmapped(int bank, int block)
 {
- set_block_handlers(bank, block, &UNSUPPORTED_READ, &UNSUPPORTED_WRITE);
+ set_block_handlers(bank, block, &CPU_OPEN_BUS_READ, &IGNORE_WRITE);
 }
 
 inline void map_unmapped_32k(int bank)
@@ -388,7 +388,7 @@ inline void map_unmapped_64k(int bank)
 
 inline void map_blank(int bank, int block)
 {
- set_block_pointers(bank, block, (void *) (Blank - (bank << 16)), (void *) (Dummy - (bank << 16)));
+ set_block_pointers(bank, block, (void *) 0, (void *) (Dummy - (bank << 16)));
  map_unmapped(bank, block);
 }
 

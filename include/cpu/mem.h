@@ -25,6 +25,7 @@ EXTERN char Dummy[65536];
 
 EXTERN void Read_Direct_Safeguard(void), Write_Direct_Safeguard(void);
 EXTERN void UNSUPPORTED_READ(void),UNSUPPORTED_WRITE(void);
+EXTERN void CPU_OPEN_BUS_READ(void),CPU_OPEN_BUS_READ_LEGACY(void);
 EXTERN void IGNORE_WRITE(void);
 EXTERN void RAM_READ(void),RAM_WRITE(void);
 EXTERN void PPU_READ(void),PPU_WRITE(void);
