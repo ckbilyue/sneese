@@ -47,9 +47,9 @@ ASM_OBJ_EXT := o
 ifneq ($(DEBUG),0)
 
 OBJ    := $(OBJ_BASE)/$(PLATFORM)/debug
-PFLAGS := -ggdb3
+PFLAGS = -ggdb3
 EXE    := sneese$(SUFFIX)d$(EXE_EXT)
-OFLAGS := $(PFLAGS)
+OFLAGS = $(PFLAGS)
 
 else
 
@@ -57,18 +57,18 @@ else
 ifneq ($(PROFILE),0)
 
 OBJ    := $(OBJ_BASE)/$(PLATFORM)/profile
-PFLAGS := -pg
+PFLAGS = -pg
 EXE    := sneese$(SUFFIX)p$(EXE_EXT)
 
 else
 
 OBJ    := $(OBJ_BASE)/$(PLATFORM)/release
-PFLAGS := -fomit-frame-pointer
+PFLAGS = -fomit-frame-pointer
 EXE    := sneese$(SUFFIX)$(EXE_EXT)
 
 endif
 
-OFLAGS := -march=i486 -mcpu=pentium -O3 -ffast-math $(PFLAGS) \
+OFLAGS = -march=i486 -mcpu=pentium -O3 -ffast-math $(PFLAGS) \
  -fno-rtti -fno-exceptions -fstrength-reduce -fthread-jumps \
  -fexpensive-optimizations -fschedule-insns -fschedule-insns2 \
  -fgcse
@@ -81,9 +81,7 @@ endif
 
 endif
 
-DFLAGS := -DDEBUG
-SFLAGS := $(OFLAGS) $(DFLAGS) -ggdb3 -S -I$(INCLUDE)/
-CFLAGS := $(OFLAGS) $(DFLAGS) -ggdb3 -c -I$(INCLUDE)/
+DFLAGS = -DDEBUG
 
 
 ifneq ($(NO_SELF_MODIFY),0)
@@ -94,6 +92,8 @@ ifneq ($(FAST_SPC),0)
 DFLAGS += -DFAST_SPC
 endif
 
+
+CFLAGS = $(OFLAGS) -ggdb3 -I$(INCLUDE)/
 
 ifneq ($(SAVE_ASM_OUTPUT),0)
 OBJBASE := s
@@ -118,13 +118,20 @@ $(sort $(OBJDIRS)):
 clean:
 	@echo Removing C/C++ output files
 	@-$(RM) $(OBJ)/*.o
+	@-$(RM) $(OBJ)/apu/*.o
 	@-$(RM) $(OBJ)/cpu/*.o
+	@-$(RM) $(OBJ)/ppu/*.o
 ifneq ($(SAVE_ASM_OUTPUT),0)
 	@-$(RM) $(OBJ)/*.s
+	@-$(RM) $(OBJ)/apu/*.s
+	@-$(RM) $(OBJ)/cpu/*.s
+	@-$(RM) $(OBJ)/ppu/*.s
 endif
 	@echo Removing ASM output files
 	@-$(RM) $(OBJ)/*.$(ASM_OBJ_EXT)
+	@-$(RM) $(OBJ)/apu/*.$(ASM_OBJ_EXT)
 	@-$(RM) $(OBJ)/cpu/*.$(ASM_OBJ_EXT)
+	@-$(RM) $(OBJ)/ppu/*.$(ASM_OBJ_EXT)
 
 $(OBJ)/%.$(ASM_OBJ_EXT): $(SRC)/%.asm
 	$(NASM) $(AFLAGS) $(DFLAGS) -o $@ $<
@@ -133,16 +140,16 @@ $(OBJ)/%.o: $(OBJ)/%.s
 	$(GCC) -c $(DFLAGS) -o $@ $<
 
 $(OBJ)/%.s: $(SRC)/%.c
-	$(GCC) $(SFLAGS) $(DFLAGS) -o $@ $<
+	$(GCC) -S $(CFLAGS) $(DFLAGS) -o $@ $<
 
 $(OBJ)/%.s: $(SRC)/%.cpp
-	$(GCC) $(SFLAGS) $(DFLAGS) -o $@ $<
+	$(GCC) -S $(CFLAGS) $(DFLAGS) -o $@ $<
 
 $(OBJ)/%.o: $(SRC)/%.c
-	$(GCC) $(CFLAGS) $(DFLAGS) -o $@ $<
+	$(GCC) -c $(CFLAGS) $(DFLAGS) -o $@ $<
 
 $(OBJ)/%.o: $(SRC)/%.cpp
-	$(GCC) $(CFLAGS) $(DFLAGS) -o $@ $<
+	$(GCC) -c $(CFLAGS) $(DFLAGS) -o $@ $<
 
 $(EXE): $(addprefix $(OBJ)/, $(OBJS))
 	$(GXX) $(PFLAGS) $(DFLAGS) -o $(EXE) $(addprefix $(OBJ)/, $(OBJS)) $(ALLEG)
