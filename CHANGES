@@ -41,10 +41,13 @@ Changes
   GUI: Made ".." come first in the file list [DBJH]
   GUI: Fixed some problems where text would be displayed outside a
    window [DBJH]
+  Source: Reorganized the source tree [TRAC]
   65c816: Fixed a serious design flaw in ADC/SBC emulation which caused
    the overflow flag to be set to an unexpected state [TRAC]
   Sound: Removed some extraneous and problematic compile-time directives
    [TRAC]
+  Sound: Added saturation to gaussian interpolation filter, thanks to
+   Jonathan Gevaryahu (Lord_Nightmare) for the fix [TRAC]
  0.776 [TRAC]
   Render: Added support for dual window clipping with all logic
    modes of backgrounds in modes 5 and 6
