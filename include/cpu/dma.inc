@@ -43,21 +43,7 @@ EXTERN_C A2L_%1     ; HDMA table address L
 EXTERN_C A2H_%1     ; HDMA table address H
 EXTERN_C A2B_%1     ; HDMA table bank address
 
-; DMA_Wr#_x - These hold the write handlers for DMA
-; DMA_Rd#_x - These hold the read handlers for DMA
 ; HDMA_Siz_x - These hold the register size for HDMA
-EXTERN DMA_Wr0_%1
-EXTERN DMA_Wr1_%1
-EXTERN DMA_Wr2_%1
-EXTERN DMA_Wr3_%1
-EXTERN DMA_Rd0_%1
-EXTERN DMA_Rd1_%1
-EXTERN DMA_Rd2_%1
-EXTERN DMA_Rd3_%1
-EXTERN DMA_B0_%1
-EXTERN DMA_B1_%1
-EXTERN DMA_B2_%1
-EXTERN DMA_B3_%1
 EXTERN HDMA_Siz_%1
 %endmacro
 
@@ -76,7 +62,6 @@ EXTERN_C Do_DMA_Channel,Do_HDMA_Channel
 EXTERN SNES_R420B,SNES_R420C,SNES_W420B,SNES_W420C
 EXTERN do_HDMA
 EXTERN Reset_DMA
-EXTERN_C Update_DMA_PPU_Handlers
 
 %macro EXTERN_MAP_READ_DMA 1
 EXTERN MAP_READ_DMAP%1
@@ -143,20 +128,12 @@ EXTERN_MAP_WRITE_DMA 7
 %define A2L A2T
 %define A2H (A2T+1)
 %define A2B (A2T+2)
-%define DMA_Wr0 0x10
-%define DMA_Wr1 0x14
-%define DMA_Wr2 0x18
-%define DMA_Wr3 0x1C
-%define DMA_Rd0 0x20
-%define DMA_Rd1 0x24
-%define DMA_Rd2 0x28
-%define DMA_Rd3 0x2C
-%define DMA_B0 0x30
-%define DMA_B1 0x34
-%define DMA_B2 0x38
-%define DMA_B3 0x3C
-%define HDMA_Siz 0x40
-%define DMATableSize 0x44
+%define HDMA_Siz 0x10
+%define DMA_B0 0x14
+%define DMA_B1 0x15
+%define DMA_B2 0x16
+%define DMA_B3 0x17
+%define DMATableSize 0x18
 
 %macro MAP_READ_DMA_LIST 1
  dd MAP_READ_DMAP%1

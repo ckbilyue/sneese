@@ -291,14 +291,14 @@ extern unsigned Frames;
 
 int dumping_dma = 0;
 
-void Dump_DMA_Read(int a)
+void Dump_Read(int a)
 {
- printf("43xx read: %04X\n", a & 0xFFFF);
+ printf("read: %04X\n", a & 0xFFFF);
 }
 
-void Dump_DMA_Write(int a, unsigned char b)
+void Dump_Write(int a, unsigned char b)
 {
- printf("43xx write: %04X, %02X\n", a & 0xFFFF, (unsigned) b);
+ printf("write: %04X, %02X\n", a & 0xFFFF, (unsigned) b);
 }
 
 void Dump_DMA(int b)

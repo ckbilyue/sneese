@@ -14,7 +14,6 @@ You must read and accept the license prior to use.
 ; DMA.asm - (H)DMA emulation
 
 ;%define NO_HDMA
-;%define LOG_HDMA_WRITES
 
 %define SNEeSe_DMA_asm
 
@@ -80,22 +79,14 @@ EXPORT_C A2H_%1 ,skipb  ; HDMA table address H
 EXPORT_C A2B_%1 ,skipb  ; HDMA table bank address
                  skipb
 
-; DMA_Wr#_x - These hold the write handlers for DMA
-; DMA_Rd#_x - These hold the read handlers for DMA
 ; HDMA_Siz_x - These hold the register size for HDMA
-DMA_Wr0_%1: skipl
-DMA_Wr1_%1: skipl
-DMA_Wr2_%1: skipl
-DMA_Wr3_%1: skipl
-DMA_Rd0_%1: skipl
-DMA_Rd1_%1: skipl
-DMA_Rd2_%1: skipl
-DMA_Rd3_%1: skipl
-DMA_B0_%1:  skipl
-DMA_B1_%1:  skipl
-DMA_B2_%1:  skipl
-DMA_B3_%1:  skipl
 HDMA_Siz_%1:skipl
+
+; DMA_By_x - B bus address for access y of 0-3
+DMA_B0_%1:  skipb
+DMA_B1_%1:  skipb
+DMA_B2_%1:  skipb
+DMA_B3_%1:  skipb
 %endmacro
 
 DMA_DATA 0
@@ -145,49 +136,40 @@ EXPORT_C Do_DMA_Channel
  jns near .ppu_write
 
 ; PPU->CPU
-;mov edi,edx
- and eax,byte 7
- lea eax,[DMA_PPU_Order+eax*4]
- mov cl,[edi+DMA_Vid]       ; PPU address in ecx
- mov edx,ecx                ; PPU address in edx
-;add cl,[eax]
- mov ecx,[C_LABEL(Read_Map_21)+ecx*4]
- mov [edi+DMA_Rd0],ecx
- mov ecx,edx                ; PPU address in ecx
- add dl,[eax+1]
- mov edx,[C_LABEL(Read_Map_21)+edx*4]
- mov [edi+DMA_Rd1],edx
- mov edx,ecx                ; PPU address in edx
- add cl,[eax+2]
- mov ecx,[C_LABEL(Read_Map_21)+ecx*4]
- mov [edi+DMA_Rd2],ecx
- add dl,[eax+3]
- mov edx,[C_LABEL(Read_Map_21)+edx*4]
- mov [edi+DMA_Rd3],edx
-;mov edx,edi
-
  cmp dword [DMA_Transfer_Size],byte 4
  jb near .lpr_less_than_4
 
 .loop_ppu_read:
- call [edi+DMA_Rd0]
+ push ebx
+ movzx ebx,byte [edi+DMA_B0]
+ add ebx,0x2100
+ GET_BYTE
+ pop ebx
  SET_BYTE
-.ppu_read_check_0:
  add bx,si
 
- call [edi+DMA_Rd1]
+ push ebx
+ movzx ebx,byte [edi+DMA_B1]
+ add ebx,0x2100
+ GET_BYTE
+ pop ebx
  SET_BYTE
-.ppu_read_check_1:
  add bx,si
 
- call [edi+DMA_Rd2]
+ push ebx
+ movzx ebx,byte [edi+DMA_B2]
+ add ebx,0x2100
+ GET_BYTE
+ pop ebx
  SET_BYTE
-.ppu_read_check_2:
  add bx,si
 
- call [edi+DMA_Rd3]
+ push ebx
+ movzx ebx,byte [edi+DMA_B3]
+ add ebx,0x2100
+ GET_BYTE
+ pop ebx
  SET_BYTE
-.ppu_read_check_3:
  add bx,si
  sub dword [DMA_Transfer_Size],byte 4
  jz near .ppu_read_done
@@ -195,31 +177,43 @@ EXPORT_C Do_DMA_Channel
  jnb near .loop_ppu_read
 
 .lpr_less_than_4:
- call [edi+DMA_Rd0]
+ push ebx
+ movzx ebx,byte [edi+DMA_B0]
+ add ebx,0x2100
+ GET_BYTE
+ pop ebx
  SET_BYTE
-.ppu_read_lt4_check_0:
  add bx,si
  dec dword [DMA_Transfer_Size]
  jz near .ppu_read_done
 
- call [edi+DMA_Rd1]
+ push ebx
+ movzx ebx,byte [edi+DMA_B1]
+ add ebx,0x2100
+ GET_BYTE
+ pop ebx
  SET_BYTE
-.ppu_read_lt4_check_1:
  add bx,si
  dec dword [DMA_Transfer_Size]
  jz near .ppu_read_done
 ;jz .ppu_read_done ;*set_byte
 
- call [edi+DMA_Rd2]
+ push ebx
+ movzx ebx,byte [edi+DMA_B2]
+ add ebx,0x2100
+ GET_BYTE
+ pop ebx
  SET_BYTE
-.ppu_read_lt4_check_2:
  add bx,si
  dec dword [DMA_Transfer_Size]
  jz .ppu_read_done
 
- call [edi+DMA_Rd3]
+ push ebx
+ movzx ebx,byte [edi+DMA_B3]
+ add ebx,0x2100
+ GET_BYTE
+ pop ebx
  SET_BYTE
-.ppu_read_lt4_check_3:
  add bx,si
  dec dword [DMA_Transfer_Size]
  jnz near .loop_ppu_read
@@ -233,49 +227,40 @@ EXPORT_C Do_DMA_Channel
 ALIGNC
 ; CPU->PPU
 .ppu_write:
-;mov edi,edx
- and eax,byte 7
- lea eax,[DMA_PPU_Order+eax*4]
- mov cl,[DMA_Vid+edi]       ; PPU address in ecx
- mov edx,ecx                ; PPU address in edx
-;add cl,[eax]
- mov ecx,[C_LABEL(Write_Map_21)+ecx*4]
- mov [edi+DMA_Wr0],ecx
- mov ecx,edx                ; PPU address in ecx
- add dl,[eax+1]
- mov edx,[C_LABEL(Write_Map_21)+edx*4]
- mov [edi+DMA_Wr1],edx
- mov edx,ecx                ; PPU address in edx
- add cl,[eax+2]
- mov ecx,[C_LABEL(Write_Map_21)+ecx*4]
- mov [edi+DMA_Wr2],ecx
- add dl,[eax+3]
- mov edx,[C_LABEL(Write_Map_21)+edx*4]
- mov [edi+DMA_Wr3],edx
-;mov edx,edi
-
  cmp dword [DMA_Transfer_Size],byte 4
  jb near .lpw_less_than_4
 
 .loop_ppu_write:
  GET_BYTE
- call [edi+DMA_Wr0]
-.ppu_write_check_0:
+ push ebx
+ movzx ebx,byte [edi+DMA_B0]
+ add ebx,0x2100
+ SET_BYTE
+ pop ebx
  add bx,si
 
  GET_BYTE
- call [edi+DMA_Wr1]
-.ppu_write_check_1:
+ push ebx
+ movzx ebx,byte [edi+DMA_B1]
+ add ebx,0x2100
+ SET_BYTE
+ pop ebx
  add bx,si
 
  GET_BYTE
- call [edi+DMA_Wr2]
-.ppu_write_check_2:
+ push ebx
+ movzx ebx,byte [edi+DMA_B2]
+ add ebx,0x2100
+ SET_BYTE
+ pop ebx
  add bx,si
 
  GET_BYTE
- call [edi+DMA_Wr3]
-.ppu_write_check_3:
+ push ebx
+ movzx ebx,byte [edi+DMA_B3]
+ add ebx,0x2100
+ SET_BYTE
+ pop ebx
  add bx,si
 
  sub dword [DMA_Transfer_Size],byte 4
@@ -285,29 +270,41 @@ ALIGNC
 
 .lpw_less_than_4:
  GET_BYTE
- call [edi+DMA_Wr0]
-.ppu_write_lt4_check_0:
+ push ebx
+ movzx ebx,byte [edi+DMA_B0]
+ add ebx,0x2100
+ SET_BYTE
+ pop ebx
  add bx,si
  dec dword [DMA_Transfer_Size]
  jz near .ppu_write_done
 
  GET_BYTE
- call [edi+DMA_Wr1]
-.ppu_write_lt4_check_1:
+ push ebx
+ movzx ebx,byte [edi+DMA_B1]
+ add ebx,0x2100
+ SET_BYTE
+ pop ebx
  add bx,si
  dec dword [DMA_Transfer_Size]
  jz .ppu_write_done
 
  GET_BYTE
- call [edi+DMA_Wr2]
-.ppu_write_lt4_check_2:
+ push ebx
+ movzx ebx,byte [edi+DMA_B2]
+ add ebx,0x2100
+ SET_BYTE
+ pop ebx
  add bx,si
  dec dword [DMA_Transfer_Size]
  jz .ppu_write_done
 
  GET_BYTE
- call [edi+DMA_Wr3]
-.ppu_write_lt4_check_3:
+ push ebx
+ movzx ebx,byte [edi+DMA_B3]
+ add ebx,0x2100
+ SET_BYTE
+ pop ebx
  add bx,si
  dec dword [DMA_Transfer_Size]
  jnz near .loop_ppu_write
@@ -346,17 +343,13 @@ Do_HDMA_Absolute:
 
 .Next_Transfer:
  GET_BYTE
-%ifdef LOG_HDMA_WRITES
- pusha
- mov bl,[edi+DMA_Vid]
- push eax
  push ebx
-extern C_LABEL(hdma_write__FUcUc)
- call C_LABEL(hdma_write__FUcUc)
- add esp,8
- popa
-%endif
- call [edi+DMA_Wr0]
+ movzx ebx,byte [edi+DMA_B0]
+ add ebx,0x2100
+
+ SET_BYTE
+ pop ebx
+
  add dword [C_LABEL(SNES_Cycles)],byte 8   ; HDMA transfer
  cmp cl,2
  inc bx                 ; Adjust temporary table pointer
@@ -364,19 +357,13 @@ extern C_LABEL(hdma_write__FUcUc)
  jb near .End_Transfer
 
  GET_BYTE
-%ifdef LOG_HDMA_WRITES
- pusha
- push eax
- mov al,[edi+DMAP]
- mov bl,[edi+DMA_Vid]
- and eax,byte 7
- add bl,[DMA_PPU_Order+eax*4+1]
  push ebx
- call C_LABEL(hdma_write__FUcUc)
- add esp,8
- popa
-%endif
- call [edi+DMA_Wr1]
+ movzx ebx,byte [edi+DMA_B1]
+ add ebx,0x2100
+
+ SET_BYTE
+ pop ebx
+
  add dword [C_LABEL(SNES_Cycles)],byte 8   ; HDMA transfer
  cmp cl,4
  inc bx                 ; Adjust temporary table pointer
@@ -384,36 +371,24 @@ extern C_LABEL(hdma_write__FUcUc)
  jb near .End_Transfer
 
  GET_BYTE
-%ifdef LOG_HDMA_WRITES
- pusha
- push eax
- mov al,[edi+DMAP]
- mov bl,[edi+DMA_Vid]
- and eax,byte 7
- add bl,[DMA_PPU_Order+eax*4+2]
  push ebx
- call C_LABEL(hdma_write__FUcUc)
- add esp,8
- popa
-%endif
- call [edi+DMA_Wr2]
+ movzx ebx,byte [edi+DMA_B2]
+ add ebx,0x2100
+
+ SET_BYTE
+ pop ebx
+
  add dword [C_LABEL(SNES_Cycles)],byte 8   ; HDMA transfer
  inc bx
 
  GET_BYTE
-%ifdef LOG_HDMA_WRITES
- pusha
- push eax
- mov al,[edi+DMAP]
- mov bl,[edi+DMA_Vid]
- and eax,byte 7
- add bl,[DMA_PPU_Order+eax*4+3]
  push ebx
- call C_LABEL(hdma_write__FUcUc)
- add esp,8
- popa
-%endif
- call [edi+DMA_Wr3]
+ movzx ebx,byte [edi+DMA_B3]
+ add ebx,0x2100
+
+ SET_BYTE
+ pop ebx
+
  add dword [C_LABEL(SNES_Cycles)],byte 8   ; HDMA transfer
 
 .End_Transfer:
@@ -458,16 +433,13 @@ Do_HDMA_Indirect:
  and ebx,(1 << 24) - 1
 
  GET_BYTE
-%ifdef LOG_HDMA_WRITES
- pusha
- mov bl,[edi+DMA_Vid]
- push eax
  push ebx
- call C_LABEL(hdma_write__FUcUc)
- add esp,8
- popa
-%endif
- call [edi+DMA_Wr0]
+ movzx ebx,byte [edi+DMA_B0]
+ add ebx,0x2100
+
+ SET_BYTE
+ pop ebx
+
  add dword [C_LABEL(SNES_Cycles)],byte 8   ; HDMA transfer
  cmp cl,2
  inc bx                 ; Adjust temporary table pointer
@@ -475,19 +447,13 @@ Do_HDMA_Indirect:
  jb near .End_Transfer
 
  GET_BYTE
-%ifdef LOG_HDMA_WRITES
- pusha
- push eax
- mov al,[edi+DMAP]
- mov bl,[edi+DMA_Vid]
- and eax,byte 7
- add bl,[DMA_PPU_Order+eax*4+1]
  push ebx
- call C_LABEL(hdma_write__FUcUc)
- add esp,8
- popa
-%endif
- call [edi+DMA_Wr1]
+ movzx ebx,byte [edi+DMA_B1]
+ add ebx,0x2100
+
+ SET_BYTE
+ pop ebx
+
  add dword [C_LABEL(SNES_Cycles)],byte 8   ; HDMA transfer
  cmp cl,4
  inc bx                 ; Adjust temporary table pointer
@@ -495,36 +461,24 @@ Do_HDMA_Indirect:
  jb near .End_Transfer
 
  GET_BYTE
-%ifdef LOG_HDMA_WRITES
- pusha
- push eax
- mov al,[edi+DMAP]
- mov bl,[edi+DMA_Vid]
- and eax,byte 7
- add bl,[DMA_PPU_Order+eax*4+2]
  push ebx
- call C_LABEL(hdma_write__FUcUc)
- add esp,8
- popa
-%endif
- call [edi+DMA_Wr2]
+ movzx ebx,byte [edi+DMA_B2]
+ add ebx,0x2100
+
+ SET_BYTE
+ pop ebx
+
  add dword [C_LABEL(SNES_Cycles)],byte 8   ; HDMA transfer
  inc bx
 
  GET_BYTE
-%ifdef LOG_HDMA_WRITES
- pusha
- push eax
- mov al,[edi+DMAP]
- mov bl,[edi+DMA_Vid]
- and eax,byte 7
- add bl,[DMA_PPU_Order+eax*4+3]
  push ebx
- call C_LABEL(hdma_write__FUcUc)
- add esp,8
- popa
-%endif
- call [edi+DMA_Wr3]
+ movzx ebx,byte [edi+DMA_B3]
+ add ebx,0x2100
+
+ SET_BYTE
+ pop ebx
+
  add dword [C_LABEL(SNES_Cycles)],byte 8   ; HDMA transfer
 
 .End_Transfer:
@@ -656,6 +610,38 @@ EXPORT do_HDMA
 .no_hdma:
  ret
 
+;called with edx = (DMA channel # * 4)
+ALIGNC
+DMA_Fix_B_Addresses:
+ push eax
+ push edi
+ mov edi,[DMA_Data_Areas+edx]
+ push ecx
+
+ mov al,[edi+DMAP]
+ and eax,byte 7
+
+ mov dl,[HDMA_Size+eax]     ; Transfer size for HDMA
+ mov cl,[edi+DMA_Vid]       ; PPU address in cl
+ mov [edi+HDMA_Siz],dl
+ lea eax,[DMA_PPU_Order+eax*4]
+ mov dl,cl                  ; PPU address in dl
+ add cl,[eax]
+ mov [edi+DMA_B0],cl
+ mov cl,dl                  ; PPU address in cl
+ add dl,[eax+1]
+ mov [edi+DMA_B1],dl
+ mov dl,cl                  ; PPU address in dl
+ add cl,[eax+2]
+ mov [edi+DMA_B2],cl
+ add dl,[eax+3]
+ mov [edi+DMA_B3],dl
+
+ pop ecx
+ pop edi
+ pop eax
+ ret
+
 ; Requires %eax to be (1 << 24) - 1!
 ;%1 = num
 %macro Reset_DMA_Channel 1
@@ -670,18 +656,14 @@ EXPORT do_HDMA
  push ecx
  mov ebx,C_LABEL(UNSUPPORTED_READ)
  mov ecx,C_LABEL(UNSUPPORTED_WRITE)
- mov [DMA_Rd0_%1],ebx
- mov [DMA_Wr0_%1],ecx
- mov [DMA_Rd1_%1],ebx
- mov [DMA_Wr1_%1],ecx
- mov [DMA_Rd2_%1],ebx
- mov [DMA_Wr2_%1],ecx
- mov [DMA_Rd3_%1],ebx
- mov [DMA_Wr3_%1],ecx
  pop ecx
  pop ebx
 
  mov byte [DMA_Inc_%1],0
+
+ mov edx,%1 * 4
+ call DMA_Fix_B_Addresses
+
 %endmacro
 
 EXPORT Reset_DMA
@@ -705,55 +687,6 @@ EXPORT Reset_DMA
 
  ; Back to 0...
  xor eax,eax
- ret
-
-ALIGNC
-EXPORT_C Update_DMA_PPU_Handlers
- cmp byte [In_DMA],0
- jz near Update_DMA_PPU_Handlers_Specific.not_in_dma
- movzx edx,byte [In_DMA]
- and edx,(7 << 2)
-Update_DMA_PPU_Handlers_Specific:
- push eax
- push ebx
- push ecx
- push edi
- mov edi,[DMA_Data_Areas+edx]
- xor ecx,ecx
- mov al,[edi+DMAP]
- and eax,byte 7
- mov cl,[edi+DMA_Vid]   ; PPU address in ecx
- mov dl,[HDMA_Size+eax]
- lea eax,[DMA_PPU_Order+eax*4]
- mov [edi+HDMA_Siz],dl
- mov edx,ecx            ; PPU address in edx
-;add cl,[eax]
- mov ebx,[C_LABEL(Read_Map_21)+ecx*4]
- mov ecx,[C_LABEL(Write_Map_21)+ecx*4]
- mov [edi+DMA_Rd0],ebx
- mov [edi+DMA_Wr0],ecx
- mov ecx,edx            ; PPU address in ecx
- add dl,[eax+1]
- mov ebx,[C_LABEL(Read_Map_21)+edx*4]
- mov edx,[C_LABEL(Write_Map_21)+edx*4]
- mov [edi+DMA_Rd1],ebx
- mov [edi+DMA_Wr1],edx
- mov edx,ecx            ; PPU address in edx
- add cl,[eax+2]
- mov ebx,[C_LABEL(Read_Map_21)+ecx*4]
- mov ecx,[C_LABEL(Write_Map_21)+ecx*4]
- mov [edi+DMA_Rd2],ebx
- mov [edi+DMA_Wr2],ecx
- add dl,[eax+3]
- mov ebx,[C_LABEL(Read_Map_21)+edx*4]
- mov edx,[C_LABEL(Write_Map_21)+edx*4]
- mov [edi+DMA_Rd3],ebx
- mov [edi+DMA_Wr3],edx
- pop edi
- pop ecx
- pop ebx
- pop eax
-.not_in_dma:
  ret
 
 ; Read from 43xx handlers
@@ -832,7 +765,7 @@ EXPORT MAP_WRITE_DMAP%1
  cmp [C_LABEL(DMAP_%1)],al
  je .no_change
 
- push ebx
+ mov edx,ebx
  mov [C_LABEL(DMAP_%1)],al
 
  test al,8      ; Does the operation require address adjustment?
@@ -847,10 +780,10 @@ EXPORT MAP_WRITE_DMAP%1
 .set_adjustment:
  mov [DMA_Inc_%1],bl
 
- pop ebx
+ mov ebx,edx
  shr edx,2
  and edx,byte 7*4
- jmp Update_DMA_PPU_Handlers_Specific   ; It'll return for us
+ jmp DMA_Fix_B_Addresses    ; It'll return for us
 
 .no_change:
  ret
@@ -860,9 +793,11 @@ EXPORT MAP_WRITE_BBAD%1
  cmp [C_LABEL(BBAD_%1)],al
  je .no_change
  mov [C_LABEL(BBAD_%1)],al
+
+ mov edx,ebx
  shr edx,2
  and edx,byte 7*4
- jmp Update_DMA_PPU_Handlers_Specific   ; It'll return for us
+ jmp DMA_Fix_B_Addresses    ; It'll return for us
 
 .no_change:
  ret

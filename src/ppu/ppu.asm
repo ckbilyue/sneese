@@ -1576,9 +1576,6 @@ ALIGNC
  Set_21_Write 0x18,SNES_W2118_NORM
  Set_21_Write 0x19,SNES_W2119_NORM
 .full_done:
-%ifndef NO_DMA_WRITE
- call C_LABEL(Update_DMA_PPU_Handlers)
-%endif
  mov al,[C_LABEL(VMAIN)]
  and al,3
  jnz .not_1
