@@ -22,6 +22,8 @@ Changes
 
 
  0.832
+  Input: Prevented input code from reading sticks that were not
+   providing digital input due to needing calibration [TRAC]
   Memory map: Corrected a scarcely used area of the LoROM map [TRAC]
   Render: Disabled drawing of sub-screen layers when screen arithmetic
    disabled [TRAC]
