@@ -1398,7 +1398,7 @@ char *TypeTable[]={
 char *CountryTable[]={
  "Japan",
  "USA",
- "Europe, Oceania, Asia, Australia",
+ "Europe, Oceania, Asia",     // Australia is part of Oceania
  "Sweden",
  "Finland",
  "Denmark",
