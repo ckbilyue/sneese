@@ -109,21 +109,32 @@ You must read and accept the license prior to use.
 ;  RMW 8-bit and 16-bit
 ;    TSB-04  ASL-06  TRB-14  ROL-26  LSR-46  ROR-66  DEC-C6  INC-E6
 ;
-%macro ADDR_Direct 0
+
+; if present, argument specifies index
+%macro ADDR_Direct 0-1 0
  mov bl,[1+R_NativePC]
  add R_NativePC,byte 2
  mov edx,B_D
  add bx,dx
+%ifnidni %1,0
+ mov edx,%1
+ add bx,dx
+%endif
 %endmacro
 
 %macro READ8_Direct 0
  ADDR_Direct
- GET_BYTE_00
+ GET_BYTE
 %endmacro
 
 %macro READ16_Direct 0
  ADDR_Direct
- GET_WORD_00
+ GET_WORD
+%endmacro
+
+%macro READ24_Direct 0
+ ADDR_Direct
+ GET_LONG
 %endmacro
 
 ; Direct Indirect Indexed (corrupts eax)
@@ -183,14 +194,7 @@ You must read and accept the license prior to use.
 ;   (if 16-bit data)
 ;   (1) 6a  1  1   1  0 AAB,AA+Y+1  Data High   1/0
 %macro ADDR_Direct_Indirect_Indexed_Long 0
- READ16_Direct
- inc bx
- shl eax,16
- GET_BYTE_00
- ror eax,16
- mov ebx,B_Y
- add ebx,eax
- and ebx,0x00FFFFFF ; Ensure 24-bit address
+ ADDR_Direct_Indirect_Long B_Y
 %endmacro
 
 %macro READ8_Direct_Indirect_Indexed_Long 0
@@ -240,22 +244,17 @@ You must read and accept the license prior to use.
 ;       6   1  0   1  0 0,D+DO+X    Data Low    0
 
 %macro ADDR_Direct_Index_X 0
- mov bl,[1+R_NativePC]
- add R_NativePC,byte 2
- mov edx,B_D
- add bx,dx
- mov edx,B_X
- add bx,dx
+ ADDR_Direct B_X
 %endmacro
 
 %macro READ8_Direct_Index_X 0
  ADDR_Direct_Index_X
- GET_BYTE_00
+ GET_BYTE
 %endmacro
 
 %macro READ16_Direct_Index_X 0
  ADDR_Direct_Index_X
- GET_WORD_00
+ GET_WORD
 %endmacro
 
 ; Direct index Y (corrupts eax)
@@ -275,22 +274,17 @@ You must read and accept the license prior to use.
 ;   (if 16-bit data)
 ;   (1) 4a  1  1   1  0 0,D+DO+Y+1  Data High   1/0
 %macro ADDR_Direct_Index_Y 0
- mov bl,[1+R_NativePC]
- add R_NativePC,byte 2
- mov edx,B_D
- add bx,dx
- mov edx,B_Y
- add bx,dx
+ ADDR_Direct B_Y
 %endmacro
 
 %macro READ8_Direct_Index_Y 0
  ADDR_Direct_Index_Y
- GET_BYTE_00
+ GET_BYTE
 %endmacro
 
 %macro READ16_Direct_Index_Y 0
  ADDR_Direct_Index_Y
- GET_WORD_00
+ GET_WORD
 %endmacro
 
 ; Direct Indexed Indirect (corrupts eax)
@@ -506,13 +500,16 @@ You must read and accept the license prior to use.
 ;       6   1  1   1  0 AAB,AA      Data Low    1/0
 ;   (if 16-bit data)
 ;   (1) 6a  1  1   1  0 AAB,AA+1    Data High   1/0
-%macro ADDR_Direct_Indirect_Long 0
- READ16_Direct
- inc bx
- shl eax,16
- GET_BYTE_00
- ror eax,16
+; if present, argument specifies index
+%macro ADDR_Direct_Indirect_Long 0-1 0
+ READ24_Direct
+%ifnidni %1,0           ;helper: index
+ mov ebx,0xFFFFFF       ;clip for indexing
+ add eax,%1
+ and ebx,eax
+%else
  mov ebx,eax
+%endif
 %endmacro
 
 %macro READ8_Direct_Indirect_Long 0
@@ -540,21 +537,20 @@ You must read and accept the license prior to use.
 ;   (if 16-bit data)
 ;   (1) 4a  1  1   1  0 0,S+SO+1    Data High   1/0
 %macro ADDR_Stack_Relative 0
- mov al,[1+R_NativePC]
+ READ8_Immediate
  mov ebx,B_S    ; Add stack pointer to make address
- add R_NativePC,byte 2
  add ebx,eax
  and ebx,0x0000FFFF
 %endmacro
 
 %macro READ8_Stack_Relative 0
  ADDR_Stack_Relative
- GET_BYTE_00
+ GET_BYTE
 %endmacro
 
 %macro READ16_Stack_Relative 0
  ADDR_Stack_Relative
- GET_WORD_00
+ GET_WORD
 %endmacro
 
 ; Stack Relative Indirect Indexed (corrupts eax)
@@ -577,7 +573,7 @@ You must read and accept the license prior to use.
 %macro ADDR_Stack_Relative_Indirect_Indexed 0
  ADDR_Stack_Relative
  mov eax,B_DB_Shifted
- GET_WORD_00
+ GET_WORD
  mov ebx,B_Y
  add ebx,eax
  and ebx,0x00FFFFFF ; Ensure 24-bit address

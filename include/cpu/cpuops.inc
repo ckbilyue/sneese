@@ -384,16 +384,16 @@ EM_ORA d_s,Stack_Relative
 E0_ORA d_s,Stack_Relative
 
 ; 04
-EM_TSB d,Direct,wrap
-E0_TSB d,Direct,wrap
+EM_TSB d,Direct
+E0_TSB d,Direct
 
 ; 05
 EM_ORA d,Direct
 E0_ORA d,Direct
 
 ; 06
-EM_ASL d,Direct,wrap
-E0_ASL d,Direct,wrap
+EM_ASL d,Direct
+E0_ASL d,Direct
 
 ; 07
 EM_ORA IdI,Direct_Indirect_Long
@@ -488,16 +488,16 @@ EM_ORA Od_sO_y,Stack_Relative_Indirect_Indexed
 E0_ORA Od_sO_y,Stack_Relative_Indirect_Indexed
 
 ; 14
-EM_TRB d,Direct,wrap
-E0_TRB d,Direct,wrap
+EM_TRB d,Direct
+E0_TRB d,Direct
 
 ; 15
 EM_ORA d_x,Direct_Index_X
 E0_ORA d_x,Direct_Index_X
 
 ; 16
-EM_ASL d_x,Direct_Index_X,wrap
-E0_ASL d_x,Direct_Index_X,wrap
+EM_ASL d_x,Direct_Index_X
+E0_ASL d_x,Direct_Index_X
 
 ; 17
 EM_ORA IdI_y,Direct_Indirect_Indexed_Long
@@ -766,8 +766,8 @@ EM_AND d,Direct
 E0_AND d,Direct
 
 ; 26
-EM_ROL d,Direct,wrap
-E0_ROL d,Direct,wrap
+EM_ROL d,Direct
+E0_ROL d,Direct
 
 ; 27
 EM_AND IdI,Direct_Indirect_Long
@@ -912,8 +912,8 @@ EM_AND d_x,Direct_Index_X
 E0_AND d_x,Direct_Index_X
 
 ; 36
-EM_ROL d_x,Direct_Index_X,wrap
-E0_ROL d_x,Direct_Index_X,wrap
+EM_ROL d_x,Direct_Index_X
+E0_ROL d_x,Direct_Index_X
 
 ; 37
 EM_AND IdI_y,Direct_Indirect_Indexed_Long
@@ -1133,8 +1133,8 @@ EM_EOR d,Direct
 E0_EOR d,Direct
 
 ; 46
-EM_LSR d,Direct,wrap
-E0_LSR d,Direct,wrap
+EM_LSR d,Direct
+E0_LSR d,Direct
 
 ; 47
 EM_EOR IdI,Direct_Indirect_Long
@@ -1286,8 +1286,8 @@ EM_EOR d_x,Direct_Index_X
 E0_EOR d_x,Direct_Index_X
 
 ; 56
-EM_LSR d_x,Direct_Index_X,wrap
-E0_LSR d_x,Direct_Index_X,wrap
+EM_LSR d_x,Direct_Index_X
+E0_LSR d_x,Direct_Index_X
 
 ; 57
 EM_EOR IdI_y,Direct_Indirect_Indexed_Long
@@ -1541,16 +1541,16 @@ E0_ADC d_s,Stack_Relative
 
 ; 64
 ALIGNC
-EM_STZ d,Direct,wrap
-E0_STZ d,Direct,wrap
+EM_STZ d,Direct
+E0_STZ d,Direct
 
 ; 65
 EM_ADC d,Direct
 E0_ADC d,Direct
 
 ; 66
-EM_ROR d,Direct,wrap
-E0_ROR d,Direct,wrap
+EM_ROR d,Direct
+E0_ROR d,Direct
 
 ; 67
 EM_ADC IdI,Direct_Indirect_Long
@@ -1782,16 +1782,16 @@ EM_ADC Od_sO_y,Stack_Relative_Indirect_Indexed
 E0_ADC Od_sO_y,Stack_Relative_Indirect_Indexed
 
 ; 74
-EM_STZ d_x,Direct_Index_X,wrap
-E0_STZ d_x,Direct_Index_X,wrap
+EM_STZ d_x,Direct_Index_X
+E0_STZ d_x,Direct_Index_X
 
 ; 75
 EM_ADC d_x,Direct_Index_X
 E0_ADC d_x,Direct_Index_X
 
 ; 76
-EM_ROR d_x,Direct_Index_X,wrap
-E0_ROR d_x,Direct_Index_X,wrap
+EM_ROR d_x,Direct_Index_X
+E0_ROR d_x,Direct_Index_X
 
 ; 77
 EM_ADC IdI_y,Direct_Indirect_Indexed_Long
@@ -1951,20 +1951,20 @@ EXPORT_C ALL_BRL        ; Branch always long (-32768 to 32767)
 %endif
 
 ; 83
-EM_STA d_s,Stack_Relative,wrap
-E0_STA d_s,Stack_Relative,wrap
+EM_STA d_s,Stack_Relative
+E0_STA d_s,Stack_Relative
 
 ; 84
-EX_STY d,Direct,wrap
-E0_STY d,Direct,wrap
+EX_STY d,Direct
+E0_STY d,Direct
 
 ; 85
-EM_STA d,Direct,wrap
-E0_STA d,Direct,wrap
+EM_STA d,Direct
+E0_STA d,Direct
 
 ; 86
-EX_STX d,Direct,wrap
-E0_STX d,Direct,wrap
+EX_STX d,Direct
+E0_STX d,Direct
 
 ; 87
 EM_STA IdI,Direct_Indirect_Long
@@ -2079,16 +2079,16 @@ EM_STA Od_sO_y,Stack_Relative_Indirect_Indexed
 E0_STA Od_sO_y,Stack_Relative_Indirect_Indexed
 
 ; 94
-EX_STY d_x,Direct_Index_X,wrap
-E0_STY d_x,Direct_Index_X,wrap
+EX_STY d_x,Direct_Index_X
+E0_STY d_x,Direct_Index_X
 
 ; 95
-EM_STA d_x,Direct_Index_X,wrap
-E0_STA d_x,Direct_Index_X,wrap
+EM_STA d_x,Direct_Index_X
+E0_STA d_x,Direct_Index_X
 
 ; 96
-EX_STX d_y,Direct_Index_Y,wrap
-E0_STX d_y,Direct_Index_Y,wrap
+EX_STX d_y,Direct_Index_Y
+E0_STX d_y,Direct_Index_Y
 
 ; 97
 EM_STA IdI_y,Direct_Indirect_Indexed_Long
@@ -2508,8 +2508,8 @@ EM_CMP d,Direct
 E0_CMP d,Direct
 
 ; C6
-EM_DEC d,Direct,wrap
-E0_DEC d,Direct,wrap
+EM_DEC d,Direct
+E0_DEC d,Direct
 
 ; C7
 EM_CMP IdI,Direct_Indirect_Long
@@ -2642,8 +2642,8 @@ EM_CMP d_x,Direct_Index_X
 E0_CMP d_x,Direct_Index_X
 
 ; D6
-EM_DEC d_x,Direct_Index_X,wrap
-E0_DEC d_x,Direct_Index_X,wrap
+EM_DEC d_x,Direct_Index_X
+E0_DEC d_x,Direct_Index_X
 
 ; D7
 EM_CMP IdI_y,Direct_Indirect_Indexed_Long
@@ -2877,8 +2877,8 @@ EM_SBC d,Direct
 E0_SBC d,Direct
 
 ; E6
-EM_INC d,Direct,wrap
-E0_INC d,Direct,wrap
+EM_INC d,Direct
+E0_INC d,Direct
 
 ; E7
 EM_SBC IdI,Direct_Indirect_Long
@@ -2981,8 +2981,8 @@ EM_SBC d_x,Direct_Index_X
 E0_SBC d_x,Direct_Index_X
 
 ; F6
-EM_INC d_x,Direct_Index_X,wrap
-E0_INC d_x,Direct_Index_X,wrap
+EM_INC d_x,Direct_Index_X
+E0_INC d_x,Direct_Index_X
 
 ; F7
 EM_SBC IdI_y,Direct_Indirect_Indexed_Long

@@ -80,6 +80,21 @@ EXPORT_C SNES_GET_WORD_00
  ret
 
 ALIGNC
+EXPORT_C SNES_GET_LONG
+ xor eax,eax
+ GET_BYTE
+ inc ebx
+ mov ah,al
+ and ebx,0x00FFFFFF
+ GET_BYTE
+ inc ebx
+ bswap eax
+ and ebx,0x00FFFFFF
+ GET_BYTE
+ ror eax,16
+ ret
+
+ALIGNC
 EXPORT_C UNSUPPORTED_READ
     mov al,0
 %ifdef DEBUG

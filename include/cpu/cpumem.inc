@@ -20,7 +20,7 @@ EXTERN_C memmap_text_start,memmap_data_start,memmap_bss_start
 EXTERN_C Read_Bank8Mapping,Write_Bank8Mapping
 EXTERN_C Read_Bank8Offset,Write_Bank8Offset
 EXTERN_C Dummy
-EXTERN_C SNES_GET_WORD,SNES_GET_WORD_00
+EXTERN_C SNES_GET_WORD,SNES_GET_WORD_00,SNES_GET_LONG
 EXTERN_C UNSUPPORTED_READ,UNSUPPORTED_WRITE,IGNORE_WRITE
 EXTERN_C PPU_READ,PPU_WRITE
 EXTERN_C SRAM_READ,SRAM_WRITE
@@ -90,12 +90,14 @@ direct and stack addressing accesses.
  dec ebx
  call C_LABEL(SNES_GET_WORD)
  jmp short %%read_done
+
 %%single_block:
  mov edx,ebx
  shr edx,13
  mov edx,[C_LABEL(Read_Bank8Offset)+edx*4]
  test edx,edx
  jnz %%read_direct
+
  mov edx,ebx
  shr edx,13
  push edx
@@ -107,6 +109,7 @@ direct and stack addressing accesses.
  call [C_LABEL(Read_Bank8Mapping)+edx*4]
  ror ax,8
  jmp short %%read_done
+
 %%read_direct:
  mov ax,[edx+ebx-1]
 %%read_done:
@@ -138,6 +141,45 @@ direct and stack addressing accesses.
  jmp short %%read_done
 %%read_direct:
  mov ax,[edx+ebx-1]
+%%read_done:
+%endmacro
+
+%macro GET_LONG 0
+ add ebx,2
+ test ebx,0x1FFE
+ jnz %%single_block
+ sub ebx,2
+ call C_LABEL(SNES_GET_LONG)
+ jmp short %%read_done
+
+%%single_block:
+ mov edx,ebx
+ xor eax,eax
+ shr edx,13
+ push edx
+ mov edx,[C_LABEL(Read_Bank8Offset)+edx*4]
+ test edx,edx
+ jnz %%read_direct
+
+ mov edx,[esp]
+ sub ebx,2
+ call [C_LABEL(Read_Bank8Mapping)+edx*4]
+ mov edx,[esp]
+ mov ah,al
+ inc ebx
+ call [C_LABEL(Read_Bank8Mapping)+edx*4]
+ pop edx
+ inc ebx
+ bswap eax
+ call [C_LABEL(Read_Bank8Mapping)+edx*4]
+ ror eax,16
+ jmp short %%read_done
+
+%%read_direct:
+ mov al,[edx+ebx]
+ shl eax,16
+ mov ax,[edx+ebx-2]
+ pop edx
 %%read_done:
 %endmacro
 
