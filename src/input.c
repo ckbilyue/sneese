@@ -27,8 +27,9 @@ You must read and accept the license prior to use.
    768- 895: buttons 128-255
  */
 
-#include <ctype.h>
+#include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "wrapaleg.h"
 
