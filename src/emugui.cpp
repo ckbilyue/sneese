@@ -85,7 +85,7 @@ BITMAP *SetGUIScreen(int ScreenMode)
   strcpy(logo_name, dat_name);
   strcat(logo_name, "#sneese");
 
-  sneese = load_pcx(logo_name, sneesepal);
+  sneese = load_bmp(logo_name, sneesepal);
  }
 #endif
 

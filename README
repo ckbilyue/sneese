@@ -43,7 +43,7 @@ Assistant Developer (Sound system emulation)
  Brad Martin                    bmartin* *at* *umr.edu
                                 http://home.gvi.net/~martin
 New logo
- stainless
+ Siloh (formerly stainless)
 
 Old logo
  neptron                        http://ciot.pair.com/neptron/
@@ -72,8 +72,8 @@ Sound system emulation
 
 Also try:
  FakeNES, a CVS open-source portable NES emulator in POSIX C with builds
-  available for DOS, Win32-DirectX and Linux, by stainless, RobotBebop,
-  TRAC, and Lord_Nightmare.     http://fakenes.sourceforge.net/
+  available for DOS, Win32-DirectX and Linux, by Siloh, RobotBebop,
+  TRAC, and Lord_Nightmare.     http://fakenes.sf.net/
 
 
 System Requirements
@@ -543,7 +543,7 @@ Thanks go out to...
  SNES '9X team, past and present: for putting so much effort into making
   it what it is today... fix those quirks!
  ZSNES team, past and present: zsKnight, _Demo_, Pharos, pagefault,
-  stainless, ...: For ZSNES. Need I say more?
+  Siloh, ...: For ZSNES. Need I say more?
  Lee Hammerton: for bringing this so far and giving me the opportunity
   to make it live on...
  archeide, Brad Martin: for getting the SPC and sound DSP and generation
@@ -561,14 +561,14 @@ Thanks go out to...
  zsKnight, for the 5x5 font for the GUI!
  Lanice, for finding the LFN bug in the GUI!
  KnucklesD, for getting on my case to put in save dir support!
- Windwalker, neptron, and stainless, for the logos!
+ Windwalker, neptron, and Siloh, for the logos!
 
- stainless: for putting up with me, and being the friend you are
+ Siloh: for putting up with me, and being the friend you are
  MKendora, Lord_Nightmare: for all the support, and always reaffirming
   my belief that there's a reason to continue.
 
  Beta testing:
-  RibOnIzEr, QbProgger, AC/DC, Malenko, Richard Ferreira, rOss, stainless,
+  RibOnIzEr, QbProgger, AC/DC, Malenko, Richard Ferreira, rOss, Siloh,
    MKendora, akito
 
   Y0ssarian, PoleStar, Steve, Vilmar, Enternal, [E|YSiUM], Goku-X, JaguarPaw,
@@ -580,8 +580,9 @@ Greets
  TCF, Borson, neptron, Avarice, KnucklesD, Richard Ferreira, AC/DC
  Goku-X, Lanice, Azimer, TNSe, dps, polarz, rOss, Neill Corlett,
  Richard Mitton, illus, Slaik, StCreator, RibOnIzEr, Thane, QbProgger,
- krial, pagefault, stainless, Zero-X, MrGrim, kode54, akito, MKendora,
- Lord_Nightmare, anomie, ipher, amit, Diablo-D3, Neviksti, slow, SamB
+ krial, pagefault, Siloh, Zero-X, MrGrim, kode54, akito, MKendora,
+ Lord_Nightmare, anomie, ipher, amit, Diablo-D3, Neviksti, slow, SamB,
+ Sabretooth, amptor, Harekiet, Nach
 
  Everyone from EFnet IRC #snesromz, #classicgames, #snesdev, #zsnes, #mugen,
   Newnet IRC #snesromz, and Openprojects IRC #fakenes, #zsnes, #assembler
