@@ -72,26 +72,32 @@ ALIGNC
 %%decimal_mode:
  mov cl,B_C_flag
  mov bl,al
- add cl,255 ;MAKE_CARRY
  mov al,B_A
- mov ecx,ebx
- mov edx,eax
+ mov ch,al
+ mov dh,bl
+ shr ch,4
+ push eax
+ shr dh,4
+ add cl,255 ;MAKE_CARRY
  adc al,bl
- lahf
- mov bl,0x10
- and bl,ah
- sub al,bl
- sahf
- daa
+ aaa
+ mov dl,al
+ mov al,ch
+ adc al,dh
+ aaa
+ sbb cl,cl
+ shl al,4
+ add al,dl
+ pop edx
  mov B_A,al
- sbb bl,bl
- STORE_FLAGS_NZC al,bl
+ STORE_FLAGS_NZC al,cl
+
 ;al = result, cl = argument, dl = old accumulator
- xor cl,dl ;accum ^ arg
+ xor bl,dl ;accum ^ arg
  xor al,dl ;accum ^ result
- xor cl,-1 ;~(accum ^ arg)
+ xor bl,-1 ;~(accum ^ arg)
  and al,0x80
- and al,cl ;(~((accum ^ arg)) & ((accum ^ result)) & 0x80)
+ and al,bl ;(~((accum ^ arg)) & ((accum ^ result)) & 0x80)
  STORE_FLAGS_V al
 %else
  READ16_%1
@@ -111,41 +117,67 @@ ALIGNC
 
 ALIGNC
 %%decimal_mode:
- mov cl,B_C_flag
  mov ebx,eax
- add cl,255 ;MAKE_CARRY
  mov eax,B_A
- mov ecx,ebx
- mov edx,eax
- adc al,bl
- lahf
- mov bl,0x10
- and bl,ah
- sub al,bl
- sahf
- daa
+ push ebx
+ shr ebx,4
+ push eax
+ shr eax,4
+ shr bl,4
+ shr al,4
+ push ebx
+ push eax
+ mov dh,[esp+8]
+ mov cl,B_C_flag
+ mov ch,[esp+12]
+ mov al,0x0F
+ mov bl,0x0F
+ and al,dh
+ shr dh,4
+ and bl,ch
+ shr ch,4
+
+ add cl,255 ;MAKE_CARRY
+ adc al,bl      ;0-3
+ aaa
  mov bl,al
  mov al,dh
- adc al,bh
- lahf
- mov bh,0x10
- and bh,ah
- sub al,bh
- sahf
- daa
+ adc al,ch      ;4-7
+ aaa
  mov bh,al
- sbb al,al
- STORE_FLAGS_N bh
- mov B_A,bx
- or bl,bh
- STORE_FLAGS_C al
- STORE_FLAGS_Z bl
-;ax = result, cx = argument, dx = old accumulator
- xor ch,dh ;accum ^ arg
+ pop eax        ;high nybbles of accumulator
+ pop edx        ;high nybbles of operand
+ mov ecx,eax
+ adc al,dl      ;8-11
+ aaa
+ mov dl,al
+ mov al,ch
+ adc al,dh      ;12-15
+ aaa
+ sbb cl,cl
+
+ ;put it all back together
+ shl bh,4
+ mov ah,al
+ shl ah,4
+ add bh,bl
+ add ah,dl
+ mov al,bh
+
+ pop edx        ;old accumulator
+ pop ebx        ;operand
+
+ STORE_FLAGS_N ah
+ mov B_A,ax
+ or al,ah
+ STORE_FLAGS_C cl
+ STORE_FLAGS_Z al
+;ax = result, bx = argument, dx = old accumulator
+ xor bh,dh ;accum ^ arg
  xor ah,dh ;accum ^ result
- xor ch,-1 ;~(accum ^ arg)
+ xor bh,-1 ;~(accum ^ arg)
  and ah,0x80
- and ah,ch ;(~((accum ^ arg)) & ((accum ^ result)) & 0x80)
+ and ah,bh ;(~((accum ^ arg)) & ((accum ^ result)) & 0x80)
  STORE_FLAGS_V ah
 %endif
 %endmacro
@@ -531,32 +563,33 @@ ALIGNC
 %%decimal_mode:
  mov cl,B_C_flag
  mov bl,al
- cmp cl,1   ;MAKE_NOT_CARRY
  mov al,B_A
- mov ecx,ebx
- mov edx,eax
+ mov ch,al
+ mov dh,bl
+ shr ch,4
+ push eax
+ shr dh,4
+ cmp cl,1   ;MAKE_NOT_CARRY
  sbb al,bl
- lahf
- and ah,0x10
- add al,ah
- sahf
- lahf
- mov bl,0x10
- and bl,ah
- add al,bl
- sahf
- das
+ aas
+ mov dl,al
+ mov al,ch
+ sbb al,dh
+ aas
+ sbb cl,cl
+ shl al,4
+ add al,dl
+ pop edx
  mov B_A,al
- sbb bl,bl
  STORE_FLAGS_N al
- xor bl,0xFF
+ xor cl,0xFF
  STORE_FLAGS_Z al
- STORE_FLAGS_C bl
+ STORE_FLAGS_C cl
 ;al = result, cl = argument, dl = old accumulator
- xor cl,dl ;accum ^ arg
+ xor bl,dl ;accum ^ arg
  xor al,dl ;accum ^ result
- and cl,0x80
- and al,cl ;(((accum ^ arg)) & ((accum ^ result)) & 0x80)
+ and bl,0x80
+ and al,bl ;(((accum ^ arg)) & ((accum ^ result)) & 0x80)
  STORE_FLAGS_V al
 %else
  READ16_%1
@@ -577,41 +610,67 @@ ALIGNC
 
 ALIGNC
 %%decimal_mode:
- mov cl,B_C_flag
  mov ebx,eax
- cmp cl,1   ;MAKE_NOT_CARRY
  mov eax,B_A
- mov ecx,ebx
- mov edx,eax
- sbb al,bl
- lahf
- mov bl,0x10
- and bl,ah
- add al,bl
- sahf
- das
+ push ebx
+ shr ebx,4
+ push eax
+ shr eax,4
+ shr bl,4
+ shr al,4
+ push ebx
+ push eax
+ mov dh,[esp+8]
+ mov cl,B_C_flag
+ mov ch,[esp+12]
+ mov al,0x0F
+ mov bl,0x0F
+ and al,dh
+ shr dh,4
+ and bl,ch
+ shr ch,4
+
+ cmp cl,1   ;MAKE_NOT_CARRY
+ sbb al,bl      ;0-3
+ aas
  mov bl,al
  mov al,dh
- sbb al,bh
- lahf
- mov bh,0x10
- and bh,ah
- add al,bh
- sahf
- das
+ sbb al,ch      ;4-7
+ aas
  mov bh,al
- sbb al,al
- STORE_FLAGS_N bh
- xor al,0xFF
- mov B_A,bx
- or bl,bh
- STORE_FLAGS_C al
- STORE_FLAGS_Z bl
-;ax = result, cx = argument, dx = old accumulator
- xor ch,dh ;accum ^ arg
+ pop eax        ;high nybbles of accumulator
+ pop edx        ;high nybbles of operand
+ mov ecx,eax
+ sbb al,dl      ;8-11
+ aas
+ mov dl,al
+ mov al,ch
+ sbb al,dh      ;12-15
+ aas
+ sbb cl,cl
+
+ ;put it all back together
+ shl bh,4
+ mov ah,al
+ shl ah,4
+ add bh,bl
+ add ah,dl
+ mov al,bh
+
+ pop edx        ;old accumulator
+ pop ebx        ;operand
+
+ STORE_FLAGS_N ah
+ xor cl,0xFF
+ mov B_A,ax
+ or al,ah
+ STORE_FLAGS_C cl
+ STORE_FLAGS_Z al
+;ax = result, bx = argument, dx = old accumulator
+ xor bh,dh ;accum ^ arg
  xor ah,dh ;accum ^ result
- and ch,0x80
- and ah,ch ;(((accum ^ arg)) & ((accum ^ result)) & 0x80)
+ and bh,0x80
+ and ah,bh ;(((accum ^ arg)) & ((accum ^ result)) & 0x80)
  STORE_FLAGS_V ah
 %endif
 %endmacro
