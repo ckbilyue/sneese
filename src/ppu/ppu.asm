@@ -30,6 +30,8 @@ You must read and accept the license prior to use.
 %include "ppu/screen.inc"
 %include "ppu/tiles.inc"
 %include "cpu/cpumem.inc"
+%include "cycles.inc"
+%include "cpu/regs.inc"
 
 EXTERN SNES_R2137,SNES_R213C,SNES_R213D
 
@@ -798,6 +800,7 @@ SNES_R2180: ; WMDATA
  inc edx
  and edx,0x01FFFF
  mov [WMADDL],edx
+ add R_65c816_Cycles,_5A22_SLOW_CYCLE - _5A22_FAST_CYCLE
  ret
 
 ALIGNC
@@ -2289,6 +2292,7 @@ SNES_W2180: ; WMDATA
  inc edx
  and edx,0x01FFFF
  mov [WMADDL],edx
+ add R_65c816_Cycles,_5A22_SLOW_CYCLE - _5A22_FAST_CYCLE
  ret
 
 ALIGNC

@@ -202,7 +202,7 @@ $(OBJ)/cpu/dma.$(ASM_OBJ_EXT): $(SRC)/cpu/dma.asm $(OBJFIX) \
  cpu/cpumem.inc)
 $(OBJ)/ppu/ppu.$(ASM_OBJ_EXT): $(SRC)/ppu/ppu.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, misc.inc ppu/ppu.inc cpu/dma.inc ppu/sprites.inc \
- ppu/screen.inc ppu/tiles.inc cpu/cpumem.inc)
+ ppu/screen.inc ppu/tiles.inc cpu/cpumem.inc cycles.inc cpu/regs.inc)
 $(OBJ)/apu/apuskip.$(ASM_OBJ_EXT): $(SRC)/apu/apuskip.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, misc.inc ppu/ppu.inc)
 $(OBJ)/clear.$(ASM_OBJ_EXT): $(SRC)/clear.asm $(INCLUDE)/misc.inc $(OBJFIX) 
