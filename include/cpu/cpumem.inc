@@ -62,6 +62,9 @@ byte accessed.
  mov edx,ebx
  shr edx,13
  push edx
+ movzx edx,byte [C_LABEL(BlockSpeed)+edx]
+ add R_65c816_Cycles,edx
+ mov edx,[esp]
  mov edx,[C_LABEL(Read_Bank8Offset)+edx*4]
  test edx,edx
  jnz %%read_direct
@@ -74,8 +77,6 @@ byte accessed.
  mov [C_LABEL(Last_Bus_Value_A)],al
 %%read_done:
  pop edx
- movzx edx,byte [C_LABEL(BlockSpeed)+edx]
- add R_65c816_Cycles,edx
 %endmacro
 
 %macro GET_WORD 0-1 0
@@ -110,8 +111,8 @@ byte accessed.
 %else
  dec bx
 %endif
- call [C_LABEL(Read_Bank8Mapping)+edx*4]
  add R_65c816_Cycles,ecx
+ call [C_LABEL(Read_Bank8Mapping)+edx*4]
  mov edx,[esp+4]
  mov ah,al
 %ifnidni %1,wrap
@@ -119,9 +120,9 @@ byte accessed.
 %else
  inc bx
 %endif
- call [C_LABEL(Read_Bank8Mapping)+edx*4]
  add R_65c816_Cycles,ecx
  pop ecx
+ call [C_LABEL(Read_Bank8Mapping)+edx*4]
  ror ax,8
  pop edx
  jmp short %%read_done
@@ -168,8 +169,8 @@ byte accessed.
 %else
  sub bx,2
 %endif
- call [C_LABEL(Read_Bank8Mapping)+edx*4]
  add R_65c816_Cycles,ecx
+ call [C_LABEL(Read_Bank8Mapping)+edx*4]
  mov edx,[esp+4]
  mov ah,al
 %ifnidni %1,wrap
@@ -177,8 +178,8 @@ byte accessed.
 %else
  inc bx
 %endif
- call [C_LABEL(Read_Bank8Mapping)+edx*4]
  add R_65c816_Cycles,ecx
+ call [C_LABEL(Read_Bank8Mapping)+edx*4]
  mov edx,[esp+4]
 %ifnidni %1,wrap
  inc ebx
@@ -186,9 +187,9 @@ byte accessed.
  inc bx
 %endif
  bswap eax
- call [C_LABEL(Read_Bank8Mapping)+edx*4]
  add R_65c816_Cycles,ecx
  pop ecx
+ call [C_LABEL(Read_Bank8Mapping)+edx*4]
  ror eax,16
  pop edx
  jmp short %%read_done
@@ -211,6 +212,9 @@ byte accessed.
  mov edx,ebx
  shr edx,13
  push edx
+ movzx edx,byte [C_LABEL(BlockSpeed)+edx]
+ add R_65c816_Cycles,edx
+ mov edx,[esp]
  mov edx,[C_LABEL(Write_Bank8Offset)+edx*4]
  test edx,edx
  jnz %%write_direct
@@ -221,8 +225,6 @@ byte accessed.
  mov [edx+ebx],al
 %%write_done:
  pop edx
- movzx edx,byte [C_LABEL(BlockSpeed)+edx]
- add R_65c816_Cycles,edx
 %endmacro
 
 ;%1 = wrap

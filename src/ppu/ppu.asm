@@ -821,11 +821,11 @@ SNES_R213F: ; STAT78
 ALIGNC
 SNES_R2180: ; WMDATA
  mov edx,[WMADDL]
+ add R_65c816_Cycles,_5A22_SLOW_CYCLE - _5A22_FAST_CYCLE
  mov al,[C_LABEL(WRAM)+edx]
  inc edx
  and edx,0x01FFFF
  mov [WMADDL],edx
- add R_65c816_Cycles,_5A22_SLOW_CYCLE - _5A22_FAST_CYCLE
  ret
 
 ; Read from 40xx handlers
@@ -2293,11 +2293,11 @@ SNES_W2133: ; SETINI
 ALIGNC
 SNES_W2180: ; WMDATA
  mov edx,[WMADDL]
+ add R_65c816_Cycles,_5A22_SLOW_CYCLE - _5A22_FAST_CYCLE
  mov [C_LABEL(WRAM)+edx],al
  inc edx
  and edx,0x01FFFF
  mov [WMADDL],edx
- add R_65c816_Cycles,_5A22_SLOW_CYCLE - _5A22_FAST_CYCLE
  ret
 
 ALIGNC
