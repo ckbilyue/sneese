@@ -46,8 +46,9 @@ Changes
    the overflow flag to be set to an unexpected state [TRAC]
   Sound: Removed some extraneous and problematic compile-time directives
    [TRAC]
-  Sound: Added saturation to gaussian interpolation filter, thanks to
-   Jonathan Gevaryahu (Lord_Nightmare) for the fix [TRAC]
+  Sound: Added clipping and saturation to gaussian interpolation filter,
+   thanks to Jonathan Gevaryahu (Lord_Nightmare) and Brad Martin for the
+   fixes [TRAC]
  0.776 [TRAC]
   Render: Added support for dual window clipping with all logic
    modes of backgrounds in modes 5 and 6

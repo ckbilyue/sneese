@@ -21,8 +21,6 @@ You must read and accept the license prior to use.
 #include "apu/sounddef.h"
 #include "apu/spc.h"
 
-//#define ALT_BRR
-
 //#define NO_PITCH_MODULATION /* do not remove - needs to be fixed */
 //#define FAULT_ON_PITCH_MODULATION_USE
 
@@ -475,32 +473,16 @@ static int get_brr_block(int voice, struct voice_state *pvs)
    switch (filter)
    {
     case 1:
-#ifdef ALT_BRR
-     output += (last1 >> 1) + ((~last1) >> 5);
-#else
      output += (last1 >> 1) + ((-last1) >> 5);
-#endif
      break;
     case 2:
-#ifdef ALT_BRR
-     output += last1 + ((~(last1 + (last1 >> 1))) >> 5) +
-      (~last2 >> 1) + (last2 >> 5);
-     break;
-#else
      output += last1 + ((-(last1 + (last1 >> 1))) >> 5) +
       (-last2 >> 1) + (last2 >> 5);
      break;
-#endif
     case 3: default:
-#ifdef ALT_BRR
-     output += last1 + ((~(last1 + (last1 << 2) + (last1 << 3))) >> 7) +
-      (~last2 >> 1) + ((last2 + (last2 >> 1)) >> 4);
-     break;
-#else
      output += last1 + ((-(last1 + (last1 << 2) + (last1 << 3))) >> 7) +
       (-last2 >> 1) + ((last2 + (last2 >> 1)) >> 4);
      break;
-#endif
    }
 
    // Clip underflow/overflow (saturation)
@@ -1262,18 +1244,21 @@ INLINE static void update_voice_pitch(int voice, struct voice_state *pvs,
  SAMPLE_CLIP_AND_WRITE(BITS,buf[i * 2],mlsample) \
  SAMPLE_CLIP_AND_WRITE(BITS,buf[i * 2 + 1],mrsample)
 
+/* NOTE: Clip with sign-extension before last sample is added in */
 #define GET_OUTX_GAUSS \
  do \
  { \
-  pvs->outx = \
-  ((((int) G4[-(pvs->pitch_counter >> 4)] * pvs->buf[(pvs->bufptr - 3) & 3]) \
-   & ~0x7FF) + \
-  (((int) G3[-(pvs->pitch_counter >> 4)] * pvs->buf[(pvs->bufptr - 2) & 3]) \
-   & ~0x7FF) + \
-  (((int) G2[(pvs->pitch_counter >> 4)] * pvs->buf[(pvs->bufptr - 1) & 3]) \
-   & ~0x7FF) + \
-  (((int) G1[(pvs->pitch_counter >> 4)] * pvs->buf[(pvs->bufptr) & 3]) \
-    & ~0x7FF)) >> 11; \
+  pvs->outx = ( \
+  ((( \
+   ((((int) G4[-(pvs->pitch_counter >> 4)] * \
+    pvs->buf[(pvs->bufptr - 3) & 3]) >> 11) & ~1) + \
+   ((((int) G3[-(pvs->pitch_counter >> 4)] * \
+    pvs->buf[(pvs->bufptr - 2) & 3]) >> 11) & ~1) + \
+   ((((int) G2[(pvs->pitch_counter >> 4)] * \
+    pvs->buf[(pvs->bufptr - 1) & 3]) >> 11) & ~1)) \
+  & 0xFFFF) ^ 0x8000) - 0x8000) + \
+  ((((int) G1[(pvs->pitch_counter >> 4)] * \
+   pvs->buf[(pvs->bufptr) & 3]) >> 11) & ~1); \
   if (pvs->outx <= -32768) pvs->outx = -32768; \
   else if (pvs->outx >= 32767) pvs->outx = 32767; \
  } while (0)
