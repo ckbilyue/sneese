@@ -21,7 +21,7 @@ Changes
   DBJH          Daniel Horchner
 
 
- 0.779
+ 0.80
   Misc: Fixed a flaw where divide result registers were not changed
    by division-by-zero [TRAC]
   Input: Fixed a flaw in JOYC1 which caused SMB in Mario All-Stars to
