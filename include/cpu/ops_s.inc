@@ -110,6 +110,76 @@ OPCODE_PROLOG(0xB0) ; BCS r
  _BFS SNES_FLAG_C
 OPCODE_EPILOG
 
+OPCODE_PROLOG(0xC2) ; REP #
+ READ8_Immediate
+
+ mov bl,B_I_flag
+
+ test al,REAL_SNES_FLAG_C
+ jz .no_change_carry
+ STORE_FLAGS_C ah
+.no_change_carry:
+
+ test al,REAL_SNES_FLAG_Z
+ jz .no_change_zero
+ STORE_FLAGS_Z al
+.no_change_zero:
+
+ test al,REAL_SNES_FLAG_I
+ jz .no_change_interrupt_disable
+ STORE_FLAGS_I ah
+.no_change_interrupt_disable:
+
+ test al,REAL_SNES_FLAG_D
+ jz .no_change_decimal_mode
+ STORE_FLAGS_D ah
+.no_change_decimal_mode:
+
+%if S_8bit == 0
+ test al,REAL_SNES_FLAG_X
+ jz .no_change_index_size
+ STORE_FLAGS_X ah
+.no_change_index_size:
+
+ test al,REAL_SNES_FLAG_M
+ jz .no_change_memory_size
+ STORE_FLAGS_M ah
+.no_change_memory_size:
+%endif
+
+ test al,REAL_SNES_FLAG_V
+ jz .no_change_overflow
+ STORE_FLAGS_V ah
+.no_change_overflow:
+
+ test al,REAL_SNES_FLAG_N
+ jz .no_change_negative
+ STORE_FLAGS_N ah
+.no_change_negative:
+
+ test bl,bl
+%if S_8bit
+ jz C_LABEL(CPU_RETURN)
+ JUMP_FLAG SNES_FLAG_I,C_LABEL(CPU_RETURN),near
+%else
+ jz .no_irq_enable
+ JUMP_FLAG SNES_FLAG_I,.no_irq_enable
+%endif
+ mov al,CEM_Instruction_After_IRQ_Enable
+ mov [CPU_Execution_Mode],al
+ xor edx,edx
+ SAVE_CYCLES
+ mov [C_LABEL(EventTrip)],edx
+ mov edx,Enabling_IRQ_Event
+ LOAD_CYCLES
+ mov [Event_Handler],edx
+
+%if S_8bit == 0
+.no_irq_enable:
+ SET_TABLE_MX
+%endif
+OPCODE_EPILOG
+
 OPCODE_PROLOG(0xD0) ; BNE r
  _BFC SNES_FLAG_Z
 OPCODE_EPILOG
@@ -117,6 +187,56 @@ OPCODE_EPILOG
 OPCODE_PROLOG(0xD4) ; PEI s
  READ16_Direct
  PUSH_W
+OPCODE_EPILOG
+
+OPCODE_PROLOG(0xE2) ; SEP #
+ READ8_Immediate
+
+ test al,REAL_SNES_FLAG_C
+ jz .no_change_carry
+ STORE_FLAGS_C al
+.no_change_carry:
+
+ test al,REAL_SNES_FLAG_Z
+ jz .no_change_zero
+ STORE_FLAGS_Z ah
+.no_change_zero:
+
+ test al,REAL_SNES_FLAG_I
+ jz .no_change_interrupt_disable
+ STORE_FLAGS_I al
+.no_change_interrupt_disable:
+
+ test al,REAL_SNES_FLAG_D
+ jz .no_change_decimal_mode
+ STORE_FLAGS_D al
+.no_change_decimal_mode:
+
+%if S_8bit == 0
+ test al,REAL_SNES_FLAG_X
+ jz .no_change_index_size
+ STORE_FLAGS_X al
+.no_change_index_size:
+
+ test al,REAL_SNES_FLAG_M
+ jz .no_change_memory_size
+ STORE_FLAGS_M al
+.no_change_memory_size:
+%endif
+
+ test al,REAL_SNES_FLAG_V
+ jz .no_change_overflow
+ STORE_FLAGS_V al
+.no_change_overflow:
+
+ test al,REAL_SNES_FLAG_N
+ jz .no_change_negative
+ STORE_FLAGS_N al
+.no_change_negative:
+
+%if S_8bit == 0
+ SET_TABLE_MX
+%endif
 OPCODE_EPILOG
 
 OPCODE_PROLOG(0xF0) ; BEQ r
