@@ -359,7 +359,7 @@ section .text
 
  report_event
 
- cmp [NMI_pin],NMI_Raised
+ cmp byte [NMI_pin],NMI_Raised
  je .nmi_waiting
 
  mov al,CEM_Instruction_After_IRQ_Enable
