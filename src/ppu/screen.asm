@@ -643,8 +643,8 @@ EXTERN_C BreaksLast
  xor eax,-1
  xor ecx,ecx
  xor ebx,ebx
- mov ecx,[C_LABEL(MosaicCount)+esi+eax+1]
- mov ebx,[C_LABEL(MosaicLine)+esi+eax+1-1]
+ mov cl,[C_LABEL(MosaicCount)+esi+eax+1]
+ mov bl,[C_LABEL(MosaicLine)+esi+eax+1-1]
  mov eax,[Mosaic_Size]
  add ebx,ebp
  cmp ecx,eax
@@ -701,12 +701,84 @@ ALIGNC
  call C_LABEL(Clear_Scanlines)
 
  pop edx
+ mov ebx,[C_LABEL(Current_Line_Render)]
+ add ebx,edx
+ mov [C_LABEL(Current_Line_Render)],ebx
+
+ mov al,[MOSAIC]
+ test al,1
+ jnz .so_mosaic_bg1
+ mov [LineCounter_BG1],ebx
+.so_mosaic_bg1:
+ test al,2
+ jnz .so_mosaic_bg2
+ mov [LineCounter_BG2],ebx
+.so_mosaic_bg2:
+ test al,4
+ jnz .so_mosaic_bg3
+ mov [LineCounter_BG3],ebx
+.so_mosaic_bg3:
+ test al,8
+ jnz .so_mosaic_bg4
+ mov [LineCounter_BG4],ebx
+.so_mosaic_bg4:
+
+;if (countdown >= linecount) countdown -= linecount;
+;else
+;{
+; line += countdown + MosaicLine[linecount - countdown - 1];
+; countdown = MosaicCount[linecount - countdown];
+; if (countdown == size) countdown = 0;
+;}
+ mov eax,[MosaicCountdown]
+ mov ebp,eax
+ sub eax,edx
+ jge .so_mosaic_fixup_done
+
+ mov esi,[Mosaic_Size_Select]
+ xor eax,-1
+ xor ecx,ecx
+ xor ebx,ebx
+ mov ecx,[C_LABEL(MosaicCount)+esi+eax+1]
+ mov ebx,[C_LABEL(MosaicLine)+esi+eax+1-1]
+ mov eax,[Mosaic_Size]
+ add ebx,ebp
+ cmp ecx,eax
+ sbb eax,eax
+ and ecx,eax
+ mov [MosaicCountdown],cl
+
+ mov al,[MOSAIC]
+ mov ebx,[LineCounter_BG1]
+ mov ecx,[LineCounter_BG2]
+ mov esi,[LineCounter_BG3]
+ mov edi,[LineCounter_BG4]
+
+ test al,1
+ jz .so_no_mosaic_bg1
+ add [LineCounter_BG1],ebp
+.so_no_mosaic_bg1:
+ test al,2
+ jz .so_no_mosaic_bg2
+ add [LineCounter_BG2],ebp
+.so_no_mosaic_bg2:
+ test al,4
+ jz .so_no_mosaic_bg3
+ add [LineCounter_BG3],ebp
+.so_no_mosaic_bg3:
+ test al,8
+ jz .so_no_mosaic_bg4
+ add [LineCounter_BG4],ebp
+.so_no_mosaic_bg4:
+
+.so_mosaic_fixup_done:
+ mov [MosaicCountdown],eax
+
  pop esi
  pop ebp
  pop edi
  pop ecx
  pop ebx
- add [C_LABEL(Current_Line_Render)],edx
 
  mov eax,GfxBufferLinePitch
  imul eax,edx
