@@ -364,56 +364,37 @@ void CTL_BITMAP::refresh(WINDOW *parent){
   parent->get_x()+dx,parent->get_y()+dy,width,height);
 }
 
-void PlotString(WINDOW *window,pGUI_FONT font,const char *String,int x,int y){
- while(*String){
-  int v;
-  if(x>=window->get_width()) break;
-  for(v=0;v<font->get_heightspace();v++){
-// GUI_Screen[window->get_visible_x()+x+font->get_widthspace()-1+
-//  GUI_ScreenWidth*(window->get_visible_y()+y+v)]=240+cText_Back;
-   putpixel(GUI_Bitmap, window->get_visible_x()+x+font->get_widthspace()-1,
-    (window->get_visible_y()+y+v),240+cText_Back);
-  }
-  for(int h=0;h<font->get_widthspace();h++){
-// GUI_Screen[window->get_visible_x()+x+h+
-//  GUI_ScreenWidth*(window->get_visible_y()+y+v-1)]=240+cText_Back;
-   putpixel(GUI_Bitmap, window->get_visible_x()+x+h,
-    (window->get_visible_y()+y+v-1),240+cText_Back);
-  }
-  if(x>-font->get_widthspace())
-   PlotChar(window,font,*String,x,y,cText_Back,cText_Fore);
-  String++; x+=font->get_widthspace();
+inline static void PlotStringHelper(WINDOW *window, pGUI_FONT font,
+                                    const char *String, int x, int y,
+                                    int col, int col_back, int col_fore){
+ while (*String){
+  if (x >= window->get_width()) break;
+  int lx  = window->get_visible_x() + x + font->get_widthspace() - 1,
+      lx2 = window->get_visible_x() + x,
+      ly  = window->get_visible_y() + y,
+      ly2 = window->get_visible_y() + y + font->get_heightspace() - 1;
+  vline(GUI_Bitmap, lx, ly, ly2, col);
+  hline(GUI_Bitmap, lx2, ly2, lx, col);
+//  if (x > -font->get_widthspace()) // this is always true - dbjh
+   PlotChar(window, font, *String, x, y, col_back, col_fore);
+  String++; x += font->get_widthspace();
  }
 }
 
+void PlotString(WINDOW *window,pGUI_FONT font,const char *String,int x,int y){
+ PlotStringHelper(window, font, String, x, y, 240 + cText_Back, cText_Back, cText_Fore);
+}
+
 void PlotStringInv(WINDOW *window,pGUI_FONT font,const char *String,int x,int y){
- while(*String){
-  int v;
-  for(v=0;v<font->get_heightspace();v++){
-// GUI_Screen[window->get_visible_x()+x+font->get_widthspace()-1+
-//  GUI_ScreenWidth*(window->get_visible_y()+y+v)]=240+cText_Fore;
-   putpixel(GUI_Bitmap, window->get_visible_x()+x+font->get_widthspace()-1,
-    (window->get_visible_y()+y+v),240+cText_Fore);
-  }
-  for(int h=0;h<font->get_widthspace();h++){
-// GUI_Screen[window->get_visible_x()+x+h+
-//  GUI_ScreenWidth*(window->get_visible_y()+y+v-1)]=240+cText_Fore;
-   putpixel(GUI_Bitmap, window->get_visible_x()+x+h,
-    (window->get_visible_y()+y+v-1),240+cText_Fore);
-  }
-  if(x>-font->get_widthspace())
-   PlotChar(window,font,*String,x,y,cText_Fore,cText_Back);
-  String++; x+=font->get_widthspace();
-  if(x>window->get_width()) break;
- }
+ PlotStringHelper(window, font, String, x, y, 240 + cText_Fore, cText_Fore, cText_Back);
 }
 
 void PlotStringTransparent(WINDOW *window,pGUI_FONT font,const char *String,int x,int y,int color){
  while(*String){
+  if(x>=window->get_width()) break;
   if(x>-font->get_widthspace())
    PlotCharT(window,font,*String,x,y,color);
   String++; x+=font->get_widthspace();
-  if(x>window->get_width()) break;
  }
 }
 
@@ -426,74 +407,33 @@ void PlotStringShadow(WINDOW *window,pGUI_FONT font,const char *String,int x,int
 void PlotMenuItem(WINDOW *window, pGUI_FONT font,
  const char *String, int x, int y, int maxlen){
  while (*String){
+  if(x>=window->get_width()) break;
   if (maxlen > 0) maxlen--;
   if (x > -font->get_widthspace())
    PlotCharT(window, font, *String, x, y, cMenu_Fore);
   String++; x+=font->get_widthspace();
-  if(x>window->get_width()) break;
  }
  while (maxlen--){
+  if(x>=window->get_width()) break;
   if(x>-font->get_widthspace())
    PlotCharT(window, font, ' ', x, y, cMenu_Fore);
   String++; x+=font->get_widthspace();
-  if(x>window->get_width()) break;
  }
 }
 
-void PlotSelectedMenuItem(WINDOW *window, pGUI_FONT font,
- const char *String, int x, int y, int maxlen){
- while (*String){
-  int v;
-  if (maxlen > 0) maxlen--;
-  for (v = 0; v < font->get_height(); v++){
-   for (int h = font->get_width(); h < font->get_widthspace(); h++){
-//  GUI_Screen[window->get_visible_x() + x + h +
-//   GUI_ScreenWidth * (window->get_visible_y() + y + v)] =
-//    240 + cSelected_Back;
-    putpixel(GUI_Bitmap, window->get_visible_x() + x + h,
-     (window->get_visible_y() + y + v), 240 + cSelected_Back);
-   }
-  }
-  for (v = font->get_height(); v < font->get_heightspace(); v++){
-   for (int h = 0; h < font->get_widthspace(); h++){
-//  GUI_Screen[window->get_visible_x() + x + h +
-//   GUI_ScreenWidth * (window->get_visible_y() + y + v)] =
-//    240 + cSelected_Back;
-    putpixel(GUI_Bitmap, window->get_visible_x() + x + h,
-     (window->get_visible_y() + y + v), 240 + cSelected_Back);
-   }
-  }
-  if (x > -font->get_widthspace())
-   PlotChar(window, font, *String, x, y, cSelected_Back, cSelected_Fore);
-   String++; x += font->get_widthspace();
-  if (x > window->get_width()) break;
- }
-
- while (maxlen--){
-  int v;
-  for (v = 0; v < font->get_height(); v++){
-   for (int h = font->get_width(); h < font->get_widthspace(); h++){
-//  GUI_Screen[window->get_visible_x() + x + h +
-//   GUI_ScreenWidth * (window->get_visible_y() + y + v)] =
-//    240 + cSelected_Back;
-    putpixel(GUI_Bitmap, window->get_visible_x() + x + h,
-     (window->get_visible_y() + y + v), 240 + cSelected_Back);
-   }
-  }
-  for (v = font->get_height(); v < font->get_heightspace(); v++){
-   for (int h = 0; h < font->get_widthspace(); h++){
-//  GUI_Screen[window->get_visible_x() + x + h +
-//   GUI_ScreenWidth * (window->get_visible_y() + y + v)] =
-//    240 + cSelected_Back;
-    putpixel(GUI_Bitmap, window->get_visible_x() + x + h,
-     (window->get_visible_y() + y + v), 240 + cSelected_Back);
-   }
-  }
-  if (x > -font->get_widthspace())
-   PlotChar(window, font, ' ', x, y, cSelected_Back, cSelected_Fore);
-  String++; x += font->get_widthspace();
-  if (x > window->get_width()) break;
- }
+void PlotSelectedMenuItem(WINDOW *window, pGUI_FONT font, const char *String, int x, int y, int maxlen){
+ PlotStringHelper(window, font, String, x, y, 240 + cSelected_Back, cSelected_Back, cSelected_Fore);
+ int len = strlen(String);
+ maxlen -= len;
+ if (maxlen <= 0)
+  return;
+ x += len * font->get_widthspace();
+ rectfill (GUI_Bitmap,
+           window->get_visible_x() + x,
+           window->get_visible_y() + y,
+           window->get_visible_x() + x + maxlen * font->get_widthspace() - 1,
+           window->get_visible_y() + y + font->get_heightspace() - 1,
+           240 + cSelected_Back);
 }
 
 PALETTE sneesepal;
@@ -761,7 +701,7 @@ int FileWindow()
  static int SelFile = 0;
  int NumFiles;
  int keypress, key_asc, key_scan;
- static char current_file_window_dir[MAXDRIVE] = ".";
+ static char current_file_window_dir[MAXPATH] = ".";
 
  chdir(current_file_window_dir);
  NumFiles = GetDirList("*.*", DirList, FileListPos, max_listed_files);
