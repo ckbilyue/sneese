@@ -4355,7 +4355,6 @@ section .text
 %endmacro
 
 ; Native mode - push byte (S--)
-;%1 = data
 %macro E0_PUSH_B 0
  mov ebx,[CPU_LABEL(S)] ; S only - bank always 0!
 %ifdef FAST_STACK_ACCESS_NATIVE_MODE
@@ -4368,7 +4367,6 @@ section .text
 %endmacro
 
 ; Emulation mode - push byte (SL--)
-;%1 = data
 %macro E1_PUSH_B 0
  mov ebx,[CPU_LABEL(S)] ; S only - bank always 0!
  dec byte [CPU_LABEL(S)]    ; Postdecrement SL
@@ -4380,7 +4378,6 @@ section .text
 %endmacro
 
 ; Native mode - pull byte (++S)
-;%1 = data
 %macro E0_PULL_B 0
  mov ebx,[CPU_LABEL(S)] ; S only - bank always 0!
  inc bx         ; Preincrement S
@@ -4393,7 +4390,6 @@ section .text
 %endmacro
 
 ; Emulation mode - pull byte (++SL)
-;%1 = data
 %macro E1_PULL_B 0
  inc byte [CPU_LABEL(S)]    ; Preincrement SL
  mov ebx,[CPU_LABEL(S)] ; S only - bank always 0!
@@ -4405,7 +4401,6 @@ section .text
 %endmacro
 
 ; Native mode - push word (S--)
-;%1 = datal, %2 = datah
 %macro E0_PUSH_W 0
  mov ebx,[CPU_LABEL(S)] ; S only - bank always 0!
 %ifdef FAST_STACK_ACCESS_NATIVE_MODE
@@ -4432,9 +4427,10 @@ section .text
  mov [CPU_LABEL(S)],ebx ; Set stack pointer
 %endmacro
 
-; Emulation mode - push word (SL--)
-;%1 = datal, %2 = datah
-%macro E1_PUSH_W 0
+;Emulation mode - push word (SL--)
+; pass argument of 'New' for opcodes new to 16-bit 65xx
+; (temporary address is 16-bit, but SH not changed after opcode)
+%macro E1_PUSH_W 0-1 0
  mov ebx,[CPU_LABEL(S)] ; S only - bank always 0!
 %ifdef FAST_STACK_ACCESS_EMULATION_MODE
  FAST_SET_BYTE_STACK_EMULATION_MODE ah
@@ -4443,7 +4439,11 @@ section .text
  mov al,ah
  SET_BYTE
 %endif
+%ifnidni %1,New
  dec bl         ; Postdecrement SL
+%else
+ dec bx         ; Postdecrement S
+%endif
 %ifdef FAST_STACK_ACCESS_EMULATION_MODE
  FAST_SET_BYTE_STACK_EMULATION_MODE al
 %else
@@ -4455,7 +4455,6 @@ section .text
 %endmacro
 
 ; Native mode - pull word (++S)
-;%1 = datal, %2 = datah
 %macro E0_PULL_W 0
  mov ebx,[CPU_LABEL(S)] ; S only - bank always 0!
  inc bx         ; Preincrement S
@@ -4481,19 +4480,30 @@ section .text
  mov [CPU_LABEL(S)],ebx ; Set stack pointer
 %endmacro
 
-; Emulation mode - pull word (++SL)
-;%1 = datal, %2 = datah
-%macro E1_PULL_W 0
+;Emulation mode - pull word (++SL)
+; pass argument of 'New' for opcodes new to 16-bit 65xx
+; (temporary address is 16-bit, but SH not changed after opcode)
+%macro E1_PULL_W 0-1 0
+%ifnidni %1,New
  inc byte [CPU_LABEL(S)]    ; Preincrement SL
  mov ebx,[CPU_LABEL(S)] ; S only - bank always 0!
+%else
+ mov ebx,[CPU_LABEL(S)] ; S only - bank always 0!
+ inc bx                 ; Preincrement S
+%endif
 %ifdef FAST_STACK_ACCESS_EMULATION_MODE
  FAST_GET_BYTE_STACK_EMULATION_MODE al
 %else
  GET_BYTE
  mov ah,al
 %endif
+%ifnidni %1,New
  inc byte [CPU_LABEL(S)]    ; Preincrement SL
  mov ebx,[CPU_LABEL(S)] ; S only - bank always 0!
+%else
+ inc bx                 ; Preincrement S
+ mov [CPU_LABEL(S)],bl  ; Update SL
+%endif
 %ifdef FAST_STACK_ACCESS_EMULATION_MODE
  FAST_GET_BYTE_STACK_EMULATION_MODE ah
 %else

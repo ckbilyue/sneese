@@ -443,18 +443,9 @@ EXPORT_C E0_SLA
  OPCODE_EPILOG
 
 ; 0B
-ALIGNC
-EXPORT_C E0_PHD
- inc R_NativePC
- mov eax,B_D
- E0_PUSH_W
- OPCODE_EPILOG
-ALIGNC
-EXPORT_C E1_PHD
- inc R_NativePC
- mov eax,B_D
- E1_PUSH_W
- OPCODE_EPILOG
+
+E0_PUSH16 B_D,E0_PHD,New
+E1_PUSH16 B_D,E1_PHD,New
 
 ; 0C
 EM_TSB a,Absolute
@@ -853,24 +844,8 @@ EXPORT_C E0_RLA
 
 ; 2B
 
-ALIGNC
-EXPORT_C E0_PLD
- inc R_NativePC
- E0_PULL_W
- mov B_D,eax
- or al,ah
- STORE_FLAGS_N ah
- STORE_FLAGS_Z al
- OPCODE_EPILOG
-ALIGNC
-EXPORT_C E1_PLD
- inc R_NativePC
- E1_PULL_W
- mov B_D,eax
- or al,ah
- STORE_FLAGS_N ah
- STORE_FLAGS_Z al
- OPCODE_EPILOG
+E0_PULL16 B_D,E0_PLD
+E1_PULL16 B_D,E1_PLD
 
 ; 2C
 EM_BIT a,Absolute
@@ -1142,26 +1117,9 @@ E0_EOR IdI,Direct_Indirect_Long
 
 ; 48
 
-ALIGNC
-EXPORT_C E0_PHA
- inc R_NativePC
- mov eax,B_A
- E0_PUSH_W
- OPCODE_EPILOG
-
-ALIGNC
-EXPORT_C EM_PHA
- inc R_NativePC
- mov eax,B_A
- E0_PUSH_B
- OPCODE_EPILOG
-
-ALIGNC
-EXPORT_C E1_PHA
- inc R_NativePC
- mov eax,B_A
- E1_PUSH_B
- OPCODE_EPILOG
+E0_PUSH16 B_A,E0_PHA
+E0_PUSH8 B_A,EM_PHA
+E1_PUSH8 B_A,E1_PHA
 
 ; 49
 EM_EOR i,Immediate
@@ -1193,19 +1151,8 @@ EXPORT_C E0_SRA
 
 ; 4B
 
-ALIGNC
-EXPORT_C E0_PHK         ; Push PB(K) onto stack
- inc R_NativePC
- mov al,B_PB
- E0_PUSH_B
- OPCODE_EPILOG
-
-ALIGNC
-EXPORT_C E1_PHK
- inc R_NativePC
- mov al,B_PB
- E1_PUSH_B
- OPCODE_EPILOG
+E0_PUSH8 B_PB,E0_PHK    ; Push PB(K) onto stack
+E1_PUSH8 B_PB,E1_PHK
 
 ; 4C
 
@@ -1341,26 +1288,9 @@ E0_EOR a_y,Absolute_Index_Y
 
 ; 5A
 
-ALIGNC
-EXPORT_C E0_PHY
- inc R_NativePC
- mov eax,B_Y
- E0_PUSH_W
- OPCODE_EPILOG
-
-ALIGNC
-EXPORT_C EX_PHY
- inc R_NativePC
- mov eax,B_Y
- E0_PUSH_B
- OPCODE_EPILOG
-
-ALIGNC
-EXPORT_C E1_PHY
- inc R_NativePC
- mov eax,B_Y
- E1_PUSH_B
- OPCODE_EPILOG
+E0_PUSH16 B_Y,E0_PHY
+E0_PUSH8 B_Y,EX_PHY
+E1_PUSH8 B_Y,E1_PHY
 
 ; 5B
 
@@ -1558,29 +1488,9 @@ E0_ADC IdI,Direct_Indirect_Long
 
 ; 68
 
-ALIGNC
-EXPORT_C E0_PLA
- inc R_NativePC
- E0_PULL_W
- mov B_A,eax
- STORE_FLAGS_N ah
- or al,ah
- STORE_FLAGS_Z al
- OPCODE_EPILOG
-ALIGNC
-EXPORT_C EM_PLA
- inc R_NativePC
- E0_PULL_B
- mov B_A,al
- STORE_FLAGS_NZ al
- OPCODE_EPILOG
-ALIGNC
-EXPORT_C E1_PLA
- inc R_NativePC
- E1_PULL_B
- mov B_A,al
- STORE_FLAGS_NZ al
- OPCODE_EPILOG
+E0_PULL16 B_A,E0_PLA
+E0_PULL8 B_A,EM_PLA
+E1_PULL8 B_A,E1_PLA
 
 ; 69
 EM_ADC i,Immediate
@@ -1812,29 +1722,9 @@ E0_ADC a_y,Absolute_Index_Y
 
 ; 7A
 
-ALIGNC
-EXPORT_C E0_PLY
- inc R_NativePC
- E0_PULL_W
- mov B_Y,eax
- STORE_FLAGS_N ah
- or al,ah
- STORE_FLAGS_Z al
- OPCODE_EPILOG
-ALIGNC
-EXPORT_C EX_PLY
- inc R_NativePC
- E0_PULL_B
- mov B_Y,al
- STORE_FLAGS_NZ al
- OPCODE_EPILOG
-ALIGNC
-EXPORT_C E1_PLY
- inc R_NativePC
- E1_PULL_B
- mov B_Y,al
- STORE_FLAGS_NZ al
- OPCODE_EPILOG
+E0_PULL16 B_Y,E0_PLY
+E0_PULL8 B_Y,EX_PLY
+E1_PULL8 B_Y,E1_PLY
 
 ; 7B
 
@@ -2033,19 +1923,8 @@ EXPORT_C E0_TXA
 
 ; 8B
 
-ALIGNC
-EXPORT_C E0_PHB
- inc R_NativePC
- mov al,B_DB
- E0_PUSH_B
- OPCODE_EPILOG
-
-ALIGNC
-EXPORT_C E1_PHB
- inc R_NativePC
- mov al,B_DB
- E1_PUSH_B
- OPCODE_EPILOG
+E0_PUSH8 B_DB,E0_PHB    ; Push DB(B) onto stack
+E1_PUSH8 B_DB,E1_PHB
 
 ; 8C
 EX_STY a,Absolute
@@ -2243,20 +2122,8 @@ EXPORT_C E0_TAX
 
 ; AB
 
-ALIGNC
-EXPORT_C E0_PLB
- inc R_NativePC
- E0_PULL_B
- mov B_DB,al
- STORE_FLAGS_NZ al
- OPCODE_EPILOG
-ALIGNC
-EXPORT_C E1_PLB
- inc R_NativePC
- E1_PULL_B
- mov B_DB,al
- STORE_FLAGS_NZ al
- OPCODE_EPILOG
+E0_PULL8 B_DB,E0_PLB    ; Pull DB(B) from stack
+E1_PULL8 B_DB,E1_PLB
 
 ; AC
 EX_LDY a,Absolute
@@ -2663,26 +2530,9 @@ E0_CMP a_y,Absolute_Index_Y
 
 ; DA
 
-ALIGNC
-EXPORT_C E0_PHX
- inc R_NativePC
- mov eax,B_X
- E0_PUSH_W
- OPCODE_EPILOG
-
-ALIGNC
-EXPORT_C EX_PHX
- inc R_NativePC
- mov eax,B_X
- E0_PUSH_B
- OPCODE_EPILOG
-
-ALIGNC
-EXPORT_C E1_PHX
- inc R_NativePC
- mov eax,B_X
- E1_PUSH_B
- OPCODE_EPILOG
+E0_PUSH16 B_X,E0_PHX
+E0_PUSH8 B_X,EX_PHX
+E1_PUSH8 B_X,E1_PHX
 
 ; DB
 ALIGNC
@@ -3003,29 +2853,9 @@ E0_SBC a_y,Absolute_Index_Y
 
 ; FA
 
-ALIGNC
-EXPORT_C E0_PLX
- inc R_NativePC
- E0_PULL_W
- mov B_X,eax
- STORE_FLAGS_N ah
- or al,ah
- STORE_FLAGS_Z al
- OPCODE_EPILOG
-ALIGNC
-EXPORT_C EX_PLX
- inc R_NativePC
- E0_PULL_B
- mov B_X,al
- STORE_FLAGS_NZ al
- OPCODE_EPILOG
-ALIGNC
-EXPORT_C E1_PLX
- inc R_NativePC
- E1_PULL_B
- mov B_X,al
- STORE_FLAGS_NZ al
- OPCODE_EPILOG
+E0_PULL16 B_X,E0_PLX
+E0_PULL8 B_X,EX_PLX
+E1_PULL8 B_X,E1_PLX
 
 ; FB
 

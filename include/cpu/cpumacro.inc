@@ -863,3 +863,91 @@ EXPORT_C E0_TSB_%1
  SET_WORD_HL    ; mem |= A
  OPCODE_EPILOG
 %endmacro
+
+; label, value
+%macro E0_PUSH8 2
+ALIGNC
+EXPORT_C %2
+ inc R_NativePC
+ mov al,%1
+ E0_PUSH_B
+ OPCODE_EPILOG
+%endmacro
+
+; label, value
+%macro E1_PUSH8 2
+ALIGNC
+EXPORT_C %2
+ inc R_NativePC
+ mov al,%1
+ E1_PUSH_B
+ OPCODE_EPILOG
+%endmacro
+
+; label, value, new
+%macro E0_PUSH16 2-3 0
+ALIGNC
+EXPORT_C %2
+ inc R_NativePC
+ mov eax,%1
+ E0_PUSH_W
+ OPCODE_EPILOG
+%endmacro
+
+; label, value, new
+%macro E1_PUSH16 2-3 0
+ALIGNC
+EXPORT_C %2
+ inc R_NativePC
+ mov eax,%1
+ E1_PUSH_W %3
+ OPCODE_EPILOG
+%endmacro
+
+; label, value
+%macro E0_PULL8 2
+ALIGNC
+EXPORT_C %2
+ inc R_NativePC
+ E0_PULL_B
+ mov %1,al
+ STORE_FLAGS_NZ al
+ OPCODE_EPILOG
+%endmacro
+
+; label, value
+%macro E1_PULL8 2
+ALIGNC
+EXPORT_C %2
+ inc R_NativePC
+ E1_PULL_B
+ mov %1,al
+ STORE_FLAGS_NZ al
+ OPCODE_EPILOG
+%endmacro
+
+; label, value, new
+%macro E0_PULL16 2-3 0
+ALIGNC
+EXPORT_C %2
+ inc R_NativePC
+ E0_PULL_W
+ STORE_FLAGS_N ah
+ mov %1,eax
+ or al,ah
+ STORE_FLAGS_Z al
+ OPCODE_EPILOG
+%endmacro
+
+; label, value, new
+%macro E1_PULL16 2-3 0
+ALIGNC
+EXPORT_C %2
+ inc R_NativePC
+ E1_PULL_W %3
+ STORE_FLAGS_N ah
+ mov %1,eax
+ or al,ah
+ STORE_FLAGS_Z al
+ OPCODE_EPILOG
+%endmacro
