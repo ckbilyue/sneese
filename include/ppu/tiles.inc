@@ -22,7 +22,6 @@ EXTERN Sprite_Tile_Plot_8_4,Sprite_Tile_Plot_16_4
 EXTERN Sprite_Tile_Plot_32_4,Sprite_Tile_Plot_64_4
 EXTERN Tile_Line_8_8,Tile_Line_16_8
 EXTERN_C TileCache2,TileCache4,TileCache8
-EXTERN_C TileTag2,TileTag4,TileTag8
 
 EXTERN TilesetAddress
 EXTERN ColourBase

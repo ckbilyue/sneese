@@ -215,9 +215,9 @@ void Reset_SRAM(void)
 
 extern unsigned char OAM_Count[239][2];
 extern unsigned OAM_Lines[239][34];
-extern unsigned char TileCache2[4 * 64 << 10], TileTag2[4 * 1 << 10];
-extern unsigned char TileCache4[2 * 64 << 10], TileTag4[2 * 1 << 10];
-extern unsigned char TileCache8[1 * 64 << 10], TileTag8[1 * 1 << 10];
+extern unsigned char TileCache2[4 * 64 << 10];
+extern unsigned char TileCache4[2 * 64 << 10];
+extern unsigned char TileCache8[1 * 64 << 10];
 void save_debug_dumps(void)
 {
  if (snes_rom_loaded)
@@ -305,14 +305,6 @@ void save_debug_dumps(void)
    fclose(fp);
   }
 
-  fp = fopen("TAG.DMP", "wb");
-  if (fp)
-  {
-   fwrite(TileTag2, sizeof(TileTag2), 1, fp);
-   fwrite(TileTag4, sizeof(TileTag4), 1, fp);
-   fwrite(TileTag8, sizeof(TileTag8), 1, fp);
-   fclose(fp);
-  }
 #endif
 
  }

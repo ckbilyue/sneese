@@ -182,9 +182,6 @@ ALIGNB
 EXPORT_C TileCache2,skipk 256
 EXPORT_C TileCache4,skipk 128
 EXPORT_C TileCache8,skipk 64
-EXPORT_C TileTag2,skipk 32
-EXPORT_C TileTag4,skipk 16
-EXPORT_C TileTag8,skipk 8
 
 EXPORT TilesetAddress,skipl
 EXPORT ColourBase,skipb
@@ -198,7 +195,7 @@ section .text
 ;  dl = line bitplanes OR'd together (clear bits = non-plotted pixels)
 ;  dh = line counter
 ;  esi = VRAM bitplane source address
-;  edi = index for tile tag (*1) and tile cache (*8)
+;  edi = index for tile cache (*8)
 
 ALIGNC
 EXPORT Recache_Tile_Set
@@ -226,31 +223,26 @@ extern _BreaksLast
 %ifndef ALT_RECACHE_4_8_BPL
  xor ebx,ebx
  xor ecx,ecx
-;shr edi,2
 %endif
 
 %ifndef NO_RECACHE_2BPL
  push edi
  mov edi,[Tile_Recache_Set_Begin]
+
 %ifdef ALT_RECACHE_4_8_BPL
 %define NO_RECACHE_4BPL
 %define NO_RECACHE_8BPL
- shl edi,5      ; index for tile tag (*1) and tile cache (*8)
-%else
-;shl edi,3      ; index for tile tag (*1) and tile cache (*8)
- shl edi,5      ; index for tile tag (*1) and tile cache (*8)
 %endif
+
+ shl edi,5      ; index for tile cache (*8)
  lea esi,[C_LABEL(VRAM)+edi*2]  ; address in VRAM of first 2bpl tile to recache
 
 .2bpl_tile_loop:
 %ifdef ALT_RECACHE_4_8_BPL
  xor ebx,ebx
  xor ecx,ecx
- mov dh,32
-%else
-;mov dh,8
- mov dh,32
 %endif
+ mov dh,32
 
  mov bl,[esi]
  mov bl,[esi+16*2]
@@ -262,18 +254,6 @@ extern _BreaksLast
  mov bl,[C_LABEL(TileCache2)+edi*8+16*10]
  mov bl,[C_LABEL(TileCache2)+edi*8+16*12]
  mov bl,[C_LABEL(TileCache2)+edi*8+16*14]
-%if 0
- mov cl,[esi+16]
- mov bl,[C_LABEL(TileCache2)+edi*8+16]
- mov cl,[esi+16*3]
- mov bl,[C_LABEL(TileCache2)+edi*8+16*3]
- mov cl,[C_LABEL(TileCache2)+edi*8+16*5]
- mov bl,[C_LABEL(TileCache2)+edi*8+16*7]
- mov cl,[C_LABEL(TileCache2)+edi*8+16*9]
- mov bl,[C_LABEL(TileCache2)+edi*8+16*11]
- mov cl,[C_LABEL(TileCache2)+edi*8+16*13]
- mov bl,[C_LABEL(TileCache2)+edi*8+16*15]
-%endif
 
 .2bpl_line_loop:
  ;  Bp0=*(LineAddress+0)
@@ -290,10 +270,8 @@ extern _BreaksLast
  ;  Bp1=*(LineAddress+1)
  mov cl,[esi+1]
  and bl,cl
-;or dl,cl   ;tag
  and cl,0xF0
  shr cl,2
-;inc dl     ;tag
  or ebp,[BPL1_2+ebx*4]
  or eax,[BPL1_2+ecx]
 
@@ -301,7 +279,6 @@ extern _BreaksLast
  push ebp
  push eax
 %endif
-;mov [C_LABEL(TileTag2)+edi],dl
  mov [C_LABEL(TileCache2)+edi*8],eax
  add esi,byte 2
  mov [C_LABEL(TileCache2)+edi*8+4],ebp
@@ -316,12 +293,6 @@ extern _BreaksLast
  mov bl,[C_LABEL(TileCache4)+edi*4-16*6]
  mov bl,[C_LABEL(TileCache4)+edi*4-16*4]
  mov bl,[C_LABEL(TileCache4)+edi*4-16*2]
-%if 0
- mov cl,[C_LABEL(TileCache4)+edi*4-16*7]
- mov bl,[C_LABEL(TileCache4)+edi*4-16*5]
- mov cl,[C_LABEL(TileCache4)+edi*4-16*3]
- mov bl,[C_LABEL(TileCache4)+edi*4-16]
-%endif
 
 .4bpl_line_loop:
  ;2bpl 0/1/2/3:7, 4bpl 0/1:7, 8bpl 0:7
@@ -375,10 +346,6 @@ extern _BreaksLast
 
  mov bl,[C_LABEL(TileCache8)+edi*2+16*2-16*4]
  mov bl,[C_LABEL(TileCache8)+edi*2+16*2-16*2]
-%if 0
- mov cl,[C_LABEL(TileCache8)+edi*2+16*2-16*3]
- mov bl,[C_LABEL(TileCache8)+edi*2+16*2-16]
-%endif
 
  mov dh,8
 
@@ -412,11 +379,7 @@ extern _BreaksLast
 %endif
 
  dec dword [esp]
-%ifdef ALT_RECACHE_4_8_BPL
- jnz near .2bpl_tile_loop
-%else
- jnz near .2bpl_tile_loop
-%endif
+ jnz .2bpl_tile_loop
 
  pop eax
 %endif
@@ -424,15 +387,12 @@ extern _BreaksLast
 %ifndef NO_RECACHE_4BPL
  mov edi,[Tile_Recache_Set_Begin]
  mov edx,[Tile_Recache_Set_End]
-;shr edi,byte 1 ; edi = Tile_Recache_Set_Begin / 2
-;shr edx,byte 1
  inc edx        ; edx = (Tile_Recache_Set_End / 2) + 1
  sub edx,edi    ; Count of 4bpl tiles to recache
 
  shl edi,4      ; edi = Tile_Recache_Set_Begin / 2
  add edx,edx
 
-;shl edi,3      ; index for tile tag (*1) and tile cache (*8)
  push edx
  lea esi,[C_LABEL(VRAM)+edi*4]  ; address in VRAM of first 4bpl tile to recache
 
@@ -455,7 +415,6 @@ extern _BreaksLast
  ;  Bp1=*(LineAddress+1)
  mov cl,[esi+1]
  and bl,cl
-;or dl,cl
  and cl,0xF0
  shr cl,2
  or ebp,[BPL1_4+ebx*4]
@@ -465,7 +424,6 @@ extern _BreaksLast
  ;  Bp2=*(LineAddress+16)
  mov cl,[esi+16]
  and bl,cl
-;or dl,cl
  and cl,0xF0
  shr cl,2
  or ebp,[BPL2_4+ebx*4]
@@ -475,14 +433,11 @@ extern _BreaksLast
  ;  Bp3=*(LineAddress+17)
  mov cl,[esi+17]
  and bl,cl
-;or dl,cl
  and cl,0xF0
  shr cl,2
-;inc dl
  or ebp,[BPL3_4+ebx*4]
  or eax,[BPL3_4+ecx]
 
-;mov [C_LABEL(TileTag4)+edi],dl
  mov [C_LABEL(TileCache4)+edi*8],eax
  add esi,byte 2
  mov [C_LABEL(TileCache4)+edi*8+4],ebp
@@ -500,12 +455,10 @@ extern _BreaksLast
 %ifndef NO_RECACHE_8BPL
  mov edi,[Tile_Recache_Set_Begin]
  mov edx,[Tile_Recache_Set_End]
-;shr edi,byte 2 ; edi = Tile_Recache_Set_Begin / 4
-;shr edx,byte 2
  inc edx        ; edx = (Tile_Recache_Set_End / 4) + 1
  sub edx,edi    ; Count of 8bpl tiles to recache
 
- shl edi,3      ; index for tile tag (*1) and tile cache (*8)
+ shl edi,3      ; index for tile cache (*8)
  push edx
  lea esi,[C_LABEL(VRAM)+edi*8]  ; address in VRAM of first 8bpl tile to recache
 
@@ -528,7 +481,6 @@ extern _BreaksLast
  ;  Bp1=*(LineAddress+1)
  mov cl,[esi+1]
  and bl,cl
-;or dl,cl
  and cl,0xF0
  shr cl,2
  or ebp,[BPL1_8+ebx*4]
@@ -538,7 +490,6 @@ extern _BreaksLast
  ;  Bp2=*(LineAddress+16)
  mov cl,[esi+16]
  and bl,cl
-;or dl,cl
  and cl,0xF0
  shr cl,2
  or ebp,[BPL2_8+ebx*4]
@@ -548,7 +499,6 @@ extern _BreaksLast
  ;  Bp3=*(LineAddress+17)
  mov cl,[esi+17]
  and bl,cl
-;or dl,cl
  and cl,0xF0
  shr cl,2
  or ebp,[BPL3_8+ebx*4]
@@ -558,7 +508,6 @@ extern _BreaksLast
  ;  Bp4=*(LineAddress+32)
  mov cl,[esi+32]
  and bl,cl
-;or dl,cl
  and cl,0xF0
  shr cl,2
  or ebp,[BPL4_8+ebx*4]
@@ -568,7 +517,6 @@ extern _BreaksLast
  ;  Bp5=*(LineAddress+33)
  mov cl,[esi+33]
  and bl,cl
-;or dl,cl
  and cl,0xF0
  shr cl,2
  or ebp,[BPL5_8+ebx*4]
@@ -578,7 +526,6 @@ extern _BreaksLast
  ;  Bp6=*(LineAddress+48)
  mov cl,[esi+48]
  and bl,cl
-;or dl,cl
  and cl,0xF0
  shr cl,2
  or ebp,[BPL6_8+ebx*4]
@@ -588,14 +535,11 @@ extern _BreaksLast
  ;  Bp7=*(LineAddress+49)
  mov cl,[esi+49]
  and bl,cl
-;or dl,cl
  and cl,0xF0
  shr cl,2
-;inc dl
  or ebp,[BPL7_8+ebx*4]
  or eax,[BPL7_8+ecx]
 
-;mov [C_LABEL(TileTag8)+edi],dl
  mov [C_LABEL(TileCache8)+edi*8],eax
  add esi,byte 2
  mov [C_LABEL(TileCache8)+edi*8+4],ebp
