@@ -737,6 +737,7 @@ EXPORT_C NMI_NoRender
  mov eax,[C_LABEL(Current_Line_Timing)]
  inc eax
  mov [C_LABEL(Current_Line_Timing)],eax
+ mov [Vblank_Start],eax
 CheckNMI:
 %ifdef DEBUG
  mov al,[CPU_LABEL(PB)]
