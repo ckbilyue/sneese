@@ -248,6 +248,7 @@ EXTERN_MAP_WRITE_DMA 7
  mov [HDMAON],al
  test al,al
  jz %%no_hdma
+ add R_65c816_Cycles,byte _5A22_FAST_CYCLE * 3  ; HDMA processing
  RELATCH_HDMA_CHANNEL 0
  RELATCH_HDMA_CHANNEL 1
  RELATCH_HDMA_CHANNEL 2

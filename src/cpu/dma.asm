@@ -294,6 +294,9 @@ section .text
 
 ALIGNC
 EXPORT_C Do_HDMA_Channel
+ ; Overhead, also used for loading next NTRLx ($43xA)
+ add R_65c816_Cycles,byte _5A22_SLOW_CYCLE
+
  mov ebx,[edi+A2T]      ; Get table address
  and ebx,(1 << 24) - 1
  mov al,[edi+DMAP]      ; Get HDMA control byte
@@ -320,26 +323,26 @@ Do_HDMA_Absolute:
 .Next_Transfer:
  HDMA_TRANSFER_A_TO_B [edi+DMA_B0]
 
- add R_65c816_Cycles,byte 8     ; HDMA transfer
+ add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
  cmp cl,2
  inc bx                 ; Adjust temporary table pointer
  jb .End_Transfer
 
  HDMA_TRANSFER_A_TO_B [edi+DMA_B1]
 
- add R_65c816_Cycles,byte 8     ; HDMA transfer
+ add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
  cmp cl,4
  inc bx                 ; Adjust temporary table pointer
  jb .End_Transfer
 
  HDMA_TRANSFER_A_TO_B [edi+DMA_B2]
 
- add R_65c816_Cycles,byte 8     ; HDMA transfer
+ add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
  inc bx
 
  HDMA_TRANSFER_A_TO_B [edi+DMA_B3]
 
- add R_65c816_Cycles,byte 8     ; HDMA transfer
+ add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
 
 .End_Transfer:
  add [edi+A2T],cx
@@ -369,12 +372,12 @@ Do_HDMA_Indirect:
  jz HDMA_End_Channel
 
  mov ah,al
+ add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; Address load low
  GET_BYTE_NO_UPDATE_CYCLES
- add R_65c816_Cycles,byte 8     ; Address load low
  inc bx
  mov [edi+DASL],al
+ add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; Address load high
  GET_BYTE_NO_UPDATE_CYCLES
- add R_65c816_Cycles,byte 8     ; Address load high
  inc bx
  mov [edi+DASH],al
  mov [edi+A2T],ebx
@@ -384,26 +387,26 @@ Do_HDMA_Indirect:
 
  HDMA_TRANSFER_A_TO_B [edi+DMA_B0]
 
- add R_65c816_Cycles,byte 8     ; HDMA transfer
+ add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
  cmp cl,2
  inc bx                 ; Adjust temporary table pointer
  jb .End_Transfer
 
  HDMA_TRANSFER_A_TO_B [edi+DMA_B1]
 
- add R_65c816_Cycles,byte 8     ; HDMA transfer
+ add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
  cmp cl,4
  inc bx                 ; Adjust temporary table pointer
  jb .End_Transfer
 
  HDMA_TRANSFER_A_TO_B [edi+DMA_B2]
 
- add R_65c816_Cycles,byte 8     ; HDMA transfer
+ add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
  inc bx
 
  HDMA_TRANSFER_A_TO_B [edi+DMA_B3]
 
- add R_65c816_Cycles,byte 8     ; HDMA transfer
+ add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
 
 .End_Transfer:
  add [edi+DAS],cx
@@ -428,6 +431,7 @@ EXPORT do_HDMA
  mov al,[HDMAON]
  test al,al
  jz .no_hdma
+ add R_65c816_Cycles,byte _5A22_FAST_CYCLE * 3  ; HDMA processing
  push eax
  push ebx
  push ecx

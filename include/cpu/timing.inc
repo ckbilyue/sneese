@@ -266,14 +266,18 @@ EXTERN_C Dump_DMA
  call C_LABEL(Dump_DMA)
  pop edi
  popa
+ LOAD_CYCLES
  RELATCH_HDMA
+ SAVE_CYCLES
  pusha
  push byte 1
  call C_LABEL(Dump_DMA)
  pop edi
  popa
 %else
+ LOAD_CYCLES
  RELATCH_HDMA
+ SAVE_CYCLES
 %endif
 
  Update_FPS_Counter
@@ -327,10 +331,7 @@ section .text
  mov dword [FixedTrip],CYCLES_NEW_SCANLINE
 ;mov [Event_Handler],eax
  mov [Fixed_Event],eax
- cmp byte [HDMAON],0
- jz .no_HDMA
  LOAD_CYCLES
- add R_65c816_Cycles,byte 18    ; HDMA processing
  call do_HDMA
  SAVE_CYCLES
 %ifdef TRAP_HDMA_RELATCH
@@ -340,7 +341,6 @@ section .text
  pop edi
  popa
 %endif
-.no_HDMA:
  call IRQ_Check_Late    ; chain
 
  LOAD_CYCLES
@@ -636,14 +636,18 @@ EXTERN_C Profiler_Start
  call C_LABEL(Dump_DMA)
  pop edi
  popa
+ LOAD_CYCLES
  RELATCH_HDMA
+ SAVE_CYCLES
  pusha
  push byte 1
  call C_LABEL(Dump_DMA)
  pop edi
  popa
 %else
+ LOAD_CYCLES
  RELATCH_HDMA
+ SAVE_CYCLES
 %endif
 
  Update_FPS_Counter
