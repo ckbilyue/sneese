@@ -329,11 +329,10 @@ static void SPC_VoicesOff(int voices, const char *reason)
 
 static INLINE int validate_brr_address(int voice)
 {
- if (SNDvoices[voice].brrptr < 0x10000) return 0;
+ // BRR fetch wraps past end of address space!
+ SNDvoices[voice].brrptr &= (1 << 16) - 1;
 
- SPC_VoiceOff(voice, "BRR address overflow");
-
- return 1;
+ return 0;
 }
 
 static int get_brr_block(int voice, struct voice_state *pvs)
@@ -715,7 +714,7 @@ void Reset_Sound_DSP()
  SPC_DSP[DSP_FLG] = DSP_FLG_NECEN | DSP_FLG_MUTE;
 
  main_lvol = main_rvol = echo_lvol = echo_rvol = 0;
- echo_base = echo_delay = echo_address = echo_feedback = 0;
+ echo_base = echo_delay = echo_address = echo_feedback = FIR_address = 0;
 
  SPC_MASK = 0xFF;
  SNDkeys = 0;
@@ -733,6 +732,7 @@ void Reset_Sound_DSP()
 
  for (i = 0; i < 8; i++)
  {
+  FIR_taps[i][0] = FIR_taps[i][1] = 0;
   FIR_coeff[i] = 0;
   SNDvoices[i].last2 = SNDvoices[i].last1 = 0;
   SNDvoices[i].envx = 0;
@@ -1420,6 +1420,21 @@ void update_sound(void)
      sound_cycle_latch) / SOUND_CYCLES_PER_SAMPLE;
     if (!samples) return;
 
+    if (SPC_DSP[DSP_FLG] & DSP_FLG_RESET)
+    {
+     SPC_DSP[DSP_FLG] |= DSP_FLG_RESET | DSP_FLG_NECEN | DSP_FLG_MUTE;
+
+     SPC_VoicesOff(SNDkeys, "DSP reset");
+     SNDkeys = 0;
+
+     SPC_DSP[DSP_ENDX] = 0;
+     SPC_DSP[DSP_KON] = 0;
+     SPC_DSP[DSP_KOF] = 0;
+
+     FIR_address = 0;
+     echo_address = 0;
+    }
+
     SPC_KeyOn(SPC_DSP[DSP_KON]);
     SPC_KeyOff(SPC_DSP[DSP_KOF]);
 
@@ -1840,22 +1855,6 @@ void SPC_WRITE_DSP()
   // Reset, mute, echo enable, noise clock select
   case DSP_FLG >> 4:
    noise_update_count = counter_update_table[SPC_DSP_DATA & 0x1F];
-
-   if (SPC_DSP_DATA & DSP_FLG_RESET)
-   {
-    int voice;
-
-    SPC_DSP[DSP_FLG] = SPC_DSP_DATA | DSP_FLG_NECEN | DSP_FLG_MUTE;
-
-    for (voice = 0; voice < 7; voice++)
-    {
-     SPC_VoicesOff(SNDkeys, "DSP reset");
-    }
-
-    SPC_DSP[DSP_ENDX] = 0;
-    SPC_DSP[DSP_KON] = 0;
-    SPC_DSP[DSP_KOF] = 0;
-   }
    break;
 
   // Sample end-block decoded

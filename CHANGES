@@ -44,6 +44,10 @@ Changes
   JMA Support: Fixed some bugs in decompression, improved performance,
    reduced memory requirements, upgraded stream support, and added
    support for JMA v1 files [Nach]
+  Sound: Corrected BRR fetches across end of address space to wrap and
+   continue fetching and to not terminate channel, thanks to anomie for
+   research [TRAC]
+  Sound: Adjusted some aspects of DSP reset [TRAC]
  0.832
   Documentation: Updated grossly insufficient copyright attributations
    [TRAC]
