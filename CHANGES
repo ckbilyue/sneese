@@ -25,6 +25,11 @@ Changes
   Render: Fixed an off-by-6 bug in mode 7 vertical flip [TRAC]
   Input: Fixed a few bugs related to multiple 'sticks' in
    joystick/joypad code, thanks to Harekiet for reporting [TRAC]
+  Render: Added correct limits to some intermediate calculations
+   in mode 7; values (BG1HOFS - M7X) and (BG1VOFS - M7Y) actually
+   produce 11-bit signed results, with the MSB taken from bit 13, not
+   bit 10; fixes Space Colony escape in Super Metroid; thanks to
+   Qwertie's Mode 7 Test which aided immensely in research [TRAC]
  0.80
   Misc: Fixed a flaw where divide result registers were not changed
    by division-by-zero [TRAC]

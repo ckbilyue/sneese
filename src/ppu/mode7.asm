@@ -1,4 +1,3 @@
-
 %if 0
 
 SNEeSe, an Open Source Super NES emulator.
@@ -13,6 +12,8 @@ You must read and accept the license prior to use.
 %endif
 
 ; Mode 7 matrix rendering / hardware port emulation.
+
+%define SNEeSe_ppu_mode7_asm
 
 %include "misc.inc"
 %include "ppu/sprites.inc"
@@ -478,6 +479,22 @@ EXTERN_C Layer_Disable_Mask
  add esp,byte SM7_Local_Bytes
  ret
 
+%macro SIGN_EXTEND 2 ;reg,bits
+ and (%1),(1 << (%2)) - 1
+ xor (%1),1 << ((%2) - 1)
+ sub (%1),1 << ((%2) - 1)
+%endmacro
+
+%macro SIGN_EXTEND_ALT 4 ;reg,reg2,bits,bit
+ mov %2,%1
+ and %1,1 << (%4)
+ and %2,(1 << (%3)) - 1
+ xor %1,1 << (%4)
+ sar %1,(%4) - (%3)
+ sub %2,1 << (%3)
+ add %1,%2
+%endmacro
+
 Recalc_Mode7:
  mov dl,[Redo_M7]
  and dl,0x05    ; Need to do any recalculating?
@@ -520,12 +537,13 @@ Recalc_Mode7:
  sar eax,(32 - 13)
  sar edi,(32 - 13)
 ;mov [C_LABEL(M7V_13)],eax
- sub eax,edi
+ sub eax,edi        ;(V - Y)
  mov [C_LABEL(M7Y_13)],edi
- and eax,1023
- xor eax,512
- sub eax,512
- mov [Mode7_VY],eax  ;(V - Y)
+;there are only 11 significant result bits - a hidden sign bit (13) and the
+;low 10 result bits
+ SIGN_EXTEND_ALT eax,ecx,10,13
+
+ mov [Mode7_VY],eax ;(V - Y)
 
 .end_recalc_vy:
  test dl,0x75   ; Recalculate A, C, H, X, or Y?
@@ -540,12 +558,11 @@ Recalc_Mode7:
  sar eax,(32 - 13)
  sar edi,(32 - 13)
 ;mov [C_LABEL(M7H_13)],eax
- sub eax,edi
+ sub eax,edi        ;(H - X)
 ;mov [C_LABEL(M7X_13)],edi
-
- and eax,1023
- xor eax,512
- sub eax,512
+;there are only 11 significant result bits - a hidden sign bit (13) and the
+;low 10 result bits
+ SIGN_EXTEND_ALT eax,ecx,10,13
 
  test dl,0x51   ; Recalculate A, H, or X?
  jz .recalc_c
@@ -990,7 +1007,6 @@ ALIGNC
  mov ebp,ecx
  mov ecx,[esp+4]
 %endif
-
 
  cmp eax,0x3FFFF    ; If outside screen range we simply skip the pixel
  ja near .pixel_covered
