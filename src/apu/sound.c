@@ -800,6 +800,9 @@ int Install_Sound(int stereo)
  srand(0);
 
  set_volume_per_voice(0);
+#ifdef ALLEGRO_WINDOWS
+ if (install_sound(DIGI_DIRECTX(0), MIDI_NONE, NULL))
+#endif
  if (install_sound(DIGI_AUTODETECT, MIDI_NONE, NULL))
  {
   return sound_enabled = sound_enable_mode = 0;
