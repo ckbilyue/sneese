@@ -969,10 +969,7 @@ OPCODE_PROLOG(0x7B) ; TDC i
  _TxC B_D
 OPCODE_EPILOG
 
-; 7C
-
-ALIGNC
-EXPORT_C ALL_JMP_Oa_xO
+OPCODE_PROLOG(0x7C) ; JMP (a,x)
 %ifdef TRAP_INVALID_JUMP
  GET_PC eax
  mov [C_LABEL(Map_Byte)],eax
@@ -981,7 +978,7 @@ EXPORT_C ALL_JMP_Oa_xO
 
  mov ebx,B_PB_Shifted
  mov R_NativePC,eax
- or eax,ebx
+ add eax,ebx
 
  shr eax,13
  mov eax,[C_LABEL(Read_Bank8Offset)+eax*4]
@@ -1005,6 +1002,7 @@ EXPORT_C ALL_JMP_Oa_xO
  mov eax,C_LABEL(Blank)
  jmp short .read_direct
 %endif
+OPCODE_EPILOG
 
 ; 82
                                  
@@ -1169,79 +1167,3 @@ OPCODE_EPILOG
 OPCODE_PROLOG(0xF8) ; SED i
  _SEx D         ; Set Decimal mode flag
 OPCODE_EPILOG
-
-; FC
-
-ALIGNC
-EXPORT_C E0_JSR_Oa_xO
- GET_PC eax
-%ifdef TRAP_INVALID_JUMP
- mov [C_LABEL(Map_Byte)],eax
-%endif
- add eax,byte 2     ; last instruction byte PC in ax
- E0_PUSH_W          ; Address of last byte not next instruction (huh!)
- ADDR_Absolute_Indexed_Indirect
-
- mov ebx,B_PB_Shifted
- mov R_NativePC,eax
- or eax,ebx
-
- shr eax,13
- mov eax,[C_LABEL(Read_Bank8Offset)+eax*4]
- test eax,eax
- jz .read_non_linear
-
- add eax,ebx
-.read_direct:
-
- add R_NativePC,eax
- mov B_PBOffset,eax
-
- OPCODE_EPILOG
-
-.read_non_linear:
-%ifdef TRAP_INVALID_JUMP
- mov byte [C_LABEL(Map_Byte)+3],0xFC
- mov [C_LABEL(Map_Address)],ebx
- jmp _InvalidJump
-%else
- mov eax,C_LABEL(Blank)
- jmp short .read_direct
-%endif
-
-ALIGNC
-EXPORT_C E1_JSR_Oa_xO
- GET_PC eax
-%ifdef TRAP_INVALID_JUMP
- mov [C_LABEL(Map_Byte)],eax
-%endif
- add eax,byte 2     ; last instruction byte PC in ax
- E1_PUSH_W          ; Address of last byte not next instruction (huh!)
- ADDR_Absolute_Indexed_Indirect
-
- mov ebx,B_PB_Shifted
- mov R_NativePC,eax
- or eax,ebx
-
- shr eax,13
- mov eax,[C_LABEL(Read_Bank8Offset)+eax*4]
- test eax,eax
- jz .read_non_linear
-
- add eax,ebx
-.read_direct:
-
- add R_NativePC,eax
- mov B_PBOffset,eax
-
- OPCODE_EPILOG
-
-.read_non_linear:
-%ifdef TRAP_INVALID_JUMP
- mov byte [C_LABEL(Map_Byte)+3],0xFC
- mov [C_LABEL(Map_Address)],ebx
- jmp _InvalidJump
-%else
- mov eax,C_LABEL(Blank)
- jmp short .read_direct
-%endif

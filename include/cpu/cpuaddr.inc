@@ -41,7 +41,7 @@ You must read and accept the license prior to use.
 %if S_8bit
  test dl,dl
  jz %%fixup
- add R_Cycles,byte _5A22_FAST_CYCLE
+ add R_Cycles,_5A22_FAST_CYCLE
  jmp %%no_fixup
 %%fixup:
  mov bh,dh 
@@ -902,12 +902,24 @@ You must read and accept the license prior to use.
 ;       7   1  1   0  1 PBR,AA+X    NEW PCL     1
 ;       8   1  1   0  1 PBR,AA+X+1  NEW PCH     1
 ;       1   1  1   1  1 PBR,NEWPC   New Op Code 1
-%macro ADDR_Absolute_Indexed_Indirect 0
- mov ebx,B_PB_Shifted
- mov bl,[1+R_NativePC]
- mov bh,[2+R_NativePC]
- mov eax,B_X
- add bx,ax
+%macro ADDR_Absolute_Indexed_Indirect 0-1 0
+%ifidni %1,JSR
+ mov eax,B_PB_Shifted
+ READ8_Immediate
+ push eax
+ GET_PC eax
+ PUSH_W New
+ pop eax
+ mov ah,[R_NativePC]
+ mov ebx,eax
+%else
+ mov eax,B_PB_Shifted
+ READ16_Immediate JMP
+ mov ebx,eax
+%endif
+;add R_Cycles,_5A22_FAST_CYCLE
+ add bx,B_X
+ xor eax,eax
  GET_WORD
 %endmacro
 
