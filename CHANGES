@@ -24,7 +24,8 @@ Changes
  0.801
   PPU: Greatly simplied VRAM read/write handling and readded VRAM read
    buffering, thanks to anomie for convincing me to give it another
-   chance [TRAC]
+   chance, and Overload for some information which fixed some
+   related glitches [TRAC]
   Timing: Implemented partial HDMA timing [TRAC]
   Render: Improved emulation of sprite priority rotation, thanks to
    anomie for research [TRAC]

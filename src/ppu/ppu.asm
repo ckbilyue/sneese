@@ -1622,17 +1622,21 @@ ALIGNC
 
 ALIGNC
 SNES_W2116: ; VMADDL
- push eax
+ mov edx,[VRAMAddress]
+ mov dl,al
  mov [VRAMAddress],al
- pop eax
+ mov dx,[C_LABEL(VRAM)+edx*2]
+ mov [VMDATAREAD_buffer],dx
  ret
 
 ALIGNC
 SNES_W2117: ; VMADDH
- push eax
- and al,0x7F
- mov [VRAMAddress+1],al
- pop eax
+ mov edx,[VRAMAddress]
+ mov dh,0x7F
+ and dh,al
+ mov [VRAMAddress+1],dh
+ mov dx,[C_LABEL(VRAM)+edx*2]
+ mov [VMDATAREAD_buffer],dx
  ret
 
 %macro VRAM_Cache_Check 0
