@@ -488,25 +488,25 @@ int update_joystick_vkeys(void)
     if (axis >= joy[joystick].stick[stick].num_axis) break;
 
     if (!last_vkey &&
-     !joystick_key[joystick][0][stick * 4 + axis * 2 + 0] &&
+     !joystick_key[joystick][0][(stick * 4 + axis) * 2 + 0] &&
      joy[joystick].stick[stick].axis[axis].d1)
     {
      last_vkey =
       joystick_axis_direction_to_vkey(joystick, stick, axis, 0);
     }
 
-    joystick_key[joystick][0][stick * 4 + axis * 2 + 0] =
+    joystick_key[joystick][0][(stick * 4 + axis) * 2 + 0] =
      joy[joystick].stick[stick].axis[axis].d1;
 
     if (!last_vkey &&
-     !joystick_key[joystick][0][stick * 4 + axis * 2 + 1] &&
+     !joystick_key[joystick][0][(stick * 4 + axis) * 2 + 1] &&
      joy[joystick].stick[stick].axis[axis].d2)
     {
      last_vkey =
       joystick_axis_direction_to_vkey(joystick, stick, axis, 1);
     }
 
-    joystick_key[joystick][0][stick * 4 + axis * 2 + 1] =
+    joystick_key[joystick][0][(stick * 4 + axis) * 2 + 1] =
      joy[joystick].stick[stick].axis[axis].d2;
    }
   }

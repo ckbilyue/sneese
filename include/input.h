@@ -27,7 +27,8 @@ You must read and accept the license prior to use.
 #define JOYSTICK_STICKS_OFFSET 0
 #define JOYSTICK_STICK_OFFSET(stick) \
  (JOYSTICK_STICKS_OFFSET + \
- (stick * JOYSTICK_MAX_AXES_PER_STICK * 2) / 128 * 256)
+ (stick * JOYSTICK_MAX_AXES_PER_STICK * 2) / 128 * 256 + \
+ (stick * JOYSTICK_MAX_AXES_PER_STICK * 2) % 128)
 #define JOYSTICK_BUTTONS_OFFSET \
  JOYSTICK_STICK_OFFSET(JOYSTICK_MAX_STICKS)
 #define JOYSTICK_BUTTON_OFFSET(button) \
