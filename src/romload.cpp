@@ -3,8 +3,12 @@
 SNEeSe, an Open Source Super NES emulator.
 
 
-Copyright (c) 1998-2004 Charles Bilyue'.
-Portions Copyright (c) 2003-2004 Daniel Horchner.
+Copyright (c) 1998-2005, Charles Bilyue'.
+Portions Copyright (c) 2003-2004, Daniel Horchner.
+Portions Copyright (c) 2004-2005, Nach. ( http://nsrt.edgeemu.com/ )
+JMA Technology, Copyright (c) 2004-2005 NSRT Team. ( http://nsrt.edgeemu.com/ )
+LZMA Technology, Copyright (c) 2001-4 Igor Pavlov. ( http://www.7-zip.org )
+Portions Copyright (c) 2002 Andrea Mazzoleni. ( http://advancemame.sf.net )
 
 This is free software.  See 'LICENSE' for details.
 You must read and accept the license prior to use.
@@ -43,7 +47,7 @@ You must read and accept the license prior to use.
 #include "wrapaleg.h"
 
 #include <iostream>
-
+#include "jma/jma.h"
 using namespace std;
 
 
@@ -475,7 +479,7 @@ inline void map_rom_32k_lorom_40_C0(int bank)
 
  for (int i = 0; i < 4; i++)
  {
-  set_block_pointers(bank, i, (void *) (RomAddress - ((bank - needed_bank) << 16) - (needed_bank) * 0x8000), (void *) (Dummy - (bank << 16)));
+  set_block_pointers(bank, i, (void *) (RomAddress - ((bank - needed_bank) << 16) - (needed_bank & 0x7F) * 0x8000), (void *) (Dummy - (bank << 16)));
  }
 
  map_rom_32k_lorom(bank);
@@ -824,6 +828,35 @@ void Load_64k(FILE *infile)
  }
 }
 
+void Copy_32k(const unsigned char *buffer, size_t len)
+{
+  const unsigned char *end = buffer + len;
+  for (int cnt = 0; cnt < rmd_64k.bank_count; cnt++) // Read first half
+  { 
+    memcpy(RomAddress + cnt * 65536 + 32768, buffer, 32768);
+    buffer += 32768;
+    if (buffer > end) break;
+  }
+ 
+  for (int cnt = 0; cnt < rmd_64k.bank_count; cnt++) // Read second half
+  { 
+    memcpy(RomAddress + cnt * 65536, buffer, 32768);
+    buffer += 32768;
+    if (buffer > end) break;
+  } 
+}
+
+void Copy_64k(const unsigned char *buffer, size_t len)
+{
+  const unsigned char *end = buffer + len;
+  for (int cnt = 0; cnt < rmd_64k.bank_count; cnt++) // Read in ROM
+  {
+    memcpy(RomAddress + cnt * 65536, buffer, 65536);
+    buffer += 65536;    
+    if (buffer > end) break;
+  }
+}
+
 unsigned check_for_header(FILE *fp, int filesize)
 {
  unsigned ROM_start;
@@ -876,29 +909,8 @@ HiROM checksums at FFDC/FFDE, 101DC/101DE with header
  return ROM_start;
 }
 
-static bool open_rom_normal(const char *Filename)
+void HiLo_Detect()
 {
- FILE *infile = fopen2(Filename, "rb");
- if (!infile) return FALSE; // File aint there m8
-
- unsigned ROM_start;        // This is where the ROM code itself starts.
-
- fseek2(infile, 0, SEEK_END);
- int infilesize = ftell2(infile);
- ROM_start = check_for_header(infile, infilesize);
-
- if (ROM_start == ROM_Header_Size)
-  printf("Header detected and ignored.\n");
- else
-  printf("No header detected.\n");
-
- ROM_format = Undetected;
-
- fseek2(infile, 0x7FC0 + ROM_start, SEEK_SET);
- fread2(&RomInfoLo, sizeof(SNESRomInfoStruct), 1, infile);
- fseek2(infile, 0xFFC0 + ROM_start, SEEK_SET);
- fread2(&RomInfoHi, sizeof(SNESRomInfoStruct), 1, infile);
-
  if ((RomInfoLo.Checksum ^ RomInfoLo.Complement) == 0xFFFF)
  {
   if ((RomInfoLo.ROM_makeup & 0x0F) == 1)
@@ -944,7 +956,162 @@ static bool open_rom_normal(const char *Filename)
   case On: ROM_format |= Interleaved; break;
   case Off: ROM_format &= ~Interleaved; break;
  }
+}
 
+static bool open_rom_jma(const char *filename)
+{
+  unsigned char *buffer = 0;
+  try
+  {
+    JMA::jma_open JMAFile(filename);
+    vector<JMA::jma_public_file_info> file_info = JMAFile.get_files_info();
+
+    string our_file_name;
+    size_t our_file_size = 0;
+
+    for (vector<JMA::jma_public_file_info>::iterator i = file_info.begin(); i != file_info.end(); i++)
+    {
+      //Check for valid ROM based on size
+      if ((i->size <= 0x600200) && (i->size > our_file_size))
+      {
+        our_file_name = i->name;
+        our_file_size = i->size;
+      }
+    }
+
+    if (!our_file_size || our_file_size < 0x10000)
+    {
+      return FALSE;
+    }
+
+    buffer = (unsigned char *)malloc(our_file_size);
+
+    unsigned char *ROM_buffer = buffer;
+
+    JMAFile.extract_file(our_file_name, buffer);
+    
+    if ((((our_file_size % 1024) == 0) || (ROM_has_header == Off)) &&
+     (ROM_has_header != On))
+      /* do nothing */ ;
+    else if (((our_file_size % 1024) == ROM_Header_Size) ||
+     (ROM_has_header == On))
+      ROM_buffer += ROM_Header_Size;
+
+    our_file_size -= ROM_buffer - buffer;
+    if (ROM_buffer > buffer)
+    {
+      printf("Header detected and ignored.\n");
+    }
+    else
+    { 
+      printf("No header detected.\n");
+    }
+    
+    memcpy(&RomInfoLo, ROM_buffer+0x7FC0, sizeof(SNESRomInfoStruct));
+    memcpy(&RomInfoHi, ROM_buffer+0xFFC0, sizeof(SNESRomInfoStruct));
+  
+    HiLo_Detect();
+  
+    rmd_64k.bank_count = ((our_file_size + (64 << 10) - 1) / (64 << 10));
+    rmd_32k.bank_count = ((our_file_size + (32 << 10) - 1) / (32 << 10));
+
+    // Maximum 64Mbit ROM size for LoROM
+    if (rmd_64k.bank_count > 128)
+    {
+      rmd_64k.bank_count = 128;
+      rmd_32k.bank_count = 256;
+    }
+
+    if (Allocate_ROM())   // Dynamic allocation of ROM
+    {
+      free(buffer);
+      return FALSE;        // return false if no memory left
+    }
+  
+    setup_rom_mirroring(&rmd_32k);
+    setup_rom_mirroring(&rmd_64k);
+
+    switch(ROM_format)
+    {
+      case HiROM:
+        DisplayRomStats(&RomInfoHi);
+
+        if (!Set_HiROM_Map())
+        {
+          Free_ROM();
+          free(buffer);
+          return FALSE;        // return false if no memory left
+        }
+
+        Copy_64k(ROM_buffer, our_file_size);
+        break;
+
+      case HiROM_Interleaved:
+        DisplayRomStats(&RomInfoLo);
+
+        if (!Set_HiROM_Map())
+        {
+          Free_ROM();
+          free(buffer);
+          return FALSE;        // return false if no memory left
+        }
+
+        Copy_32k(ROM_buffer, our_file_size);
+        break;
+
+      case LoROM_Interleaved:
+        printf("Interleaved LoROM not supported - basic LoROM loader used\n");
+      case LoROM:
+      default:
+        DisplayRomStats(&RomInfoLo);
+
+        if (!Set_LoROM_Map())
+        {
+          Free_ROM();
+          free(buffer);
+          return FALSE;        // return false if no memory left
+        }
+
+        Copy_64k(ROM_buffer, our_file_size);
+        break;
+    }
+    free(buffer);
+    return TRUE;
+  }
+  catch (JMA::jma_errors jma_error)
+  {
+    if (buffer) { free(buffer); }
+    return FALSE;
+  }
+}
+
+static bool open_rom_normal(const char *Filename)
+{
+ if (!strcasecmp(fn_ext, ".jma")) return open_rom_jma(Filename);
+ 
+ FILE *infile = fopen2(Filename, "rb");
+ if (!infile) return FALSE; // File aint there m8
+
+ unsigned ROM_start;        // This is where the ROM code itself starts.
+
+ fseek2(infile, 0, SEEK_END);
+ int infilesize = ftell2(infile);
+ ROM_start = check_for_header(infile, infilesize);
+
+ if (ROM_start == ROM_Header_Size)
+  printf("Header detected and ignored.\n");
+ else
+  printf("No header detected.\n");
+
+ ROM_format = Undetected;
+
+ fseek2(infile, 0x7FC0 + ROM_start, SEEK_SET);
+ fread2(&RomInfoLo, sizeof(SNESRomInfoStruct), 1, infile);
+ fseek2(infile, 0xFFC0 + ROM_start, SEEK_SET);
+ fread2(&RomInfoHi, sizeof(SNESRomInfoStruct), 1, infile);
+
+ HiLo_Detect();
+ 
  rmd_64k.bank_count = (((infilesize - ROM_start) + (64 << 10) - 1)
   / (64 << 10));
  rmd_32k.bank_count = (((infilesize - ROM_start) + (32 << 10) - 1)

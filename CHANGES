@@ -41,6 +41,8 @@ Changes
   Sound: Hacked in some code to try to make the Win32 port prefer the
    DSound mixer over the Allegro mixer, alleviates serious audio
    latency issues [TRAC]
+  Misc: Added support for reading .jma files [Nach]
+  ROM loader: Minor clean-up in ROM loading code [Nach]
  0.831
   5A22: Changed emulation-mode interrupts to NOT zero data bank
    register - thanks to Overload for pointing out that the SNES CPU

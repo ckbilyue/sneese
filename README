@@ -10,7 +10,7 @@ The SNES emulator with the extra e's...
         SSSSS   NN    NN  EEEEEE   eeee    SSSSS    eeee
 
                                             v0.832 (Public BETA)
-                                            xx xxx 2004
+                                            xx Febuary 2005
 
   Please read the license (LICENSE file) before using or distributing
    SNEeSe in any way!
@@ -42,6 +42,27 @@ Unix/Linux/BeOS Port Developer/Maintainer
 Assistant Developer (Sound system emulation)
  Brad Martin                    bmartin* *at* *umr.edu
                                 http://home.gvi.net/~martin
+
+JMA ROM Format Credits
+ LZMA Technology
+  Igor Pavlov                   http://www.7-zip.org/
+ LZMA/GCC Compatibility and LZMA API Extensions
+  Andrea Mazzoleni              http://advancemame.sf.net/
+ NSRT Team
+  JMA Concept, Code, Portability
+  JMA Support Code in SNEeSe
+   Nach                         http://nsrt.edgeemu.com/
+  JMA Code
+   malcster
+   CL
+  JMA Format Ideas
+   Jonathan Gevaryahu           (Lord_Nightmare)
+  LZMA Source Cleanup
+   grinvader
+  JMA Portability Testing and Endianness Fixes
+   zones
+
+
 New logo
  Siloh (formerly stainless)
 
