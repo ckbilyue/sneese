@@ -128,4 +128,28 @@ OPCODE_PROLOG(0xF4) ; PEA s
  PUSH_W
 OPCODE_EPILOG
 
+OPCODE_PROLOG(0xFB) ; XCE i
+ ADDR_Implied
+%if S_8bit
+ JUMP_FLAG SNES_FLAG_C,C_LABEL(CPU_RETURN),near
+ STORE_FLAGS_E ah
+ mov al,1
+ STORE_FLAGS_C al
+ STORE_FLAGS_M al
+ STORE_FLAGS_X al
+ mov dword [OpTable],OpTableMX  ; Set current opcode emulation table
+%else
+ JUMP_NOT_FLAG SNES_FLAG_C,C_LABEL(CPU_RETURN),near
+ mov B_XH,ah
+ mov B_YH,ah
+ STORE_FLAGS_C ah
+ mov al,1
+ STORE_FLAGS_E al
+ STORE_FLAGS_B al
+ STORE_FLAGS_1 al
+ mov B_SH,al
+ mov dword [OpTable],OpTableE1  ; Set current opcode emulation table
+%endif
+OPCODE_EPILOG
+
 %undef OPCODE_PROLOG

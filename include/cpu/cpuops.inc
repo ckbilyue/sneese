@@ -715,11 +715,9 @@ EXPORT_C E1_RTI
  jmp .read_direct
 %endif
 
-; 42
-ALIGNC
-EXPORT_C ALL_WDM
+OPCODE_PROLOG(0x42) ; WDM
  READ8_Immediate
- OPCODE_EPILOG
+OPCODE_EPILOG
 
 ; 4C
 
@@ -1247,10 +1245,8 @@ EXPORT_C E1_REP
 .no_irq_enable:
  OPCODE_EPILOG
 
-; CB
-
-ALIGNC
-EXPORT_C ALL_WAI        ; Wait for interrupt
+; Wait for interrupt
+OPCODE_PROLOG(0xCB) ; WAI i
  mov al,[IRQ_pin]
  test al,al
  jnz .irq_active
@@ -1275,16 +1271,14 @@ ALIGNC
  ; WAI delay after interrupt signal: 2 IO
  add R_Cycles,byte 12   ;*
 %endif
-
- OPCODE_EPILOG
+OPCODE_EPILOG
 
 OPCODE_PROLOG(0xD8) ; CLC i
  _CLx D         ; Clear Decimal mode flag
 OPCODE_EPILOG
 
-; DB
-ALIGNC
-EXPORT_C ALL_STP
+; Stop the clock
+OPCODE_PROLOG(0xDB) ; STP i
 %ifndef ADD_CYCLES_FIRST
  pop ebx
  add R_Cycles,ebx
@@ -1297,6 +1291,7 @@ EXPORT_C ALL_STP
  jge near HANDLE_EVENT
  xor R_Cycles,R_Cycles
  jmp HANDLE_EVENT
+OPCODE_EPILOG
 
 ; DC
 
@@ -1457,37 +1452,6 @@ OPCODE_EPILOG
 OPCODE_PROLOG(0xF8) ; SED i
  _SEx D         ; Set Decimal mode flag
 OPCODE_EPILOG
-
-; FB
-
-ALIGNC
-EXPORT_C E0_XCE
- ADDR_Implied
-
- JUMP_NOT_FLAG SNES_FLAG_C,C_LABEL(CPU_RETURN),near
- mov B_XH,ah
- mov B_YH,ah
- STORE_FLAGS_C ah
- mov al,1
- STORE_FLAGS_E al
- STORE_FLAGS_B al
- STORE_FLAGS_1 al
- mov B_SH,al
- mov dword [OpTable],OpTableE1  ; Set current opcode emulation table
- OPCODE_EPILOG
-
-ALIGNC
-EXPORT_C E1_XCE
- ADDR_Implied
-
- JUMP_FLAG SNES_FLAG_C,C_LABEL(CPU_RETURN),near
- STORE_FLAGS_E ah
- mov al,1
- STORE_FLAGS_C al
- STORE_FLAGS_M al
- STORE_FLAGS_X al
- mov dword [OpTable],OpTableMX  ; Set current opcode emulation table
- OPCODE_EPILOG
 
 ; FC
 
