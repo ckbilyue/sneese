@@ -54,6 +54,7 @@ src/clear.asm
 include/clear.inc
 src/apu/apuskip.asm
 src/ppu/mode7.asm
+src/ppu/windows.asm
 src/scrmode.asm
 src/font.asm
 src/main.cpp
