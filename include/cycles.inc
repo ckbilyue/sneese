@@ -19,7 +19,7 @@ You must read and accept the license prior to use.
 %define _5A22_LEGACY_CYCLE 12
 
 %define CYCLES_PER_DOT 4
-%define DOTS_PER_SCANLINE 335
+%define DOTS_PER_SCANLINE 341
 %define DOTS_IN_REFRESH 10
 %define DOTS_BEFORE_DISPLAY 0
 %define DOTS_BEFORE_REFRESH 0x85
