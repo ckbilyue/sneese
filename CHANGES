@@ -1,0 +1,870 @@
+Changes
+"""""""
+ The following describes the layout of this changelog.
+
+ In releases with contributions from multiple developers:
+---
+ Version number
+  Area of project changed: Description of change [developer]
+---
+ In releases with contributions from a single developer:
+---
+ Version number [developer]
+  Area of project changed: Description of change
+---
+
+ Changes from older releases may not classify changes by area of project.
+
+
+ Developer abbreviations:
+  TRAC          Charles Bilyue'
+  DBJH          Daniel Horchner
+
+
+ 0.779
+  Misc: Fixed a flaw where divide result registers were not changed
+   by division-by-zero [TRAC]
+  Input: Fixed a flaw in JOYC1 which caused SMB in Mario All-Stars to
+   not acknowledge the start button [TRAC]
+  Source: Seperated the makefile for the multiple ports [TRAC]
+  Documentation: Cleaned up and clarified the history, and moved it
+   to another file [TRAC]
+  Ports: Added Linux/Unix build support [DBJH]
+  Source: Contributed to the removal of some non-portable code and
+   more source clean-up [DBJH]
+  ROM loader: Reduced some problems with loading ROMs in non-absolute
+   paths [DBJH]
+  Ports: Added BeOS build support [DBJH]
+  Configuration: Improved the portability of code which handled
+   configuration file regeneration [DBJH]
+  Source: Fixed a few problems in variable declarations [DBJH]
+  GUI: Made ".." come first in the file list [DBJH]
+  GUI: Fixed some problems where text would be displayed outside a
+   window [DBJH]
+ 0.776 [TRAC]
+  Render: Added support for dual window clipping with all logic
+   modes of backgrounds in modes 5 and 6
+  Render: Added full mosaic effect to modes 5 and 6
+  Render: Added support for offset change in mode 6
+  Render: Fixed an offset map addressing bug in all offset-change
+   renderers
+  SPC700: Improved CPU cycle count conversion accuracy in PAL emulation
+  Configuration: Removed support for old (pre-0.60) format .cfg files
+   to help simplify the code and solve a few bugs
+ 0.774 [TRAC]
+  SRAM: Added support for mirrored SRAM at banks F0 and above in LoROM
+   memory map, helps Big Sky Troopers and others, thanks to MKendora
+   for the information
+  Render: Fixed a screen map addressing bug in 16x16-tile background with
+   mosaic renderer
+  Render: Fixed a pixel count computation bug in 16x16-tile background with
+   mosaic renderer
+  Render: Fixed a screen map addressing bug in 16x16-tile background with
+   offset-change and mosaic renderer
+  Render: Added support for dual window clipping with all logic
+   modes of 8x8-tile backgrounds with offset change and mosaic in
+   modes 2 and 4
+  Render: Added support for dual window clipping with all logic
+   modes of 16x16-tile backgrounds with offset change and mosaic in
+   modes 2 and 4
+  Interface: Changed filename prefix for screenshots
+  SPC700: Fixed a flaw in SPC700 timers that could cause fractional ticks
+   to be lost on timer startup
+  SPC700: Fixed a bug which caused the POP PSW opcode to not restore the
+   negative flag properly, thanks to Brad Martin for help with this
+ 0.77 [TRAC]
+  SPC700: Fixed the SPC700 timer bug that was supposed to be fixed in
+   0.75; not certain how it didn't make it into the release
+  Sound: Fixed a serious bug which caused the sound to never be updated
+   on DSP register changes; allows the correct attack 15 timing to
+   work with FF4, thanks to MKendora and Brad Martin for getting me
+   to go back to it
+  Sound: Changed behavior of key on and key off registers, should
+   be more accurate
+  Render: Added support for dual window clipping with all logic
+   modes of 8x8-tile backgrounds with offset change and no mosaic in
+   modes 2 and 4
+  Render: Added support for dual window clipping with all logic
+   modes of 16x16-tile backgrounds with offset change and no mosaic in
+   modes 2 and 4
+  65c816: Fixed a bug in which caused the timing position of an IRQ on
+   a new scanline to be incorrectly computed; fixes a problem in
+   Tetris Attack
+ 0.751 [TRAC]
+  Render: Disabled some debugging code that caused mosaic to be forced
+   on in background rendering, thanks to Andr‚s Tangir for pointing
+   this out!
+ 0.75 [TRAC]
+  65c816: Corrected address wrapping in direct and stack addressing
+   modes, thanks to MKendora for pointing out these problems
+  65c816: Altered register allocation
+  SPC700: Altered register allocation
+  SPC700: Fixed a bug in the timers which caused them to be reset
+   to random values when turned on, thanks to Brad Martin for pointing
+   this out
+  Source: Removed some obsolete code and dependencies
+  Source: Started cleaning up many of the C label references in the asm
+   code
+  Render: Added support for dual window clipping with XOR or XNOR logic
+   modes of 8x8-tile backgrounds with no offset change or mosaic
+  Render: Fixed a bug where window clipping was not updated correctly
+   when changing layering order
+  Render: Added support for dual window clipping with all logic
+   modes of 16x16-tile backgrounds with no offset change or mosaic in
+   modes 0-4
+  Render: Added support for dual window clipping with all logic
+   modes of 8x8-tile backgrounds with mosaic and no offset change
+  Render: Added support for dual window clipping with all logic
+   modes of 16x16-tile backgrounds with mosaic and no offset change in
+   modes 0-4
+ 0.74 [TRAC]
+  Render: Altered clip window setup code
+  Sound: Corrected behavior of invalid range values in BRR header byte,
+   thanks to Brad Martin for the information
+  Sound: Corrected bug in ADSR/GAIN switching; when switching from GAIN
+   to ADSR, envelope update time was not set based on current ADSR state
+  Sound: Restructed BRR decoding
+  Render: Changed the back area color addition hack to actually add to
+   color 0 instead of replacing it, helps many games
+  Render: Added support for dual window clipping with OR or AND logic
+   modes of 8x8-tile backgrounds with no offset change or mosaic
+  Sound: Corrected sample loop behavior, erroneously changed it in 0.73,
+   fixes Sidmania
+  Sound: Added emulation of 4-point pitch-regulated gaussian
+   interpolation of sample data
+  Sound: Added emulation of SNES echo effect and its corresponding FIR
+   filter
+ 0.735 [TRAC]
+  PPU: Fixed some register corruption issues in VRAM write handlers
+  PPU: Altered VRAM writes; when VRAM writes are attempted during the
+   display period, update addresses but do not save data, fixes Mega
+   Man X status screen glitch
+  Sound: Modified the envelope update values
+  Sound: Altered timing of attack rate 15, thanks to Brad Martin for
+   the correction
+  Sound: Altered behavior of ADSR envelope decay with the maximum
+   sustain level, thanks to Brad Martin for the correction
+  Sound: Altered ADSR/GAIN switching; when switching from GAIN to
+   ADSR, use the last ADSR state used by the channel since key on,
+   fixes Mega Man X music looping bug, thanks to Brad Martin for help
+   with this
+  Source: Fixed a bug in the makefile where some flags weren't being
+   properly passed for building the CPU cores
+ 0.73 [TRAC]
+  Timing: Changed Korea region to South Korea, and its video standard
+   default to NTSC, fixes Dragon Ball Z - Super Butoden 3 (K), thanks
+   to MKendora for the information!
+  Sound: Changed envelope behavior: when voices already on are keyed on,
+   reset volume to zero, thanks to Brad Martin for setting me straight
+   on this
+  Sound: Fixed envelope behavior: no longer allowing envelope mode
+   changes for voices that are releasing
+ 0.725 [TRAC]
+  Render: Added support for single window clipping of 8x8-tile
+   backgrounds with no offset change or mosaic
+  Timing: Fixed the Final Fantasy 6 timing hack
+  Render: Fixed a minor bug in offset change screen map address
+   calculation
+  Render: Corrected address wrapping for wide and tall screen maps
+   at the end of VRAM
+ 0.721 [TRAC]
+  Render: Removed some unused masking code for performance
+ 0.72 [TRAC]
+  Memory map: Added a hack for Batman: Revenge of the Joker, an odd
+   ROM with LoROM memory map and ROM info block in the 2nd 32k bank
+  Memory map: Fixed behavior of command-line options -fi (Force
+   interleaved) and -fn (Force non-interleaved) on non-split ROMs when
+   -fl or -fh also used
+  Memory map: Fixed behavior of command-line options -fl (Force LoROM)
+   and -fh (Force HiROM)
+  Timing: Added a hack to eliminate the world map flicker on Final
+   Fantasy 6 until timing is improved
+  Source: Cleaned up some parts of the source and altered makefile to
+   help portability
+  Sound: Reevaluated and adjusted sample ranges to increase output
+   volume
+  GUI: Added options for independently stretching the emulation
+   display output in the horizontal and vertical directions
+  Other: Added blitter support for the stretch options in 16-bit
+   screen modes
+  Render: Added full mosaic effect to modes 2 and 4, 16x16-tile
+   backgrounds with offset change
+  Sound: Re-enabled pitch-modulation
+  Sound: Changed the BRR sample decoding to a new method based on
+   information from Brad Martin, helps sounds in several games
+   (Final Fantasy 6, Chrono Trigger, Mega Man 7, Mega Man X, others)
+  Render: Improved performance of background rendering in modes 5 and 6
+  Configuration: Reordered screen modes due to new stretch options
+ 0.706 [TRAC]
+  65c816: Added support for the inability to acknowledge an IRQ in the
+   instruction immediately after one that clears the I flag, fixes
+   Marko's Magic Football, thanks to anomie for information on the
+   problem
+ 0.705 [TRAC]
+  65c816: Optimized portions of the main execution loop
+  SPC700: Optimized portions of the main execution loop, cycle
+   conversions, and timer calculations
+  Memory map: Removed the hack for Mega Man X/Rock Man X, it was
+   mistakenly commented out some time ago, but is no longer needed
+  Memory map: Added support for ROM mirroring, fixes
+   Mega Man X/Rock Man X
+  SRAM: Corrected addressing in 512kbit and 1Mbit SRAMs, fixes
+   Dezaemon and Thoroughbred Breeder 3
+ 0.702 [TRAC]
+  Other: Added code to use the FPU or MMX to clear the framebuffer,
+   and to allow disabling of cache preloading
+  Config: Added options control usage of FPU/MMX and cache preloading
+  Source: Fixed a few minor issues which prevented compilation with
+   NASM 0.98.34
+  SRAM: Added support for SRAMs larger than 512kbit - unfortunately,
+   something must be off as nothing requiring it seems to work yet
+  SRAM: Fixed a serious bug in support for HiROM SRAM larger than 64kbit
+  Render: Fixed a bug which caused 8x8-tile offset change layers without
+   mosaic to not display correctly in mode 4
+  Render: Fixed a bug where tile priority was unlikely to behave
+   properly in 8x8-tile offset change layers with mosaic
+ 0.701 [TRAC]
+  Sound: Fixed some issues in GAIN register emulation
+  Sound: Fixed some issues related to envelope updates
+  65c816: Fixed a bug in 16-bit ADC/SBC where invalid values could
+   sometimes be stored in the accumulator, fixes a crash in Terranigma
+ 0.70 [TRAC]
+  Sound: Fixed a serious bug in ENVX reading, fixes samples being cut
+   short in Super Offroad: The Baja
+  Sound: Fixed a serious bug in mixing epilog, fixes freezes in
+   Terranigma
+ 0.694 [TRAC]
+  Render: Fixed a bug which caused char 0 repeat outside the screen
+   area to not work
+  Render: Added full mosaic effect to modes 2 and 4, 8x8-tile backgrounds
+   with offset change
+ 0.692 [TRAC]
+  Render: Fixed a bug in modes 5-6 where screen map selection was
+   sometimes incorrect when 64-tile screen width was used (fixes
+   Seiken Densetsu 3 menu screens)
+  Timing: Fixed a bug where IRQs could be set for non-existant H-timer
+   positions
+  Render: Added full mosaic effect to modes 0-4, 16x16-tile backgrounds
+   without offset change
+ 0.69 [TRAC]
+  SPC700: Eliminated some self-modifying code
+  Timing: Fixed an IRQ-related bug in register $2137 (SLHV) (thanks to
+   SNES'9X)
+  Render: Added full mosaic effect to mode 7
+  Render: Added full mosaic effect to modes 0-4, 8x8-tile backgrounds
+   without offset change
+  Timing: Changed timing of RDNMI/HVBJOY vblank start closer to NMI
+   like it was before 0.68 - fixes ActRaiser title
+  PPU: Eliminated some self-modifying code
+  PPU: Fixed a bug in VRAM access (fixes some issues on Earthworm Jim 2
+   copyright screen)
+ 0.68 [TRAC]
+  Input: Fixed a bug in the input code
+  GUI: Added the ability to configure shift keys for controllers
+  Source: Fixed a makefile issue where non-profiling builds were
+   linked with profiling enabled - it is safe to delete the
+   gmon.out files that were being produced (thanks to stainless
+   for reporting)
+  Render: Overhauled 8x8 tile background plotters
+  65c816: Fixed several address wrapping bugs
+  65c816: Optimized 16-bit loads
+  SPC700: Fixed a bug in POP PSW where the 'direct page' offset was
+   sometimes incorrectly set, fixes Super Punch-Out!!
+  SPC700: Various minor bug fixes and optimizations
+  SPC700: Optimized 16-bit loads
+ 0.666 [TRAC]
+  Render: Fixed a bug which was causing BG3 high priority tiles to not
+   be drawn in mode 1 when BG3 highest priority was disabled
+  Render: Restructured the 16x16 tile background plotters
+  Render: Added support for offset change in modes 2 and 4,
+   16x16-tile layers
+  Render: Fixed a bug in the offset-change elimination speed hack
+   (was causing it to sometimes disable offset-change despite it
+   being used)
+  Render: Corrected address wrapping for the vertical offset table in
+   mode 2, fixes WWF Wrestlemania Arcade
+  PPU: Altered background offset register behavior, fixes Theme Park
+   (thanks to anomie and Matthew Kendora)
+  Sound: Changed the behavior of the BRR decoding rate for noise-enabled
+   channels
+  Render: Fixed an OBJ setup bug for large OBJ partially off the left
+   edge
+  GUI: Fixed a bug where the logo wasn't always displayed
+  Logo: Thanks to stainless for providing a new logo!
+ 0.665 [TRAC]
+  Render: Corrected OBJ range limitations (thanks to anomie and Neviksti)
+  Render: Removed BG3 highest priority from mode 0 since it doesn't
+   actually exist (thanks to anomie)
+  Render: Readded mode 7 rendering for the sub-screen
+  SPC700/APU skipper: Added APUI00-APUI03 port mirroring
+ 0.662 [TRAC]
+  Render: Corrected mode 7 EXTBG (priority-per-pixel) emulation
+   (thanks to anomie and Neviksti)
+  PPU: Corrected OAM register emulation (thanks to anomie and Neviksti)
+ 0.66 [TRAC]
+  Sound: Fixed sound DSP key-on behavior
+  Sound: Fixed a memory leak when sound was disabled
+  Sound: Fixed crashes when switching sample sizes
+  Sound: Fixed some issues with 8-bit sound
+  Sound: Overhauled portions of the mixing code
+  Render: Enabled some portions of the tile cache code which should have
+   been already
+  Source: Overhauled the makefile
+  Source: Reorganized background rendering code
+  Render: Added support for offset change in mode 4, 8x8-tile layers
+  Render: Added code to eliminate emulation of offset-change when it
+   is unused
+ 0.653 [TRAC]
+  Sound: Fixed sound<>SPC timing speed, the conditional-compile directive
+   was placed a few lines too late
+ 0.652 [TRAC]
+  Sound: Fixed a sound DSP behavior issue - DSP address bit 7 is
+   significant (was ignored since 0.625), fixes Donkey Kong Country
+   series, others
+ 0.651 [TRAC]
+  Render: Fixed a few cases where a segment register was not properly
+   restored
+  Render: Cache-related optimizations in mode 7
+ 0.65 [TRAC]
+  65c816: Optimizations in flag handling and memory access
+  SPC700: Optimizations in memory access
+  Render: Altered method of decoding 4- and 8-bitplane tiles
+  Render: Altered method of clearing framebuffer
+ 0.641 [TRAC]
+  Source: Removed some debugging code that was no longer needed
+  Source: Removed errors and warnings when compiling under GCC 3
+ 0.64 [TRAC]
+  Render: Simplified/reoptimized mode 7 rendering
+  Render: Corrected depth of low priority sprites in mode 7
+  Timing: Fixed a bug which caused some events to occur one instruction
+   too late
+  Render: Overhauled sprite limitations and priority rotation,
+   fixes Final Fantasy: Mystic Quest, perhaps others
+  SPC700: Optimizations in flag handling
+ 0.63 [TRAC]
+  Render: Reimplemented priority-per-pixel in mode 7
+  Render: Fixed a bug that caused some calculations to be done too
+   often in mode 7
+ 0.625 [TRAC]
+  Sound: Removed some debugging code that was breaking Secret of
+   Evermore
+  Sound: Altered some of the envelope update timings
+  Render: Fixed a mode 7 off-by-one-line bug
+ 0.62 [TRAC]
+  Sound: Fixed severe slowdown when sustain was set to infinite
+  Sound: Fixed severe slowdown with noise
+  65c816: Fixed a crash bug related to WAI instruction
+  Render: Fixed a bug where sprites were not recomputed when highest
+   priority sprite was changed (fixes star sprite test in test ROM)
+  Timing: Changed first non-vblank scanline to 0
+ 0.61 [TRAC]
+  Frameskip: Fixed two bugs in the speed-throttle code: one when speed
+   limiter was disabled (min frameskip > 0), one when fast-forward was
+   used
+  Render: Added code to eliminate emulation of unneeded priorities
+  Render: Reoptimized and overhauled the general structure of mode 2
+   offset change emulation
+  Render: Fixed a bug in mode 7 outside-screen-area clip mode
+  GUI: Fixed the behavior of the FPS counter for FPS > 99
+  GUI: Added a 'rendering break' counter - tells how many times the
+   delayed renderer is forced to synchronize rendering in the last frame
+  GUI: Modified the keyboard handling to solve stability issues caused
+   by a problem in the DJGPP/Allegro code - GUI is again enabled by
+   default
+  Sound: Fixed the register behavior of disabled voices
+  Sound: Fixed sample looping when loop position changed
+  Sound: Improved performance of sound generation
+  Sound: Added option to allow generation of 8-bit output samples,
+   and a GUI option to toggle sample size
+  Sound: Added a config file option to select the Allegro mixer mode
+  Configuration: Added 320x240x256 VESA2 screen mode as mode 8
+ 0.60 [TRAC]
+  Render: Fixed a bug in mode 7 vertical-flip
+  Render: Rewrote sprite rendering again - improves speed
+  Configuration: Restructured config file
+  Render: Added independent horizontal/vertical stretch options
+  Source: Now linking with Allegro 3.9.34
+  DMA: No longer preventing HDMA register from being written to during
+   display - fixes some graphics glitches in Chrono Trigger
+  PPU: No longer allowing writes to VRAM and OAM outside v-blank,
+   force-blank
+  PPU: No longer allowing writes to CGRAM outside v-blank, h-blank,
+   force-blank
+  65c816: Modified cycle counter and wait-for-interrupt emulation
+  Timing: Improved 65c816<>SPC700 timing slightly
+  GUI: GUI is now by default DISABLED because of instability - those who
+   still wish to bear with it can enable it via a commandline switch
+  Commandline: Added several new configuration switches
+ 0.55 [TRAC]
+  Sound: Many changes to volume envelope timing
+  Sound: Corrected synchronization of sound mixing and volume envelope
+   generation
+  Sound: Implemented noise generation
+  Sound: Changed sound to use a double-buffering method - sound may
+   skip on slower systems
+ 0.53 [TRAC]
+  65c816: Fixed a bug in the MVP/MVN opcodes that could seriously
+   disrupt timing (fixes Final Fantasy: Mystic Quest)
+ 0.52 [TRAC]
+  Stability: Fixed a serious bug in the tile decoder that has caused
+   crashes since the decoder was rewritten in 0.40
+  Timing: Corrected an error in the CPU timing
+  Interface: Added a fast-forward key (tilde)
+ 0.51 [TRAC]
+  Render: Fixed a bug that caused some sprites to be corrupted
+ 0.50 [TRAC]
+  65c816: Completed the memory mapper changes started in 0.49
+  Source: Moved some debugging-related code into its own file
+  Source: More source cleanup
+  Stability: Fixed bugs in SRAM loading/saving (files opened weren't
+   being closed) - appears to have fixed the last of the exit crashes
+  Config: Changed the default save RAM file extension to SRM, and
+   removed support for the old 'frameskip' setting in the config
+   file
+ 0.49 [TRAC]
+  Render: Implemented BG3 highest priority in mode 0
+  Render: Corrected wrapping from end of tilesets
+  GUI: Now uses standard keyboard controller auto-repeat
+  Interface: Emulation no longer pauses when pressing certain keys
+   (ESC to go to GUI, F1-F8 to toggle sound channels, 1-8 to change
+   render options, 0 for screenshot)
+  65c816: More changes to the memory mapper, for speed, accuracy, and
+   allowing execution of code from SRAM (does anything use this?)
+ 0.48 [TRAC]
+  Source: Ported the sprite decoder/plotters to NASM
+  Source: Ported the background layer decoder/plotters to NASM
+  Source: Ported the hardware port handlers to NASM
+  Render: Removed a sprite 'fix' I put in back in 0.47 - did nothing
+   except slow things down
+  Display: Removed an unnecessary part of the screen mode setup code
+  Render: Fixed a bug that caused sprites to be disabled when mode 7
+   layer was disabled
+  Memory map: Added support for the special memory map used by
+   Rock Man X and Mega Man X (allows uncracked ROMs to work properly)
+ 0.472 [TRAC]
+  Source: Ported the tile decoder/plotters to NASM
+  Startup: Pulled out some debug code that caused the emulator to
+   silently wait for a keypress at startup
+ 0.47 [TRAC]
+  GUI: Extended the width of the Load ROM window (per request)
+  Source: Ported the mode 7 emulation to NASM
+  Display: Tweaked with the 256x239x256 setup code - appears to have
+   been causing problems under some conditions
+  Config: if it can be detected that a full path was supplied to start
+   the emulator, it will now force the current directory to that path
+   (temporary fix for Windows Explorer drag-and-drop startup until I
+   do it a more elegant way) - ensures SNEeSe can find its .cfg and .dat
+   files
+  Config: Fixed some of the defaults used when a config file isn't
+   present
+ 0.46 [TRAC]
+  GUI: Fixed a few bugs that didn't allow the mouse to be enabled/used
+  Source: Ported the DMA emulation to NASM
+  Timing: Fixed a source inconsistency bug which could cause
+   unpredictable SPC timing
+  CPU: Altered the main memory mapper, should be faster than before
+  Source: Ported the SPC700 CPU core to NASM
+  65c816: Went back to more accurate stack operations in native mode
+  Source: More cleaning up under the hood
+  Render: Now clearing lines between actual end of display and maximum
+   end of display
+  Stability: Changed the way the internal render surface is transferred
+   to the display - appears to have fixed the crashes during exiting
+   that have been around since 0.43
+ 0.45 [TRAC]
+  Sprite: Fixed sprite intermediate render buffer clearing -
+   fixes garbage sprites in Bill Laimbeer's Combat Basketball, probably
+   others
+  Source: Fixed source to compile with and now compiling with
+   GCC 2.95.2, Allegro 3.9.32 WIP
+  NOTE: All keymaps set in cfg files from previous versions are
+   incompatible, and must be reset!
+  Stability: No longer using GCC asm labels, as GCC doesn't seem to be
+   handling them correctly causing stability problems
+  Stability: Wasn't always setting es register up for string instructions,
+   fixed
+  DMA: Now updating DMA transfer size after PPU->CPU DMA
+  Timing: Made several changes to improve IRQ function - fixes SF2
+   Turbo, New Ninja Warriors, probably others
+  Source: Ported the 65c816 CPU core to NASM
+  Stability: Noticed I wasn't locking a var used in interrupt context,
+   fixed
+  Allegro: Disabled Ctrl-Alt-End/Ctrl-Break exiting until I can figure
+   out why they sometimes restart my computer under Win95
+  Timing: Changed the way CPU cycle counts are translated into SPC
+   cycles - should allow for closer CPU<>SPC synchronization
+ 0.441 [TRAC]
+  APU skipper: Fixed a nasty bug that caused the emulator to crash
+   upon entering the GUI if the APU skipper was enabled
+ 0.44 [TRAC]
+  Render: Implemented correct sprite priorities (helps MANY ROMs:
+   Chrono Trigger, Super Mario Allstars, Terranigma to name a few)
+ 0.43
+  Logo: Thanks to neptron (http://ciot.pair.com/neptron/) for providing
+   a new logo! [neptron]
+  Disclaimer: Updated the disclaimer with more information on how
+   SNEeSe may and may not be distributed [TRAC]
+  Render: Wasn't resetting deinterleaved VRAM during Reset, now doing so
+   (combined with resetting VRAM to 0, fixes missing tile on ActRaiser
+   mode7 logo) [TRAC]
+  PPU: Implemented delay-by-one-word read, from SNES'9X
+   (was hoping it would fix Captain America... no luck) [TRAC]
+  ROM loader: Added support for split ROMs (*.1) [TRAC]
+  GUI: Fixed the controller configuration window (joypad pic was missing)
+   [TRAC]
+  Render: Fixed an offset change map address computation bug;
+   helps vertical offset change in mode 2 (Tetris Attack looks much better)
+   [TRAC]
+  Render: Added tile priorities to offset change enabled mode 2
+   (helps Art of Fighting) [TRAC]
+  Render: Implemented priority per pixel in mode 7 (helps F1 Grand Prix)
+   [TRAC]
+  Render: Fixed a possible offset change map address wrap bug [TRAC]
+  Render: Added horizontal scrolling support to mode 2 offset change
+   renderer [TRAC]
+  Render: Added screen size support to offset change map in mode 2
+   offset change renderer (fixes Chrono Trigger menus!) [TRAC]
+  Render: Added horizontal offset change to mode 2 offset change renderer
+   [TRAC]
+  Sound: Implemented custom mixer - improves sound greatly in most cases
+   [Brad Martin]
+  HDMA: Implemented HDMA-start-within-frame (fixes Killer Instinct)
+   [TRAC]
+  Render: Changed the way the internal bitmap is stored/handled
+   (helps mode-X speed, allows screenshots in linear VGA modes) [TRAC]
+  GUI: Worked on the Load ROM interface a bit - '.' dir is now excluded,
+   directories are updated in their entirety (not one window at a time),
+   sorting is done (both in names, and in types - files are at the top,
+   followed by dirs, then drives) you can use the HOME and END keys now,
+   and drive switching can be done (A:-Z: are listed at the far bottom)
+   -note: for directories larger than 998 entries, only the first 998
+    entries will be read! [TRAC]
+  Sound: Now allowing ENVX (envelope height) reading to be disabled in
+   the GUI (helps Bomberman series) [TRAC]
+  Sound: Fixed a bug that allowed the sound code to be used when the
+   SPC was disabled [TRAC]
+  Sound: Hacked in a fix to prevent some ROMs (Bill Laimbeer's Combat
+   Basketball) from crashing the emulator [TRAC]
+ 0.41
+  Render: Added 3-way layering order cycle, press 8 key [TRAC]
+  Timing: Made a few tweaks that may improve IRQ timing [TRAC]
+  Sound: Implemented cycle-exact ADSR calculation, this fixes or improves
+   sound on some things (Rampart), worsens on others [Brad Martin]
+ 0.40 [TRAC]
+  65c816: Fixed a bug that could cause WAI to miss a waiting IRQ
+  Source: Many changes to reduce repetition in 65c816/SPC opcodes
+  65c816: Made a few improvements to the register allocation
+  Sound: Fixed a possible buffer underrun bug
+  PPU: Went back to the old VRAM read method - 'VRAM read buffering'
+   might make more sense, but it doesn't work well with ActRaiser...
+  PPU: Fixed a bug in VRAM full address increment (untested...)
+  Render: Completely changed the tile caching method
+  DMA: Made a few slight changes to the DMA/HDMA emulation
+  Timing: Rewrote event handling, now using more correct timing for
+   rendering and HDMA
+  Timing: Implemented pre-NMI delay (fixes Chrono Trigger intro freeze)
+  Timing: Fixed controller ready bit in HVBJOY (fixes Chrono Trigger
+   combat slowdown and combat menu flickering)
+    Thanks to Neill Corlett for info!
+  Timing: Implemented much more correct H-IRQ timing, should also allow
+   multiple H-IRQ's on a scanline
+  Source: Ported some of the source from GNU-AS (GAS) to NASM
+   (memory mapper, APU skipper, special screenmode setup)
+  Joypad: No longer reporting parodoxical inputs - up and down can
+   no longer be pressed at the same time, nor can left and right
+   (fixes a potential problem in Zelda 3 name entry)
+  SPC700: Now updating SPC timers at least once every Vblank
+  SPC700: Fixed a major bug that caused the SPC to freeze after about
+   17.5 minutes of virtual execution
+ 0.371 [TRAC]
+  Config: Added save directory support (must be set manually in cfg file,
+   read the config file section of the readme for info)
+ 0.37
+  PPU: Modified the way VRAM read is done - now uses 'VRAM read
+   buffering' which makes MUCH more sense, thanks to Ben Parnell
+   of FCE Ultra (NES emulator) for info! [TRAC]
+  Sound: Made a few improvements to the sample decompression routines
+   [TRAC]
+  Sound: Figured out why Soundscape cards weren't getting any sound
+   and told Allegro to put the drivers in [TRAC]
+  Sound: GUI should now be quiet on more cards [TRAC]
+  CPU: Completely redid CPU opcode timing tables - thanks to Neill
+   Corlett for better timing info! [TRAC]
+  CPU: More improvements to the execution loop [TRAC]
+  HDMA: Removed some unnecessary code that was in since the last rewrite
+  Source: Removed an erroneous extra line in one file [TNSe]
+  Source: Added a kludge in many files to work around the DJGPP linker's
+   lack of object file alignment [TRAC]
+  SPC700: Changed flag format conversion to use lookup tables [TRAC]
+  65c816: Fixed a few bugs related to the Break flag in emulation mode
+   (allowing Break flag to be cleared, Break flag set on stack after NMI)
+   [TRAC]
+  65c816: Simplified stack operations [TRAC]
+  PPU: Fixed a bug that caused CGDATAREAD to be disabled [TRAC]
+  Commandline: Added support for video standard forcing (-fvp to force PAL,
+   -fvn to force NTSC) [TRAC]
+ 0.36 [TRAC]
+  CPU: Timing base changed
+  CPU: Redid the FastROM support, improving speed in cycle counting
+  IRQ: Improved IRQ support (IRQs were being ignored in Vblank before,
+   fixed)
+  PPU: Improved joypad hardware emulation ('automatic read' timing)
+  SPC: Improved speed in opcode fetcher, some source changes
+  SPC: Now only resync'ing on CPU-SPC communication and on the start
+   of Vblank (when sound update is done), doesn't appear to worsen
+   anything and improves speed
+  Other: Redid some of the debug dump from when the emulator exits
+ 0.35 [TRAC]
+  SPC: Many more optimizations and some source cleanup
+  SPC: Fixed yet another bug in the CPU-SPC cycle calculation code -
+   caused Reset to cause 'unpredictable behavior' when the SPC was enabled
+ 0.34 [TRAC]
+  Render: Slight tweaks inside the renderer, including a modification
+   to the back area color addition hack
+  Render: Implemented mosaic effect (vertical direction only)
+  Render: Major tweaks to the vertical offset change support in mode 2 -
+   still not correct but appears better
+ 0.33 [TRAC]
+  SPC: Fixed a very stupid, nasty bug that showed up in 0.26, that
+   caused the DIV YA,X opcode to corrupt the stack pointer
+  Sound: Fixed a bug that caused the sound driver not to be installed
+   if a ROM filename was not specified on the command line
+ 0.32
+  Sound: Fixed some problems that caused sound generation to be used
+   when sound was disabled [TRAC]
+  SPC: Fixed a bug that caused SPC timers to lose cycles in conditional
+   branches [Brad Martin]
+  SPC: Now allowing SPC timer targets to be set when timer is enabled
+   as it seems to fix other timing problems [Brad Martin]
+  Render: Fixed some problems with layers using 16x16 tiles having
+   small virtual screens [TRAC]
+ 0.30
+  GUI: Fixed yet another small GUI bug [TRAC]
+  Joypad: Tore out the old joypad code [TRAC]
+  Allegro: Now linking with Allegro 3.11, should fix some sound card
+   incompatibilities [TRAC]
+  SPC: Bug fixes in 4 SPC opcodes, and a serious bug in the SPC CTRL
+   register fixed, AND a new sound DSP/sound generation core
+   (Compatibility noticably improved!) [Brad Martin]
+ 0.277 [TRAC]
+  SPC: Fixed timer 2 to be a 64kHz timer - had mistakenly made it 8kHz
+   in the rewrite
+  SPC: Fixed some bugs in the sound DSP, that could have potentially
+   caused memory overwrite
+ 0.276 [TRAC]
+  APU skipper: fixed a nasty bug that showed up in (and went unnoticed
+   since) 0.27, caused severe SNES timing problems
+  GUI: Fixed a bug causing the CPU Reset to freeze up when the SPC is
+   enabled after it having been disabled during execution
+ 0.275 [TRAC]
+  SPC: Many more optimizations to opcode fetcher
+  SPC: Implemented TCALL instruction
+ 0.27 [TRAC]
+  SPC: More optimizations
+  SPC: Completely rewrote SPC timers - fixes some SPC problems and sound
+   playing too fast or slow
+  SPC: Forcing SPC to 'catch up' once per 65816 'scanline' time period,
+   may clear up more sound quirks (until sound generation code can be
+   rewritten)
+  Timing: Vblank timing adjusted slightly
+ 0.26 [TRAC]
+  HDMA: Fixed a bug where the transfer size for the first line of a set
+   was corrupted
+  HDMA: No longer repeats write to register for continue mode
+  IRQ: Put in a better H-IRQ hack, until I do the timing
+  Render: Palette is set for highest brightness in the frame (helps
+   Chrono Trigger, SF2 series, others), thanks to an anonymous
+   contributor for help
+  Timing: Hblank timing code simplified
+ 0.251 [TRAC]
+  Render: Fixed the back color add hack (Mario World blue sky, others)
+   that got broke somewhere along the way.
+  Source: Fixed some problems in the makefile that gave some users
+   trouble rebuilding.
+ 0.25 [TRAC]
+  CLI: Implemented a basic commandline interface, providing a means to
+   override ROM loader autodetection
+  Released to the public!
+ 0.25b17 [TRAC]
+  Timing: Reworked how Hblank is handled
+  SPC: Now forced to 'catch up' once a frame, solves the 'lags' and
+   improves sound overall
+ 0.25b16 [TRAC]
+  SPC: Source cleanup, general optimization (register allocation needs
+   more improvement), a few more fixes
+  DMA: Fixed a bug where DASL/DASH was not being reset to 0 after general
+   DMA transfer (thanks to ESNES and Trepalium for pointing me to DMA -
+   F-Zero is fixed!!!)
+  Render: Fixed a stupid, nasty, bug in the new sprite code
+ 0.25b15 [TRAC]
+  GUI: Fixed another bug with changing SPC enable (menu item wasn't changed)
+  Render: More changes to sprite render code
+  PPU: Slight change to 16x8 multiply
+  PPU: Fixed the emulation of the RDNMI register/timing - thanks to
+   archeide of SNEmul for pointing me in the right direction!)
+  65816: Fixed the write order of some instructions
+  SPC: Now treating SLEEP and STOP as invalid opcodes for debugging purposes
+   (is there any point in emulating these, similar to the 65816's STP?)
+  SPC: Fixed part of the SPC register dump
+  SPC: Implemented hidden 64 bytes of RAM at top of SPC address space
+ 0.25b14 [TRAC]
+  Fixed a bug in the GUI with changing SPC/sound enable
+  Added a FPS counter - it works, unfortunately you can't always see it...
+   must be enabled in the GUI
+ 0.25b13 [TRAC]
+  Reversed plot order back to the way it used to be before 0.16 - another
+   speed increase (doh!)
+ 0.25b12 (unreleased) [TRAC]
+  Implemented deinterleaved VRAM storage and a new mode 7 renderer:
+   VRAM is now also stored as 32k low bytes and 32k high bytes. This has
+   minimal effect overall but may provide a mode 7 speed increase, in
+   particular for low-end systems (486)
+  Fixed a bug where disabling mode 7 also disabled sprites
+  More layering priority fixes in modes 2-6
+  Altered the 256x240 mode to get rid of a lot of the excess border
+  Reduced the 256x240 mode to 256x239
+  Modified the way screen modes are handled with the GUI
+  More tweaking with DMA/HDMA emulation
+ 0.25b11 [TRAC]
+  Tweaked with the screen core a bit, removing a lot of redundant code
+  Improved the header detection in the ROM loader (thanks to Gridle for the
+   suggestion)
+  Modified the way frameskipping is handled
+ 0.25b10 [TRAC]
+  Tweaked with the controller code a bit - now DKC and Mario All Stars
+   work as expected
+ 0.25b9 [TRAC]
+  Fixed a bug in VRAM read ports - they were suggested by zsKnight as a
+   likely cause of gfx corruption, and making a change to match a noticed
+   difference in the '9X source, gfx corruption went away in the following
+   ROMs, and likely others: ActRaiser, FF2, Super Metroid, Wario's Woods...
+  Fixed a stupid bug that showed up in 0.25b8 that stopped FF2 from starting
+  Several layering priority fixes
+ 0.25b8 [TRAC]
+  Removed H-IRQ hack as it was causing more problems than it helped
+  Implemented partial support for delayed IRQ
+  Implemented a hack in WAI which causes the CPU timing to skip ahead to the
+   next event
+  Some SPC optimizations
+  Another doc was wrong: increased SPC RAM back to 64k, sound is back to
+   being reasonable (timing is still terrible)
+ 0.25b7 [TRAC]
+  More CPU speed-ups
+  Hooked SPC back up with on-demand execution, however sound is not
+   considered a 'demand', and SPC is slow and buggy still.
+ 0.25b6 [TRAC]
+  Layering priority fix: BG3 highest priority in mode 1 - BG3 high priority
+   tiles now drawn over highest priority sprites, not under (helps Mario
+   World map)
+ 0.25b5 [TRAC]
+  Fixed a bug in full VRAM address increment
+  Fixed a bug that sometimes caused Reset to freeze emulator
+  Fixed mode 7 outside-screen-area clip/char 0 repeat - it appears that
+   two docs were wrong on this...
+  Native mode XCE no longer forces M/X bits set
+  Now always keeping 65c816 flags in a register during opcode execution
+  More source reorganization
+ 0.25b4 [TRAC]
+  Fixed a bug in scrolling hardware ports
+  Rewrote more opcodes to take better advantage of new opcode fetcher
+ 0.25b3 [TRAC]
+  Implemented alternate 65c816 opcode fetcher (should be considerably
+   faster - original one likely to be removed in the future)
+  Implemented interleaved HiROM support in ROM loader
+ 0.25b2 [TRAC]
+  Finished hooking in last of new horizontal calc code
+  Slight speed-up tweak in 65c816 emulation
+  Fixed a nasty bug that showed up in 0.25b1 that caused severe gfx
+   corruption in at least one ROM (ActRaiser)
+ 0.25b1 (doh! date in readme said 4-3, should have said 23-3) [TRAC]
+  Rewrote horizontal scrolling calc code to reuse data
+  Reworked some of the tile cache invalidate tables/recaching code to
+   store information on certain special cases of tiles to limit some
+   unnecessary checks
+  Implemented OAM decode caching - this increases sprite rendering speed
+   noticably - more optimizations possible here...
+ 0.17b7 [TRAC]
+  Fixed data store method of double write registers (BG scroll, M7 matrix)
+  More speed up tweaks in memory mapper and screen core
+  Fixed a bug in HDMA code - fixes GPFs after fights in FF5, extra
+   sprites in TMNT4 and missing sprites in Killer Instinct
+  Disabled DJGPP LFN support (was causing problems in the Load ROM file
+   selector in the GUI, because it's still expecting 8.3 filenames)
+   Thanks to Lanice for pointing out the crashing! (doh)
+  Rewrote a lot more bits of the GUI to use OOP and allow more advanced
+   features to be implemented in the future
+  Compiling in two new fonts: the font from ZSNES (thanks zsKnight!),
+   and a slightly cosmetically modified version of the same
+   (only the modified font is available in the GUI at this time)
+ 0.17b6 [TRAC]
+  More internal work on GUI
+  Fixed a bug in mode 1 background priorities with BG3 high priority
+   enabled - helps intro in FF5
+  Oops! Removed some code that shouldn't have been in b5 - was causing
+   the ROM loader to create a test file the size of the loaded ROM
+  Fixed a bug that caused the color subtraction in back area hack to
+   kick in sometimes when it shouldn't
+ 0.17b5 [TRAC]
+  Fixed a bug in the ROM loader that caused it to get in an endless loop
+   on ROMs that weren't an even multiple of 32k (excluding header)
+  Fixed a bug that prevented HiROM SRAM from working AND allowed it to
+   overwrite other memory
+  Implemented SRAM mirroring in HiROM
+  Reduced SRAM allocated to 64k and SRAM supported in HiROM to 64k
+  Changed the value certain areas of RAM were initialized to to closer
+   match SNES '9X
+  Changed memory mapper so LoROM/HiROM shared more code/data
+  ROM loader: replaced the fstream code with stdio code - this seems to
+   fix the problem with 32k ROMs not loading correctly
+ 0.17b4 [TRAC]
+  More work on background plotting speed, hw port emulation speed/accuracy
+  SPC disabled - stopped working sometime between b2/b3 and needs to be
+   rewritten anyway
+  More CPU speed
+  Fixed many non-emulation related bugs that caused crashes in pure DOS,
+   and forced the switch to WDOSX before
+  Reverted to standard DJGPP stub now that WDOSX is no longer necessary
+  More fixes to LoROM SRAM mapping - SNES '9X source and one problematic
+   ROM provided insight into the workings of SRAM mirroring
+  Improved emulation of CGDATA/CGDATAREAD:
+   now use seperate vars for odd byte reads
+  DMA modes 2+ had been disabled for some strange reason (doh!) - fixed
+ 0.17b3 [TRAC]
+  Now using WDOSX, because of having too many problems with the standard
+   DJGPP stub
+  Moved plenty of code around in gfx engine for potential speed increase
+   and code size reduction
+  Most data moved around in hw port emulation
+  Most hw ports now reset in Reset (used in 'Reset Emulation' and
+   'Load ROM' in GUI) - some still remain (especially in SPC)
+  More work on ROM loader
+  Can now go in GUI without specifying ROM on command line, however trying
+   to load a ROM in GUI is still painful!
+ 0.17b2 [TRAC]
+  Simplified hardware ports in memory mapper
+  Improved emulation of OPHCT/OPVCT
+  Statically allocating SRAM, WRAM, VRAM, SPC address space, OAM now
+  Improved emulation of OAMDATA/OAMDATAREAD:
+   now use seperate vars for odd byte reads
+  Fixed a bug where 8 bytes too few were being allocated for OAM
+  SRAM allocation halved (only 128k now)
+  LoROM: SRAM supported reduced to 64k, writes prevented if ROM says less
+   exists (allows Puzzle Bobble to start)
+ 0.17b1 [TRAC]
+  Implemented speed throttling (thanks to Richard Mitton of the New
+   Zealand Story Emulator for help with this!)
+  GUI overhaul begun ('3D' appearance added, code is becoming more object
+   oriented)
+  CFG handler rewrite begun
+  Source cleanup/overhaul begun
+  LoROM 16+Mbit and HiROM memory maps fixed (thanks to zsKnight for help!)
+  Implemented Hblank emulation/CPU timing (thanks to zsKnight and the '9X
+   source for help and info!)
+  Fixed emulation of SLHV register (thanks to '9X source for info!)
+  Fixed SPC memory map to only have 32k of RAM
+  Fixed a few CPU opcodes
+  Fixed a memory overwrite bug in a few CPU opcodes which caused the
+   emulator to deconfigure controller keymaps
+
+ 0.16f: Various bug fixes and speed-ups.
+

@@ -1,0 +1,32 @@
+PLATFORM := unix
+
+# Unix/Linux
+
+
+# How to call the tools we need to use
+
+NASM   := nasm -w+orphan-labels -w+macro-params -O3 -DUNIX
+GCC    := gcc -Werror -Wall -Wno-deprecated -DUNIX
+# GCC of DJGPP and Cygwin defines unix, __unix__ and __unix.
+RM     := rm -f
+MD     := mkdir
+
+
+# Default filename extension for executables
+EXE_EXT :=
+
+
+# How to inform the linker of libraries we're using
+
+ALLEG  := `allegro-config --shared`
+
+
+# Set up build for this platform.
+
+SUFFIX :=
+AFLAGS := -f elf
+GXX    := g++
+NO_SELF_MODIFY := 1
+
+
+include makefile.all

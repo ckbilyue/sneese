@@ -1,0 +1,580 @@
+
+The SNES emulator with the extra e's...
+
+        SSSSS   NN    NN  EEEEEE           SSSSS
+       SS   SS  NNN   NN  EE              SS   SS
+        SS      NNNN  NN  EE       eeee    SS       eeee
+         SSS    NN NN NN  EEEEE   ee  ee    SSS    ee  ee
+           SS   NN  NNNN  EE      eeeeee      SS   eeeeee
+       SS   SS  NN   NNN  EE      ee      SS   SS  ee
+        SSSSS   NN    NN  EEEEEE   eeee    SSSSS    eeee
+
+                                            v0.779 (Public BETA)
+                                            xx March 2003
+
+  Please read the license (LICENSE file) before using or distributing
+   SNEeSe in any way!
+
+  This release is dedicated to Lord_Nightmare and MKendora, for bugging
+   me to attempt porting of SNEeSe...
+
+  THIS IS NOT SHAREWARE NEVER HAS BEEN...ITS FREE AND SHOWS ;-)
+
+- In memory of the Emu News Service/Emu News World, which served as a strong
+  backbone for emulation, and will not be soon forgotten...
+                                        http://www.emunews.net/
+
+NOTE:
+ This release has SPC emulation, it may get some ROMs to work that would
+  not with APU skipper.
+ This release also has sound, but the sound may be unstable.
+  Send critical bug reports (this is, report only the ROMs that crash the
+  emulator) to: esaelon@users.sourceforge.net
+ Please list the ROM, ROM filename, the settings you were using in the
+  emulator, when it crashed, etc. Thanks for the help!
+
+Credits
+"""""""
+New development
+Core & DOS/Win32 Port Developer/Maintainer
+ Charles Bilyue'    (TRAC)      esaelon@users.sourceforge.net
+Unix/Linux/BeOS Port Developer/Maintainer
+ Daniel Horchner                dbjh@gmx.net
+Assistant Developer (Sound system emulation)
+ Brad Martin                    bmartin@umr.edu
+                                http://home.gvi.net/~martin
+New logo
+ stainless
+
+Old logo
+ neptron                        http://ciot.pair.com/neptron/
+
+Allegro library                 http://alleg.sf.net/
+
+Former SNEeSe team
+Project founder
+ Lee Hammerton      (Savoury SnaX)
+Original logo
+ Windwalker
+GUI improvements, testing
+ Santeri Saarimaa   (Gridle)
+Assistant developer
+ Charles Bilyue'    (TRAC)
+Sound system emulation
+ Lee Hammerton      (Savoury Snax)
+ Brad Martin
+ archeide
+
+ Shawn Hargreaves & Co. - Allegro library!
+
+
+- Thanks, Greets, and News moved to end of file
+
+
+Also try:
+ FakeNES, a CVS open-source portable NES emulator in POSIX C with builds
+  available for DOS, Win32-DirectX and Linux, by stainless, RobotBebop,
+  TRAC, and Lord_Nightmare.     http://fakenes.sourceforge.net/
+
+
+System Requirements
+"""""""""""""""""""
+Here is a rough guide to the things you need to run this emulator:
+
+ - A 486 or better CPU.  Preferably better, as SNES emulation is
+    computationally intensive, involving at least two CPUs, a
+    complex audio DSP and complex video hardware.
+
+ - Roughly 4-8 MB of memory free, dependant on ROM size.
+
+ - Some SNES ROM images to try out. I will NOT give images due to ethics
+    and copyright laws. Don't waste our time asking.
+
+-- DOS --
+ - A PC running MS-DOS or Win9x (95/98/ME).
+
+ - VGA-compatible graphics card capable of mode 13h for the following
+    8-bit display modes:
+     320x200
+     320x240 Mode-X - 256x239
+ - SVGA graphics card (either with native VESA 2 support, or with a driver
+    providing VESA 2 support, such as UniVBE or Scitech Display Doctor)
+    for the following display modes:
+     8-bit using linear framebuffer
+      320x240
+     16-bit using linear framebuffer
+      320x200        - 320x240
+      640x480
+   Note that the 16-bit modes are slower and there is currently no
+    advantage to using them!
+
+ - A reasonable monitor (if you want to use the 256x239 or Mode-X modes!).
+
+ - A sound card from the following list for sound output (compatible cards
+    may work):
+    Ensoniq Soundscape;
+    ESS AudioDrive;
+    Sound Blaster (SB1.0, SB1.5, SB2.0, SB Pro, SB Pro 2.0, SB16);
+    Windows Sound System.
+
+
+-- Win32 --
+ - A PC running 32-bit Windows (Win9X/ME/NT/2K/XP, etc.), with
+    DirectX 5 or above.
+ - A video adapter with DirectX-compatible drivers.
+ - A sound output device with DirectX-compatible drivers, for sound output.
+
+
+-- Linux/Unix --
+ - A PC running X (windowing system), with Allegro 4.0 or above.
+ - A video adapter compatible with X; improved performance may be achieved
+    by having DGA(2) support and the necessary privileges to access it.
+ - A sound output device compatible with OSS, ESD, or ALSA, for sound
+    output.
+
+
+-- BeOS --
+ - A PC running BeOS R5 PE, with Allegro 4.1 or above. Other versions of BeOS
+    might also work.
+ - A video adapter supported by BeOS.
+ - A sound output device supported by BeOS.
+
+
+The config file
+"""""""""""""""
+ A config file is used so SNEeSe remembers what state it was in when the
+user quit. It can be edited with a text editor for those interested, but
+most options can be changed inside the GUI, with less hassle...
+
+ If you want to change the standard .SRM extension for Save RAM files
+(perhaps to prevent corruption of saved files, in case of bugs) simply
+edit the SNEeSe.CFG file with a text editor and change the line:
+
+saveextension=SRM
+
+to
+
+saveextension=RAM
+
+to use the .RAM extension, for example.
+
+ If you want to use a fixed save directory for your Save RAM files instead
+of the same directory of the ROM (to keep all your ROM directories from
+getting cluttered, and to be able to use Save RAM with ROMs on read-only
+media such as CD-ROM), edit the SNEeSe.CFG file and add the line:
+
+savedirectory=D:\SRAMDIR\
+
+replacing 'D:\SRAMDIR\' with the save directory you wish to use.
+The directory specified MUST exist - if not, it will not be created,
+and SRAM loads and saves will simply fail without warning.
+(note: the trailing slash is not required and may be omitted)
+
+The GUI
+"""""""
+ The GUI can be opened by pressing ESC during emulation. From here you
+can RESUME emulation, RESET the emulation, LOAD a new SNES ROM into
+the emulator, setup some CONFIGURATION options (see below), get various
+infos about the loaded ROM and current emulated hardware state, and EXIT
+the emulator. Pressing ESC while in the GUI closes the current window,
+if the last window is closed, emulation resumes. To move the bar use the
+cursor UP/DOWN controls, to choose an option press ENTER (either one
+will do).
+
+In the file loading window:
+ PAGE UP and PAGE DOWN allow you to travel through the listing a window
+  at a time;
+ HOME will go to the top of the list;
+ and END to the bottom of the files/directories (first press),
+ then to the bottom of the drives (second press).
+
+There is no exclusion by extension, and no jump-to-pressed-letter in
+the file loader yet, and LFNs are truncated... sorry, but will fix
+all of these soon!
+
+ The CONFIGURATION menu allows you to change some features of the
+emulation as follows:
+
+  ???x???x???              - The first option in the list will
+                             show the current emulation resolution.
+                             When you press ENTER a window will open
+                             allowing you to choose a new resolution.
+                             If the resolution cannot be set, it will
+                             revert to standard 320x200x256 mode.
+
+  Min Frameskip: ?         - You can modify the amount of frames to
+  Max Frameskip: ?           skip by pressing left or right arrow.
+                             Default is 4 for maxframeskip (show at least
+                             every 4th frame), 0 for minframeskip.
+
+   Max Frameskip sets the maximum number of frames that will be skipped
+    before a frame is drawn.
+   Min Frameskip sets the number of frames that will always be skipped before
+    a frame is drawn. a min skip of 0 tells SNEeSe to wait for at least one
+    timer tick (50/60Hz) to have passed before emulating a frame (to slow
+    down machines that are running too fast)
+   Min Frameskip will never be above Max Frameskip. In the config file,
+    'maxframeskip' has precedence over 'minframeskip'.
+   Setting Min Frameskip and Max Frameskip to the same number effectively
+    disables all speed-throttling.
+
+  Keyboard on player 1     - This option toggles joystick or keyboard
+                             mode for controller 1. Now toggles to
+                             mouse support, in mouse mode joypad will
+                             still function using keyboard controls.
+
+  Keyboard on player 2     - This option toggles joystick or keyboard
+                             mode for controller 2.
+                             Only 1 joystick/joypad is supported,
+                             don't map it to both unless you want
+                             mirrored controls for some reason...
+                             Also toggles to mouse support.
+
+  Define keys for player 1 - This option lets you redefine the
+                             keys for controller 1. Since version 0.15
+                             this has been done through the GUI, it
+                             shows a nice picture of the SNES joypad
+                             and asks the keys. You can press ESC
+                             anytime to stop redefining.
+
+  Define keys for player 1 - This option lets you redefine the
+                             keys for controller 2.
+
+  Emulate SPC              - Toggle SPC emulation/skipper. SPC emulation
+  Skip SPC                   must be enabled with below option for sound.
+
+  Configure Sound          - Brings up the SOUND CONFIGURATION menu.
+
+  FPS counter: on or off   - Toggles the on-screen FPS counter in the
+                             top-right corner of the screen (note:
+                             this counter is sometimes difficult
+                             or impossible to see).
+
+ The SOUND CONFIGURATION menu allows you to change some features of
+the sound emulation as follows:
+
+  Sound Enabled            - Enable/disable sound output when
+                             emulating the SPC.  Also used to select
+                             mono or stereo emulation.
+
+  Sample Size              - Select sample size of samples output by
+                             audio emulation (8- or 16-bit).
+
+  Echo/FIR filter          - Toggles emulation of the SNES audio echo
+                             and its corresponding FIR filter.
+
+  Gaussian filter          - Toggles emulation of the 4-point pitch-
+                             regulated gaussian interpolation of
+                             sample data.
+
+  ENVX reading             - Toggles reporting of current ADSR/GAIN
+                             volume envelope heights to sound CPU,
+                             in case some ROM has a problem with it.
+
+
+Readme or don't bother e-mailing me
+"""""""""""""""""""""""""""""""""""
+When you attempt to use a ROM you should take note of any information
+displayed on the screen. For instance, if a ROM just bombs back to DOS,
+and all the information displayed looked like rubbish, the ROM image
+format may not be supported by the emulator (split ROMs, certain
+interleaved ROMs, certain memory maps), the ROM may be corrupted,
+or the ROM may have hit a bug in the emulator.
+
+To start the emulation, type SNEESE and then the file name of the ROM to
+load, or with no filename to go straight into GUI (you can load a ROM from
+the GUI, but it's painful!)
+
+SNEESE thisrom.smc
+
+You may also try any combination of the following switches:
+Memory map:
+ -fl  Force LoROM memory map
+ -fh  Force HiROM memory map
+ROM format:
+ -fi  Force interleaved ROM (only supported for HiROM)
+ -fn  Force non-interleaved ROM
+Copier header:
+ -h   Force ROM copier header
+ -n   Force no ROM copier header
+Video standard:
+ -fvp Force PAL video standard
+ -fvn Force NTSC video standard
+Audio output:
+ -ds  Disable sound
+ -s   Enable sound (stereo)
+ -sm  Enable sound (mono)
+Video output:
+ -m#  Set screen mode
+  Available screen modes:
+ DOS:
+   0:320x200x256 VGA       1:320x240x256 VESA2     2:320x240x256 MODE-X
+   3:256x239x256 VGA       4:320x200x16b VESA2     5:320x240x16b VESA2
+   6:640x480x16b VESA2
+ Win32, Unix & BeOS:
+   0:320x200x256 WIN       1:320x240x256 WIN       2:320x240x256 FS
+   3:256x239x256 WIN       4:320x200x16b WIN       5:320x240x16b WIN
+   6:640x480x16b WIN       7:640x480x16b FS
+Paths and files:
+ -saveext RAM     Set extension for save RAM files
+ -savedir .\saves Set save directory
+Performance:
+ -pt  Disable cache preloads    -pt2 Disable cache preloads (alt)
+ -pb  Enable cache preloads     -pb2 Enable cache preloads (alt)
+ -pm  Enable MMX support        -pf  Enable FPU copies
+ -pd  Disable MMX/FPU support
+Options:
+ -fps Start with frames-per-second (FPS) counter enabled
+ -gui Enable GUI
+ -cli Disable GUI
+
+If two or more switches conflict, the last switch takes priority.
+
+Once the ROM title is displayed, press a key to start the emulation.
+
+If the GUI is enabled (default):
+To pause the emulation and enter the GUI, press ESC. The GUI will pop up
+and allow you to return to the emulation, reset the emulation, load
+another ROM, reconfigure the emulator, display information about the
+ROM, or exit the emulator. Use the cursor and ENTER keys to navigate
+through the menus.
+
+If the GUI is NOT enabled:
+To exit the emulation, press ESC.
+
+Regardless of whether GUI is enabled or not:
+To break out of the emulator (quick-exit) press Ctrl-Alt-End.
+Use this if the emulator stops responding to input (including ESC).
+
+If you have any helpful information on DSP, SuperFX, sound, bug fixes,
+or any other emulation or general improvements, and would like to
+send me some constructive comments or help (NOT - are you gonna have
+DSP/FX/better sound/better graphics/more speed/etc., when for the same)
+feel free to e-mail me at:
+
+ esaelon@users.sourceforge.net
+
+Or you can visit the SNEeSe homepage at:
+ http://sneese.n3.net/
+ http://www.emuunlim.com/sneese/
+ http://skyscraper.fortunecity.com/online/312/sneese.html
+
+The source code for this release of SNEeSe should be available at the
+homepage.
+
+Any email about obtaining copyright ROMs will likely be forwarded to the
+appropriate authorities, so don't waste our time!
+
+
+About the performance switches
+""""""""""""""""""""""""""""""
+Switches -pt (preload_cache=0 in the config file) and -pb
+(preload_cache=1) control if data areas that are expected to be written
+to will be preloaded into the host CPU's internal cache before they are
+used. This is likely to help performance on CPUs with a 64-bit data bus,
+a write-back internal cache and no write-allocation.  Such CPUs include
+original '586' Intel Pentiums, both with and without MMX, and possibly
+other CPUs for similar mainboards, such as AMD K5s.
+
+Switches -pt2 (preload_cache_2=0) and -pb2 (preload_cache_2=1) control
+a limited form of the above, that should help performance on most or all
+CPUs with a write-back internal cache and no write-allocation.  Such CPUs
+include 486DX4s, write-back enhanced 486DX2s, Pentium Overdrive CPUs for
+486 systems, AMD 5x86s, and similar CPUs.
+
+'preload_cache' and 'preload_cache_2' both default to enabled if the
+detected CPU family is 5, representing Intel Pentium and similar CPUs.
+
+Switches -pm (use_mmx=1), -pf (use_fpu_copies=1), and -pd (use_mmx=0,
+use_fpu_copies=0) control usage of MMX instructions, and usage of the
+FPU for copying data.
+
+MMX instructions will be used if MMX support is detected and 'use_mmx' is
+enabled.  'use_mmx' defaults to enabled if MMX support is detected.
+
+The FPU will be used for copying data if an FPU is detected and
+'use_fpu_copies' is enabled.  This is faster on original '586' Intel
+Pentiums without MMX.  'use_fpu_copies' defaults to enabled if an FPU
+is detected, if MMX is NOT detected, and if the detected CPU family is 5,
+representing Intel Pentium and similar CPUs.
+
+
+What can SNEeSe do in this version?
+"""""""""""""""""""""""""""""""""""
+Emulation details:
+ - 65c816-alike 5A22 main CPU with 254/256 opcodes implemented.
+    The last two (WDM and STP) remain unimplemented since they
+    do nothing important and can help detect runaway ROMs!
+ - NMI/IRQ interrupts running (timings are a little out).
+ - Hblank/Vblank CPU timing.
+ - Partial SlowROM/FastROM support (fixed-cycle, buggy).
+ - DMA and HDMA, all 8 channels, modes 0-4 (5-7 supported but possibly
+    incorrect), HDMA may have some bugs. DMA timing is not implemented.
+
+ - SPC700 sound CPU with 250/256 opcodes implemented, running with
+    on-demand execution.
+    BRK/RETI, BCD (DAS/DAA), SLEEP/STOP remain unimplemented.
+ - Partial sound DSP support and sound generation, including accurate
+    emulation of the 4-point pitch-regulated gaussian interpolation of
+    sample data, OUTX/ENVX registers, pitch modulation, and the echo
+    effect and its corresponding FIR filter.
+
+ - LoROM and HiROM memory maps (up to 32Mbit).
+
+ - ROM loader supporting whole and split (*.1) ROM images, LoROM,
+    HiROM, and interleaved HiROM, with or without 512-byte copier header(s)
+
+ - Most hardware registers emulated.
+
+ - SNES joypads 1 and 2 and mouse are supported.
+
+ - BG modes 0-7, 8x8 and 16x16 tiles, X/Y flip, palette mapping,
+    scrolling, tile priorities.
+    - Full offset change support in modes 2, 4, and 6 (mode 6 support
+     not properly tested).
+    - Partial wide-tile support in modes 5 and 6 (odd pixels are skipped).
+    - Partial priority-per-pixel support in mode 7 (may still have bugs).
+ - Dual window clipping with all logic modes in BG modes 0-6.
+ - Full mosaic effect in BG modes 0-7.
+ - Screen sizes 32x32, 64x32, 32x64, and 64x64 supported.
+ - Sprites are supported in all sizes (8x8, 16x16, 32x32, 64x64), with
+    name and base select, priority rotation, correct sprite-to-sprite
+    priorities, and correct time/range limitation.
+
+Extras:
+ - Independent optional stretching of screen in horizontal and vertical
+    directions.
+ - Speed-throttling with speed-capping, and minimum/maximum frameskip
+    control.
+ - GUI and config file.
+
+ - Keyboard working as follows:
+    The following settings are fixed:
+     ESC     - Open GUI
+     F1-F8   - Toggle sound channels
+     F11     - Toggle FPS (frames-per-second) counter
+     F12     - Toggle 'rendering break' counter
+                tells how many times the delayed renderer is forced to
+                synchronize rendering in the last frame
+     ~       - Fast-forward (lock to the configured max frameskip)
+     1-4     - Toggle BG layers 1-4
+     5       - Toggle sprites
+     6       - Reset BG layers/layering order/sprites/sound channels
+     7       - Toggle offset change
+     8       - cycle between 3 layering orders
+     0       - Save PCX of current display (IMAGE###.PCX)
+    The following settings are reconfigurable:
+     Keypad cursor keys - joypad direction
+     Q,A     - L/R buttons
+     W,S     - X/Y buttons
+     E,D     - A/B buttons
+     [,]     - Select/Start buttons
+
+ - A 4 or 6 button joystick/joypad can be used in place of the keyboard,
+   selectable from the GUI.
+   *** Joystick/joypad support is not available in this release.
+
+What is left to do in this emulator?
+""""""""""""""""""""""""""""""""""""
+
+The following list contains a sampling of changes that are planned,
+in a order vaguely similar to when they can be expected...
+it may not be complete!
+
+TO DO:
+~~~~~~
+ Screen rendering
+  OBJ limitations: Time/range over flag emulation
+  Performance: Implement tile-based rendering + more
+  Windowing: Used to cut holes in layers, as well as determining area of
+   color arithmetic
+  Color +/-: This relies on windowing, and allows overlaying BGs like the
+             rain in Zelda
+  Direct color mode: Used in ActRaiser 2, Secret of Mana, others
+  Priority per pixel in mode 7: May have priority problems
+  Plenty of other missing stuff...
+
+ Source   : More source cleanup/clarity/commentation
+ Keyboard : Replace or extend keyboard handler to help with interface
+ Joypad   : Implement joystick/joypad support
+             (could some kind soul help out with this???)
+            Button reconfig
+            Better joypad hardware emulation
+
+ Command-line interface: More control, especially over configuration
+ CPU      : Variable bus timing, DMA timing
+
+ SPC      : Needs better communication with sound DSP
+  Skipper  : Fails to work on MANY ROMs, need at least an alternate skipper
+ Sound DSP: Correct noise, etc.
+
+ GUI: interface cleanup/rewrite/ease-of-use/versatility/mouse
+
+ ROM loader: More memory maps, compressed ROMs...
+ Savestates: ...
+
+Thanks go out to...
+"""""""""""""""""""
+ Nintendo, for making the SNES...
+ and the SNES software developers, who suffered through the SNES design,
+  showing what it could do, and making it what it is today!
+
+ Pastor M. M. Angel: you know what you're doing with code...
+ Y0SHi and Marat Fayzullin: Nintendo emulation wouldn't have come nearly
+  this far without you...
+ Lord ESNES: For supporting SNES emulation so much, and giving so much
+  help to the authors of the more primitive SNES emulators...
+ SNES '9X team, past and present: for putting so much effort into making
+  it what it is today... fix those quirks!
+ ZSNES team, past and present: zsKnight, _Demo_, Pharos, pagefault,
+  stainless, ...: For ZSNES. Need I say more?
+ Lee Hammerton: for bringing this so far and giving me the opportunity
+  to make it live on...
+ archeide, Brad Martin: for getting the SPC and sound DSP and generation
+  working in the first place...
+ Brad Martin: for all the help with the sound core!
+ zsKnight: for always being so helpful!
+ archeide: hope you get that tile editor figured out...
+
+ Richard Ferreira (general code and optimization ideas and support)
+ Richard Mitton of the New Zealand Story Emulator (speed-throttling ideas)
+ zsKnight (for providing so much help and info... HDMA, memory maps, timing,
+  and the list goes on...)
+ SNES9X team (for spending so much time on trying to make such an exact
+  emulator, and releasing the source to it!)
+ zsKnight, for the 5x5 font for the GUI!
+ Lanice, for finding the LFN bug in the GUI!
+ KnucklesD, for getting on my case to put in save dir support!
+ Windwalker, neptron, and stainless, for the logos!
+
+ stainless: for putting up with me, and being the friend you are
+ MKendora, Lord_Nightmare: for all the support, and always reaffirming
+  my belief that there's a reason to continue.
+
+ Beta testing:
+  RibOnIzEr, QbProgger, AC/DC, Malenko, Richard Ferreira, rOss, stainless,
+   MKendora, akito
+
+  Y0ssarian, PoleStar, Steve, Vilmar, Enternal, [E|YSiUM], Goku-X, JaguarPaw,
+  JJJJ, KnucklesD, dps, Cowering, Lanice, EddyB43 from EFnet-#snesromz and
+  #classicgames, never coulda done it without you!
+
+Greets
+""""""
+ TCF, Borson, neptron, Avarice, KnucklesD, Richard Ferreira, AC/DC
+ Goku-X, Lanice, Azimer, TNSe, dps, polarz, rOss, Neill Corlett,
+ Richard Mitton, illus, Slaik, StCreator, RibOnIzEr, Thane, QbProgger,
+ krial, pagefault, stainless, Zero-X, MrGrim, kode54, akito, MKendora,
+ Lord_Nightmare, anomie, ipher, amit, Diablo-D3, Neviksti, slow, SamB
+
+ Everyone from EFnet IRC #snesromz, #classicgames, #snesdev, #zsnes, #mugen,
+  Newnet IRC #snesromz, and Openprojects IRC #fakenes, #zsnes, #assembler
+
+ Savoury SnaX and Gridle
+
+ archeide, Tim Riemann, Brad Martin, Qwertie, Martijn Kersbergen, B. Walker,
+ Paul Robson, Aquarius-1, D.Kieselhof, zsKnight, _Demo_, Pastor M. M. Angel,
+ Y0SHi, Albert Lloyd Sawyers, Zachary Williams, Lord ESNES, Jonathan Turner,
+ W/\re\/\/0lf, Malenko, James Cartrette, Duncanthrax, rRNA, Dark Claw,
+ Poiple Shadow, Flash, Windwalker, Chris Lacey, MaJiC, Dark Elf, Shade,
+ + any I forgot.

@@ -1,0 +1,89 @@
+
+SNEeSe source
+=-=-=-=-=-=-=
+
+ Files may be added/removed/renamed with each source release, install each
+  source release in its own fresh, clean directory. Not doing so may
+  cause complications.
+
+ The files that you should find in this source release are listed in
+  files.lst. Descriptions may be added here eventually.
+
+- DOS -
+ If DJGPP crashes during compilation, just re-run it. If that doesn't help,
+  contact the DJGPP FAQ or website (http://www.delorie.com/djgpp/).
+
+ This requires DJGPP v2, GCC 3.2, NASM 0.98.34, and Allegro 4.1 to build.
+ NASM should be a build made with DJGPP v2, else it may not work properly
+  with DJGPP's make.  DOS is the only platform that currently supports
+  FastROM emulation.
+
+- Win32 -
+ This source can build under MinGW32.  GCC 3.2 and Allegro 4.1 are
+  required.  A patched build of NASM 0.98.34 is also required to add
+  support for MinGW32's object format.  Diffs for patching NASM are
+  included in the nasmming folder in source release distributions only.
+  NASM patch files are not included in CVS.  Use 'make -f makefile.win'.
+ NASM should be a build made with a Win32 compiler, else it may not work
+  properly with MinGW32 make.
+
+- Linux -
+ This source should build under Linux/x86.  Same details as building for
+  DOS essentially, though some of the makefile options may need to be
+  changed if you are using a GCC pre-3.2.  Use 'make -f makefile.unix'.
+
+- BeOS -
+ This source should build under BeOS.  Same details as building for
+  DOS essentially, though some of the makefile options may need to be
+  changed if you are using a GCC pre-3.2.  Use 'make -f makefile.beos'.
+
+
+ Links to the DJGPP, NASM, and Allegro pages are available from the
+  SNEeSe homepage. Allegro 4 is available from the Allegro
+  homepage (http://alleg.sf.net/).
+
+ You may need to modify portions in the base makefile.all or your
+  platform-specific makefile to get this to build (you may need to
+  set your paths, and program names and/or locations if they do not
+  match the defaults).
+ Compiling with a source dir other than "." should work now. Not
+  thouroughly tested...
+
+ The binaries built from this source require the included SNEESE.DAT
+  file in the directory it is started from.
+
+ Do not expect this to be portable to non-x86 platforms, as the core is
+  written primarily in x86 assembly.
+
+ Some commented code may be redundant in this release, and some compiled
+  code may be unused, but some may be useful later on so it remains.
+
+ Allegro saves us much work, so we use it.  Don't like it? Provide a
+  better alternative!
+
+ If you find this code useful, at least mention it!
+
+ I will try to help people struggling to write emulators, especially for
+  SNES, and will try to help out with problems with this code, though
+  support for modified sources is limited, e-mail me at:
+        esaelon@users.sourceforge.net
+
+ If I ever make any SNES dox, I'll put them on the SNEeSe homepage, where
+  latest public binaries and source can be found:
+        http://sneese.n3.net/
+        http://www.emuunlim.com/sneese/
+        http://skyscraper.fortunecity.com/online/312/sneese.html
+
+ SNEeSe may also be obtained from SourceForge CVS:
+        http://www.sourceforge.net/projects/sneese/
+
+ The original SNEeSe homepage is at:
+        http://olympia.fortunecity.com/baberuth/24/sneese.html
+
+ However I do not believe it is still being maintained... has some old
+  screenshots and the final binaries and source (v0.16f), from the time
+  of the discontinuation.
+
+ Send bug reports and/or fixes, ideas, constructive information - no 'when'
+  is this or that going in, etc... and don't ask for ROMs! read Readme.txt
+  for the disclaimer, and for more information!
