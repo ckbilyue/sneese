@@ -441,7 +441,7 @@ int platform_init(int argc, char **argv)
 #endif
 
  /* Should hook this for exit, actually... */
- set_window_close_button(FALSE);
+ set_close_button_callback(NULL);
 
  /* This helps SNEeSe find it's home directory, for .cfg/.dat file,
   * when started from a different directory
