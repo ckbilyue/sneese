@@ -49,6 +49,7 @@ Changes
   Sound: Added clipping and saturation to gaussian interpolation filter,
    thanks to Jonathan Gevaryahu (Lord_Nightmare) and Brad Martin for the
    fixes [TRAC]
+  Timing: Moved display period to the start of scanlines [TRAC]
  0.776 [TRAC]
   Render: Added support for dual window clipping with all logic
    modes of backgrounds in modes 5 and 6
