@@ -1,4 +1,4 @@
-makefile
+smakefile
 makefile.all
 makefile.dos
 makefile.win
@@ -33,7 +33,7 @@ include/cpu/dma.inc
 src/ppu/ppu.asm
 include/ppu/ppu.inc
 src/ppu/screen.asm
-src/ppu/screen.inc
+include/ppu/screen.inc
 src/ppu/bg8.asm
 src/ppu/bg8m.asm
 src/ppu/bg16.asm
