@@ -73,7 +73,7 @@ OFLAGS = -march=i486 -mcpu=pentium -O3 -ffast-math $(PFLAGS) \
  -fexpensive-optimizations -fschedule-insns -fschedule-insns2 \
  -fgcse
 
-# Probably just a gcc < 3 problem. I'll upgrade soon.
+# Probably just a gcc < 3 problem. I'll upgrade soon. Really ;-)
 ifneq ($(OSTYPE),beos)
 OFLAGS += -foptimize-sibling-calls -fgcse-lm -fgcse-sm
 endif
@@ -94,6 +94,10 @@ endif
 
 
 CFLAGS = $(OFLAGS) -ggdb3 -I$(INCLUDE)/
+ifdef ZLIB
+CFLAGS += -DZLIB
+SFLAGS += -DZLIB
+endif
 
 ifneq ($(SAVE_ASM_OUTPUT),0)
 OBJBASE := s
@@ -102,7 +106,14 @@ OBJBASE := o
 endif
 
 
-OBJS   := $(addsuffix .$(ASM_OBJ_EXT), $(addprefix cpu/, 65c816 memmap dma) $(addprefix apu/, spc700 apuskip) $(addprefix ppu/, screen mode7 tiles sprites ppu) clear scrmode font) main.o romload.o snes.o timers.o debug.o helper.o apu/sound.o dos.o guicore.o emugui.o
+OBJS   := $(addsuffix .$(ASM_OBJ_EXT), \
+            $(addprefix cpu/, 65c816 memmap dma) $(addprefix apu/, spc700 apuskip) \
+            $(addprefix ppu/, screen mode7 tiles sprites ppu) clear scrmode font) \
+          main.o romload.o snes.o timers.o debug.o helper.o apu/sound.o dos.o \
+          guicore.o emugui.o map.o multiio.o
+ifdef ZLIB
+OBJS += unzip.o
+endif
 
 all: maketree $(EXE)
 
@@ -137,7 +148,7 @@ $(OBJ)/%.$(ASM_OBJ_EXT): $(SRC)/%.asm
 	$(NASM) $(AFLAGS) $(DFLAGS) -o $@ $<
 
 $(OBJ)/%.o: $(OBJ)/%.s
-	$(GCC) -c $(DFLAGS) -o $@ $<
+	$(GCC) -c $(SFLAGS) $(DFLAGS) -o $@ $<
 
 $(OBJ)/%.s: $(SRC)/%.c
 	$(GCC) -S $(CFLAGS) $(DFLAGS) -o $@ $<
@@ -152,7 +163,8 @@ $(OBJ)/%.o: $(SRC)/%.cpp
 	$(GCC) -c $(CFLAGS) $(DFLAGS) -o $@ $<
 
 $(EXE): $(addprefix $(OBJ)/, $(OBJS))
-	$(GXX) $(PFLAGS) $(DFLAGS) -o $(EXE) $(addprefix $(OBJ)/, $(OBJS)) $(ALLEG)
+	$(GXX) $(PFLAGS) $(DFLAGS) -o $(EXE) $(addprefix $(OBJ)/, $(OBJS)) $(ALLEG) $(MIOFLAGS)
+# Note that the order of arguments matters for libraries!
 
 
 $(OBJ)/cpu/65c816.$(ASM_OBJ_EXT): $(SRC)/cpu/65c816.asm \
@@ -220,3 +232,7 @@ $(OBJ)/helper.$(OBJBASE): $(SRC)/helper.c \
 $(OBJ)/apu/sound.$(OBJBASE): $(SRC)/apu/sound.c \
  $(addprefix $(INCLUDE)/, helper.h apu/sound.h apu/sounddef.h apu/spc.h \
  misc.h wrapaleg.h)
+$(OBJ)/map.$(OBJBASE): $(SRC)/map.c \
+ $(addprefix $(INCLUDE)/, map.h version.h)
+$(OBJ)/multiio.$(OBJBASE): $(SRC)/multiio.c \
+ $(addprefix $(INCLUDE)/, multiio.h map.h version.h)
