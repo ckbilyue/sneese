@@ -107,7 +107,7 @@ DMA_DATA 5
 DMA_DATA 6
 DMA_DATA 7
 
-EXPORT_C DMA_Transfer_Size,skipl        ;Size for active DMA transfer
+DMA_Transfer_Size:skipl ;Size for active DMA transfer
 
 EXPORT_C MDMAEN,skipb   ; DMA enable
 EXPORT_C HDMAEN,skipb   ; HDMA enable
@@ -225,8 +225,9 @@ EXPORT_C Do_DMA_Channel
  jnz near .loop_ppu_read
 
 .ppu_read_done:
+ mov eax,[DMA_Transfer_Size]
  mov [edi+A1T],bx       ; v0.15 forgot to update DMA pointers!
- mov word [edi+DAS],bp
+ mov word [edi+DAS],ax
  ret
 
 ALIGNC
@@ -312,8 +313,9 @@ ALIGNC
  jnz near .loop_ppu_write
 
 .ppu_write_done:
+ mov eax,[DMA_Transfer_Size]
  mov [edi+A1T],bx       ; v0.15 forgot to update DMA pointers!
- mov word [edi+DAS],bp
+ mov word [edi+DAS],ax
 .abort_channel:
  ret
 
