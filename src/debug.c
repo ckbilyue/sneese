@@ -104,7 +104,7 @@ void InvalidROMWrite()
 const char *CPU_OpID[256] = {
 /* 00 */ "BRK"      ,"ORA (d,x)","COP"      ,"ORA d,s"      ,
 /* 04 */ "TSB d"    ,"ORA d"    ,"ASL d"    ,"ORA [d]"      ,
-/* 08 */ "PHP"      ,"ORA i"    ,"SLA"      ,"PHD"          ,
+/* 08 */ "PHP"      ,"ORA #"    ,"SLA"      ,"PHD"          ,
 /* 0C */ "TSB a"    ,"ORA a"    ,"ASL a"    ,"ORA al"       ,
 
 /* 10 */ "BPL r"    ,"ORA (d),y","ORA (d)"  ,"ORA (d,s),y"  ,
@@ -114,7 +114,7 @@ const char *CPU_OpID[256] = {
 
 /* 20 */ "JSR a"    ,"AND (d,x)","JSL al"   ,"AND d,s"      ,
 /* 24 */ "BIT d"    ,"AND d"    ,"ROL d"    ,"AND [d]"      ,
-/* 28 */ "PLP"      ,"AND i"    ,"RLA"      ,"PLD"          ,
+/* 28 */ "PLP"      ,"AND #"    ,"RLA"      ,"PLD"          ,
 /* 2C */ "BIT a"    ,"AND a"    ,"ROL a"    ,"AND al"       ,
 
 /* 30 */ "BMI r"    ,"AND (d),y","AND (d)"  ,"AND (d,s),y"  ,
@@ -124,7 +124,7 @@ const char *CPU_OpID[256] = {
 
 /* 40 */ "RTI"      ,"EOR (d,x)","WDM *"    ,"EOR d,s"      ,
 /* 44 */ "MVP"      ,"EOR d"    ,"LSR d"    ,"EOR [d]"      ,
-/* 48 */ "PHA"      ,"EOR i"    ,"SRA"      ,"PHK"          ,
+/* 48 */ "PHA"      ,"EOR #"    ,"SRA"      ,"PHK"          ,
 /* 4C */ "JMP a"    ,"EOR a"    ,"LSR a"    ,"EOR al"       ,
 
 /* 50 */ "BVC r"    ,"EOR (d),y","EOR (d)"  ,"EOR (d,s),y"  ,
@@ -134,7 +134,7 @@ const char *CPU_OpID[256] = {
 
 /* 60 */ "RTS"      ,"ADC (d,x)","PER"      ,"ADC d,s"      ,
 /* 64 */ "STZ d"    ,"ADC d"    ,"ROR d"    ,"ADC [d]"      ,
-/* 68 */ "PLA"      ,"ADC i"    ,"RRA"      ,"RTL"          ,
+/* 68 */ "PLA"      ,"ADC #"    ,"RRA"      ,"RTL"          ,
 /* 6C */ "JMP (a)"  ,"ADC a"    ,"ROR a"    ,"ADC al"       ,
 
 /* 70 */ "BVS r"    ,"ADC (d),y","ADC (d)"  ,"ADC (d,s),y"  ,
@@ -144,7 +144,7 @@ const char *CPU_OpID[256] = {
 
 /* 80 */ "BRA r"    ,"STA (d,x)","BRL rl"   ,"STA d,s"      ,
 /* 84 */ "STY d"    ,"STA d"    ,"STX d"    ,"STA [d]"      ,
-/* 88 */ "DEY"      ,"BIT i"    ,"TXA"      ,"PHB"          ,
+/* 88 */ "DEY"      ,"BIT #"    ,"TXA"      ,"PHB"          ,
 /* 8C */ "STY a"    ,"STA a"    ,"STX a"    ,"STA al"       ,
 
 /* 90 */ "BCC r"    ,"STA (d),y","STA (d)"  ,"STA (d,s),y"  ,
@@ -152,9 +152,9 @@ const char *CPU_OpID[256] = {
 /* 98 */ "TYA"      ,"STA a,y"  ,"TXS"      ,"TXY"          ,
 /* 9C */ "STZ a"    ,"STA a,x"  ,"STZ a,x"  ,"STA al,x"     ,
 
-/* A0 */ "LDY i"    ,"LDA (d,x)","LDX i"    ,"LDA d,s"      ,
+/* A0 */ "LDY #"    ,"LDA (d,x)","LDX #"    ,"LDA d,s"      ,
 /* A4 */ "LDY d"    ,"LDA d"    ,"LDX d"    ,"LDA [d]"      ,
-/* A8 */ "TAY"      ,"LDA i"    ,"TAX"      ,"PLB"          ,
+/* A8 */ "TAY"      ,"LDA #"    ,"TAX"      ,"PLB"          ,
 /* AC */ "LDY a"    ,"LDA a"    ,"LDX a"    ,"LDA al"       ,
 
 /* B0 */ "BCS r"    ,"LDA (d),y","LDA (d)"  ,"LDA (d,s),y"  ,
@@ -162,9 +162,9 @@ const char *CPU_OpID[256] = {
 /* B8 */ "CLV"      ,"LDA a,y"  ,"TSX"      ,"TYX"          ,
 /* BC */ "LDY a,x"  ,"LDA a,x"  ,"LDX a,y"  ,"LDA al,x"     ,
 
-/* C0 */ "CPY i"    ,"CMP (d,x)","REP i"    ,"CMP d,s"      ,
+/* C0 */ "CPY #"    ,"CMP (d,x)","REP #"    ,"CMP d,s"      ,
 /* C4 */ "CPY d"    ,"CMP d"    ,"DEC d"    ,"CMP [d]"      ,
-/* C8 */ "INY"      ,"CMP i"    ,"DEX"      ,"WAI"          ,
+/* C8 */ "INY"      ,"CMP #"    ,"DEX"      ,"WAI"          ,
 /* CC */ "CPY a"    ,"CMP a"    ,"DEC a"    ,"CMP al"       ,
 
 /* D0 */ "BNE r"    ,"CMP (d),y","CMP (d)"  ,"CMP (d,s),y"  ,
@@ -172,9 +172,9 @@ const char *CPU_OpID[256] = {
 /* D8 */ "CLD"      ,"CMP a,y"  ,"PHX"      ,"STP *"        ,
 /* DC */ "JML (a)"  ,"CMP a,x"  ,"DEC a,x"  ,"CMP al,x"     ,
 
-/* E0 */ "CPX i"    ,"SBC (d,x)","SEP i"    ,"SBC d,s"      ,
+/* E0 */ "CPX #"    ,"SBC (d,x)","SEP #"    ,"SBC d,s"      ,
 /* E4 */ "CPX d"    ,"SBC d"    ,"INC d"    ,"SBC [d]"      ,
-/* E8 */ "INX"      ,"SBC i"    ,"NOP"      ,"XBA"          ,
+/* E8 */ "INX"      ,"SBC #"    ,"NOP"      ,"XBA"          ,
 /* EC */ "CPX a"    ,"SBC a"    ,"INC a"    ,"SBC al"       ,
 
 /* F0 */ "BEQ r"    ,"SBC (d),y","SBC (d)"  ,"SBC (d,s),y"  ,
