@@ -598,13 +598,18 @@ ALIGNC
 %endif
 %endmacro
 
+;%1 = value
+%macro _PUSH8 1
+ ADDR_Implied
+ mov al,%1
+ PUSH_B
+%endmacro
+
 ; label, value
 %macro E0_PUSH8 2
 ALIGNC
 EXPORT_C %2
- ADDR_Implied
- mov al,%1
- E0_PUSH_B
+ _PUSH8 %1
  OPCODE_EPILOG
 %endmacro
 
@@ -612,19 +617,22 @@ EXPORT_C %2
 %macro E1_PUSH8 2
 ALIGNC
 EXPORT_C %2
- ADDR_Implied
- mov al,%1
- E1_PUSH_B
+ _PUSH8 %1
  OPCODE_EPILOG
+%endmacro
+
+;%1 = value, %2 = new
+%macro _PUSH16 1-2 0
+ ADDR_Implied
+ mov eax,%1
+ PUSH_W %2
 %endmacro
 
 ; label, value, new
 %macro E0_PUSH16 2-3 0
 ALIGNC
 EXPORT_C %2
- ADDR_Implied
- mov eax,%1
- E0_PUSH_W
+ _PUSH16 %1,%3
  OPCODE_EPILOG
 %endmacro
 
@@ -632,20 +640,23 @@ EXPORT_C %2
 %macro E1_PUSH16 2-3 0
 ALIGNC
 EXPORT_C %2
- ADDR_Implied
- mov eax,%1
- E1_PUSH_W %3
+ _PUSH16 %1,%3
  OPCODE_EPILOG
+%endmacro
+
+;%1 = register
+%macro _PULL8 1
+ ADDR_Implied
+ PULL_B
+ mov %1,al
+ STORE_FLAGS_NZ al
 %endmacro
 
 ; label, value
 %macro E0_PULL8 2
 ALIGNC
 EXPORT_C %2
- ADDR_Implied
- E0_PULL_B
- mov %1,al
- STORE_FLAGS_NZ al
+ _PULL8 %1
  OPCODE_EPILOG
 %endmacro
 
@@ -653,23 +664,25 @@ EXPORT_C %2
 %macro E1_PULL8 2
 ALIGNC
 EXPORT_C %2
- ADDR_Implied
- E1_PULL_B
- mov %1,al
- STORE_FLAGS_NZ al
+ _PULL8 %1
  OPCODE_EPILOG
+%endmacro
+
+;%1 = register, %2 = new
+%macro _PULL16 1-2 0
+ ADDR_Implied
+ PULL_W %2
+ STORE_FLAGS_N ah
+ mov %1,eax
+ or al,ah
+ STORE_FLAGS_Z al
 %endmacro
 
 ; label, value, new
 %macro E0_PULL16 2-3 0
 ALIGNC
 EXPORT_C %2
- ADDR_Implied
- E0_PULL_W
- STORE_FLAGS_N ah
- mov %1,eax
- or al,ah
- STORE_FLAGS_Z al
+ _PULL16 %1,%3
  OPCODE_EPILOG
 %endmacro
 
@@ -677,14 +690,43 @@ EXPORT_C %2
 %macro E1_PULL16 2-3 0
 ALIGNC
 EXPORT_C %2
- ADDR_Implied
- E1_PULL_W %3
- STORE_FLAGS_N ah
- mov %1,eax
- or al,ah
- STORE_FLAGS_Z al
+ _PULL16 %1,%3
  OPCODE_EPILOG
 %endmacro
+
+
+;register, size
+%macro _PUSH_reg 2
+%if (%2) == 8
+ _PUSH8 %1
+%else
+ _PUSH16 %1
+%endif
+%endmacro
+
+%define _PHA _PUSH_reg B_A, M_size
+%define _PHX _PUSH_reg B_X, X_size
+%define _PHY _PUSH_reg B_Y, X_size
+%define _PHB _PUSH_reg B_DB, 8
+%define _PHK _PUSH_reg B_PB, 8
+%define _PHD _PUSH16 B_D,New
+
+
+;register, size
+%macro _PULL_reg 2
+%if (%2) == 8
+ _PULL8 %1
+%else
+ _PULL16 %1
+%endif
+%endmacro
+
+%define _PLA _PULL_reg B_A, M_size
+%define _PLX _PULL_reg B_X, X_size
+%define _PLY _PULL_reg B_Y, X_size
+%define _PLB _PULL_reg B_DB, 8
+%define _PLD _PULL16 B_D,New
+
 
 ;src,size,label
 %macro _TxS 3

@@ -372,7 +372,7 @@ dd  C_LABEL(E0_COP)       ,C_LABEL(OpM0_0x03)
 dd  C_LABEL(OpE0M0_0x04)  ,C_LABEL(OpE0M0_0x05)
 dd  C_LABEL(OpE0M0_0x06)  ,C_LABEL(OpE0M0_0x07)
 dd  C_LABEL(E0_PHP)       ,C_LABEL(OpM0_0x09)
-dd  C_LABEL(OpM0_0x0A)    ,C_LABEL(E0_PHD)
+dd  C_LABEL(OpM0_0x0A)    ,C_LABEL(OpE0_0x0B)
 dd  C_LABEL(OpM0_0x0C)    ,C_LABEL(OpM0_0x0D)
 dd  C_LABEL(OpM0_0x0E)    ,C_LABEL(OpM0_0x0F)
 dd  C_LABEL(ALL_BPL)      ,C_LABEL(OpE0M0X0_0x11)   ; 10
@@ -388,7 +388,7 @@ dd  C_LABEL(E0_JSL_al)    ,C_LABEL(OpM0_0x23)
 dd  C_LABEL(OpE0M0_0x24)  ,C_LABEL(OpE0M0_0x25)
 dd  C_LABEL(OpE0M0_0x26)  ,C_LABEL(OpE0M0_0x27)
 dd  C_LABEL(E0_PLP)       ,C_LABEL(OpM0_0x29)
-dd  C_LABEL(OpM0_0x2A)    ,C_LABEL(E0_PLD)
+dd  C_LABEL(OpM0_0x2A)    ,C_LABEL(OpE0_0x2B)
 dd  C_LABEL(OpM0_0x2C)    ,C_LABEL(OpM0_0x2D)
 dd  C_LABEL(OpM0_0x2E)    ,C_LABEL(OpM0_0x2F)
 dd  C_LABEL(ALL_BMI)      ,C_LABEL(OpE0M0X0_0x31)   ; 30
@@ -403,8 +403,8 @@ dd  C_LABEL(E0_RTI)       ,C_LABEL(OpE0M0_0x41)     ; 40
 dd  C_LABEL(ALL_INVALID)  ,C_LABEL(OpM0_0x43)
 dd  C_LABEL(E0_MVP)       ,C_LABEL(OpE0M0_0x45)
 dd  C_LABEL(OpE0M0_0x46)  ,C_LABEL(OpE0M0_0x47)
-dd  C_LABEL(E0_PHA)       ,C_LABEL(OpM0_0x49)
-dd  C_LABEL(OpM0_0x4A)    ,C_LABEL(E0_PHK)
+dd  C_LABEL(OpE0M0_0x48)  ,C_LABEL(OpM0_0x49)
+dd  C_LABEL(OpM0_0x4A)    ,C_LABEL(OpE0_0x4B)
 dd  C_LABEL(ALL_JMP_a)    ,C_LABEL(OpM0_0x4D)
 dd  C_LABEL(OpM0_0x4E)    ,C_LABEL(OpM0_0x4F)
 dd  C_LABEL(ALL_BVC)      ,C_LABEL(OpE0M0X0_0x51)   ; 50
@@ -412,14 +412,14 @@ dd  C_LABEL(OpE0M0_0x52)  ,C_LABEL(OpM0_0x53)
 dd  C_LABEL(E0_MVN)       ,C_LABEL(OpE0M0_0x55)
 dd  C_LABEL(OpE0M0_0x56)  ,C_LABEL(OpE0M0_0x37)
 dd  C_LABEL(ALL_CLI)      ,C_LABEL(OpM0X0_0x59)
-dd  C_LABEL(E0_PHY)       ,C_LABEL(ALL_TCD)
+dd  C_LABEL(OpE0X0_0x5A)  ,C_LABEL(ALL_TCD)
 dd  C_LABEL(ALL_JML_al)   ,C_LABEL(OpM0X0_0x5D)
 dd  C_LABEL(OpM0_0x5E)    ,C_LABEL(OpM0_0x5F)
 dd  C_LABEL(E0_RTS)       ,C_LABEL(OpE0M0_0x61)     ; 60
 dd  C_LABEL(E0_PER)       ,C_LABEL(OpM0_0x63)
 dd  C_LABEL(OpE0M0_0x64)  ,C_LABEL(OpE0M0_0x65)
 dd  C_LABEL(OpE0M0_0x66)  ,C_LABEL(OpE0M0_0x67)
-dd  C_LABEL(E0_PLA)       ,C_LABEL(OpM0_0x69)
+dd  C_LABEL(OpE0M0_0x68)  ,C_LABEL(OpM0_0x69)
 dd  C_LABEL(OpM0_0x6A)    ,C_LABEL(E0_RTL)
 dd  C_LABEL(ALL_JMP_OaO)  ,C_LABEL(OpM0_0x6D)
 dd  C_LABEL(OpM0_0x6E)    ,C_LABEL(OpM0_0x6F)
@@ -428,7 +428,7 @@ dd  C_LABEL(OpE0M0_0x72)  ,C_LABEL(OpM0_0x73)
 dd  C_LABEL(OpE0M0_0x74)  ,C_LABEL(OpE0M0_0x75)
 dd  C_LABEL(OpE0M0_0x76)  ,C_LABEL(OpE0M0_0x77)
 dd  C_LABEL(ALL_SEI)      ,C_LABEL(OpM0X0_0x79)
-dd  C_LABEL(E0_PLY)       ,C_LABEL(ALL_TDC)
+dd  C_LABEL(OpE0X0_0x7A)  ,C_LABEL(ALL_TDC)
 dd  C_LABEL(ALL_JMP_Oa_xO),C_LABEL(OpM0X0_0x7D)
 dd  C_LABEL(OpM0_0x7E)    ,C_LABEL(OpM0_0x7F)
 dd  C_LABEL(ALL_BRA)      ,C_LABEL(OpE0M0_0x81)     ; 80
@@ -436,7 +436,7 @@ dd  C_LABEL(ALL_BRL)      ,C_LABEL(OpM0_0x83)
 dd  C_LABEL(OpE0X0_0x84)  ,C_LABEL(OpE0M0_0x85)
 dd  C_LABEL(OpE0X0_0x86)  ,C_LABEL(OpE0M0_0x87)
 dd  C_LABEL(OpX0_0x88)    ,C_LABEL(E0_BIT_i)
-dd  C_LABEL(E0_TXA)       ,C_LABEL(E0_PHB)
+dd  C_LABEL(E0_TXA)       ,C_LABEL(OpE0_0x8B)
 dd  C_LABEL(OpX0_0x8C)    ,C_LABEL(OpM0_0x8D)
 dd  C_LABEL(OpX0_0x8E)    ,C_LABEL(OpM0_0x8F)
 dd  C_LABEL(ALL_BCC)      ,C_LABEL(OpE0M0X0_0x91)   ; 90
@@ -452,7 +452,7 @@ dd  C_LABEL(OpX0_0xA2)    ,C_LABEL(OpM0_0xA3)
 dd  C_LABEL(OpE0X0_0xA4)  ,C_LABEL(OpE0M0_0xA5)
 dd  C_LABEL(OpE0X0_0xA6)  ,C_LABEL(OpE0M0_0xA7)
 dd  C_LABEL(E0_TAY)       ,C_LABEL(OpM0_0xA9)
-dd  C_LABEL(E0_TAX)       ,C_LABEL(E0_PLB)
+dd  C_LABEL(E0_TAX)       ,C_LABEL(OpE0_0xAB)
 dd  C_LABEL(OpX0_0xAC)    ,C_LABEL(OpM0_0xAD)
 dd  C_LABEL(OpX0_0xAE)    ,C_LABEL(OpM0_0xAF)
 dd  C_LABEL(ALL_BCS)      ,C_LABEL(OpE0M0X0_0xB1)   ; B0
@@ -476,7 +476,7 @@ dd  C_LABEL(OpE0M0_0xD2)  ,C_LABEL(OpM0_0xD3)
 dd  C_LABEL(E0_PEI)       ,C_LABEL(OpE0M0_0xD5)
 dd  C_LABEL(OpE0M0_0xD6)  ,C_LABEL(OpE0M0_0xD7)
 dd  C_LABEL(ALL_CLD)      ,C_LABEL(OpM0X0_0xD9)
-dd  C_LABEL(E0_PHX)       ,C_LABEL(ALL_INVALID)
+dd  C_LABEL(OpE0X0_0xDA)  ,C_LABEL(ALL_INVALID)
 dd  C_LABEL(ALL_JML_OaO)  ,C_LABEL(OpM0X0_0xDD)
 dd  C_LABEL(OpM0_0xDE)    ,C_LABEL(OpM0_0xDF)
 dd  C_LABEL(OpX0_0xE0)    ,C_LABEL(OpE0M0_0xE1)     ; E0
@@ -492,7 +492,7 @@ dd  C_LABEL(OpE0M0_0xF2)  ,C_LABEL(OpM0_0xF3)
 dd  C_LABEL(E0_PEA)       ,C_LABEL(OpE0M0_0xF5)
 dd  C_LABEL(OpE0M0_0xF6)  ,C_LABEL(OpE0M0_0xF7)
 dd  C_LABEL(ALL_SED)      ,C_LABEL(OpM0X0_0xF9)
-dd  C_LABEL(E0_PLX)       ,C_LABEL(E0_XCE)
+dd  C_LABEL(OpE0X0_0xFA)  ,C_LABEL(E0_XCE)
 dd  C_LABEL(E0_JSR_Oa_xO) ,C_LABEL(OpM0X0_0xFD)
 dd  C_LABEL(OpM0_0xFE)    ,C_LABEL(OpM0_0xFF)
 
@@ -1083,7 +1083,7 @@ dd  C_LABEL(E0_COP)       ,C_LABEL(OpM1_0x03)
 dd  C_LABEL(OpE0M1_0x04)  ,C_LABEL(OpE0M1_0x05)
 dd  C_LABEL(OpE0M1_0x06)  ,C_LABEL(OpE0M1_0x07)
 dd  C_LABEL(E0_PHP)       ,C_LABEL(OpM1_0x09)
-dd  C_LABEL(OpM1_0x0A)    ,C_LABEL(E0_PHD)
+dd  C_LABEL(OpM1_0x0A)    ,C_LABEL(OpE0_0x0B)
 dd  C_LABEL(OpM1_0x0C)    ,C_LABEL(OpM1_0x0D)
 dd  C_LABEL(OpM1_0x0E)    ,C_LABEL(OpM1_0x0F)
 dd  C_LABEL(ALL_BPL)      ,C_LABEL(OpE0M1X0_0x11)   ; 10
@@ -1099,7 +1099,7 @@ dd  C_LABEL(E0_JSL_al)    ,C_LABEL(OpM1_0x23)
 dd  C_LABEL(OpE0M1_0x24)  ,C_LABEL(OpE0M1_0x25)
 dd  C_LABEL(OpE0M1_0x26)  ,C_LABEL(OpE0M1_0x27)
 dd  C_LABEL(E0_PLP)       ,C_LABEL(OpM1_0x29)
-dd  C_LABEL(OpM1_0x2A)    ,C_LABEL(E0_PLD)
+dd  C_LABEL(OpM1_0x2A)    ,C_LABEL(OpE0_0x2B)
 dd  C_LABEL(OpM1_0x2C)    ,C_LABEL(OpM1_0x2D)
 dd  C_LABEL(OpM1_0x2E)    ,C_LABEL(OpM1_0x2F)
 dd  C_LABEL(ALL_BMI)      ,C_LABEL(OpE0M1X0_0x31)   ; 30
@@ -1114,8 +1114,8 @@ dd  C_LABEL(E0_RTI)       ,C_LABEL(OpE0M1_0x41)     ; 40
 dd  C_LABEL(ALL_INVALID)  ,C_LABEL(OpM1_0x43)
 dd  C_LABEL(E0_MVP)       ,C_LABEL(OpE0M1_0x45)
 dd  C_LABEL(OpE0M1_0x46)  ,C_LABEL(OpE0M1_0x47)
-dd  C_LABEL(EM_PHA)       ,C_LABEL(OpM1_0x49)
-dd  C_LABEL(OpM1_0x4A)    ,C_LABEL(E0_PHK)
+dd  C_LABEL(OpE0M1_0x48)  ,C_LABEL(OpM1_0x49)
+dd  C_LABEL(OpM1_0x4A)    ,C_LABEL(OpE0_0x4B)
 dd  C_LABEL(ALL_JMP_a)    ,C_LABEL(OpM1_0x4D)
 dd  C_LABEL(OpM1_0x4E)    ,C_LABEL(OpM1_0x4F)
 dd  C_LABEL(ALL_BVC)      ,C_LABEL(OpE0M1X0_0x51)   ; 50
@@ -1123,14 +1123,14 @@ dd  C_LABEL(OpE0M1_0x52)  ,C_LABEL(OpM1_0x53)
 dd  C_LABEL(E0_MVN)       ,C_LABEL(OpE0M1_0x55)
 dd  C_LABEL(OpE0M1_0x56)  ,C_LABEL(OpE0M1_0x57)
 dd  C_LABEL(ALL_CLI)      ,C_LABEL(OpM1X0_0x59)
-dd  C_LABEL(E0_PHY)       ,C_LABEL(ALL_TCD)
+dd  C_LABEL(OpE0X0_0x5A)  ,C_LABEL(ALL_TCD)
 dd  C_LABEL(ALL_JML_al)   ,C_LABEL(OpM1X0_0x5D)
 dd  C_LABEL(OpM1_0x5E)    ,C_LABEL(OpM1_0x5F)
 dd  C_LABEL(E0_RTS)       ,C_LABEL(OpE0M1_0x61)     ; 60
 dd  C_LABEL(E0_PER)       ,C_LABEL(OpM1_0x63)
 dd  C_LABEL(OpE0M1_0x64)  ,C_LABEL(OpE0M1_0x65)
 dd  C_LABEL(OpE0M1_0x66)  ,C_LABEL(OpE0M1_0x67)
-dd  C_LABEL(EM_PLA)       ,C_LABEL(OpM1_0x69)
+dd  C_LABEL(OpE0M1_0x68)  ,C_LABEL(OpM1_0x69)
 dd  C_LABEL(OpM1_0x6A)    ,C_LABEL(E0_RTL)
 dd  C_LABEL(ALL_JMP_OaO)  ,C_LABEL(OpM1_0x6D)
 dd  C_LABEL(OpM1_0x6E)    ,C_LABEL(OpM1_0x6F)
@@ -1139,7 +1139,7 @@ dd  C_LABEL(OpE0M1_0x72)  ,C_LABEL(OpM1_0x73)
 dd  C_LABEL(OpE0M1_0x74)  ,C_LABEL(OpE0M1_0x75)
 dd  C_LABEL(OpE0M1_0x76)  ,C_LABEL(OpE0M1_0x77)
 dd  C_LABEL(ALL_SEI)      ,C_LABEL(OpM1X0_0x79)
-dd  C_LABEL(E0_PLY)       ,C_LABEL(ALL_TDC)
+dd  C_LABEL(OpE0X0_0x7A)  ,C_LABEL(ALL_TDC)
 dd  C_LABEL(ALL_JMP_Oa_xO),C_LABEL(OpM1X0_0x7D)
 dd  C_LABEL(OpM1_0x7E)    ,C_LABEL(OpM1_0x7F)
 dd  C_LABEL(ALL_BRA)      ,C_LABEL(OpE0M1_0x81)     ; 80
@@ -1147,7 +1147,7 @@ dd  C_LABEL(ALL_BRL)      ,C_LABEL(OpM1_0x83)
 dd  C_LABEL(OpE0X0_0x84)  ,C_LABEL(OpE0M1_0x85)
 dd  C_LABEL(OpE0X0_0x86)  ,C_LABEL(OpE0M1_0x87)
 dd  C_LABEL(OpX0_0x88)    ,C_LABEL(EM_BIT_i)
-dd  C_LABEL(EM_TXA)       ,C_LABEL(E0_PHB)
+dd  C_LABEL(EM_TXA)       ,C_LABEL(OpE0_0x8B)
 dd  C_LABEL(OpX0_0x8C)    ,C_LABEL(OpM1_0x8D)
 dd  C_LABEL(OpX0_0x8E)    ,C_LABEL(OpM1_0x8F)
 dd  C_LABEL(ALL_BCC)      ,C_LABEL(OpE0M1X0_0x91)   ; 90
@@ -1163,7 +1163,7 @@ dd  C_LABEL(OpX0_0xA2)    ,C_LABEL(OpM1_0xA3)
 dd  C_LABEL(OpE0X0_0xA4)  ,C_LABEL(OpE0M1_0xA5)
 dd  C_LABEL(OpE0X0_0xA6)  ,C_LABEL(OpE0M1_0xA7)
 dd  C_LABEL(E0_TAY)       ,C_LABEL(OpM1_0xA9)
-dd  C_LABEL(E0_TAX)       ,C_LABEL(E0_PLB)
+dd  C_LABEL(E0_TAX)       ,C_LABEL(OpE0_0xAB)
 dd  C_LABEL(OpX0_0xAC)    ,C_LABEL(OpM1_0xAD)
 dd  C_LABEL(OpX0_0xAE)    ,C_LABEL(OpM1_0xAF)
 dd  C_LABEL(ALL_BCS)      ,C_LABEL(OpE0M1X0_0xB1)   ; B0
@@ -1187,7 +1187,7 @@ dd  C_LABEL(OpE0M1_0xD2)  ,C_LABEL(OpM1_0xD3)
 dd  C_LABEL(E0_PEI)       ,C_LABEL(OpE0M1_0xD5)
 dd  C_LABEL(OpE0M1_0xD6)  ,C_LABEL(OpE0M1_0xD7)
 dd  C_LABEL(ALL_CLD)      ,C_LABEL(OpM1X0_0xD9)
-dd  C_LABEL(E0_PHX)       ,C_LABEL(ALL_INVALID)
+dd  C_LABEL(OpE0X0_0xDA)  ,C_LABEL(ALL_INVALID)
 dd  C_LABEL(ALL_JML_OaO)  ,C_LABEL(OpM1X0_0xDD)
 dd  C_LABEL(OpM1_0xDE)    ,C_LABEL(OpM1_0xDF)
 dd  C_LABEL(OpX0_0xE0)    ,C_LABEL(OpE0M1_0xE1)     ; E0
@@ -1203,7 +1203,7 @@ dd  C_LABEL(OpE0M1_0xF2)  ,C_LABEL(OpM1_0xF3)
 dd  C_LABEL(E0_PEA)       ,C_LABEL(OpE0M1_0xF5)
 dd  C_LABEL(OpE0M1_0xF6)  ,C_LABEL(OpE0M1_0xF7)
 dd  C_LABEL(ALL_SED)      ,C_LABEL(OpM1X0_0xF9)
-dd  C_LABEL(E0_PLX)       ,C_LABEL(E0_XCE)
+dd  C_LABEL(OpE0X0_0xFA)  ,C_LABEL(E0_XCE)
 dd  C_LABEL(E0_JSR_Oa_xO) ,C_LABEL(OpM1X0_0xFD)
 dd  C_LABEL(OpM1_0xFE)    ,C_LABEL(OpM1_0xFF)
 
@@ -1794,7 +1794,7 @@ dd  C_LABEL(E0_COP)       ,C_LABEL(OpM0_0x03)
 dd  C_LABEL(OpE0M0_0x04)  ,C_LABEL(OpE0M0_0x05)
 dd  C_LABEL(OpE0M0_0x06)  ,C_LABEL(OpE0M0_0x07)
 dd  C_LABEL(E0_PHP)       ,C_LABEL(OpM0_0x09)
-dd  C_LABEL(OpM0_0x0A)    ,C_LABEL(E0_PHD)
+dd  C_LABEL(OpM0_0x0A)    ,C_LABEL(OpE0_0x0B)
 dd  C_LABEL(OpM0_0x0C)    ,C_LABEL(OpM0_0x0D)
 dd  C_LABEL(OpM0_0x0E)    ,C_LABEL(OpM0_0x0F)
 dd  C_LABEL(ALL_BPL)      ,C_LABEL(OpE0M0X1_0x11)   ; 10
@@ -1810,7 +1810,7 @@ dd  C_LABEL(E0_JSL_al)    ,C_LABEL(OpM0_0x23)
 dd  C_LABEL(OpE0M0_0x24)  ,C_LABEL(OpE0M0_0x25)
 dd  C_LABEL(OpE0M0_0x26)  ,C_LABEL(OpE0M0_0x27)
 dd  C_LABEL(E0_PLP)       ,C_LABEL(OpM0_0x29)
-dd  C_LABEL(OpM0_0x2A)    ,C_LABEL(E0_PLD)
+dd  C_LABEL(OpM0_0x2A)    ,C_LABEL(OpE0_0x2B)
 dd  C_LABEL(OpM0_0x2C)    ,C_LABEL(OpM0_0x2D)
 dd  C_LABEL(OpM0_0x2E)    ,C_LABEL(OpM0_0x2F)
 dd  C_LABEL(ALL_BMI)      ,C_LABEL(OpE0M0X1_0x31)   ; 30
@@ -1825,8 +1825,8 @@ dd  C_LABEL(E0_RTI)       ,C_LABEL(OpE0M0_0x41)     ; 40
 dd  C_LABEL(ALL_INVALID)  ,C_LABEL(OpM0_0x43)
 dd  C_LABEL(EX_MVP)       ,C_LABEL(OpE0M0_0x45)
 dd  C_LABEL(OpE0M0_0x46)  ,C_LABEL(OpE0M0_0x47)
-dd  C_LABEL(E0_PHA)       ,C_LABEL(OpM0_0x49)
-dd  C_LABEL(OpM0_0x4A)    ,C_LABEL(E0_PHK)
+dd  C_LABEL(OpE0M0_0x48)  ,C_LABEL(OpM0_0x49)
+dd  C_LABEL(OpM0_0x4A)    ,C_LABEL(OpE0_0x4B)
 dd  C_LABEL(ALL_JMP_a)    ,C_LABEL(OpM0_0x4D)
 dd  C_LABEL(OpM0_0x4E)    ,C_LABEL(OpM0_0x4F)
 dd  C_LABEL(ALL_BVC)      ,C_LABEL(OpE0M0X1_0x51)   ; 50
@@ -1834,14 +1834,14 @@ dd  C_LABEL(OpE0M0_0x52)  ,C_LABEL(OpM0_0x53)
 dd  C_LABEL(EX_MVN)       ,C_LABEL(OpE0M0_0x55)
 dd  C_LABEL(OpE0M0_0x56)  ,C_LABEL(OpE0M0_0x37)
 dd  C_LABEL(ALL_CLI)      ,C_LABEL(OpM0X1_0x59)
-dd  C_LABEL(EX_PHY)       ,C_LABEL(ALL_TCD)
+dd  C_LABEL(OpE0X1_0x5A)  ,C_LABEL(ALL_TCD)
 dd  C_LABEL(ALL_JML_al)   ,C_LABEL(OpM0X1_0x5D)
 dd  C_LABEL(OpM0_0x5E)    ,C_LABEL(OpM0_0x5F)
 dd  C_LABEL(E0_RTS)       ,C_LABEL(OpE0M0_0x61)     ; 60
 dd  C_LABEL(E0_PER)       ,C_LABEL(OpM0_0x63)
 dd  C_LABEL(OpE0M0_0x64)  ,C_LABEL(OpE0M0_0x65)
 dd  C_LABEL(OpE0M0_0x66)  ,C_LABEL(OpE0M0_0x67)
-dd  C_LABEL(E0_PLA)       ,C_LABEL(OpM0_0x69)
+dd  C_LABEL(OpE0M0_0x68)  ,C_LABEL(OpM0_0x69)
 dd  C_LABEL(OpM0_0x6A)    ,C_LABEL(E0_RTL)
 dd  C_LABEL(ALL_JMP_OaO)  ,C_LABEL(OpM0_0x6D)
 dd  C_LABEL(OpM0_0x6E)    ,C_LABEL(OpM0_0x6F)
@@ -1850,7 +1850,7 @@ dd  C_LABEL(OpE0M0_0x72)  ,C_LABEL(OpM0_0x73)
 dd  C_LABEL(OpE0M0_0x74)  ,C_LABEL(OpE0M0_0x75)
 dd  C_LABEL(OpE0M0_0x76)  ,C_LABEL(OpE0M0_0x77)
 dd  C_LABEL(ALL_SEI)      ,C_LABEL(OpM0X1_0x79)
-dd  C_LABEL(EX_PLY)       ,C_LABEL(ALL_TDC)
+dd  C_LABEL(OpE0X1_0x7A)  ,C_LABEL(ALL_TDC)
 dd  C_LABEL(ALL_JMP_Oa_xO),C_LABEL(OpM0X1_0x7D)
 dd  C_LABEL(OpM0_0x7E)    ,C_LABEL(OpM0_0x7F)
 dd  C_LABEL(ALL_BRA)      ,C_LABEL(OpE0M0_0x81)     ; 80
@@ -1858,7 +1858,7 @@ dd  C_LABEL(ALL_BRL)      ,C_LABEL(OpM0_0x83)
 dd  C_LABEL(OpE0X1_0x84)  ,C_LABEL(OpE0M0_0x85)
 dd  C_LABEL(OpE0X1_0x86)  ,C_LABEL(OpE0M0_0x87)
 dd  C_LABEL(OpX1_0x88)    ,C_LABEL(E0_BIT_i)
-dd  C_LABEL(E0_TXA)       ,C_LABEL(E0_PHB)
+dd  C_LABEL(E0_TXA)       ,C_LABEL(OpE0_0x8B)
 dd  C_LABEL(OpX1_0x8C)    ,C_LABEL(OpM0_0x8D)
 dd  C_LABEL(OpX1_0x8E)    ,C_LABEL(OpM0_0x8F)
 dd  C_LABEL(ALL_BCC)      ,C_LABEL(OpE0M0X1_0x91)   ; 90
@@ -1874,7 +1874,7 @@ dd  C_LABEL(OpX1_0xA2)    ,C_LABEL(OpM0_0xA3)
 dd  C_LABEL(OpE0X1_0xA4)  ,C_LABEL(OpE0M0_0xA5)
 dd  C_LABEL(OpE0X1_0xA6)  ,C_LABEL(OpE0M0_0xA7)
 dd  C_LABEL(EX_TAY)       ,C_LABEL(OpM0_0xA9)
-dd  C_LABEL(EX_TAX)       ,C_LABEL(E0_PLB)
+dd  C_LABEL(EX_TAX)       ,C_LABEL(OpE0_0xAB)
 dd  C_LABEL(OpX1_0xAC)    ,C_LABEL(OpM0_0xAD)
 dd  C_LABEL(OpX1_0xAE)    ,C_LABEL(OpM0_0xAF)
 dd  C_LABEL(ALL_BCS)      ,C_LABEL(OpE0M0X1_0xB1)   ; B0
@@ -1898,7 +1898,7 @@ dd  C_LABEL(OpE0M0_0xD2)  ,C_LABEL(OpM0_0xD3)
 dd  C_LABEL(E0_PEI)       ,C_LABEL(OpE0M0_0xD5)
 dd  C_LABEL(OpE0M0_0xD6)  ,C_LABEL(OpE0M0_0xD7)
 dd  C_LABEL(ALL_CLD)      ,C_LABEL(OpM0X1_0xD9)
-dd  C_LABEL(EX_PHX)       ,C_LABEL(ALL_INVALID)
+dd  C_LABEL(OpE0X1_0xDA)  ,C_LABEL(ALL_INVALID)
 dd  C_LABEL(ALL_JML_OaO)  ,C_LABEL(OpM0X1_0xDD)
 dd  C_LABEL(OpM0_0xDE)    ,C_LABEL(OpM0_0xDF)
 dd  C_LABEL(OpX1_0xE0)    ,C_LABEL(OpE0M0_0xE1)     ; E0
@@ -1914,7 +1914,7 @@ dd  C_LABEL(OpE0M0_0xF2)  ,C_LABEL(OpM0_0xF3)
 dd  C_LABEL(E0_PEA)       ,C_LABEL(OpE0M0_0xF5)
 dd  C_LABEL(OpE0M0_0xF6)  ,C_LABEL(OpE0M0_0xF7)
 dd  C_LABEL(ALL_SED)      ,C_LABEL(OpM0X1_0xF9)
-dd  C_LABEL(EX_PLX)       ,C_LABEL(E0_XCE)
+dd  C_LABEL(OpE0X1_0xFA)  ,C_LABEL(E0_XCE)
 dd  C_LABEL(E0_JSR_Oa_xO) ,C_LABEL(OpM0X1_0xFD)
 dd  C_LABEL(OpM0_0xFE)    ,C_LABEL(OpM0_0xFF)
 
@@ -2505,7 +2505,7 @@ dd  C_LABEL(E0_COP)       ,C_LABEL(OpM1_0x03)
 dd  C_LABEL(OpE0M1_0x04)  ,C_LABEL(OpE0M1_0x05)
 dd  C_LABEL(OpE0M1_0x06)  ,C_LABEL(OpE0M1_0x07)
 dd  C_LABEL(E0_PHP)       ,C_LABEL(OpM1_0x09)
-dd  C_LABEL(OpM1_0x0A)    ,C_LABEL(E0_PHD)
+dd  C_LABEL(OpM1_0x0A)    ,C_LABEL(OpE0_0x0B)
 dd  C_LABEL(OpM1_0x0C)    ,C_LABEL(OpM1_0x0D)
 dd  C_LABEL(OpM1_0x0E)    ,C_LABEL(OpM1_0x0F)
 dd  C_LABEL(ALL_BPL)      ,C_LABEL(OpE0M1X1_0x11)   ; 10
@@ -2521,7 +2521,7 @@ dd  C_LABEL(E0_JSL_al)    ,C_LABEL(OpM1_0x23)
 dd  C_LABEL(OpE0M1_0x24)  ,C_LABEL(OpE0M1_0x25)
 dd  C_LABEL(OpE0M1_0x26)  ,C_LABEL(OpE0M1_0x27)
 dd  C_LABEL(E0_PLP)       ,C_LABEL(OpM1_0x29)
-dd  C_LABEL(OpM1_0x2A)    ,C_LABEL(E0_PLD)
+dd  C_LABEL(OpM1_0x2A)    ,C_LABEL(OpE0_0x2B)
 dd  C_LABEL(OpM1_0x2C)    ,C_LABEL(OpM1_0x2D)
 dd  C_LABEL(OpM1_0x2E)    ,C_LABEL(OpM1_0x2F)
 dd  C_LABEL(ALL_BMI)      ,C_LABEL(OpE0M1X1_0x31)   ; 30
@@ -2536,8 +2536,8 @@ dd  C_LABEL(E0_RTI)       ,C_LABEL(OpE0M1_0x41)     ; 40
 dd  C_LABEL(ALL_INVALID)  ,C_LABEL(OpM1_0x43)
 dd  C_LABEL(EX_MVP)       ,C_LABEL(OpE0M1_0x45)
 dd  C_LABEL(OpE0M1_0x46)  ,C_LABEL(OpE0M1_0x47)
-dd  C_LABEL(EM_PHA)       ,C_LABEL(OpM1_0x49)
-dd  C_LABEL(OpM1_0x4A)    ,C_LABEL(E0_PHK)
+dd  C_LABEL(OpE0M1_0x48)  ,C_LABEL(OpM1_0x49)
+dd  C_LABEL(OpM1_0x4A)    ,C_LABEL(OpE0_0x4B)
 dd  C_LABEL(ALL_JMP_a)    ,C_LABEL(OpM1_0x4D)
 dd  C_LABEL(OpM1_0x4E)    ,C_LABEL(OpM1_0x4F)
 dd  C_LABEL(ALL_BVC)      ,C_LABEL(OpE0M1X1_0x51)   ; 50
@@ -2545,14 +2545,14 @@ dd  C_LABEL(OpE0M1_0x52)  ,C_LABEL(OpM1_0x53)
 dd  C_LABEL(EX_MVN)       ,C_LABEL(OpE0M1_0x55)
 dd  C_LABEL(OpE0M1_0x56)  ,C_LABEL(OpE0M1_0x57)
 dd  C_LABEL(ALL_CLI)      ,C_LABEL(OpM1X1_0x59)
-dd  C_LABEL(EX_PHY)       ,C_LABEL(ALL_TCD)
+dd  C_LABEL(OpE0X1_0x5A)  ,C_LABEL(ALL_TCD)
 dd  C_LABEL(ALL_JML_al)   ,C_LABEL(OpM1X1_0x5D)
 dd  C_LABEL(OpM1_0x5E)    ,C_LABEL(OpM1_0x5F)
 dd  C_LABEL(E0_RTS)       ,C_LABEL(OpE0M1_0x61)     ; 60
 dd  C_LABEL(E0_PER)       ,C_LABEL(OpM1_0x63)
 dd  C_LABEL(OpE0M1_0x64)  ,C_LABEL(OpE0M1_0x65)
 dd  C_LABEL(OpE0M1_0x66)  ,C_LABEL(OpE0M1_0x67)
-dd  C_LABEL(EM_PLA)       ,C_LABEL(OpM1_0x69)
+dd  C_LABEL(OpE0M1_0x68)  ,C_LABEL(OpM1_0x69)
 dd  C_LABEL(OpM1_0x6A)    ,C_LABEL(E0_RTL)
 dd  C_LABEL(ALL_JMP_OaO)  ,C_LABEL(OpM1_0x6D)
 dd  C_LABEL(OpM1_0x6E)    ,C_LABEL(OpM1_0x6F)
@@ -2561,7 +2561,7 @@ dd  C_LABEL(OpE0M1_0x72)  ,C_LABEL(OpM1_0x73)
 dd  C_LABEL(OpE0M1_0x74)  ,C_LABEL(OpE0M1_0x75)
 dd  C_LABEL(OpE0M1_0x76)  ,C_LABEL(OpE0M1_0x77)
 dd  C_LABEL(ALL_SEI)      ,C_LABEL(OpM1X1_0x79)
-dd  C_LABEL(EX_PLY)       ,C_LABEL(ALL_TDC)
+dd  C_LABEL(OpE0X1_0x7A)  ,C_LABEL(ALL_TDC)
 dd  C_LABEL(ALL_JMP_Oa_xO),C_LABEL(OpM1X1_0x7D)
 dd  C_LABEL(OpM1_0x7E)    ,C_LABEL(OpM1_0x7F)
 dd  C_LABEL(ALL_BRA)      ,C_LABEL(OpE0M1_0x81)     ; 80
@@ -2569,7 +2569,7 @@ dd  C_LABEL(ALL_BRL)      ,C_LABEL(OpM1_0x83)
 dd  C_LABEL(OpE0X1_0x84)  ,C_LABEL(OpE0M1_0x85)
 dd  C_LABEL(OpE0X1_0x86)  ,C_LABEL(OpE0M1_0x87)
 dd  C_LABEL(OpX1_0x88)    ,C_LABEL(EM_BIT_i)
-dd  C_LABEL(EM_TXA)       ,C_LABEL(E0_PHB)
+dd  C_LABEL(EM_TXA)       ,C_LABEL(OpE0_0x8B)
 dd  C_LABEL(OpX1_0x8C)    ,C_LABEL(OpM1_0x8D)
 dd  C_LABEL(OpX1_0x8E)    ,C_LABEL(OpM1_0x8F)
 dd  C_LABEL(ALL_BCC)      ,C_LABEL(OpE0M1X1_0x91)   ; 90
@@ -2585,7 +2585,7 @@ dd  C_LABEL(OpX1_0xA2)    ,C_LABEL(OpM1_0xA3)
 dd  C_LABEL(OpE0X1_0xA4)  ,C_LABEL(OpE0M1_0xA5)
 dd  C_LABEL(OpE0X1_0xA6)  ,C_LABEL(OpE0M1_0xA7)
 dd  C_LABEL(EX_TAY)       ,C_LABEL(OpM1_0xA9)
-dd  C_LABEL(EX_TAX)       ,C_LABEL(E0_PLB)
+dd  C_LABEL(EX_TAX)       ,C_LABEL(OpE0_0xAB)
 dd  C_LABEL(OpX1_0xAC)    ,C_LABEL(OpM1_0xAD)
 dd  C_LABEL(OpX1_0xAE)    ,C_LABEL(OpM1_0xAF)
 dd  C_LABEL(ALL_BCS)      ,C_LABEL(OpE0M1X1_0xB1)   ; B0
@@ -2609,7 +2609,7 @@ dd  C_LABEL(OpE0M1_0xD2)  ,C_LABEL(OpM1_0xD3)
 dd  C_LABEL(E0_PEI)       ,C_LABEL(OpE0M1_0xD5)
 dd  C_LABEL(OpE0M1_0xD6)  ,C_LABEL(OpE0M1_0xD7)
 dd  C_LABEL(ALL_CLD)      ,C_LABEL(OpM1X1_0xD9)
-dd  C_LABEL(EX_PHX)       ,C_LABEL(ALL_INVALID)
+dd  C_LABEL(OpE0X1_0xDA)  ,C_LABEL(ALL_INVALID)
 dd  C_LABEL(ALL_JML_OaO)  ,C_LABEL(OpM1X1_0xDD)
 dd  C_LABEL(OpM1_0xDE)    ,C_LABEL(OpM1_0xDF)
 dd  C_LABEL(OpX1_0xE0)    ,C_LABEL(OpE0M1_0xE1)     ; E0
@@ -2625,7 +2625,7 @@ dd  C_LABEL(OpE0M1_0xF2)  ,C_LABEL(OpM1_0xF3)
 dd  C_LABEL(E0_PEA)       ,C_LABEL(OpE0M1_0xF5)
 dd  C_LABEL(OpE0M1_0xF6)  ,C_LABEL(OpE0M1_0xF7)
 dd  C_LABEL(ALL_SED)      ,C_LABEL(OpM1X1_0xF9)
-dd  C_LABEL(EX_PLX)       ,C_LABEL(E0_XCE)
+dd  C_LABEL(OpE0X1_0xFA)  ,C_LABEL(E0_XCE)
 dd  C_LABEL(E0_JSR_Oa_xO) ,C_LABEL(OpM1X1_0xFD)
 dd  C_LABEL(OpM1_0xFE)    ,C_LABEL(OpM1_0xFF)
 
@@ -3216,7 +3216,7 @@ dd  C_LABEL(E1_COP)       ,C_LABEL(OpM1_0x03)
 dd  C_LABEL(OpE1_0x04)    ,C_LABEL(OpE1_0x05)
 dd  C_LABEL(OpE1_0x06)    ,C_LABEL(OpE1_0x07)
 dd  C_LABEL(E1_PHP)       ,C_LABEL(OpM1_0x09)
-dd  C_LABEL(OpM1_0x0A)    ,C_LABEL(E1_PHD)
+dd  C_LABEL(OpM1_0x0A)    ,C_LABEL(OpE1_0x0B)
 dd  C_LABEL(OpM1_0x0C)    ,C_LABEL(OpM1_0x0D)
 dd  C_LABEL(OpM1_0x0E)    ,C_LABEL(OpM1_0x0F)
 dd  C_LABEL(ALL_BPL)      ,C_LABEL(OpE1_0x11)       ; 10
@@ -3232,7 +3232,7 @@ dd  C_LABEL(E1_JSL_al)    ,C_LABEL(OpM1_0x23)
 dd  C_LABEL(OpE1_0x24)    ,C_LABEL(OpE1_0x25)
 dd  C_LABEL(OpE1_0x26)    ,C_LABEL(OpE1_0x27)
 dd  C_LABEL(E1_PLP)       ,C_LABEL(OpM1_0x29)
-dd  C_LABEL(OpM1_0x2A)    ,C_LABEL(E1_PLD)
+dd  C_LABEL(OpM1_0x2A)    ,C_LABEL(OpE1_0x2B)
 dd  C_LABEL(OpM1_0x2C)    ,C_LABEL(OpM1_0x2D)
 dd  C_LABEL(OpM1_0x2E)    ,C_LABEL(OpM1_0x2F)
 dd  C_LABEL(ALL_BMI)      ,C_LABEL(OpE1_0x31)       ; 30
@@ -3247,8 +3247,8 @@ dd  C_LABEL(E1_RTI)       ,C_LABEL(OpE1_0x41)       ; 40
 dd  C_LABEL(ALL_INVALID)  ,C_LABEL(OpM1_0x43)
 dd  C_LABEL(EX_MVP)       ,C_LABEL(OpE1_0x45)
 dd  C_LABEL(OpE1_0x46)    ,C_LABEL(OpE1_0x47)
-dd  C_LABEL(EM_PHA)       ,C_LABEL(OpM1_0x49)
-dd  C_LABEL(OpM1_0x4A)    ,C_LABEL(E1_PHK)
+dd  C_LABEL(OpE1_0x48)    ,C_LABEL(OpM1_0x49)
+dd  C_LABEL(OpM1_0x4A)    ,C_LABEL(OpE1_0x4B)
 dd  C_LABEL(ALL_JMP_a)    ,C_LABEL(OpM1_0x4D)
 dd  C_LABEL(OpM1_0x4E)    ,C_LABEL(OpM1_0x4F)
 dd  C_LABEL(ALL_BVC)      ,C_LABEL(OpE1_0x51)       ; 50
@@ -3256,14 +3256,14 @@ dd  C_LABEL(OpE1_0x52)    ,C_LABEL(OpM1_0x53)
 dd  C_LABEL(EX_MVN)       ,C_LABEL(OpE1_0x55)
 dd  C_LABEL(OpE1_0x56)    ,C_LABEL(OpE1_0x57)
 dd  C_LABEL(ALL_CLI)      ,C_LABEL(OpM1X1_0x59)
-dd  C_LABEL(E1_PHY)       ,C_LABEL(ALL_TCD)
+dd  C_LABEL(OpE1_0x5A)    ,C_LABEL(ALL_TCD)
 dd  C_LABEL(ALL_JML_al)   ,C_LABEL(OpM1X1_0x5D)
 dd  C_LABEL(OpM1_0x5E)    ,C_LABEL(OpM1_0x5F)
 dd  C_LABEL(E1_RTS)       ,C_LABEL(OpE1_0x61)       ; 60
 dd  C_LABEL(E1_PER)       ,C_LABEL(OpM1_0x63)
 dd  C_LABEL(OpE1_0x64)    ,C_LABEL(OpE1_0x65)
 dd  C_LABEL(OpE1_0x66)    ,C_LABEL(OpE1_0x67)
-dd  C_LABEL(E1_PLA)       ,C_LABEL(OpM1_0x69)
+dd  C_LABEL(OpE1_0x68)    ,C_LABEL(OpM1_0x69)
 dd  C_LABEL(OpM1_0x6A)    ,C_LABEL(E1_RTL)
 dd  C_LABEL(ALL_JMP_OaO)  ,C_LABEL(OpM1_0x6D)
 dd  C_LABEL(OpM1_0x6E)    ,C_LABEL(OpM1_0x6F)
@@ -3272,7 +3272,7 @@ dd  C_LABEL(OpE1_0x72)    ,C_LABEL(OpM1_0x73)
 dd  C_LABEL(OpE1_0x74)    ,C_LABEL(OpE1_0x75)
 dd  C_LABEL(OpE1_0x76)    ,C_LABEL(OpE1_0x77)
 dd  C_LABEL(ALL_SEI)      ,C_LABEL(OpM1X1_0x79)
-dd  C_LABEL(E1_PLY)       ,C_LABEL(ALL_TDC)
+dd  C_LABEL(OpE1_0x7A)    ,C_LABEL(ALL_TDC)
 dd  C_LABEL(ALL_JMP_Oa_xO),C_LABEL(OpM1X1_0x7D)
 dd  C_LABEL(OpM1_0x7E)    ,C_LABEL(OpM1_0x7F)
 dd  C_LABEL(ALL_BRA)      ,C_LABEL(OpE1_0x81)       ; 80
@@ -3280,7 +3280,7 @@ dd  C_LABEL(ALL_BRL)      ,C_LABEL(OpM1_0x83)
 dd  C_LABEL(OpE1_0x84)    ,C_LABEL(OpE1_0x85)
 dd  C_LABEL(OpE1_0x86)    ,C_LABEL(OpE1_0x87)
 dd  C_LABEL(OpX1_0x88)    ,C_LABEL(EM_BIT_i)
-dd  C_LABEL(EM_TXA)       ,C_LABEL(E1_PHB)
+dd  C_LABEL(EM_TXA)       ,C_LABEL(OpE1_0x8B)
 dd  C_LABEL(OpX1_0x8C)    ,C_LABEL(OpM1_0x8D)
 dd  C_LABEL(OpX1_0x8E)    ,C_LABEL(OpM1_0x8F)
 dd  C_LABEL(ALL_BCC)      ,C_LABEL(OpE1_0x91)       ; 90
@@ -3296,7 +3296,7 @@ dd  C_LABEL(OpX1_0xA2)    ,C_LABEL(OpM1_0xA3)
 dd  C_LABEL(OpE1_0xA4)    ,C_LABEL(OpE1_0xA5)
 dd  C_LABEL(OpE1_0xA6)    ,C_LABEL(OpE1_0xA7)
 dd  C_LABEL(EX_TAY)       ,C_LABEL(OpM1_0xA9)
-dd  C_LABEL(EX_TAX)       ,C_LABEL(E1_PLB)
+dd  C_LABEL(EX_TAX)       ,C_LABEL(OpE1_0xAB)
 dd  C_LABEL(OpX1_0xAC)    ,C_LABEL(OpM1_0xAD)
 dd  C_LABEL(OpX1_0xAE)    ,C_LABEL(OpM1_0xAF)
 dd  C_LABEL(ALL_BCS)      ,C_LABEL(OpE1_0xB1)       ; B0
@@ -3320,7 +3320,7 @@ dd  C_LABEL(OpE1_0xD2)    ,C_LABEL(OpM1_0xD3)
 dd  C_LABEL(E1_PEI)       ,C_LABEL(OpE1_0xD5)
 dd  C_LABEL(OpE1_0xD6)    ,C_LABEL(OpE1_0xD7)
 dd  C_LABEL(ALL_CLD)      ,C_LABEL(OpM1X1_0xD9)
-dd  C_LABEL(E1_PHX)       ,C_LABEL(ALL_INVALID)
+dd  C_LABEL(OpE1_0xDA)    ,C_LABEL(ALL_INVALID)
 dd  C_LABEL(ALL_JML_OaO)  ,C_LABEL(OpM1X1_0xDD)
 dd  C_LABEL(OpM1_0xDE)    ,C_LABEL(OpM1_0xDF)
 dd  C_LABEL(OpX1_0xE0)    ,C_LABEL(OpE1_0xE1)       ; E0
@@ -3336,7 +3336,7 @@ dd  C_LABEL(OpE1_0xF2)    ,C_LABEL(OpM1_0xF3)
 dd  C_LABEL(E1_PEA)       ,C_LABEL(OpE1_0xF5)
 dd  C_LABEL(OpE1_0xF6)    ,C_LABEL(OpE1_0xF7)
 dd  C_LABEL(ALL_SED)      ,C_LABEL(OpM1X1_0xF9)
-dd  C_LABEL(E1_PLX)       ,C_LABEL(E1_XCE)
+dd  C_LABEL(OpE1_0xFA)    ,C_LABEL(E1_XCE)
 dd  C_LABEL(E1_JSR_Oa_xO) ,C_LABEL(OpM1X1_0xFD)
 dd  C_LABEL(OpM1_0xFE)    ,C_LABEL(OpM1_0xFF)
 
@@ -4378,6 +4378,15 @@ section .text
 %endif
 %endmacro
 
+%macro PUSH_B 0
+%if S_8bit
+ E1_PUSH_B
+%else
+ E0_PUSH_B
+%endif
+%endmacro
+
+
 ; Native mode - pull byte (++S)
 %macro E0_PULL_B 0
  mov ebx,[CPU_LABEL(S)] ; S only - bank always 0!
@@ -4400,6 +4409,15 @@ section .text
  GET_BYTE
 %endif
 %endmacro
+
+%macro PULL_B 0
+%if S_8bit
+ E1_PULL_B
+%else
+ E0_PULL_B
+%endif
+%endmacro
+
 
 ; Native mode - push word (S--)
 %macro E0_PUSH_W 0
@@ -4455,7 +4473,16 @@ section .text
  mov [CPU_LABEL(S)],bl  ; Set stack pointer
 %endmacro
 
-; Native mode - pull word (++S)
+%macro PUSH_W 0-1 0
+%if S_8bit
+ E1_PUSH_W %1
+%else
+ E0_PUSH_W
+%endif
+%endmacro
+
+
+;Native mode - push word (S--)
 %macro E0_PULL_W 0
  mov ebx,[CPU_LABEL(S)] ; S only - bank always 0!
  inc bx         ; Preincrement S
@@ -4510,6 +4537,99 @@ section .text
 %else
  GET_BYTE
  ror ax,8
+%endif
+%endmacro
+
+%macro PULL_W 0-1 0
+%if S_8bit
+ E1_PULL_W %1
+%else
+ E0_PULL_W
+%endif
+%endmacro
+
+
+; Native mode - push long (S--)
+%macro E0_PUSH_L 0
+ mov ebx,[CPU_LABEL(S)] ; S only - bank always 0!
+ ror eax,16     ; bank byte
+ SET_BYTE
+ dec bx         ; Postdecrement S
+ rol eax,8      ; high byte
+ SET_BYTE
+ dec bx         ; Postdecrement S
+ rol eax,8      ; low byte
+ SET_BYTE
+ dec bx         ; Postdecrement S
+ mov [CPU_LABEL(S)],ebx ; Set stack pointer
+%endmacro
+
+; Emulation mode - push long (SL--*)
+%macro E1_PUSH_L_New 0
+ mov ebx,[CPU_LABEL(S)] ; S only - bank always 0!
+ ror eax,16     ; bank byte
+ SET_BYTE
+ dec bx         ; Postdecrement S
+ rol eax,8      ; high byte
+ SET_BYTE
+ dec bx         ; Postdecrement S
+ rol eax,8      ; low byte
+ SET_BYTE
+ dec bx         ; Postdecrement S
+ mov [CPU_LABEL(S)],bl  ; Set stack pointer
+%endmacro
+
+%macro PUSH_L 0
+%if S_8bit
+ E1_PUSH_L_New
+%else
+ E0_PUSH_L
+%endif
+%endmacro
+
+
+; Native mode - pull long (++S)
+%macro E0_PULL_L 0
+ mov ebx,[CPU_LABEL(S)] ; S only - bank always 0!
+ inc bx         ; Preincrement S
+ GET_BYTE
+ inc bx         ; Preincrement S
+ ror eax,8      ; low byte
+ GET_BYTE
+ inc bx         ; Preincrement S
+ ror eax,8      ; high byte
+ GET_BYTE
+ ror eax,16     ; bank byte
+ mov [CPU_LABEL(S)],ebx ; Set stack pointer
+%endmacro
+
+; Emulation mode - pull long (++SL*)
+%macro E1_PULL_L_New 0
+ mov ebx,[CPU_LABEL(S)] ; S only - bank always 0!
+ inc bx         ; Preincrement S
+ GET_BYTE
+ inc bx         ; Preincrement S
+ ror eax,8      ; low byte
+ GET_BYTE
+ inc bx         ; Preincrement S
+ ror eax,8      ; high byte
+ GET_BYTE
+ ror eax,16     ; bank byte
+ mov [CPU_LABEL(S)],bl  ; Set stack pointer
+%endmacro
+
+%macro PULL_L 0
+%if S_8bit
+ E1_PULL_L_New
+%else
+ E0_PULL_L
+%endif
+%endmacro
+
+
+%macro Stack_Fixup 0
+%if S_8bit
+ mov byte B_SH,1
 %endif
 %endmacro
 

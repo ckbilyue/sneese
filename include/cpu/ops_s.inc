@@ -1,5 +1,27 @@
 %define OPCODE_PROLOG(op) OPCODE_LABEL OpE %+ S_8bit %+ _ %+ op
 
 
+OPCODE_PROLOG(0x0B) ; PHD s
+ _PHD
+OPCODE_EPILOG
+
+OPCODE_PROLOG(0x2B) ; PLD s
+ _PLD
+OPCODE_EPILOG
+
+; Push PB(K) onto stack
+OPCODE_PROLOG(0x4B) ; PHK s
+ _PHK
+OPCODE_EPILOG
+
+; Push DB(B) onto stack
+OPCODE_PROLOG(0x8B) ; PHB s
+ _PHB
+OPCODE_EPILOG
+
+; Pull DB(B) from stack
+OPCODE_PROLOG(0xAB) ; PLB s
+ _PLB
+OPCODE_EPILOG
 
 %undef OPCODE_PROLOG
