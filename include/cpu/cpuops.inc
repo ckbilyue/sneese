@@ -467,10 +467,6 @@ ALIGNC
 EXPORT_C E1_COP
  Emu6502Interrupt B_COP_Evector,B_COP_Eoffset
 
-; 03
-EM_ORA d_s,Stack_Relative
-E0_ORA d_s,Stack_Relative
-
 ; 05
 EM_ORA d,Direct
 E0_ORA d,Direct
@@ -734,10 +730,6 @@ EXPORT_C E1_JSL_al
  jmp short .read_direct
 %endif
 
-; 23
-EM_AND d_s,Stack_Relative
-E0_AND d_s,Stack_Relative
-
 ; 24
 EM_BIT d,Direct
 E0_BIT d,Direct
@@ -992,10 +984,6 @@ ALIGNC
 EXPORT_C ALL_WDM
  add R_NativePC,byte 2
  OPCODE_EPILOG
-
-; 43
-EM_EOR d_s,Stack_Relative
-E0_EOR d_s,Stack_Relative
 
 ; 44
 
@@ -1292,10 +1280,6 @@ EXPORT_C E1_PER
  add eax,ebx
  E1_PUSH_W
  OPCODE_EPILOG
-
-; 63
-EM_ADC d_s,Stack_Relative
-E0_ADC d_s,Stack_Relative
 
 ; 65
 EM_ADC d,Direct
@@ -1642,10 +1626,6 @@ E0_LDA Od_xO,Direct_Indexed_Indirect
 EX_LDX i,Immediate
 E0_LDX i,Immediate
 
-; A3
-EM_LDA d_s,Stack_Relative
-E0_LDA d_s,Stack_Relative
-
 ; A4
 EX_LDY d,Direct
 E0_LDY d,Direct
@@ -1875,10 +1855,6 @@ EXPORT_C E1_REP
 
 .no_irq_enable:
  OPCODE_EPILOG
-
-; C3
-EM_CMP d_s,Stack_Relative
-E0_CMP d_s,Stack_Relative
 
 ; C4
 EX_CPY d,Direct
@@ -2160,10 +2136,6 @@ EXPORT_C E1_SEP
  add R_NativePC,byte 2
 
  OPCODE_EPILOG
-
-; E3
-EM_SBC d_s,Stack_Relative
-E0_SBC d_s,Stack_Relative
 
 ; E4
 EX_CPX d,Direct
