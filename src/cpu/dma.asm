@@ -108,6 +108,59 @@ EXPORT In_DMA,skipb     ; c = channel # 0-7 | a = address # 0-3
 %define DMA_IN_PROGRESS 0x40
 
 section .text
+;macro for getting A bus alias for B bus address for DMA access
+%macro GET_B_BUS_ADDRESS 1
+ movzx ebx,byte %1
+ add ebx,0x2100
+%endmacro
+
+;macro for reading a byte without affecting timing - for parallel/fixed
+; speed accesses (DMA)
+%macro GET_BYTE_NO_UPDATE_CYCLES 0
+ push R_65c816_Cycles
+ GET_BYTE
+ pop R_65c816_Cycles
+%endmacro
+
+;macro for writing a byte without affecting timing - for parallel/fixed
+; speed accesses (DMA)
+%macro SET_BYTE_NO_UPDATE_CYCLES 0
+ push R_65c816_Cycles
+ SET_BYTE
+ pop R_65c816_Cycles
+%endmacro
+
+;macro for performing DMA B bus accesses
+%macro ACCESS_B_BUS 2
+ push ebx
+ GET_B_BUS_ADDRESS %2
+ %1
+ pop ebx
+%endmacro
+
+;macro for DMA reads from B bus
+%macro GET_BYTE_B_BUS 1
+ ACCESS_B_BUS GET_BYTE_NO_UPDATE_CYCLES,%1
+%endmacro
+
+;macro for DMA writes to B bus
+%macro SET_BYTE_B_BUS 1
+ ACCESS_B_BUS SET_BYTE_NO_UPDATE_CYCLES,%1
+%endmacro
+
+;macro for HDMA transfers, and DMA transfers in PPU write mode
+%macro TRANSFER_A_TO_B 1
+ GET_BYTE_NO_UPDATE_CYCLES
+ SET_BYTE_B_BUS %1
+%endmacro
+
+;macro for DMA transfers in PPU read mode
+%macro TRANSFER_B_TO_A 1
+ GET_BYTE_B_BUS %1
+ SET_BYTE_NO_UPDATE_CYCLES
+%endmacro
+
+
 ALIGNC
 %if 0
   al = data byte
@@ -133,90 +186,49 @@ EXPORT_C Do_DMA_Channel
  xor ecx,ecx
  movsx esi,byte [edi+DMA_Inc]   ; Get address adjustment
  test al,al     ; Is the operation CPU->PPU?
- jns near .ppu_write
+ jns .ppu_write
 
 ; PPU->CPU
  cmp dword [DMA_Transfer_Size],byte 4
- jb near .lpr_less_than_4
+ jb .lpr_less_than_4
 
 .loop_ppu_read:
- push ebx
- movzx ebx,byte [edi+DMA_B0]
- add ebx,0x2100
- GET_BYTE
- pop ebx
- SET_BYTE
+ TRANSFER_B_TO_A [edi+DMA_B0]
  add bx,si
 
- push ebx
- movzx ebx,byte [edi+DMA_B1]
- add ebx,0x2100
- GET_BYTE
- pop ebx
- SET_BYTE
+ TRANSFER_B_TO_A [edi+DMA_B1]
  add bx,si
 
- push ebx
- movzx ebx,byte [edi+DMA_B2]
- add ebx,0x2100
- GET_BYTE
- pop ebx
- SET_BYTE
+ TRANSFER_B_TO_A [edi+DMA_B2]
  add bx,si
 
- push ebx
- movzx ebx,byte [edi+DMA_B3]
- add ebx,0x2100
- GET_BYTE
- pop ebx
- SET_BYTE
+ TRANSFER_B_TO_A [edi+DMA_B3]
  add bx,si
  sub dword [DMA_Transfer_Size],byte 4
- jz near .ppu_read_done
+ jz .ppu_read_done
  cmp dword [DMA_Transfer_Size],byte 4
- jnb near .loop_ppu_read
+ jnb .loop_ppu_read
 
 .lpr_less_than_4:
- push ebx
- movzx ebx,byte [edi+DMA_B0]
- add ebx,0x2100
- GET_BYTE
- pop ebx
- SET_BYTE
- add bx,si
- dec dword [DMA_Transfer_Size]
- jz near .ppu_read_done
-
- push ebx
- movzx ebx,byte [edi+DMA_B1]
- add ebx,0x2100
- GET_BYTE
- pop ebx
- SET_BYTE
- add bx,si
- dec dword [DMA_Transfer_Size]
- jz near .ppu_read_done
-;jz .ppu_read_done ;*set_byte
-
- push ebx
- movzx ebx,byte [edi+DMA_B2]
- add ebx,0x2100
- GET_BYTE
- pop ebx
- SET_BYTE
+ TRANSFER_B_TO_A [edi+DMA_B0]
  add bx,si
  dec dword [DMA_Transfer_Size]
  jz .ppu_read_done
 
- push ebx
- movzx ebx,byte [edi+DMA_B3]
- add ebx,0x2100
- GET_BYTE
- pop ebx
- SET_BYTE
+ TRANSFER_B_TO_A [edi+DMA_B1]
  add bx,si
  dec dword [DMA_Transfer_Size]
- jnz near .loop_ppu_read
+ jz .ppu_read_done
+
+ TRANSFER_B_TO_A [edi+DMA_B2]
+ add bx,si
+ dec dword [DMA_Transfer_Size]
+ jz .ppu_read_done
+
+ TRANSFER_B_TO_A [edi+DMA_B3]
+ add bx,si
+ dec dword [DMA_Transfer_Size]
+ jnz .loop_ppu_read
 
 .ppu_read_done:
  mov eax,[DMA_Transfer_Size]
@@ -228,86 +240,46 @@ ALIGNC
 ; CPU->PPU
 .ppu_write:
  cmp dword [DMA_Transfer_Size],byte 4
- jb near .lpw_less_than_4
+ jb .lpw_less_than_4
 
 .loop_ppu_write:
- GET_BYTE
- push ebx
- movzx ebx,byte [edi+DMA_B0]
- add ebx,0x2100
- SET_BYTE
- pop ebx
+ TRANSFER_A_TO_B [edi+DMA_B0]
  add bx,si
 
- GET_BYTE
- push ebx
- movzx ebx,byte [edi+DMA_B1]
- add ebx,0x2100
- SET_BYTE
- pop ebx
+ TRANSFER_A_TO_B [edi+DMA_B1]
  add bx,si
 
- GET_BYTE
- push ebx
- movzx ebx,byte [edi+DMA_B2]
- add ebx,0x2100
- SET_BYTE
- pop ebx
+ TRANSFER_A_TO_B [edi+DMA_B2]
  add bx,si
 
- GET_BYTE
- push ebx
- movzx ebx,byte [edi+DMA_B3]
- add ebx,0x2100
- SET_BYTE
- pop ebx
+ TRANSFER_A_TO_B [edi+DMA_B3]
  add bx,si
 
  sub dword [DMA_Transfer_Size],byte 4
- jz near .ppu_write_done
+ jz .ppu_write_done
  cmp dword [DMA_Transfer_Size],byte 4
- jnb near .loop_ppu_write
+ jnb .loop_ppu_write
 
 .lpw_less_than_4:
- GET_BYTE
- push ebx
- movzx ebx,byte [edi+DMA_B0]
- add ebx,0x2100
- SET_BYTE
- pop ebx
- add bx,si
- dec dword [DMA_Transfer_Size]
- jz near .ppu_write_done
-
- GET_BYTE
- push ebx
- movzx ebx,byte [edi+DMA_B1]
- add ebx,0x2100
- SET_BYTE
- pop ebx
+ TRANSFER_A_TO_B [edi+DMA_B0]
  add bx,si
  dec dword [DMA_Transfer_Size]
  jz .ppu_write_done
 
- GET_BYTE
- push ebx
- movzx ebx,byte [edi+DMA_B2]
- add ebx,0x2100
- SET_BYTE
- pop ebx
+ TRANSFER_A_TO_B [edi+DMA_B1]
  add bx,si
  dec dword [DMA_Transfer_Size]
  jz .ppu_write_done
 
- GET_BYTE
- push ebx
- movzx ebx,byte [edi+DMA_B3]
- add ebx,0x2100
- SET_BYTE
- pop ebx
+ TRANSFER_A_TO_B [edi+DMA_B2]
  add bx,si
  dec dword [DMA_Transfer_Size]
- jnz near .loop_ppu_write
+ jz .ppu_write_done
+
+ TRANSFER_A_TO_B [edi+DMA_B3]
+ add bx,si
+ dec dword [DMA_Transfer_Size]
+ jnz .loop_ppu_write
 
 .ppu_write_done:
  mov eax,[DMA_Transfer_Size]
@@ -323,7 +295,7 @@ EXPORT_C Do_HDMA_Channel
  mov al,[edi+DMAP]      ; Get HDMA control byte
  test al,0x40           ; Check for indirect addressing
  mov ecx,[edi+HDMA_Siz] ; Get HDMA transfer size
- jnz near Do_HDMA_Indirect
+ jnz Do_HDMA_Indirect
 
 Do_HDMA_Absolute:
  mov ah,[edi+NTRL]      ; Get number of lines to transfer
@@ -334,60 +306,34 @@ Do_HDMA_Absolute:
  jmp .Continue
 
 .Next_Set:
- GET_BYTE
+ GET_BYTE_NO_UPDATE_CYCLES
  inc bx                 ; Adjust table address
  test al,al             ; Check for zero-length set
  mov [edi+NTRL],al      ; Save length of set
- jz near HDMA_End_Channel
+ jz HDMA_End_Channel
  mov [edi+A2T],ebx      ; Save new table address
 
 .Next_Transfer:
- GET_BYTE
- push ebx
- movzx ebx,byte [edi+DMA_B0]
- add ebx,0x2100
-
- SET_BYTE
- pop ebx
+ TRANSFER_A_TO_B [edi+DMA_B0]
 
  add R_65c816_Cycles,byte 8     ; HDMA transfer
  cmp cl,2
  inc bx                 ; Adjust temporary table pointer
-;jb .End_Transfer
- jb near .End_Transfer
+ jb .End_Transfer
 
- GET_BYTE
- push ebx
- movzx ebx,byte [edi+DMA_B1]
- add ebx,0x2100
-
- SET_BYTE
- pop ebx
+ TRANSFER_A_TO_B [edi+DMA_B1]
 
  add R_65c816_Cycles,byte 8     ; HDMA transfer
  cmp cl,4
  inc bx                 ; Adjust temporary table pointer
-;jb .End_Transfer
- jb near .End_Transfer
+ jb .End_Transfer
 
- GET_BYTE
- push ebx
- movzx ebx,byte [edi+DMA_B2]
- add ebx,0x2100
-
- SET_BYTE
- pop ebx
+ TRANSFER_A_TO_B [edi+DMA_B2]
 
  add R_65c816_Cycles,byte 8     ; HDMA transfer
  inc bx
 
- GET_BYTE
- push ebx
- movzx ebx,byte [edi+DMA_B3]
- add ebx,0x2100
-
- SET_BYTE
- pop ebx
+ TRANSFER_A_TO_B [edi+DMA_B3]
 
  add R_65c816_Cycles,byte 8     ; HDMA transfer
 
@@ -408,22 +354,22 @@ Do_HDMA_Indirect:
  test ah,0x7F
  jz  .Next_Set
  test ah,ah
- js near .Next_Transfer
+ js .Next_Transfer
  jmp .Continue
 
 .Next_Set:
- GET_BYTE
+ GET_BYTE_NO_UPDATE_CYCLES
  inc bx
  mov [edi+NTRL],al
  test al,al
  jz HDMA_End_Channel
 
  mov ah,al
- GET_BYTE
+ GET_BYTE_NO_UPDATE_CYCLES
  add R_65c816_Cycles,byte 8     ; Address load low
  inc bx
  mov [edi+DASL],al
- GET_BYTE
+ GET_BYTE_NO_UPDATE_CYCLES
  add R_65c816_Cycles,byte 8     ; Address load high
  inc bx
  mov [edi+DASH],al
@@ -432,52 +378,26 @@ Do_HDMA_Indirect:
  mov ebx,[edi+DAS]
  and ebx,(1 << 24) - 1
 
- GET_BYTE
- push ebx
- movzx ebx,byte [edi+DMA_B0]
- add ebx,0x2100
-
- SET_BYTE
- pop ebx
+ TRANSFER_A_TO_B [edi+DMA_B0]
 
  add R_65c816_Cycles,byte 8     ; HDMA transfer
  cmp cl,2
  inc bx                 ; Adjust temporary table pointer
-;jb .End_Transfer
- jb near .End_Transfer
+ jb .End_Transfer
 
- GET_BYTE
- push ebx
- movzx ebx,byte [edi+DMA_B1]
- add ebx,0x2100
-
- SET_BYTE
- pop ebx
+ TRANSFER_A_TO_B [edi+DMA_B1]
 
  add R_65c816_Cycles,byte 8     ; HDMA transfer
  cmp cl,4
  inc bx                 ; Adjust temporary table pointer
-;jb .End_Transfer
- jb near .End_Transfer
+ jb .End_Transfer
 
- GET_BYTE
- push ebx
- movzx ebx,byte [edi+DMA_B2]
- add ebx,0x2100
-
- SET_BYTE
- pop ebx
+ TRANSFER_A_TO_B [edi+DMA_B2]
 
  add R_65c816_Cycles,byte 8     ; HDMA transfer
  inc bx
 
- GET_BYTE
- push ebx
- movzx ebx,byte [edi+DMA_B3]
- add ebx,0x2100
-
- SET_BYTE
- pop ebx
+ TRANSFER_A_TO_B [edi+DMA_B3]
 
  add R_65c816_Cycles,byte 8     ; HDMA transfer
 
@@ -580,7 +500,7 @@ ALIGNC
 EXPORT do_HDMA
  mov al,[HDMAON]
  test al,al
- jz near .no_hdma
+ jz .no_hdma
  push eax
  push ebx
  push ecx
