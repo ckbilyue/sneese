@@ -43,20 +43,18 @@ edx is always corrupted.
 For bus reads:
 GET_BYTE    Get byte from any bank
 GET_WORD    Get word from any bank
+GET_LONG    Get long (24-bit address) from any bank
 For bus write:
 SET_BYTE    Set byte in any bank
 SET_WORD    Set word in any bank
 SET_WORD_HL Set word in any bank for RMW operations
 
-SET_WORD may be passed an optional 'NoSave' parameter to prevent the
-push/pop used to preserve the data word.
-
-SET_WORD may be passed an optional 'Double' parameter to force it to
-use al for both high and low bytes of write data. eax is not modified.
-
 SET_WORD_HL is an alternate macros for when the address being passed in
-is of the high byte, and the high byte will be written first. This
-alternate macro does not support NoSave or Double.
+is of the high byte, and the high byte will be written first.
+
+GET_WORD, GET_LONG, SET_WORD, and SET_WORD_HL may be passed optional
+'wrap' parameters to cause them to wrap within the same bank as the first
+byte accessed.
 
 %endif
 
@@ -227,32 +225,33 @@ alternate macro does not support NoSave or Double.
  add R_65c816_Cycles,edx
 %endmacro
 
-;%1 = NoSave/Double
+;%1 = wrap
 %macro SET_WORD 0-1 0
  SET_BYTE
-%ifnidni %1,Double
-%ifnidni %1,NoSave
  push eax
-%endif
  mov al,ah
-%endif
+%ifnidni %1,wrap
  inc ebx
  and ebx,(1 << 24) - 1
+%else
+ inc bx
+%endif
  SET_BYTE
-%ifnidni %1,Double
-%ifnidni %1,NoSave
  pop eax
-%endif
-%endif
 %endmacro
 
-%macro SET_WORD_HL 0
+;%1 = wrap
+%macro SET_WORD_HL 0-1 0
  push eax
  mov al,ah
  SET_BYTE
  pop eax
+%ifnidni %1,wrap
  dec ebx
  and ebx,(1 << 24) - 1
+%else
+ inc bx
+%endif
  SET_BYTE
 %endmacro
 

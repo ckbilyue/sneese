@@ -327,12 +327,20 @@ You must read and accept the license prior to use.
 
 %macro READ16_Direct 0
  ADDR_Direct
+%if S_8bit
+ GET_WORD wrap
+%else
  GET_WORD
+%endif
 %endmacro
 
 %macro READ24_Direct 0
  ADDR_Direct
+%if S_8bit
+ GET_LONG wrap
+%else
  GET_LONG
+%endif
 %endmacro
 
 %macro WRITE8_Direct 1
@@ -344,7 +352,11 @@ You must read and accept the license prior to use.
 %macro WRITE16_Direct 1
  ADDR_Direct
  mov eax,%1
+%if S_8bit
+ SET_WORD wrap
+%else
  SET_WORD
+%endif
 %endmacro
 
 %macro RMW_Direct 1
@@ -354,7 +366,11 @@ You must read and accept the license prior to use.
 %if M_8bit
  SET_BYTE
 %else
+%if S_8bit
+ SET_WORD_HL wrap
+%else
  SET_WORD_HL
+%endif
 %endif
 %endmacro
 
@@ -362,9 +378,13 @@ You must read and accept the license prior to use.
 ; if present, argument specifies post-index
 %macro ADDR_Direct_Indirect_Base 0-2 0,0
  mov eax,B_DB_Shifted   ;implied bank
+%if S_8bit
+ GET_WORD wrap
+%else
  GET_WORD
-%ifnidni %1,0           ;helper: post-index
+%endif
 
+%ifnidni %1,0           ;helper: post-index
 %ifidni %2,0
 %define %%wrapcheck X_8bit
 %else
@@ -603,7 +623,11 @@ You must read and accept the license prior to use.
 
 %macro READ16_Direct_Index_X 0
  ADDR_Direct_Index_X
+%if S_8bit
+ GET_WORD wrap
+%else
  GET_WORD
+%endif
 %endmacro
 
 %macro WRITE8_Direct_Index_X 1
@@ -615,7 +639,11 @@ You must read and accept the license prior to use.
 %macro WRITE16_Direct_Index_X 1
  ADDR_Direct_Index_X
  mov eax,%1
+%if S_8bit
+ SET_WORD wrap
+%else
  SET_WORD
+%endif
 %endmacro
 
 %macro RMW_Direct_Index_X 1
@@ -625,7 +653,11 @@ You must read and accept the license prior to use.
 %if M_8bit
  SET_BYTE
 %else
+%if S_8bit
+ SET_WORD_HL wrap
+%else
  SET_WORD_HL
+%endif
 %endif
 %endmacro
 
@@ -657,7 +689,11 @@ You must read and accept the license prior to use.
 
 %macro READ16_Direct_Index_Y 0
  ADDR_Direct_Index_Y
+%if S_8bit
+ GET_WORD wrap
+%else
  GET_WORD
+%endif
 %endmacro
 
 %macro WRITE8_Direct_Index_Y 1
@@ -669,7 +705,11 @@ You must read and accept the license prior to use.
 %macro WRITE16_Direct_Index_Y 1
  ADDR_Direct_Index_Y
  mov eax,%1
+%if S_8bit
+ SET_WORD wrap
+%else
  SET_WORD
+%endif
 %endmacro
 
 ; Direct Indexed Indirect (corrupts eax)
