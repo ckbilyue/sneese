@@ -25,7 +25,7 @@ You must read and accept the license prior to use.
 ;%define TRAP_INVALID_READ
 ;%define TRAP_INVALID_WRITE
 
-;%define UPDATE_SOUND_ON_RAM_WRITE
+%define UPDATE_SOUND_ON_RAM_WRITE
 
 ; This file contains:
 ;  CPU core info
