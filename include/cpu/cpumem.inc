@@ -20,7 +20,8 @@ EXTERN_C memmap_text_start,memmap_data_start,memmap_bss_start
 EXTERN_C Read_Bank8Mapping,Write_Bank8Mapping
 EXTERN_C Read_Bank8Offset,Write_Bank8Offset
 EXTERN_C Dummy
-EXTERN_C SNES_GET_WORD,SNES_GET_LONG
+EXTERN_C SNES_GET_WORD,SNES_GET_WORD_WRAP
+EXTERN_C SNES_GET_LONG,SNES_GET_LONG_WRAP
 EXTERN_C UNSUPPORTED_READ,UNSUPPORTED_WRITE,IGNORE_WRITE
 EXTERN_C PPU_READ,PPU_WRITE
 EXTERN_C SRAM_READ,SRAM_WRITE
@@ -70,12 +71,20 @@ alternate macro does not support NoSave or Double.
 %%read_done:
 %endmacro
 
-%macro GET_WORD 0
+%macro GET_WORD 0-1 0
+%ifnidni %1,wrap
  inc ebx
- test ebx,0x1FFF
+ test ebx,(8 << 10) - 1
  jnz %%single_block
  dec ebx
  call C_LABEL(SNES_GET_WORD)
+%else
+ inc bx
+ test bx,(8 << 10) - 1
+ jnz %%single_block
+ dec ebx
+ call C_LABEL(SNES_GET_WORD_WRAP)
+%endif
  jmp short %%read_done
 
 %%single_block:
@@ -88,10 +97,18 @@ alternate macro does not support NoSave or Double.
  mov edx,ebx
  shr edx,13
  push edx
+%ifnidni %1,wrap
  dec ebx
+%else
+ dec bx
+%endif
  call [C_LABEL(Read_Bank8Mapping)+edx*4]
  mov ah,al
+%ifnidni %1,wrap
  inc ebx
+%else
+ inc bx
+%endif
  pop edx
  call [C_LABEL(Read_Bank8Mapping)+edx*4]
  ror ax,8
@@ -102,12 +119,20 @@ alternate macro does not support NoSave or Double.
 %%read_done:
 %endmacro
 
-%macro GET_LONG 0
+%macro GET_LONG 0-1 0
+%ifnidni %1,wrap
  add ebx,2
- test ebx,0x1FFE
+ test ebx,(8 << 10) - 2
  jnz %%single_block
- sub ebx,2
+ sub bx,2
  call C_LABEL(SNES_GET_LONG)
+%else
+ add bx,2
+ test bx,(8 << 10) - 2
+ jnz %%single_block
+ sub bx,2
+ call C_LABEL(SNES_GET_LONG_WRAP)
+%endif
  jmp short %%read_done
 
 %%single_block:
@@ -120,14 +145,26 @@ alternate macro does not support NoSave or Double.
  jnz %%read_direct
 
  mov edx,[esp]
+%ifnidni %1,wrap
  sub ebx,2
+%else
+ sub bx,2
+%endif
  call [C_LABEL(Read_Bank8Mapping)+edx*4]
  mov edx,[esp]
  mov ah,al
+%ifnidni %1,wrap
  inc ebx
+%else
+ inc bx
+%endif
  call [C_LABEL(Read_Bank8Mapping)+edx*4]
  pop edx
+%ifnidni %1,wrap
  inc ebx
+%else
+ inc bx
+%endif
  bswap eax
  call [C_LABEL(Read_Bank8Mapping)+edx*4]
  ror eax,16

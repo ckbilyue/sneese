@@ -135,7 +135,7 @@ You must read and accept the license prior to use.
 %macro READ16_Immediate 0-1 0
  GET_PBPC ebx
  inc bx
- GET_WORD
+ GET_WORD wrap
 %ifnidni %1,JSR
 %ifnidni %1,JMP
  add R_PC,byte 3
@@ -149,7 +149,7 @@ You must read and accept the license prior to use.
  GET_PBPC ebx
  inc bx
 %ifnidni %1,JSR
- GET_LONG
+ GET_LONG wrap
 %ifnidni %1,JMP
  add R_PC,byte 4
 %endif

@@ -39,6 +39,7 @@ You must read and accept the license prior to use.
 %include "cpu/memmap.inc"
 %include "cpu/cpumem.inc"
 %include "ppu/ppu.inc"
+%include "cpu/regs.inc"
 
 section .text
 EXPORT_C memmap_text_start
@@ -65,7 +66,7 @@ EXPORT_C SNES_GET_WORD
  GET_BYTE
  mov ah,al
  inc ebx
- and ebx,0x00FFFFFF
+ and ebx,(1 << 24) - 1
  GET_BYTE
  ror ax,8
  ret
@@ -76,11 +77,33 @@ EXPORT_C SNES_GET_LONG
  GET_BYTE
  inc ebx
  mov ah,al
- and ebx,0x00FFFFFF
+ and ebx,(1 << 24) - 1
  GET_BYTE
  inc ebx
  bswap eax
- and ebx,0x00FFFFFF
+ and ebx,(1 << 24) - 1
+ GET_BYTE
+ ror eax,16
+ ret
+
+ALIGNC
+EXPORT_C SNES_GET_WORD_WRAP
+ GET_BYTE
+ mov ah,al
+ inc bx
+ GET_BYTE
+ ror ax,8
+ ret
+
+ALIGNC
+EXPORT_C SNES_GET_LONG_WRAP
+ xor eax,eax
+ GET_BYTE
+ inc bx
+ mov ah,al
+ GET_BYTE
+ inc bx
+ bswap eax
  GET_BYTE
  ror eax,16
  ret
@@ -147,14 +170,14 @@ EXPORT_C Write_Direct_Safeguard
 ALIGNC
 ; Read hardware - 2000-5FFF in 00-3F/80-BF
 EXPORT_C PPU_READ
-    mov edx,0xFFFF
+    mov edx,(1 << 16) - 1
     and edx,ebx
     jmp [(C_LABEL(Read_Map_20_5F)-0x2000*4)+edx*4]
 
 ALIGNC
 ; Write hardware - 2000-5FFF in 00-3F/80-BF
 EXPORT_C PPU_WRITE
-    mov edx,0xFFFF
+    mov edx,(1 << 16) - 1
     and edx,ebx
     jmp [(C_LABEL(Write_Map_20_5F)-0x2000*4)+edx*4]
 
@@ -181,8 +204,8 @@ EXPORT_C SRAM_WRITE_ALT
     push edi
     mov edi,ebx
     shr ecx,byte 1
-    and edi,0x7FFF
-    and ecx,~0x7FFF
+    and edi,(32 << 10) - 1
+    and ecx,~((32 << 10) - 1)
     add edi,ecx
     mov edx,[C_LABEL(SRAM_Mask)]
     and edx,edi
@@ -196,7 +219,7 @@ ALIGNC
 EXPORT_C SRAM_WRITE_HIROM
     push ecx
     mov ecx,0x0F0000
-    mov edx,0x1FFF
+    mov edx,((8 << 10) - 1)
     and ecx,ebx
     shr ecx,3
     and edx,ebx
@@ -210,7 +233,7 @@ EXPORT_C SRAM_WRITE_HIROM
 
 ALIGNC
 EXPORT_C SRAM_WRITE_2k
-    mov edx,2048 - 1
+    mov edx,(2 << 10) - 1
     and edx,ebx
     add edx,[C_LABEL(SRAM)]
     mov [edx],al
@@ -221,7 +244,7 @@ EXPORT_C SRAM_WRITE_2k
 
 ALIGNC
 EXPORT_C SRAM_WRITE_4k
-    mov edx,4096 - 1
+    mov edx,(4 << 10) - 1
     and edx,ebx
     add edx,[C_LABEL(SRAM)]
     mov [edx],al
