@@ -433,14 +433,14 @@ EXPORT_C Render_Offset_16x%2_Even_C%1
  add edi,eax
 
  mov esi,[RO16E_Clipped]
- mov al,[BG_Win_Count+edx+esi]
+ mov al,[Win_Count+edx+esi]
 
  test al,al
  jz .done
 
  mov ebx,[OffsetChangeMap_VOffset]
  mov [RO16E_Runs_Left],eax
- lea edx,[BG_Win_Bands+edx+esi]
+ lea edx,[Win_Bands+edx+esi]
 
  mov [RO16E_Output],edi
  mov [RO16E_RunListPtr],edx

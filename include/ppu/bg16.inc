@@ -383,13 +383,13 @@ Render_16x16_Base:
  lea ecx,[ecx+ebp*4+4]
 
  mov esi,[R16x16_Clipped]
- mov al,[BG_Win_Count+edx+esi]
+ mov al,[Win_Count+edx+esi]
 
  test al,al
  jz .done
 
  push eax
- lea edx,[BG_Win_Bands+edx+esi]
+ lea edx,[Win_Bands+edx+esi]
 
  push edi
  push edx

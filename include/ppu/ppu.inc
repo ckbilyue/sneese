@@ -96,15 +96,26 @@ EXTERN_BG_DATA 4
 
 %macro EXTERN_WIN_DATA 1
 EXTERN_C TableWin%1
-EXTERN_C Win%1_Bands_Out
-EXTERN_C Win%1_Bands_In
 EXTERN_C Win%1_Count_Out
+EXTERN_C Win%1_Bands_Out
 EXTERN_C Win%1_Count_In
-EXTERN_C Win%1_Type
+EXTERN_C Win%1_Bands_In
 %endmacro
 
 EXTERN_WIN_DATA 1
 EXTERN_WIN_DATA 2
+
+%macro MERGED_WIN_DATA 2
+EXPORT_C TableWin%1
+EXPORT_C Win%1_Count,skipb
+EXPORT_C Win%1_Bands,skipb 2*%2
+%endmacro
+
+%macro EXTERN_MERGED_WIN_DATA 2
+EXTERN_C TableWin%1
+EXTERN_C Win%1_Count
+EXTERN_C Win%1_Bands
+%endmacro
 
 EXTERN_C BG1SC,BG2SC,BG3SC,BG4SC
 EXTERN_C BG1HOFS,BG2HOFS,BG3HOFS,BG4HOFS
@@ -126,11 +137,6 @@ EXTERN_C Update_Layering
 %macro Set_21_Write 2
   mov dword [Write_21_Address(%1)],(%2)
 %endmacro
-
-
-; Offsets from _TableWin*BG#
-%define BG_Win_Count 0
-%define BG_Win_Bands 1
 
 
 ; Offsets from _TableBG#
@@ -160,35 +166,28 @@ EXTERN_C Update_Layering
 %define OC_Flag 0x3D
 
 %define BG_Win_Main 0x3E
-%define BG_Win_Main_Count (BG_Win_Main + BG_Win_Count)
-%define BG_Win_Main_Bands (BG_Win_Main + BG_Win_Bands)
+%define BG_Win_Main_Count (BG_Win_Main + Win_Count)
+%define BG_Win_Main_Bands (BG_Win_Main + Win_Bands)
 
 %define BG_Win_Sub 0x45
-%define BG_Win_Sub_Count (BG_Win_Sub + BG_Win_Count)
-%define BG_Win_Sub_Bands (BG_Win_Sub + BG_Win_Bands)
+%define BG_Win_Sub_Count (BG_Win_Sub + Win_Count)
+%define BG_Win_Sub_Bands (BG_Win_Sub + Win_Bands)
 
 %define Priority_Used 0x4C
 %define Priority_Unused 0x4D
 
+; Offsets from _TableWin*
+%define Win_Count 0
+%define Win_Bands 1
+
 ; Offsets from TableWin#
-%define Win_Bands_Out 0
-%define Win_Bands_In 4
-%define Win_Count_Out 6
-%define Win_Count_In 7
-%define Win_Type 8
+%define Win_Out 0
+%define Win_Count_Out (Win_Out + Win_Count)
+%define Win_Bands_Out (Win_Out + Win_Bands)
+%define Win_In 5
+%define Win_Count_In (Win_In + Win_Count)
+%define Win_Bands_In (Win_In + Win_Bands)
 
-
-;00000arl a = window has area
-;l = window flush with left edge, r = window flush with right edge
-
-%define WT_Left_Bit  (1 << 0)
-%define WT_Right_Bit (1 << 1)
-%define WT_Area_Bit  (1 << 2)
-
-%define WT_None  (0)
-%define WT_Left  (WT_Left_Bit | WT_Area_Bit)
-%define WT_Right (WT_Right_Bit | WT_Area_Bit)
-%define WT_Full  (WT_Left_Bit | WT_Right_Bit | WT_Area_Bit)
 
 %macro LOAD_BG_TABLE 1-2 edx
  mov dword %2,C_LABEL(TableBG%1)

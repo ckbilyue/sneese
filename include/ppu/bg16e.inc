@@ -337,13 +337,13 @@ Render_16x%1_Even_Base:
  mov ecx,[ecx+ebp*4+4]
 
  mov esi,[R16E_Clipped]
- mov al,[BG_Win_Count+edx+esi]
+ mov al,[Win_Count+edx+esi]
 
  test al,al
  jz .done
 
  mov [R16E_Runs_Left],eax
- lea edx,[BG_Win_Bands+edx+esi]
+ lea edx,[Win_Bands+edx+esi]
 
  mov [R16E_Output],edi
  mov [R16E_RunListPtr],edx

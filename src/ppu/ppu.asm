@@ -65,6 +65,7 @@ EXTERN_C Offset_Change_Disable
 EXTERN_C M7H_13,M7V_13
 EXTERN Redo_M7
 EXTERN_C M7SEL
+EXTERN_C EXTBG_Mask
 EXTERN M7_Handler_Table,M7_Handler
 EXTERN_C fixedpalettecheck
 
@@ -407,13 +408,10 @@ EXPORT_C CGADSUB,skipb
 %macro WIN_DATA 1
 ALIGNB
 EXPORT_C TableWin%1
-EXPORT_C Win%1_Bands_Out,skipb 2*2
-EXPORT_C Win%1_Bands_In,skipb 2
 EXPORT_C Win%1_Count_Out,skipb
+EXPORT_C Win%1_Bands_Out,skipb 2*2
 EXPORT_C Win%1_Count_In,skipb
-;00000alr a = window has area
-;l = window flush with left edge, r = window flush with right edge
-EXPORT_C Win%1_Type,skipb
+EXPORT_C Win%1_Bands_In,skipb 2
 %endmacro
 
 WIN_DATA 1
@@ -678,6 +676,8 @@ EXPORT Reset_Ports
  mov [C_LABEL(TM)],al
  mov [C_LABEL(TS)],al
  mov [C_LABEL(SETINI)],al
+ mov dword [C_LABEL(EXTBG_Mask)],~(2 | (2 << 8))
+
  mov [C_LABEL(COLDATA)],eax
  mov [C_LABEL(CGWSEL)],al
  mov [C_LABEL(CGADSUB)],al
@@ -2794,13 +2794,21 @@ SNES_W2133: ; SETINI
  cmp al,[C_LABEL(SETINI)]
  je .no_change
  UpdateDisplay  ;*interlaced etc. not yet supported
+ xor edx,edx
  test al,4
  mov [C_LABEL(SETINI)],al
- mov edx,239
+ mov dl,239
  jnz .tall_screen
- mov edx,224
+ mov dl,224
 .tall_screen:
+ ; if SETINI:6 (EXTBG enable) is clear, ignore BG2 enable (EXTBG)
+ ; we pregenerate a mask for this here
+ shr al,7
  mov [C_LABEL(LastRenderLine)],edx
+
+ sbb edx,edx
+ or edx,~(2 | (2 << 8))
+ mov [C_LABEL(EXTBG_Mask)],edx
 
  mov al,[C_LABEL(SETINI)]
 .no_change:

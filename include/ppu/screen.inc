@@ -38,6 +38,10 @@ EXTERN_C Render_Layering_Option_1
 EXTERN_C Render_Layering_Option_2
 EXTERN_C Update_Display
 EXTERN_C Recalc_Window_Effects
+EXTERN_C Recalc_Window_Area_BG
+EXTERN_C Intersect_Window_Area_AND
+EXTERN_C Intersect_Window_Area_OR
+EXTERN_C Intersect_Window_Area_XOR
 EXTERN_C Render_8x8_C2,Render_16x16_C2
 EXTERN_C Render_8x8_C4,Render_16x16_C4
 EXTERN_C Render_8x8_C8,Render_16x16_C8

@@ -304,13 +304,13 @@ Render_16x16M_Base:
 
  mov esi,[R16x16M_Clipped]
  push ebp
- mov al,[BG_Win_Count+edx+esi]
+ mov al,[Win_Count+edx+esi]
 
  test al,al
  jz .done
 
  push eax
- lea edx,[BG_Win_Bands+edx+esi]
+ lea edx,[Win_Bands+edx+esi]
 
  push edi
  push edx

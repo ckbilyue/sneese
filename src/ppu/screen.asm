@@ -14,8 +14,7 @@ You must read and accept the license prior to use.
 ; screen.asm
 ; Screen rendering code
 ; -BGMODE specific handlers, including specialized handlers for:
-;   partial offset change in Mode 2;
-;   partial offset change in Mode 4;
+;   offset change in Modes 2, 4, and 6;
 ; -Basic BG scanline renderers;
 ; -Line offset in tile tables.
 ;
@@ -193,26 +192,18 @@ section .text
 ;ebx = first line, edi = destination base ptr, ebp = # lines
 ALIGNC
 EXPORT_C Render_Layering_Option_0   ; main-on-sub
- mov al,[SCR_TSW]
- mov ah,[SCR_TMW]
- shl eax,16
  mov al,[SCR_TS]    ; Get BG status for sub screens
  mov ah,[SCR_TM]    ; Get BG status for main screens
  jmp dword [Render_Mode]
 
 ALIGNC
 EXPORT_C Render_Layering_Option_1   ; sub-on-main
- mov al,[SCR_TMW]
- mov ah,[SCR_TSW]
- shl eax,16
  mov al,[SCR_TM]    ; Get BG status for main screens
  mov ah,[SCR_TS]    ; Get BG status for sub screens
  jmp dword [Render_Mode]
 
 ALIGNC
 EXPORT_C Render_Layering_Option_2   ; main-with-sub
- mov al,[SCR_TMW]
- shl eax,16
  mov al,[SCR_TM]    ; Get BG status for main/sub screens
  mov ah,0
  jmp dword [Render_Mode]
@@ -664,18 +655,15 @@ EXPORT_C Recalc_Window_Bands
  test al,al
 
  mov byte [Win_Count_In+edx],1  ; One band inside window (left,right)
- mov bl,WT_Left
  mov [Win_Bands_In+edx+1],cl
  jnz .not_flush_left    ; if (!Left) window flush left;
  test cl,cl
  jnz .flush_one_side    ; if (!Left && Right == 255) full range inside;
  ; Full range inside window
  mov byte [Win_Count_Out+edx],0     ; No bands outside window
- mov byte [Win_Type+edx],WT_Full    ; Full range inside window
  jmp short .done
 .not_flush_left:
  ; Window not flush left (1 inside, 1 or 2 outside)
- mov bl,WT_Right
  test cl,cl
  je .flush_one_side     ; if (Left && Right == 255) window flush right;
  ; Window not flush left or right (1 inside, 2 outside)
@@ -697,14 +685,12 @@ EXPORT_C Recalc_Window_Bands
 ;dec eax                 ; Right outside edge = Left inside edge - 1
 ;inc edx                 ; Left outside edge = right inside edge + 1
  mov [Win_Bands_Out+edx+1],al
- mov byte [Win_Type+edx],bl     ; Window flush to one side
  mov byte [Win_Count_Out+edx],1 ; One band outside window (right+1,left-1)
  mov [Win_Bands_Out+edx],cl
  jmp short .done
 .full_outside:
  ; Full range outside window (0 inside, 1 outside)
  mov byte [Win_Count_Out+edx],1     ; One band outside window
- mov byte [Win_Type+edx],WT_None    ; No range inside window
  mov dword [Win_Bands_Out+edx],0    ; Full range band
  mov byte [Win_Count_In+edx],0  ; No bands inside window
 .done:
@@ -759,20 +745,19 @@ EXPORT_C Recalc_Window_Area_BG
  
  ; we want drawn areas, not window areas, so we need the inverted results...
  test al,4
- mov al,[Win_Count_Out+edx]
  jz .draw_outside
- mov al,[Win_Count_In+edx]
- add edx,byte Win_Bands_In - Win_Bands_Out
+ add edx,byte Win_In - Win_Out
 .draw_outside:
 
- mov [edi+BG_Win_Count],al
+ mov al,[Win_Count+edx]
+ mov [edi+Win_Count],al
  test al,al
  jz .no_runs
 
 .next_run:
- mov cx,[edx+Win_Bands_Out]
+ mov cx,[edx+Win_Bands]
  add edx,byte 2
- mov [edi+BG_Win_Bands],cx
+ mov [edi+Win_Bands],cx
  add edi,byte 2
  dec al
  jnz .next_run
@@ -781,9 +766,9 @@ EXPORT_C Recalc_Window_Area_BG
  ret
 
 .no_clip:
- mov byte [edi+esi+BG_Win_Count],1
- mov byte [edi+esi+BG_Win_Bands+0],0
- mov byte [edi+esi+BG_Win_Bands+1],0
+ mov byte [edi+esi+Win_Count],1
+ mov byte [edi+esi+Win_Bands+0],0
+ mov byte [edi+esi+Win_Bands+1],0
  ret
 
 ; Method of generation depends on logic mode.
@@ -831,40 +816,32 @@ EXPORT_C Recalc_Window_Area_BG
 
  ; we want drawn areas, not window areas, so we need the inverted results...
  test al,1
- mov cl,[Win_Count_Out+edx]
  jz .or_draw_outside_1
- mov cl,[Win_Count_In+edx]
- add edx,byte Win_Bands_In - Win_Bands_Out
+ add edx,byte Win_In - Win_Out
 .or_draw_outside_1:
-%if Win_Bands_Out
- add edx,Win_Bands_Out
-%endif
 
  test al,4
- mov ch,[Win_Count_Out+esi]
  jz .or_draw_outside_2
- mov ch,[Win_Count_In+esi]
- add esi,byte Win_Bands_In - Win_Bands_Out
+ add esi,byte Win_In - Win_Out
 .or_draw_outside_2:
-%if Win_Bands_Out
- add esi,Win_Bands_Out
-%endif
 
 .intersect_and_entry:
+ mov cl,[Win_Count+edx]
  test cl,cl
  jz .and_no_more_bands
 
+ mov ch,[Win_Count+esi]
  test ch,ch
  jz .and_no_more_bands
 
 .and_win1_loop:
  push ecx
- mov ax,[edx+Win_Bands_Out]
+ mov ax,[edx+Win_Bands]
  dec ah
  push esi
 
 .and_win2_loop:
- mov bx,[esi+Win_Bands_Out]
+ mov bx,[esi+Win_Bands]
  dec bh
 
  cmp al,bh      ;win1left, win2right
@@ -878,7 +855,7 @@ EXPORT_C Recalc_Window_Area_BG
  mov bl,al
 .and_max_left:
 
- mov [edi+ebp*2+BG_Win_Bands],bl
+ mov [edi+ebp*2+Win_Bands],bl
 
  cmp bh,ah
  jb .and_min_right
@@ -886,7 +863,7 @@ EXPORT_C Recalc_Window_Area_BG
 .and_min_right:
 
  inc bh
- mov [edi+ebp*2+BG_Win_Bands+1],bh
+ mov [edi+ebp*2+Win_Bands+1],bh
  inc ebp
 
  add esi,byte 2
@@ -903,7 +880,7 @@ EXPORT_C Recalc_Window_Area_BG
 
 .and_no_more_bands:
  mov eax,ebp
- mov [edi+BG_Win_Count],al
+ mov [edi+Win_Count],al
  ret
 
 .and_no_intersect:
@@ -926,36 +903,28 @@ EXPORT_C Recalc_Window_Area_BG
 
  ; we want drawn areas, not window areas, so we need the inverted results...
  test al,1
- mov cl,[Win_Count_Out+edx]
  jz .and_draw_outside_1
- mov cl,[Win_Count_In+edx]
- add edx,byte Win_Bands_In - Win_Bands_Out
+ add edx,byte Win_In - Win_Out
 .and_draw_outside_1:
-%if Win_Bands_Out
- add edx,Win_Bands_Out
-%endif
 
  test al,4
- mov ch,[Win_Count_Out+esi]
  jz .and_draw_outside_2
- mov ch,[Win_Count_In+esi]
- add esi,byte Win_Bands_In - Win_Bands_Out
+ add esi,byte Win_In - Win_Out
 .and_draw_outside_2:
-%if Win_Bands_Out
- add esi,Win_Bands_Out
-%endif
 
 .intersect_or_entry:
+ mov cl,[Win_Count+edx]
  test cl,cl
  jz .or_copy_win2
 
+ mov ch,[Win_Count+esi]
  test ch,ch
  jz .or_copy_win1
 
 .or_win1_loop:
  ; start with leftmost window bands
- mov al,[edx+Win_Bands_Out]
- mov bl,[esi+Win_Bands_Out]
+ mov al,[edx+Win_Bands]
+ mov bl,[esi+Win_Bands]
  cmp al,bl
  jbe .or_no_swap
  rol cx,8
@@ -964,10 +933,10 @@ EXPORT_C Recalc_Window_Area_BG
  mov esi,ebx
 .or_no_swap:
 
- mov ax,[edx+Win_Bands_Out]
+ mov ax,[edx+Win_Bands]
 
 .or_win2_loop:
- mov bx,[esi+Win_Bands_Out]
+ mov bx,[esi+Win_Bands]
 
  ; compare left edges against right edges
  test bh,bh
@@ -1005,7 +974,7 @@ EXPORT_C Recalc_Window_Area_BG
  dec cl
  jz .or_last_band
 
- mov bx,[edx+Win_Bands_Out+2]
+ mov bx,[edx+Win_Bands+2]
  add edx,byte 2
 
  ; compare left edges against right edges
@@ -1046,12 +1015,12 @@ EXPORT_C Recalc_Window_Area_BG
  mov ebx,edx
  mov edx,esi
  mov esi,ebx
- mov bx,[edx+Win_Bands_Out]
+ mov bx,[edx+Win_Bands]
  dec bh
 
 .or_no_intersect2:
- mov [edi+ebp*2+BG_Win_Bands],al
- mov [edi+ebp*2+BG_Win_Bands+1],ah
+ mov [edi+ebp*2+Win_Bands],al
+ mov [edi+ebp*2+Win_Bands+1],ah
  inc ebp
 
  test ch,ch
@@ -1063,11 +1032,11 @@ EXPORT_C Recalc_Window_Area_BG
  test ch,ch
  jnz .or_swap_windows
 
- mov [edi+ebp*2+BG_Win_Bands],ax
+ mov [edi+ebp*2+Win_Bands],ax
  inc ebp
 
  mov eax,ebp
- mov [edi+BG_Win_Count],al
+ mov [edi+Win_Count],al
 .or_done:
  ret
 
@@ -1075,12 +1044,12 @@ EXPORT_C Recalc_Window_Area_BG
  mov cl,ch
  mov edx,esi
 .or_copy_win1:
- mov [edi+BG_Win_Count],cl
+ mov [edi+Win_Count],cl
  dec cl
  js .or_done
 .or_copy_another:
- mov ax,[edx+ebp*2+Win_Bands_Out]
- mov [edi+ebp*2+BG_Win_Bands],ax
+ mov ax,[edx+ebp*2+Win_Bands]
+ mov [edi+ebp*2+Win_Bands],ax
  inc ebp
  dec cl
  jns .or_copy_another
@@ -1101,30 +1070,28 @@ EXPORT_C Recalc_Window_Area_BG
 
  ; we want drawn areas, not window areas, so we need the inverted results...
  test al,1
- mov cl,[Win_Count_Out+edx]
  jnz .xor_draw_outside_1
- mov cl,[Win_Count_In+edx]
- add edx,byte Win_Bands_In - Win_Bands_Out
+ add edx,byte Win_In - Win_Out
 .xor_draw_outside_1:
-%if Win_Bands_Out
- add edx,Win_Bands_Out
-%endif
 
  test al,4
- mov ch,[Win_Count_Out+esi]
  jz .xor_draw_outside_2
- mov ch,[Win_Count_In+esi]
- add esi,byte Win_Bands_In - Win_Bands_Out
+ add esi,byte Win_In - Win_Out
 .xor_draw_outside_2:
-%if Win_Bands_Out
- add esi,Win_Bands_Out
-%endif
 
 .intersect_xor_entry:
 EXTERN_C xor_bands
+ mov cl,[Win_Count+edx]
+ mov ch,[Win_Count+esi]
+
+%if Win_Bands
+ add edx,Win_Bands
+ add esi,Win_Bands
+%endif
+
  push edi
  xor eax,eax
- add edi,byte BG_Win_Bands
+ add edi,byte Win_Bands
  mov al,ch
  and ecx,byte 0x7F
  push edi
@@ -1135,9 +1102,12 @@ EXTERN_C xor_bands
  call C_LABEL(xor_bands)
  mov edi,[esp+20]
  add esp,byte 24
- mov [edi+BG_Win_Count],al
+ mov [edi+Win_Count],al
  ret
 
+EXPORT_EQU_C Intersect_Window_Area_AND,C_LABEL(Recalc_Window_Area_BG).intersect_and_entry
+EXPORT_EQU_C Intersect_Window_Area_OR,C_LABEL(Recalc_Window_Area_BG).intersect_or_entry
+EXPORT_EQU_C Intersect_Window_Area_XOR,C_LABEL(Recalc_Window_Area_BG).intersect_xor_entry
 
 ALIGNC
 EXPORT_C Recalc_Window_Effects
@@ -1201,12 +1171,52 @@ EXPORT_C Recalc_Window_Effects
  pop eax
  ret
 
-; full | any == full
-; full & any == any
-; side-flush | same-flush == same-flush (longer)
-; side-flush & same-flush == same-flush (shorter)
-; side-flush ^ same-flush == 0 (if equal) or no-flush (difference)
-; side-flush & other-flush == 0 (if no overlap) or no-flush (overlap)
+; max output bands is 1 more than max input bands; only in case where
+;neither outermost band edges are at screen edge
+EXPORT_C Invert_Window_Bands
+;esi = base address for input bands; first byte is count
+;edi = base address for output bands; first byte is count
+;edx = count of bands output (count up)
+;ecx = count of bands input (count down)
+
+ xor ecx,ecx
+ xor edx,edx ;current output
+ mov cl,[esi]
+ test ecx,ecx
+ jnz .no_bands
+
+ xor eax,eax
+ mov ah,[esi+1]
+ test ah,ah
+ jz .no_left_edge_band
+ mov [edi+1],eax        ;00 xx
+ inc edx
+
+.no_left_edge_band:
+ dec ecx
+ jz .last_band
+
+.next_band:
+ mov ax,[esi+2]
+ mov [edi+edx*2+1],ax
+ add esi,2
+ inc edx
+ dec ecx
+ jnz .next_band
+
+.last_band:
+ mov cl,[esi+2]
+ test cl,cl
+ jz .no_more_bands
+ mov [edi+edx*2+1],cx   ;xx 00
+ inc edx
+.no_more_bands:
+ mov [edi],dl
+ ret
+
+.no_bands:
+ mov dword [edi],1      ;01 00 00 - 1 band, full area
+ ret
 
 ; windows:
 %if 0
@@ -1518,7 +1528,6 @@ ALIGNC
 %define SM01_Current_Line esp+12
 %define SM01_BaseDestPtr esp+8
 %define SM01_Lines esp+4
-%define SM01_Layers_Mask esp+2
 %define SM01_Layers esp
 
 %macro Check_Present_Layer 2
@@ -1849,7 +1858,6 @@ EXPORT_C SCREEN_MODE_1
 %define SM26_Current_Line esp+12
 %define SM26_BaseDestPtr esp+8
 %define SM26_Lines esp+4
-%define SM26_Layers_Mask esp+2
 %define SM26_Layers esp
 
 %macro Render_SM26 2

@@ -446,14 +446,14 @@ Render_Offset_8x8_Base:
  add edi,eax
 
  mov esi,[RO8x8_Clipped]
- mov al,[BG_Win_Count+edx+esi]
+ mov al,[Win_Count+edx+esi]
 
  test al,al
  jz .done
 
  mov ebx,[OffsetChangeMap_VOffset]
  mov [RO8x8_Runs_Left],eax
- lea edx,[BG_Win_Bands+edx+esi]
+ lea edx,[Win_Bands+edx+esi]
 
  mov [RO8x8_Output],edi
  mov [RO8x8_RunListPtr],edx

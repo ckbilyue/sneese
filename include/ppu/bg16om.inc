@@ -397,14 +397,14 @@ Render_Offset_16x16M_Base:
  add edi,eax
 
  mov esi,[RO16x16M_Clipped]
- mov al,[BG_Win_Count+edx+esi]
+ mov al,[Win_Count+edx+esi]
 
  test al,al
  jz .done
 
  mov ebx,[OffsetChangeMap_VOffset]
  mov [RO16x16M_Runs_Left],eax
- lea edx,[BG_Win_Bands+edx+esi]
+ lea edx,[Win_Bands+edx+esi]
 
  mov [RO16x16M_Output],edi
  mov [RO16x16M_RunListPtr],edx

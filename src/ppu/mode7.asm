@@ -71,11 +71,52 @@ MPYH equ MPY+2  ; Mode 7 multiplication result: high byte
 
 EXPORT M7_Handler,skipl
 EXPORT M7_Handler_EXTBG,skipl
+EXPORT_C EXTBG_Mask,skipl   ; mask applied to BG enable for EXTBG
 EXPORT_C M7SEL,skipb    ; ab0000yx  ab=mode 7 repetition info,y=flip vertical,x=flip horizontal
 EXPORT Redo_M7,skipb    ; vhyxdcba
 M7_Used:    skipb
 M7_Unused:  skipb
 Redo_16x8:  skipb
+
+; BG1 area |  BG2 area = displayed mode 7 background
+; BG2 area = EXTBG, high priority
+
+; BG1 area on both screens
+MERGED_WIN_DATA BG1_Both,3
+; BG2 area on both screens
+MERGED_WIN_DATA BG2_Both,3
+; BG1 area + BG2 area on main screen; both screens in 8-bit rendering
+MERGED_WIN_DATA Mode7_Main,4
+; BG1 area + BG2 area on sub screen (currently unused)
+MERGED_WIN_DATA Mode7_Sub,4
+
+;!BG1 area on main screen; both screens in 8-bit rendering
+MERGED_WIN_DATA BG1_Main_Off,3
+;!BG1 area on sub screen (currently unused)
+MERGED_WIN_DATA BG1_Sub_Off,3
+
+;!BG2 area on main screen; both screens in 8-bit rendering
+MERGED_WIN_DATA BG2_Main_Off,3
+;!BG2 area on sub screen (currently unused)
+MERGED_WIN_DATA BG2_Sub_Off,3
+
+;!BG1 area &  BG2 area = EXTBG, low priority
+;main screen; both in 8-bit
+MERGED_WIN_DATA Mode7_Main_EXTBG_Low,3
+;sub screen
+MERGED_WIN_DATA Mode7_Sub_EXTBG_Low,3
+
+; BG1 area &  BG2 area = EXTBG, normal priority
+;main screen; both in 8-bit
+MERGED_WIN_DATA Mode7_Main_EXTBG_Normal,3
+;sub screen
+MERGED_WIN_DATA Mode7_Sub_EXTBG_Normal,3
+
+; BG1 area & !BG2 area = no EXTBG
+;main screen; both in 8-bit
+MERGED_WIN_DATA Mode7_Main_EXTBG_Off,3
+;sub screen
+MERGED_WIN_DATA Mode7_Sub_EXTBG_Off,3
 
 %define SM7_Local_Bytes 16
 %define SM7_Current_Line esp+12
@@ -83,85 +124,12 @@ Redo_16x8:  skipb
 %define SM7_Lines esp+4
 %define SM7_Layers esp
 
-%if 0
-;Need to convert this into something sensible for mode 7 rendering
-
-;Window clipping likely affects EXTBG (TM/TS bit 1 'BG2')...
-
- mov al,[R8x8_Clipped]
- test al,al
- jz .no_window_clip
-
- mov al,[WSEL+edx]
- test al,8+2
- jpe .no_window_clip
-
- LOAD_WIN_TABLE 2
- test al,2
- jz .single_window_clip_2
- LOAD_WIN_TABLE 1
- shl al,2
-.single_window_clip_2:
- 
- test al,4
- mov al,[Win_Count_Out+edx]
- jz .draw_outside
- mov al,[Win_Count_In+edx]
- add edx,byte Win_Bands_In - Win_Bands_Out
-.draw_outside:
-
- test al,al
- jz .done
-
- push edi
- push edx
- push ebx       ;vertical screen map address
- xor ebx,ebx
- push ecx       ;renderer
- mov bl,[Win_Bands_Out+edx]
-
- xor ecx,ecx
- mov cl,[Win_Bands_Out+edx+1]
- mov edx,[R8x8_BG_Table+16]
- sub cl,bl
- setz ch
-
- push edx
- push ebx
- push ecx
-
- cmp al,1
- je .last_run
-
- call Render_8x8_Run
- mov edx,[esp+20]
- mov edi,[esp+24]
- xor ebx,ebx
- xor ecx,ecx
- mov bl,[Win_Bands_Out+edx+2]
-
- mov cl,[Win_Bands_Out+edx+3]
- mov edx,[esp+8]
- sub cl,bl
-
- mov [esp+4],ebx
- mov [esp],ecx
-.last_run:
- call Render_8x8_Run
- add esp,byte 28
- jmp short .done
-
-.no_window_clip:
- push ebx       ;vertical screen map address
- push ecx       ;renderer
- push edx
- push byte 0    ;first pixel
- push dword 256 ;pixel count
- call Render_8x8_Run
- add esp,byte 20
-
-.done:
-%endif
+; edx = address of window 1 bands
+; esi = address of window 2 bands
+; cl = count of window 1 bands
+; ch = count of window 2 bands
+; ebp = 0
+; edi = address for output window area (BG_WIN_DATA)
 
 section .text
 ALIGNC
@@ -169,34 +137,20 @@ EXPORT_C SCREEN_MODE_7
 
  push ebx
  push edi
- mov al,[C_LABEL(TM)]
- mov ah,[C_LABEL(TS)]
 EXTERN_C Layer_Disable_Mask
  and al,[C_LABEL(Layer_Disable_Mask)]
  and ah,[C_LABEL(Layer_Disable_Mask)]
  push ebp
+ ; if SETINI:6 (EXTBG enable) is clear, ignore BG2 enable (EXTBG)
+ mov ebx,[C_LABEL(EXTBG_Mask)]
  push eax
 
- mov eax,[SM7_Layers]
- test al,3
- jnz .background_main
+ and eax,ebx
 
- ;Hack in sub screen mode 7 if it's enabled
- and ah,3
- jz .background_off
+ test eax,0x303
+ jnz .background_on
 
- or al,ah
- mov [SM7_Layers],al
-
-.background_main:
- and eax,byte 1
- jnz near .background_on
-
- ; we only reach here when bit 0 clear, bit 1 set
- test byte [C_LABEL(SETINI)],0x40
- jnz near .background_on
 .background_off:
-
  mov edi,[C_LABEL(SNES_Screen8)]    ; (256+16)*(240+1) framebuffer
  ; Clear the framebuffer
  mov ebx,[SM7_BaseDestPtr]
@@ -244,9 +198,6 @@ EXTERN_C Layer_Disable_Mask
 ;%1 = priority (0 = low, 1 = low/none, 2 = high)
 %macro Render_Mode7_Background 1
 %if %1 == 2
- test byte [C_LABEL(SETINI)],0x40
- jz %%no_plot
-
  test byte [SM7_Layers],2
  jz %%no_plot
 
@@ -281,19 +232,94 @@ EXTERN_C Layer_Disable_Mask
  mov edx,0              ; First pixel
 
 %if %1 == 1
- mov al,[C_LABEL(SETINI)]
- test al,0x40
- jz %%no_extbg
-
  mov al,[SM7_Layers]
  test al,2
  jz %%no_extbg
 
  call dword [M7_Handler_EXTBG]
- jmp short %%no_plot
+ jmp %%no_plot
 
 %%no_extbg:
+;Window clipping likely affects EXTBG (TM/TS bit 1 'BG2')...
+
+ push edi
+
+ xor ebp,ebp
+ mov edi,C_LABEL(TableWinMode7_Main_EXTBG_Off)
+
+ mov edx,C_LABEL(TableWinMainBG1)
+ mov esi,C_LABEL(TableWinSubBG1)
+
+ mov al,[C_LABEL(TM)]
+ mov bl,[C_LABEL(TS)]
+ and al,1
+ jz %%no_merge_sub
+ and bl,al
+ jz %%no_merge_main
+
+ call C_LABEL(Intersect_Window_Area_OR)
+
+ mov esi,C_LABEL(TableWinMode7_Main_EXTBG_Off)
+ jmp %%got_bands
+
+%%no_merge_main:
+ mov esi,edx
+%%no_merge_sub:
+%%got_bands:
+ mov al,[Win_Count+esi]
+ test al,al
+ jz .done
+
+ mov edi,[esp]
+ push eax
+ push esi
+
+;mov [R8x8_Runs_Left],eax
+;mov [R8x8_Output],edi
+;mov [R8x8_RunListPtr],esi
+ xor edx,edx
+;mov [R8x8R_Plotter],ecx    ;renderer
+ mov dl,[Win_Bands+esi]
+
+ xor ecx,ecx
+ mov cl,[Win_Bands+esi+1]
+ sub cl,dl
+ setz ch
+
+ dec al
+ mov ebp,ecx
+ je .last_run
+
+.not_last_run:
+;mov [R8x8_Runs_Left],al
+ mov [esp+4],al
  call dword [M7_Handler]
+
+;mov esi,[R8x8_RunListPtr]
+ mov esi,[esp]
+;mov edi,[R8x8_Output]
+ mov edi,[esp+8]
+ xor edx,edx
+ xor ecx,ecx
+ mov dl,[Win_Bands+esi+2]
+
+ mov cl,[Win_Bands+esi+3]
+ add esi,byte 2
+ sub cl,dl
+;mov [R8x8_RunListPtr],esi
+ mov [esp],esi
+ mov ebp,ecx
+
+;mov al,[R8x8_Runs_Left]
+ mov al,[esp+4]
+ dec al
+ jne .not_last_run
+.last_run:
+ call dword [M7_Handler]
+
+ add esp,byte 8
+.done:
+ add esp,byte 4
 %else
  call dword [M7_Handler_EXTBG]
 %endif
@@ -301,6 +327,10 @@ EXTERN_C Layer_Disable_Mask
 %endmacro
 
 .background_on:
+ and ah,3
+ or al,ah
+ mov [SM7_Layers],al
+
  call Recalc_Mode7
 
  jmp short .first_line
@@ -310,7 +340,7 @@ EXTERN_C Layer_Disable_Mask
 
 .first_line:
  mov edx,[SM7_Current_Line]
-%if 1
+
  ; Handle vertical mosaic
  mov al,[MosaicBG1]
  test al,al
@@ -319,7 +349,6 @@ EXTERN_C Layer_Disable_Mask
  mov dl,[C_LABEL(MosaicLine)+edx+eax]
 .no_mosaic:
  ; End vertical mosaic
-%endif
 
  mov al,[C_LABEL(M7SEL)]
  test al,2
@@ -367,7 +396,7 @@ EXTERN_C Layer_Disable_Mask
 
  Render_Mode7_Background 0
 
- test dword [SM7_Layers],0x1010
+ test byte [SM7_Layers],0x10
  jz .no_sprites_0
 
  mov ebx,[SM7_Current_Line]
@@ -380,7 +409,7 @@ EXTERN_C Layer_Disable_Mask
 
  Render_Mode7_Background 1
 
- test dword [SM7_Layers],0x1010
+ test byte [SM7_Layers],0x10
  jz .no_sprites_1
 
  mov ebx,[SM7_Current_Line]
@@ -393,7 +422,7 @@ EXTERN_C Layer_Disable_Mask
 
  Render_Mode7_Background 2
 
- test dword [SM7_Layers],0x1010
+ test byte [SM7_Layers],0x10
  jz .no_sprites_23
 
  mov ebx,[SM7_Current_Line]
@@ -410,6 +439,38 @@ EXTERN_C Layer_Disable_Mask
  mov dl,0x30
  call Plot_Sprites
 .no_sprites_23:
+
+ test byte [SM7_Layers+1],0x10
+ jz .no_sprites_alt
+
+ mov ebx,[SM7_Current_Line]
+ mov edi,[SM7_BaseDestPtr]
+ mov ebp,1
+;inc ebx
+ mov dl,0x00
+ call Plot_Sprites
+
+ mov ebx,[SM7_Current_Line]
+ mov edi,[SM7_BaseDestPtr]
+ mov ebp,1
+;inc ebx
+ mov dl,0x10
+ call Plot_Sprites
+
+ mov ebx,[SM7_Current_Line]
+ mov edi,[SM7_BaseDestPtr]
+ mov ebp,1
+;inc ebx
+ mov dl,0x20
+ call Plot_Sprites
+
+ mov ebx,[SM7_Current_Line]
+ mov edi,[SM7_BaseDestPtr]
+ mov ebp,1
+;inc ebx
+ mov dl,0x30
+ call Plot_Sprites
+.no_sprites_alt:
 
  mov edi,[SM7_BaseDestPtr]
  add edi,GfxBufferLinePitch
