@@ -78,10 +78,7 @@ EXPORT_C Read_Map_20_5F
     ; 2000-20FF: Unmapped
     DUPLICATE dd,0x100,C_LABEL(UNSUPPORTED_READ)
 EXPORT_C Read_Map_21
-    DUPLICATE dd,0x16,C_LABEL(UNSUPPORTED_READ)
-    dd   SNES_R2116  ; VMADDL
-    dd   SNES_R2117  ; VMADDH
-    DUPLICATE dd,0x1C,C_LABEL(UNSUPPORTED_READ)
+    DUPLICATE dd,0x34,C_LABEL(UNSUPPORTED_READ)
     dd   SNES_R2134  ; MPYL
     dd   SNES_R2135  ; MPYM
     dd   SNES_R2136  ; MPYH
@@ -680,16 +677,6 @@ EXPORT Reset_Ports
 
 ; Read from 21xx handlers
 
-ALIGNC
-SNES_R2116: ; VMADDL
- mov al,[VRAMAddress]
- ret
-
-ALIGNC
-SNES_R2117: ; VMADDH
- mov al,[VRAMAddress+1]
- ret
-
 ; SNES_R2134: ; MPYL in mode7.asm
 ; SNES_R2135: ; MPYM in mode7.asm
 ; SNES_R2136: ; MPYH in mode7.asm
@@ -829,13 +816,9 @@ SNES_R2183: ; WMADDH
  ret
 
 ALIGNC
-SNES_R21C2: ; Unknown? SNES test cart reads it, returning same value as 9X
- mov al,0x20
- ret
-
-ALIGNC
-SNES_R21C3: ; Unknown? SNES test cart reads it, returning same value as 9X
- mov al,0
+SNES_R21C2: ; Unknown? SNES test cart reads it, returning open bus kludge
+SNES_R21C3: ; Unknown? SNES test cart reads it, returning open bus kludge
+ mov al,0x21
  ret
 
 ; Read from 40xx handlers
