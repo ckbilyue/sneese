@@ -130,11 +130,9 @@ ALIGNC
  mov dh,[esp+8]
  mov cl,B_C_flag
  mov ch,[esp+12]
- mov al,0x0F
- mov bl,0x0F
- and al,dh
+ mov al,dh
  shr dh,4
- and bl,ch
+ mov bl,ch
  shr ch,4
 
  add cl,255 ;MAKE_CARRY
@@ -623,11 +621,9 @@ ALIGNC
  mov dh,[esp+8]
  mov cl,B_C_flag
  mov ch,[esp+12]
- mov al,0x0F
- mov bl,0x0F
- and al,dh
+ mov al,dh
  shr dh,4
- and bl,ch
+ mov bl,ch
  shr ch,4
 
  cmp cl,1   ;MAKE_NOT_CARRY
