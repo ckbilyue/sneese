@@ -1556,7 +1556,7 @@ void SPC_READ_DSP()
 #else
                 if (ENVX_ENABLED)
 #endif
-                 UpdateEnvelopeHeight(addr_hi) >> ENVX_DOWNSHIFT_BITS;
+                 UpdateEnvelopeHeight(addr_hi); // >> ENVX_DOWNSHIFT_BITS;
                 else
                  SPC_DSP[SPC_DSP_ADDR] = 0;
 
