@@ -40,7 +40,7 @@ SUFFIX :=
 AFLAGS := -f coff
 GXX    := gxx
 
-#ZLIB   := 1 # comment this line to disable ZLIB support
+ZLIB   := 1 # comment this line to disable ZLIB support
 ifdef ZLIB
 MIOFLAGS := -lz
 endif
