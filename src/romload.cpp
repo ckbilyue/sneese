@@ -67,7 +67,8 @@ char *rom_sram = 0;
 char *rom_country = 0;
 char rom_name[22];
 
-unsigned char BlockIsROM[256*8];
+extern "C" unsigned char BlockSpeed[256*8];
+
 unsigned char BlockSpeed[256*8];
 
 unsigned char *RomAddress;      // Address of SNES ROM
@@ -359,7 +360,6 @@ inline void set_block_pointers(int bank, int block, void *read, void *write)
 inline void map_wram(int bank, int block)
 {
  set_block_pointers(bank, block, (void *) (WRAM - (bank << 16)), (void *) (WRAM - (bank << 16)));
- BlockSpeed[bank * 8 + block] = 8;
 }
 
 inline void map_wram_128k(int bank)
@@ -368,15 +368,12 @@ inline void map_wram_128k(int bank)
  {
   set_block_pointers(bank, i, (void *) (WRAM - (bank << 16)), (void *) (WRAM - (bank << 16)));
   set_block_pointers(bank + 1, i, (void *) (WRAM - (bank << 16)), (void *) (WRAM - (bank << 16)));
-  BlockSpeed[bank * 8 + i] = 8;
  }
 }
 
 inline void map_unmapped(int bank, int block)
 {
  set_block_handlers(bank, block, &UNSUPPORTED_READ, &UNSUPPORTED_WRITE);
- BlockIsROM[bank * 8 + block] = 0;
- BlockSpeed[bank * 8 + block] = 8;
 }
 
 inline void map_unmapped_32k(int bank)
@@ -393,8 +390,6 @@ inline void map_blank(int bank, int block)
 {
  set_block_pointers(bank, block, (void *) (Blank - (bank << 16)), (void *) (Dummy - (bank << 16)));
  map_unmapped(bank, block);
- BlockIsROM[bank * 8 + block] = (0 - 1);
- BlockSpeed[bank * 8 + block] = 8;
 }
 
 inline void map_blank_32k(int bank)
@@ -415,28 +410,23 @@ inline void map_sram(int bank, int block, int sram_block,
 // set_block_write_pointer(bank, block,
 //  SRAM + (sram_block << 13) - (bank << 16) - (block << 13));
  set_block_write_handler(bank, block, sram_write_handler);
- BlockSpeed[bank * 8 + block] = 8;
 }
 
 inline void map_no_sram(int bank, int block)
 {
  map_blank(bank, block);
- BlockIsROM[bank * 8 + block] = 0;
- BlockSpeed[bank * 8 + block] = 8;
 }
 
 inline void map_sram_2k(int bank, int block)
 {
  set_block_read_pointer(bank, block, SRAM - (bank << 16) - (block << 13));
  set_block_write_handler(bank, block, &SRAM_WRITE_2k);
- BlockSpeed[bank * 8 + block] = 8;
 }
 
 inline void map_sram_4k(int bank, int block)
 {
  set_block_read_pointer(bank, block, SRAM - (bank << 16) - (block << 13));
  set_block_write_handler(bank, block, &SRAM_WRITE_4k);
- BlockSpeed[bank * 8 + block] = 8;
 }
 
 inline void map_sram_32k(int bank, int sram_block, int mask,
@@ -470,8 +460,6 @@ inline void map_rom_32k_lorom(int bank)
  for (int i = 4; i < 8; i++)
  {
   set_block_pointers(bank, i, (void *) (RomAddress - ((bank - needed_bank) << 16) - (needed_bank + 1) * 0x8000), (void *) (Dummy - (bank << 16)));
-  BlockIsROM[bank * 8 + i] = (0 - 1);
-  BlockSpeed[bank * 8 + i] = 8;
  }
 }
 
@@ -484,8 +472,6 @@ inline void map_rom_32k_lorom_40_C0(int bank)
  for (int i = 0; i < 4; i++)
  {
   set_block_pointers(bank, i, (void *) (RomAddress - ((bank - needed_bank) << 16) - (needed_bank & 0x7F) * 0x8000), (void *) (Dummy - (bank << 16)));
-  BlockIsROM[bank * 8 + i] = (0 - 1);
-  BlockSpeed[bank * 8 + i] = 8;
  }
 
  map_rom_32k_lorom(bank);
@@ -500,8 +486,6 @@ inline void map_rom_32k_hirom(int bank)
  for (int i = 4; i < 8; i++)
  {
   set_block_pointers(bank, i, (void *) (RomAddress - ((bank - needed_bank) << 16)), (void *) (Dummy - (bank << 16)));
-  BlockIsROM[bank * 8 + i] = (0 - 1);
-  BlockSpeed[bank * 8 + i] = 8;
  }
 }
 
@@ -514,8 +498,6 @@ inline void map_rom_64k(int bank)
  for (int i = 0; i < 8; i++)
  {
   set_block_pointers(bank, i, (void *) (RomAddress - ((bank - needed_bank) << 16)), (void *) (Dummy - (bank << 16)));
-  BlockIsROM[bank * 8 + i] = (0 - 1);
-  BlockSpeed[bank * 8 + i] = 8;
  }
 }
 
@@ -524,8 +506,89 @@ inline void map_ports(int bank)
  map_wram(bank, 0);
  set_block_handlers(bank, 1, &PPU_READ, &PPU_WRITE);
  set_block_handlers(bank, 2, &PPU_READ, &PPU_WRITE);
- BlockSpeed[bank * 8 + 1] = 6;
- BlockSpeed[bank * 8 + 2] = 6;
+}
+
+static inline void set_rom_speed(int A23, unsigned char MEMSEL)
+{
+ int bank, speed;
+
+ speed = (MEMSEL & 1) ? 6 : 8;
+
+ for (bank = (A23 ? 0x80 : 0); bank < (A23 ? 0xC0 : 0x40); bank++)
+ {
+  BlockSpeed[bank * 8 + 4] = speed;
+  BlockSpeed[bank * 8 + 5] = speed;
+  BlockSpeed[bank * 8 + 6] = speed;
+  BlockSpeed[bank * 8 + 7] = speed;
+ }
+
+ for (bank = (A23 ? 0xC0 : 0x40); bank < (A23 ? 0x100 : 0x7E); bank++)
+ {
+  BlockSpeed[bank * 8 + 0] = speed;
+  BlockSpeed[bank * 8 + 1] = speed;
+  BlockSpeed[bank * 8 + 2] = speed;
+  BlockSpeed[bank * 8 + 3] = speed;
+  BlockSpeed[bank * 8 + 4] = speed;
+  BlockSpeed[bank * 8 + 5] = speed;
+  BlockSpeed[bank * 8 + 6] = speed;
+  BlockSpeed[bank * 8 + 7] = speed;
+ }
+}
+
+static void set_lower_rom_speed(void)
+{
+ set_rom_speed(0, 0);
+}
+
+extern "C" void set_upper_rom_speed(unsigned char MEMSEL)
+{
+ set_rom_speed(1, MEMSEL);
+}
+
+extern "C" void reset_bus_timings(void)
+{
+ int bank, block;
+
+ /* lower ROM area - 00-3F:8000-FFFF, 40-7D:0000-FFFF; always 8 cycles */
+ set_lower_rom_speed();
+ /* upper ROM area - 80-BF:8000-FFFF, C0-FF:0000-FFFF; 6/8 cycles select */
+ set_upper_rom_speed(0);
+
+ /* access times in master cycles for for non-ROM areas */
+ 
+ /* 8 - RAM, 00-3F/80-BF:6000-7FFF */
+ for (bank = 0; bank < 0x40; bank++)
+ {
+  BlockSpeed[bank * 8] = 8;
+  BlockSpeed[bank * 8 + 3] = 8;
+  BlockSpeed[(bank + 0x80) * 8] = 8;
+  BlockSpeed[(bank + 0x80) * 8 + 3] = 8;
+ }
+ for (bank = 0x7E; bank < 0x80; bank++)
+ {
+  for (block = 0; block < 8; block++)
+  {
+   BlockSpeed[bank * 8 + block] = 8;
+  }
+ }
+
+ /* 12 - legacy CPU register area (00-3F/80-BF:4000-41FF) */
+ /* 6 - all remaining area (00-3F/80-BF:2000-3FFF and 4200-5FFF) */
+ for (bank = 0; bank < 0x40; bank++)
+ {
+  BlockSpeed[bank * 8 + 1] = 6;
+  BlockSpeed[bank * 8 + 2] = 6;
+  BlockSpeed[(bank + 0x80) * 8 + 1] = 6;
+  BlockSpeed[(bank + 0x80) * 8 + 2] = 6;
+ }
+
+ FILE *out = fopen("memspeed.dmp", "wb");
+ if (out)
+ {
+  fwrite(BlockSpeed, 1, 256 * 8, out);
+  fclose(out);
+ }
+
 }
 
 // SRAM is now dynamically allocated. This is to add large SRAM support

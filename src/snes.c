@@ -37,6 +37,8 @@ unsigned SPC_LastIns;
 #endif
 #endif
 
+extern void reset_bus_timings(void);
+
 signed char snes_rom_loaded = 0;
 
 #define SPC_CPU_CYCLE_MULTIPLICAND_PAL 102400
@@ -114,6 +116,8 @@ int snes_init(void)
 
 void snes_reset(void)
 {
+ reset_bus_timings();
+
  Reset_CPU();
 
  /* Copy the SPC ROM into the top of the SPC RAM */

@@ -1623,4 +1623,14 @@ EXPORT SNES_W420D ; MEMSEL    ; FastROM switch
 
  pop eax
 %endif
+ push eax
+ push ecx
+ push edx
+ push eax
+EXTERN_C set_upper_rom_speed
+ call C_LABEL(set_upper_rom_speed)
+ pop eax
+ pop edx
+ pop ecx
+ pop eax
  ret
