@@ -439,12 +439,13 @@ Do_HDMA_Indirect:
  test al,al
  jz HDMA_End_Channel
 
- add dword [C_LABEL(SNES_Cycles)],byte 16   ; Address load time
  mov ah,al
  GET_BYTE
+ add dword [C_LABEL(SNES_Cycles)],byte 8   ; Address load low
  inc bx
  mov [edi+DASL],al
  GET_BYTE
+ add dword [C_LABEL(SNES_Cycles)],byte 8   ; Address load high
  inc bx
  mov [edi+DASH],al
  mov [edi+A2T],ebx
@@ -606,22 +607,6 @@ extern C_LABEL(Dump_DMA)
 ;mov R_65c816_Cycles,[SNES_Cycles] ;
  ret
 
-%define CYCLES_PER_DOT 4
-%define DOTS_PER_SCANLINE 342
-%define DOTS_IN_REFRESH 10
-%define DOTS_BEFORE_DISPLAY 0
-%define DOTS_BEFORE_REFRESH 128
-%define DOTS_IN_DISPLAY 256
-%define DOTS_HBLANK_START (DOTS_BEFORE_DISPLAY + DOTS_IN_DISPLAY)
-
-%define CYCLES_NEW_SCANLINE ((DOTS_PER_SCANLINE - DOTS_IN_REFRESH) * CYCLES_PER_DOT)
-%define CYCLES_DISPLAY_START (DOTS_BEFORE_DISPLAY * CYCLES_PER_DOT)
-%define CYCLES_HBLANK_START ((DOTS_HBLANK_START - DOTS_IN_REFRESH) * CYCLES_PER_DOT)
-
-%define CYCLES_NMI_DELAY 19
-%define CYCLES_REFRESH_START (DOTS_BEFORE_REFRESH * CYCLES_PER_DOT)
-%define CYCLES_IN_REFRESH (DOTS_IN_REFRESH * CYCLES_PER_DOT)
-%define CYCLES_REFRESH_END ((DOTS_BEFORE_REFRESH + DOTS_IN_REFRESH) * CYCLES_PER_DOT)
 ALIGNC
 EXPORT SNES_W420C ; HDMAEN      ; Actually handled within screen core!
 %ifdef NO_HDMA
@@ -631,42 +616,6 @@ EXPORT SNES_W420C ; HDMAEN      ; Actually handled within screen core!
 ;ret
 
  mov [HDMAON],al
- ret
-
- test byte [HVBJOY],0x80        ; Vblank?
- jnz .in_blank
- cmp R_65c816_Cycles,CYCLES_DISPLAY_START   ; Hblank?
- jb .in_blank
- cmp R_65c816_Cycles,CYCLES_HBLANK_START    ; Hblank?
-;cmp R_65c816_Cycles,1024-40    ; Hblank?
- jnb .in_blank
- test byte [C_LABEL(INIDISP)],0x80  ; Force-blank?
- jns .not_in_blank
-.in_blank:
-%if 0
- push eax
- push ebx
- push ecx
- push edi
- push ebp
- push esi
- RELATCH_HDMA_IN_FRAME 0
- RELATCH_HDMA_IN_FRAME 1
- RELATCH_HDMA_IN_FRAME 2
- RELATCH_HDMA_IN_FRAME 3
- RELATCH_HDMA_IN_FRAME 4
- RELATCH_HDMA_IN_FRAME 5
- RELATCH_HDMA_IN_FRAME 6
- RELATCH_HDMA_IN_FRAME 7
- pop esi
- pop ebp
- pop edi
- pop ecx
- pop ebx
- pop eax
-%endif
- mov [HDMAON],al
-.not_in_blank:
  ret
 
 ALIGNC
