@@ -1600,17 +1600,9 @@ _TxX B_S,16,E0_TSX
 _TxX B_Y,8,EX_TYX
 _TxX B_Y,16,E0_TYX
 
-; BC
-EX_LDY a_x,Absolute_Index_X
-E0_LDY a_x,Absolute_Index_X
-
 ; BD
 EM_LDA a_x,Absolute_Index_X
 E0_LDA a_x,Absolute_Index_X
-
-; BE
-EX_LDX a_y,Absolute_Index_Y
-E0_LDX a_y,Absolute_Index_Y
 
 ; C1
 EM_CMP Od_xO,Direct_Indexed_Indirect
