@@ -34,10 +34,6 @@ ifndef SAVE_ASM_OUTPUT
 SAVE_ASM_OUTPUT := 1
 endif
 
-ifndef FAST_SPC
-FAST_SPC := 0
-endif
-
 ifndef NO_SELF_MODIFY
 NO_SELF_MODIFY := 0
 endif
@@ -95,10 +91,6 @@ DFLAGS = -DDEBUG
 
 
 ifneq ($(NO_SELF_MODIFY),0)
-endif
-
-ifneq ($(FAST_SPC),0)
-DFLAGS += -DFAST_SPC
 endif
 
 

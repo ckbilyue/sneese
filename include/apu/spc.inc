@@ -40,25 +40,15 @@ EXTERN_C SPC_T2_cycle_latch,SPC_T2_counter
 
 %endif
 
+;%define NO_TIMER_COUNTER_WRAP
+
 ;%1 = timer
 %macro Update_SPC_Timer 1
- test byte [C_LABEL(SPCRAM) + SPC_CTRL],1 << %1
- je %%done
-
  mov edx,[C_LABEL(SPC_T%1_cycle_latch)]
  mov ecx,[C_LABEL(TotalCycles)]
  sub ecx,edx
  mov eax,ecx
 
-%ifdef FAST_SPC
-%if %1 != 2
- mov cl,0
- shr eax,8
-%else
- and ecx,byte ~31
- shr eax,5
-%endif
-%else
 %if %1 != 2
  and ecx,byte ~127
  shr eax,7
@@ -66,21 +56,36 @@ EXTERN_C SPC_T2_cycle_latch,SPC_T2_counter
  and ecx,byte ~15
  shr eax,4
 %endif
-%endif
  add edx,ecx
- add ax,[C_LABEL(SPC_T%1_position)]
+ add eax,[C_LABEL(SPC_T%1_position)]
  mov [C_LABEL(SPC_T%1_cycle_latch)],edx
- mov cx,[C_LABEL(SPC_T%1_target)]
- mov [C_LABEL(SPC_T%1_position)],ax
- cmp ax,cx
- jb %%done
 
- xor edx,edx
+ test byte [C_LABEL(SPCRAM) + SPC_CTRL],1 << %1
+ je %%done
+
+ mov ecx,[C_LABEL(SPC_T%1_target)]
+ mov [C_LABEL(SPC_T%1_position)],eax
+ cmp eax,ecx
+ jl %%done
+
+ mov edx,eax
+ shr edx,16
  div cx
- mov cl,[C_LABEL(SPC_T%1_counter)]
- mov [C_LABEL(SPC_T%1_position)],dx
- add al,cl
+ movzx ecx,byte [C_LABEL(SPC_T%1_counter)]
+ movzx edx,dx
+ movzx eax,ax
+ mov [C_LABEL(SPC_T%1_position)],edx
+ add eax,ecx
+
+%ifdef NO_TIMER_COUNTER_WRAP
+ mov edx,15
+ sub edx,eax
+ sbb ecx,ecx
+ and ecx,edx
+ add eax,ecx
+%else
  and al,15
+%endif
  mov [C_LABEL(SPC_T%1_counter)],al
 
 %%done:

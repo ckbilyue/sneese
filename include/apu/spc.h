@@ -38,13 +38,13 @@ EXTERN unsigned char SPC_ROM_CODE[64];
 EXTERN unsigned TotalCycles;
 
 EXTERN unsigned SPC_T0_cycle_latch;
-EXTERN unsigned short SPC_T0_position, SPC_T0_target;
+EXTERN unsigned SPC_T0_position, SPC_T0_target;
 
 EXTERN unsigned SPC_T1_cycle_latch;
-EXTERN unsigned short SPC_T1_position, SPC_T1_target;
+EXTERN unsigned SPC_T1_position, SPC_T1_target;
 
 EXTERN unsigned SPC_T2_cycle_latch;
-EXTERN unsigned short SPC_T2_position, SPC_T2_target;
+EXTERN unsigned SPC_T2_position, SPC_T2_target;
 
 EXTERN unsigned char SPC_T0_counter, SPC_T1_counter, SPC_T2_counter;
 

@@ -37,6 +37,10 @@ Changes
    anomie for verifying this [TRAC]
   SPC700: Improved flag behavior of ADDW, SUBW, and MUL opcodes, thanks
    to anomie for research [TRAC]
+  SPC700: Fixed some issues in timers [TRAC]
+  SPC700: Improved timer accuracy and behavior of register area, thanks
+   to research from anomie [TRAC]
+  Source: Removed support for double-clocked SPC700 execution rate [TRAC]
  0.832
   Documentation: Updated grossly insufficient copyright attributations
    [TRAC]
