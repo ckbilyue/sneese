@@ -957,26 +957,50 @@ SNES_R2143_SPC: ; APUI03
 
 ALIGNC
 SNES_W2140_SPC: ; APUI00
+ cmp [C_LABEL(SPC_PORT0R)],al
+ jne .change
+ test al,al
+ jz .no_change
+.change:
  Execute_SPC SaveCycles
  mov [C_LABEL(SPC_PORT0R)],al
+.no_change:
  ret
 
 ALIGNC
 SNES_W2141_SPC: ; APUI01
+ cmp [C_LABEL(SPC_PORT1R)],al
+ jne .change
+ test al,al
+ jz .no_change
+.change:
  Execute_SPC SaveCycles
  mov [C_LABEL(SPC_PORT1R)],al
+.no_change:
  ret
 
 ALIGNC
 SNES_W2142_SPC: ; APUI02
+ cmp [C_LABEL(SPC_PORT2R)],al
+ jne .change
+ test al,al
+ jz .no_change
+.change:
  Execute_SPC SaveCycles
  mov [C_LABEL(SPC_PORT2R)],al
+.no_change:
  ret
 
 ALIGNC
 SNES_W2143_SPC: ; APUI03
+ cmp [C_LABEL(SPC_PORT3R)],al
+ jne .change
+ test al,al
+ jz .no_change
+.change:
  Execute_SPC SaveCycles
  mov [C_LABEL(SPC_PORT3R)],al
+.no_change:
  ret
 
 ALIGNC
