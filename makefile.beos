@@ -23,7 +23,7 @@ NASM   := nasm -w+orphan-labels -w+macro-params -O3
 GCC    := gcc -Werror -Wall
 # -Wno-deprecated
 RM     := rm -f
-MD     := mkdir
+MD     := mkdir -p
 
 
 # Default filename extension for executables

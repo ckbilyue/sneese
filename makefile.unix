@@ -23,7 +23,7 @@ NASM   := nasm -w+orphan-labels -w+macro-params -O3 -DUNIX
 GCC    := gcc -Werror -Wall -Wno-deprecated -DUNIX
 # GCC of DJGPP and Cygwin defines unix, __unix__ and __unix.
 RM     := rm -f
-MD     := mkdir
+MD     := mkdir -p
 
 
 # Default filename extension for executables
