@@ -179,6 +179,7 @@ void snes_exec(void)
 /* Resets memory heaps */
 void Reset_Memory(void)
 {
+ int i;
 #ifdef DEBUG
 #ifdef CPUTRACKER
  /* Reset CPU instruction tracking buffer */
@@ -197,8 +198,11 @@ void Reset_Memory(void)
  /* Reset blank ROM space to 0xFF */
  memset(Blank,0xFF,(64 << 10));
 
- /* Reset SPC address space to 0xFF */
- memset(SPCRAM,0xFF,(64 << 10));
+ /* Reset SPC address space to the value of pin A5 */
+ for (i = 0; i < (64 << 10>; i += (1 << 5))
+ {
+  memset(SPCRAM, i & (1 << 5) ? (0 - 1) : 0, (1 << 5));
+ }
 
  /* Reset WRAM to 0x55 */
  memset(WRAM,0x55,(128 << 10));
