@@ -893,7 +893,7 @@ EXPORT MAP_WRITE_DMAP%1
 
 ALIGNC
 EXPORT MAP_WRITE_BBAD%1
- cmp [C_LABEL(DMAP_%1)],al
+ cmp [C_LABEL(BBAD_%1)],al
  je .no_change
  mov [C_LABEL(BBAD_%1)],al
  shr edx,2
