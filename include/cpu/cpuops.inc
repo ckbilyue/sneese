@@ -1667,10 +1667,6 @@ E0_STA al,Absolute_Long
 ; 90
 BFC BCC,SNES_FLAG_C
 
-; 91
-EM_STA OdO_y,Direct_Indirect_Indexed
-E0_STA OdO_y,Direct_Indirect_Indexed
-
 ; 92
 EM_STA OdO,Direct_Indirect
 E0_STA OdO,Direct_Indirect

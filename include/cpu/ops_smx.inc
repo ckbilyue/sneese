@@ -5,5 +5,8 @@
 %endif
 
 
+OPCODE_PROLOG(0x91) ; STA (d),y
+ _STA Direct_Indirect_Indexed
+OPCODE_EPILOG
 
 %undef OPCODE_PROLOG

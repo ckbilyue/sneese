@@ -439,7 +439,7 @@ dd  C_LABEL(OpX0_0x88)    ,C_LABEL(E0_BIT_i)
 dd  C_LABEL(E0_TXA)       ,C_LABEL(E0_PHB)
 dd  C_LABEL(OpX0_0x8C)    ,C_LABEL(E0_STA_a)
 dd  C_LABEL(OpX0_0x8E)    ,C_LABEL(E0_STA_al)
-dd  C_LABEL(ALL_BCC)      ,C_LABEL(E0_STA_OdO_y)    ; 90
+dd  C_LABEL(ALL_BCC)      ,C_LABEL(OpE0M0X0_0x91)   ; 90
 dd  C_LABEL(E0_STA_OdO)   ,C_LABEL(E0_STA_Od_sO_y)
 dd  C_LABEL(OpE0X0_0x94)  ,C_LABEL(E0_STA_d_x)
 dd  C_LABEL(OpE0X0_0x96)  ,C_LABEL(E0_STA_IdI_y)
@@ -1150,7 +1150,7 @@ dd  C_LABEL(OpX0_0x88)    ,C_LABEL(EM_BIT_i)
 dd  C_LABEL(EM_TXA)       ,C_LABEL(E0_PHB)
 dd  C_LABEL(OpX0_0x8C)    ,C_LABEL(EM_STA_a)
 dd  C_LABEL(OpX0_0x8E)    ,C_LABEL(EM_STA_al)
-dd  C_LABEL(ALL_BCC)      ,C_LABEL(EM_STA_OdO_y)    ; 90
+dd  C_LABEL(ALL_BCC)      ,C_LABEL(OpE0M1X0_0x91)   ; 90
 dd  C_LABEL(EM_STA_OdO)   ,C_LABEL(EM_STA_Od_sO_y)
 dd  C_LABEL(OpE0X0_0x94)  ,C_LABEL(EM_STA_d_x)
 dd  C_LABEL(OpE0X0_0x96)  ,C_LABEL(EM_STA_IdI_y)
@@ -1861,7 +1861,7 @@ dd  C_LABEL(OpX1_0x88)    ,C_LABEL(E0_BIT_i)
 dd  C_LABEL(E0_TXA)       ,C_LABEL(E0_PHB)
 dd  C_LABEL(OpX1_0x8C)    ,C_LABEL(E0_STA_a)
 dd  C_LABEL(OpX1_0x8E)    ,C_LABEL(E0_STA_al)
-dd  C_LABEL(ALL_BCC)      ,C_LABEL(E0_STA_OdO_y)    ; 90
+dd  C_LABEL(ALL_BCC)      ,C_LABEL(OpE0M0X1_0x91)   ; 90
 dd  C_LABEL(E0_STA_OdO)   ,C_LABEL(E0_STA_Od_sO_y)
 dd  C_LABEL(OpE0X1_0x94)  ,C_LABEL(E0_STA_d_x)
 dd  C_LABEL(OpE0X1_0x96)  ,C_LABEL(E0_STA_IdI_y)
@@ -2572,7 +2572,7 @@ dd  C_LABEL(OpX1_0x88)    ,C_LABEL(EM_BIT_i)
 dd  C_LABEL(EM_TXA)       ,C_LABEL(E0_PHB)
 dd  C_LABEL(OpX1_0x8C)    ,C_LABEL(EM_STA_a)
 dd  C_LABEL(OpX1_0x8E)    ,C_LABEL(EM_STA_al)
-dd  C_LABEL(ALL_BCC)      ,C_LABEL(EM_STA_OdO_y)    ; 90
+dd  C_LABEL(ALL_BCC)      ,C_LABEL(OpE0M1X1_0x91)   ; 90
 dd  C_LABEL(EM_STA_OdO)   ,C_LABEL(EM_STA_Od_sO_y)
 dd  C_LABEL(OpE0X1_0x94)  ,C_LABEL(EM_STA_d_x)
 dd  C_LABEL(OpE0X1_0x96)  ,C_LABEL(EM_STA_IdI_y)
@@ -3283,7 +3283,7 @@ dd  C_LABEL(OpX1_0x88)    ,C_LABEL(EM_BIT_i)
 dd  C_LABEL(EM_TXA)       ,C_LABEL(E1_PHB)
 dd  C_LABEL(OpX1_0x8C)    ,C_LABEL(EM_STA_a)
 dd  C_LABEL(OpX1_0x8E)    ,C_LABEL(EM_STA_al)
-dd  C_LABEL(ALL_BCC)      ,C_LABEL(EM_STA_OdO_y)    ; 90
+dd  C_LABEL(ALL_BCC)      ,C_LABEL(OpE1_0x91)       ; 90
 dd  C_LABEL(EM_STA_OdO)   ,C_LABEL(EM_STA_Od_sO_y)
 dd  C_LABEL(OpE1_0x94)    ,C_LABEL(EM_STA_d_x)
 dd  C_LABEL(OpE1_0x96)    ,C_LABEL(EM_STA_IdI_y)
