@@ -163,6 +163,18 @@ You must read and accept the license prior to use.
  GET_WORD
 %endmacro
 
+%macro WRITE8_Absolute 1
+ ADDR_Absolute
+ mov al,%1
+ SET_BYTE
+%endmacro
+
+%macro WRITE16_Absolute 1
+ ADDR_Absolute
+ mov eax,%1
+ SET_WORD
+%endmacro
+
 %macro RMW_Absolute 1
  READ %+ M_size %+ _Absolute
 ;add R_Cycles,_5A22_FAST_CYCLE
@@ -198,6 +210,18 @@ You must read and accept the license prior to use.
 %macro READ16_Absolute_Long 0
  ADDR_Absolute_Long
  GET_WORD
+%endmacro
+
+%macro WRITE8_Absolute_Long 1
+ ADDR_Absolute_Long
+ mov al,%1
+ SET_BYTE
+%endmacro
+
+%macro WRITE16_Absolute_Long 1
+ ADDR_Absolute_Long
+ mov eax,%1
+ SET_WORD
 %endmacro
 
 ; Direct (corrupts eax)
@@ -239,6 +263,18 @@ You must read and accept the license prior to use.
 %macro READ24_Direct 0
  ADDR_Direct
  GET_LONG
+%endmacro
+
+%macro WRITE8_Direct 1
+ ADDR_Direct
+ mov al,%1
+ SET_BYTE
+%endmacro
+
+%macro WRITE16_Direct 1
+ ADDR_Direct
+ mov eax,%1
+ SET_WORD
 %endmacro
 
 %macro RMW_Direct 1
@@ -291,6 +327,18 @@ You must read and accept the license prior to use.
  GET_WORD
 %endmacro
 
+%macro WRITE8_Direct_Indirect_Indexed 1
+ ADDR_Direct_Indirect_Indexed
+ mov al,%1
+ SET_BYTE
+%endmacro
+
+%macro WRITE16_Direct_Indirect_Indexed 1
+ ADDR_Direct_Indirect_Indexed
+ mov eax,%1
+ SET_WORD
+%endmacro
+
 ; Direct Indirect Indexed Long (corrupts eax)
 ;  Read 8-bit and 16-bit
 ;    ORA-17  AND-37  EOR-57  ADC-77  LDA-B7  CMP-D7  SBC-F7
@@ -323,6 +371,18 @@ You must read and accept the license prior to use.
  GET_WORD
 %endmacro
 
+%macro WRITE8_Direct_Indirect_Indexed_Long 1
+ ADDR_Direct_Indirect_Indexed_Long
+ mov al,%1
+ SET_BYTE
+%endmacro
+
+%macro WRITE16_Direct_Indirect_Indexed_Long 1
+ ADDR_Direct_Indirect_Indexed_Long
+ mov eax,%1
+ SET_WORD
+%endmacro
+
 ; Direct index X (corrupts eax)
 ;  Read 8-bit and 16-bit
 ;    ORA-15  BIT-34  AND-35  EOR-55  ADC-75  LDY-B4  LDA-B5  CMP-D5
@@ -344,6 +404,18 @@ You must read and accept the license prior to use.
 %macro READ16_Direct_Index_X 0
  ADDR_Direct_Index_X
  GET_WORD
+%endmacro
+
+%macro WRITE8_Direct_Index_X 1
+ ADDR_Direct_Index_X
+ mov al,%1
+ SET_BYTE
+%endmacro
+
+%macro WRITE16_Direct_Index_X 1
+ ADDR_Direct_Index_X
+ mov eax,%1
+ SET_WORD
 %endmacro
 
 %macro RMW_Direct_Index_X 1
@@ -388,6 +460,18 @@ You must read and accept the license prior to use.
  GET_WORD
 %endmacro
 
+%macro WRITE8_Direct_Index_Y 1
+ ADDR_Direct_Index_Y
+ mov al,%1
+ SET_BYTE
+%endmacro
+
+%macro WRITE16_Direct_Index_Y 1
+ ADDR_Direct_Index_Y
+ mov eax,%1
+ SET_WORD
+%endmacro
+
 ; Direct Indexed Indirect (corrupts eax)
 ;  Read 8-bit and 16-bit
 ;    ORA-01  AND-21  EOR-41  ADC-61  LDA-A1  CMP-C1  SBC-E1
@@ -422,6 +506,18 @@ You must read and accept the license prior to use.
  GET_WORD
 %endmacro
 
+%macro WRITE8_Direct_Indexed_Indirect 1
+ ADDR_Direct_Indexed_Indirect
+ mov al,%1
+ SET_BYTE
+%endmacro
+
+%macro WRITE16_Direct_Indexed_Indirect 1
+ ADDR_Direct_Indexed_Indirect
+ mov eax,%1
+ SET_WORD
+%endmacro
+
 ; Absolute Index X (corrupts eax)
 ;  Read 8-bit and 16-bit
 ;    ORA-1D  BIT-3C  AND-3D  EOR-5D  ADC-7D  LDY-BC  LDA-BD  CMP-DD
@@ -449,6 +545,18 @@ You must read and accept the license prior to use.
 %macro READ16_Absolute_Index_X 0
  ADDR_Absolute_Index_X
  GET_WORD
+%endmacro
+
+%macro WRITE8_Absolute_Index_X 1
+ ADDR_Absolute_Index_X
+ mov al,%1
+ SET_BYTE
+%endmacro
+
+%macro WRITE16_Absolute_Index_X 1
+ ADDR_Absolute_Index_X
+ mov eax,%1
+ SET_WORD
 %endmacro
 
 %macro RMW_Absolute_Index_X 1
@@ -499,6 +607,18 @@ You must read and accept the license prior to use.
  GET_WORD
 %endmacro
 
+%macro WRITE8_Absolute_Index_Y 1
+ ADDR_Absolute_Index_Y
+ mov al,%1
+ SET_BYTE
+%endmacro
+
+%macro WRITE16_Absolute_Index_Y 1
+ ADDR_Absolute_Index_Y
+ mov eax,%1
+ SET_WORD
+%endmacro
+
 ; Absolute Long Index X (corrupts eax)
 ;  Read 8-bit and 16-bit
 ;    ORA-1F  AND-3F  EOR-5F  ADC-7F  LDA-BF  CMP-DF  SBC-FF
@@ -535,6 +655,18 @@ You must read and accept the license prior to use.
  GET_WORD
 %endmacro
 
+%macro WRITE8_Absolute_Long_Index_X 1
+ ADDR_Absolute_Long_Index_X
+ mov al,%1
+ SET_BYTE
+%endmacro
+
+%macro WRITE16_Absolute_Long_Index_X 1
+ ADDR_Absolute_Long_Index_X
+ mov eax,%1
+ SET_WORD
+%endmacro
+
 ; Direct Indirect (corrupts eax)
 ;  Read 8-bit and 16-bit
 ;    ORA-12  AND-32  EOR-52  ADC-72  LDA-B2  CMP-D2  SBC-F2
@@ -568,6 +700,18 @@ You must read and accept the license prior to use.
 %macro READ16_Direct_Indirect 0
  ADDR_Direct_Indirect
  GET_WORD
+%endmacro
+
+%macro WRITE8_Direct_Indirect 1
+ ADDR_Direct_Indirect
+ mov al,%1
+ SET_BYTE
+%endmacro
+
+%macro WRITE16_Direct_Indirect 1
+ ADDR_Direct_Indirect
+ mov eax,%1
+ SET_WORD
 %endmacro
 
 ; Direct Indirect Long (corrupts eax)
@@ -610,6 +754,18 @@ You must read and accept the license prior to use.
  GET_WORD
 %endmacro
 
+%macro WRITE8_Direct_Indirect_Long 1
+ ADDR_Direct_Indirect_Long
+ mov al,%1
+ SET_BYTE
+%endmacro
+
+%macro WRITE16_Direct_Indirect_Long 1
+ ADDR_Direct_Indirect_Long
+ mov eax,%1
+ SET_WORD
+%endmacro
+
 ; Stack Relative (corrupts eax)
 ;  Read 8-bit and 16-bit
 ;    ORA-03  AND-23  EOR-43  ADC-63  LDA-A3  CMP-C3  SBC-E3
@@ -639,6 +795,18 @@ You must read and accept the license prior to use.
 %macro READ16_Stack_Relative 0
  ADDR_Stack_Relative
  GET_WORD
+%endmacro
+
+%macro WRITE8_Stack_Relative 1
+ ADDR_Stack_Relative
+ mov al,%1
+ SET_BYTE
+%endmacro
+
+%macro WRITE16_Stack_Relative 1
+ ADDR_Stack_Relative
+ mov eax,%1
+ SET_WORD
 %endmacro
 
 ; Stack Relative Indirect Indexed (corrupts eax)
@@ -675,6 +843,18 @@ You must read and accept the license prior to use.
 %macro READ16_Stack_Relative_Indirect_Indexed 0
  ADDR_Stack_Relative_Indirect_Indexed
  GET_WORD
+%endmacro
+
+%macro WRITE8_Stack_Relative_Indirect_Indexed 1
+ ADDR_Stack_Relative_Indirect_Indexed
+ mov al,%1
+ SET_BYTE
+%endmacro
+
+%macro WRITE16_Stack_Relative_Indirect_Indexed 1
+ ADDR_Stack_Relative_Indirect_Indexed
+ mov eax,%1
+ SET_WORD
 %endmacro
 
 ; Absolute Indexed Indirect (corrupts eax)
