@@ -4117,9 +4117,9 @@ section .text
 %endmacro
 
 ; Save register R_Cycles to cycle counter
-%macro SAVE_CYCLES 0
- GET_CYCLES eax
- mov [C_LABEL(SNES_Cycles)],eax
+%macro SAVE_CYCLES 0-1 eax
+ GET_CYCLES %1
+ mov [C_LABEL(SNES_Cycles)],%1
 %endmacro
 
 ; Load base pointer to CPU register set

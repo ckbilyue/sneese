@@ -350,7 +350,7 @@ Do_HDMA_Absolute:
  SET_BYTE
  pop ebx
 
- add dword [C_LABEL(SNES_Cycles)],byte 8   ; HDMA transfer
+ add R_65c816_Cycles,byte 8     ; HDMA transfer
  cmp cl,2
  inc bx                 ; Adjust temporary table pointer
 ;jb .End_Transfer
@@ -364,7 +364,7 @@ Do_HDMA_Absolute:
  SET_BYTE
  pop ebx
 
- add dword [C_LABEL(SNES_Cycles)],byte 8   ; HDMA transfer
+ add R_65c816_Cycles,byte 8     ; HDMA transfer
  cmp cl,4
  inc bx                 ; Adjust temporary table pointer
 ;jb .End_Transfer
@@ -378,7 +378,7 @@ Do_HDMA_Absolute:
  SET_BYTE
  pop ebx
 
- add dword [C_LABEL(SNES_Cycles)],byte 8   ; HDMA transfer
+ add R_65c816_Cycles,byte 8     ; HDMA transfer
  inc bx
 
  GET_BYTE
@@ -389,7 +389,7 @@ Do_HDMA_Absolute:
  SET_BYTE
  pop ebx
 
- add dword [C_LABEL(SNES_Cycles)],byte 8   ; HDMA transfer
+ add R_65c816_Cycles,byte 8     ; HDMA transfer
 
 .End_Transfer:
  add [edi+A2T],cx
@@ -420,11 +420,11 @@ Do_HDMA_Indirect:
 
  mov ah,al
  GET_BYTE
- add dword [C_LABEL(SNES_Cycles)],byte 8   ; Address load low
+ add R_65c816_Cycles,byte 8     ; Address load low
  inc bx
  mov [edi+DASL],al
  GET_BYTE
- add dword [C_LABEL(SNES_Cycles)],byte 8   ; Address load high
+ add R_65c816_Cycles,byte 8     ; Address load high
  inc bx
  mov [edi+DASH],al
  mov [edi+A2T],ebx
@@ -440,7 +440,7 @@ Do_HDMA_Indirect:
  SET_BYTE
  pop ebx
 
- add dword [C_LABEL(SNES_Cycles)],byte 8   ; HDMA transfer
+ add R_65c816_Cycles,byte 8     ; HDMA transfer
  cmp cl,2
  inc bx                 ; Adjust temporary table pointer
 ;jb .End_Transfer
@@ -454,7 +454,7 @@ Do_HDMA_Indirect:
  SET_BYTE
  pop ebx
 
- add dword [C_LABEL(SNES_Cycles)],byte 8   ; HDMA transfer
+ add R_65c816_Cycles,byte 8     ; HDMA transfer
  cmp cl,4
  inc bx                 ; Adjust temporary table pointer
 ;jb .End_Transfer
@@ -468,7 +468,7 @@ Do_HDMA_Indirect:
  SET_BYTE
  pop ebx
 
- add dword [C_LABEL(SNES_Cycles)],byte 8   ; HDMA transfer
+ add R_65c816_Cycles,byte 8     ; HDMA transfer
  inc bx
 
  GET_BYTE
@@ -479,7 +479,7 @@ Do_HDMA_Indirect:
  SET_BYTE
  pop ebx
 
- add dword [C_LABEL(SNES_Cycles)],byte 8   ; HDMA transfer
+ add R_65c816_Cycles,byte 8     ; HDMA transfer
 
 .End_Transfer:
  add [edi+DAS],cx
@@ -534,7 +534,7 @@ extern C_LABEL(Dump_DMA)
  push ebx
  push ecx
  push edi
- push ebp
+;push ebp   ;R_65c816_Cycles
  push esi
 
  mov al,[In_CPU]
@@ -556,7 +556,7 @@ extern C_LABEL(Dump_DMA)
  mov [In_CPU],al
 
  pop esi
- pop ebp
+;pop ebp    ;R_65c816_Cycles
  pop edi
  pop ecx
  pop ebx
@@ -585,7 +585,7 @@ EXPORT do_HDMA
  push ebx
  push ecx
  push edx
- push ebp
+;push ebp   ;R_65c816_Cycles
  push esi
  push edi
  mov al,[In_DMA]
@@ -602,7 +602,7 @@ EXPORT do_HDMA
  mov [In_DMA],al
  pop edi
  pop esi
- pop ebp
+;pop ebp   ;R_65c816_Cycles
  pop edx
  pop ecx
  pop ebx
