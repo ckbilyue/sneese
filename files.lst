@@ -1,4 +1,4 @@
-smakefile
+makefile
 makefile.all
 makefile.dos
 makefile.win
