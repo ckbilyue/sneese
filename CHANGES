@@ -21,6 +21,7 @@ Changes
   DBJH          Daniel Horchner
 
 
+ 0.832
  0.831
   5A22: Changed emulation-mode interrupts to NOT zero data bank
    register - thanks to Overload for pointing out that the SNES CPU
