@@ -728,24 +728,19 @@ EXPORT_C %2
 %define _PLD _PULL16 B_D,New
 
 
-;src,size,label
-%macro _TxS 3
-ALIGNC
-EXPORT_C %3
+;src
+%macro _TxS 1
  ADDR_Implied
  mov eax,%1
-%if (%2) == 8
+%if S_8bit
  mov B_S,al
 %else
  mov B_S,eax
 %endif
- OPCODE_EPILOG
 %endmacro
 
-;src,dest,size,label
-%macro _Txx 4
-ALIGNC
-EXPORT_C %4
+;src,dest,size
+%macro _Txx 3
  ADDR_Implied
  mov eax,%1
 %if (%3) == 8
@@ -757,32 +752,31 @@ EXPORT_C %4
  STORE_FLAGS_N ah
  STORE_FLAGS_Z al
 %endif
- OPCODE_EPILOG
 %endmacro
 
-;src,size,label
-%macro _TxA 3
- _Txx %1,B_A,%2,%3
+;src
+%macro _TxA 1
+ _Txx %1,B_A,M_size
 %endmacro
 
-;src,size,label
-%macro _TxX 3
- _Txx %1,B_X,%2,%3
+;src
+%macro _TxX 1
+ _Txx %1,B_X,X_size
 %endmacro
 
-;src,size,label
-%macro _TxY 3
- _Txx %1,B_Y,%2,%3
+;src
+%macro _TxY 1
+ _Txx %1,B_Y,X_size
 %endmacro
 
-;src,label
-%macro _TxC 2
- _Txx %1,B_A,16,%2
+;src
+%macro _TxC 1
+ _Txx %1,B_A,16
 %endmacro
 
-;label
-%macro _TCD 1
- _Txx B_A,B_D,16,%1
+;src
+%macro _TCD 0
+ _Txx B_A,B_D,16
 %endmacro
 
 ;flag,label

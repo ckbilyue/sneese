@@ -489,10 +489,6 @@ BFC BPL,SNES_FLAG_N
 ; 18
 _CLx C,ALL_CLC          ; Clear Carry flag
 
-; 1B
-_TxS B_A,16,E0_TCS
-_TxS B_A,8,E1_TCS
-
 ; 20
 
 ALIGNC
@@ -726,8 +722,9 @@ BFS BMI,SNES_FLAG_N
 ; 38
 _SEx C,ALL_SEC          ; Set Carry flag
 
-; 3B
-_TxC B_S,ALL_TSC
+OPCODE_PROLOG(0x3B) ; TSC i
+ _TxC B_S
+OPCODE_EPILOG
 
 ; 40
 
@@ -940,8 +937,9 @@ EXPORT_C ALL_CLI
 .no_irq_enable:
  OPCODE_EPILOG
 
-; 5B
-_TCD ALL_TCD
+OPCODE_PROLOG(0x5B) ; TCD i
+ _TCD
+OPCODE_EPILOG
 
 ; 5C
 
@@ -1233,8 +1231,9 @@ BFS BVS,SNES_FLAG_V
 ; 78
 _SEx I,ALL_SEI          ; Set Interrupt disable flag
 
-; 7B
-_TxC B_D,ALL_TDC
+OPCODE_PROLOG(0x7B) ; TDC i
+ _TxC B_D
+OPCODE_EPILOG
 
 ; 7C
 
@@ -1340,46 +1339,14 @@ EXPORT_C E0_BIT_i
  STORE_FLAGS_Z al
  OPCODE_EPILOG
 
-; 8A
-_TxA B_X,8,EM_TXA
-_TxA B_X,16,E0_TXA
-
 ; 90
 BFC BCC,SNES_FLAG_C
-
-; 98
-_TxA B_Y,8,EM_TYA
-_TxA B_Y,16,E0_TYA
-
-; 9A
-_TxS B_X,16,E0_TXS
-_TxS B_X,8,E1_TXS
-
-; 9B
-_TxY B_X,8,EX_TXY
-_TxY B_X,16,E0_TXY
-
-; A8
-_TxY B_A,8,EX_TAY
-_TxY B_A,16,E0_TAY
-
-; AA
-_TxX B_A,8,EX_TAX
-_TxX B_A,16,E0_TAX
 
 ; B0
 BFS BCS,SNES_FLAG_C
 
 ; B8
 _CLx V,ALL_CLV          ; Clear oVerflow flag
-
-; BA
-_TxX B_S,8,EX_TSX
-_TxX B_S,16,E0_TSX
-
-; BB
-_TxX B_Y,8,EX_TYX
-_TxX B_Y,16,E0_TYX
 
 ; C2
 
