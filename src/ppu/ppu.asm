@@ -48,8 +48,8 @@ EXTERN_C Reset_Mode_7
 EXTERN_C LastRenderLine
 EXTERN_C BrightnessLevel
 EXTERN_C NMITIMEN
-EXTERN_C JOYSTICK_ENABLED,JOYSTICK_ENABLED2
-EXTERN_C MickeyMouse,MickeyRead,MouseButts
+EXTERN_C CONTROLLER_1_TYPE,CONTROLLER_2_TYPE
+EXTERN_C MickeyMouse,MickeyRead,MouseButtons
 EXTERN_C KEY_A_1,KEY_X_1,KEY_L_1,KEY_R_1
 EXTERN_C KEY_B_1,KEY_Y_1,KEY_SELECT_1,KEY_START_1
 EXTERN_C KEY_UP_1,KEY_DOWN_1,KEY_LEFT_1,KEY_RIGHT_1
@@ -1111,7 +1111,7 @@ SNES_R4016: ; JOYC1
 .read_enabled:
  push ecx
  push ebx
- cmp byte [C_LABEL(JOYSTICK_ENABLED)],2 ; Is mouse plugged in?
+ cmp byte [C_LABEL(CONTROLLER_1_TYPE)],1    ; Is mouse plugged in?
  je .do_mouse
 
  mov cl,[C_LABEL(Controller1_Pos)]
@@ -1156,7 +1156,7 @@ SNES_R4017: ; JOYC2
 .read_enabled:
  push ecx
  push ebx
- cmp byte [C_LABEL(JOYSTICK_ENABLED2)],2    ; Is mouse plugged in?
+ cmp byte [C_LABEL(CONTROLLER_2_TYPE)],1    ; Is mouse plugged in?
  je .do_mouse
 
  mov cl,[C_LABEL(Controller23_Pos)]
@@ -1234,13 +1234,13 @@ SNES_R4217: ; RDMPYH
 
 ALIGNC
 SNES_R4218: ; JOY1L
- cmp byte [C_LABEL(JOYSTICK_ENABLED)],2 ; Is mouse plugged in?
+ cmp byte [C_LABEL(CONTROLLER_1_TYPE)],1    ; Is mouse plugged in?
  je .mouse
  mov al,[C_LABEL(JOY1L)]
  ret
 
 .mouse:
- mov al,[C_LABEL(MouseButts)]
+ mov al,[C_LABEL(MouseButtons)]
  or al,0x01
  ret
 
@@ -1251,13 +1251,13 @@ SNES_R4219: ; JOY1H
 
 ALIGNC
 SNES_R421A: ; JOY2L
- cmp byte [C_LABEL(JOYSTICK_ENABLED2)],2    ; Is mouse plugged in?
+ cmp byte [C_LABEL(CONTROLLER_2_TYPE)],1    ; Is mouse plugged in?
  je .mouse
  mov al,[C_LABEL(JOY2L)]
  ret
 
 .mouse:
- mov al,[C_LABEL(MouseButts)]
+ mov al,[C_LABEL(MouseButtons)]
  or al,0x01
  ret
 
