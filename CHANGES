@@ -23,6 +23,8 @@ Changes
 
  0.832
   Memory map: Corrected a scarcely used area of the LoROM map [TRAC]
+  Render: Disabled drawing of sub-screen layers when screen arithmetic
+   disabled [TRAC]
  0.831
   5A22: Changed emulation-mode interrupts to NOT zero data bank
    register - thanks to Overload for pointing out that the SNES CPU
