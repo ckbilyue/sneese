@@ -1133,6 +1133,7 @@ EXPORT SNES_R2137 ; SLHV  ; This latches the counter for horizontal/vertical dat
  cmp ebx,edx
  jbe .before_next_frame
  sub ebx,edx        ; fixup for next frame
+ dec ebx
 .before_next_frame:
 
  and bh,1
