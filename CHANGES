@@ -34,6 +34,8 @@ Changes
   5A22: Corrected emulation-mode interrupts to zero data bank register
    [TRAC]
   5A22: Corrected emulation-mode stack behavior of PHD/PLD opcodes [TRAC]
+  Documentation: Corrected Win32 port compilation requirements, other
+   minor improvements [TRAC]
  0.81
   PPU: Greatly simplied VRAM read/write handling and readded VRAM read
    buffering, thanks to anomie for convincing me to give it another
