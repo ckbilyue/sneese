@@ -129,6 +129,7 @@ OPCODE_EPILOG
 OPCODE_PROLOG(0x60) ; RTS s
  add R_Cycles,_5A22_FAST_CYCLE * 2
  PULL_W
+ add R_Cycles,_5A22_FAST_CYCLE
  inc ax
  mov R_PC,ax
 OPCODE_EPILOG
