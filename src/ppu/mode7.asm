@@ -352,7 +352,7 @@ EXTERN_C Layer_Disable_Mask
  jz .no_flip_y
 
  xor edx,-1
- add edx,262
+ add edx,256
 .no_flip_y:
 
  mov ecx,[Mode7_VY]

@@ -21,6 +21,8 @@ Changes
   DBJH          Daniel Horchner
 
 
+ 0.81
+  Render: Fixed an off-by-6 bug in mode 7 vertical flip [TRAC]
  0.80
   Misc: Fixed a flaw where divide result registers were not changed
    by division-by-zero [TRAC]
