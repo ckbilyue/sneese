@@ -62,9 +62,25 @@ EXPORT_C Read_Bank8Offset   ,skipl 256*8
 EXPORT_C Write_Bank8Offset  ,skipl 256*8
 EXPORT_C Dummy              ,skipk 64
 
+EXPORT_C Access_Speed_Mask  ,skipl
 EXPORT_C Last_Bus_Value_A   ,skipb
 
 section .text
+ALIGNC
+EXPORT_C SNES_GET_BYTE
+ GET_BYTE_CODE
+ ret
+
+ALIGNC
+EXPORT_C SNES_GET_BYTE_FIXED
+ GET_BYTE_CODE 1
+ ret
+
+ALIGNC
+EXPORT_C SNES_GET_WORD_FAST
+ GET_WORD_CODE
+ ret
+
 ALIGNC
 EXPORT_C SNES_GET_WORD
  GET_BYTE
@@ -73,6 +89,11 @@ EXPORT_C SNES_GET_WORD
  and ebx,(1 << 24) - 1
  GET_BYTE
  ror ax,8
+ ret
+
+ALIGNC
+EXPORT_C SNES_GET_LONG_FAST
+ GET_LONG_CODE
  ret
 
 ALIGNC
@@ -91,12 +112,22 @@ EXPORT_C SNES_GET_LONG
  ret
 
 ALIGNC
+EXPORT_C SNES_GET_WORD_FAST_WRAP
+ GET_WORD_CODE wrap
+ ret
+
+ALIGNC
 EXPORT_C SNES_GET_WORD_WRAP
  GET_BYTE
  mov ah,al
  inc bx
  GET_BYTE
  ror ax,8
+ ret
+
+ALIGNC
+EXPORT_C SNES_GET_LONG_FAST_WRAP
+ GET_LONG_CODE wrap
  ret
 
 ALIGNC
@@ -121,7 +152,9 @@ EXPORT_C CPU_OPEN_BUS_READ
 ALIGNC
 EXPORT_C CPU_OPEN_BUS_READ_LEGACY
     mov al,[C_LABEL(Last_Bus_Value_A)]
-    add R_65c816_Cycles,_5A22_LEGACY_CYCLE - _5A22_FAST_CYCLE
+    mov edx,[C_LABEL(Access_Speed_Mask)]
+    and edx,_5A22_LEGACY_CYCLE - _5A22_FAST_CYCLE
+    add R_65c816_Cycles,edx
     ret
 
 

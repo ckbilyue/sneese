@@ -833,8 +833,10 @@ SNES_R213F: ; STAT78
 
 ALIGNC
 SNES_R2180: ; WMDATA
+ mov edx,[C_LABEL(Access_Speed_Mask)]
+ and edx,_5A22_SLOW_CYCLE - _5A22_FAST_CYCLE
+ add R_65c816_Cycles,edx
  mov edx,[WMADDL]
- add R_65c816_Cycles,_5A22_SLOW_CYCLE - _5A22_FAST_CYCLE
  mov al,[C_LABEL(WRAM)+edx]
  inc edx
  and edx,0x01FFFF
@@ -2379,8 +2381,10 @@ SNES_W2133: ; SETINI
 
 ALIGNC
 SNES_W2180: ; WMDATA
+ mov edx,[C_LABEL(Access_Speed_Mask)]
+ and edx,_5A22_SLOW_CYCLE - _5A22_FAST_CYCLE
+ add R_65c816_Cycles,edx
  mov edx,[WMADDL]
- add R_65c816_Cycles,_5A22_SLOW_CYCLE - _5A22_FAST_CYCLE
  mov [C_LABEL(WRAM)+edx],al
  inc edx
  and edx,0x01FFFF

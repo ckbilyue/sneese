@@ -1764,6 +1764,8 @@ EXPORT_C Reset_CPU
  mov [HTimer],eax
  mov [HTimer_Set],eax
 
+ mov dword [C_LABEL(Access_Speed_Mask)],-1
+
  ; Reset other registers
  mov byte [C_LABEL(WRIO)],0xFF
  mov byte [C_LABEL(RDIO)],0xFF
