@@ -595,7 +595,7 @@ EXPORT Reset_Ports
  mov dword [Render_Select],C_LABEL(Render_Layering_Option_0)
  mov byte [C_LABEL(Layering_Mode)],0
 
- mov dword [C_LABEL(LastRenderLine)],239
+ mov dword [C_LABEL(LastRenderLine)],224
 
  mov [Display_Needs_Update],al
 
