@@ -512,17 +512,9 @@ E0_ORA IdI_y,Direct_Indirect_Indexed_Long
 ; 18
 _CLx C,ALL_CLC          ; Clear Carry flag
 
-; 19
-EM_ORA a_y,Absolute_Index_Y
-E0_ORA a_y,Absolute_Index_Y
-
 ; 1B
 _TxS B_A,16,E0_TCS
 _TxS B_A,8,E1_TCS
-
-; 1D
-EM_ORA a_x,Absolute_Index_X
-E0_ORA a_x,Absolute_Index_X
 
 ; 20
 
@@ -793,20 +785,8 @@ E0_AND IdI_y,Direct_Indirect_Indexed_Long
 ; 38
 _SEx C,ALL_SEC          ; Set Carry flag
 
-; 39
-EM_AND a_y,Absolute_Index_Y
-E0_AND a_y,Absolute_Index_Y
-
 ; 3B
 _TxC B_S,ALL_TSC
-
-; 3C
-EM_BIT a_x,Absolute_Index_X
-E0_BIT a_x,Absolute_Index_X
-
-; 3D
-EM_AND a_x,Absolute_Index_X
-E0_AND a_x,Absolute_Index_X
 
 ; 40
 
@@ -1052,10 +1032,6 @@ EXPORT_C ALL_CLI
 .no_irq_enable:
  OPCODE_EPILOG
 
-; 59
-EM_EOR a_y,Absolute_Index_Y
-E0_EOR a_y,Absolute_Index_Y
-
 ; 5A
 E0_PUSH16 B_Y,E0_PHY
 E0_PUSH8 B_Y,EX_PHY
@@ -1112,10 +1088,6 @@ EXPORT_C ALL_JML_al
  mov edx,C_LABEL(Blank)
  jmp short .read_direct
 %endif
-
-; 5D
-EM_EOR a_x,Absolute_Index_X
-E0_EOR a_x,Absolute_Index_X
 
 ; 60
 
@@ -1387,10 +1359,6 @@ E0_ADC IdI_y,Direct_Indirect_Indexed_Long
 ; 78
 _SEx I,ALL_SEI          ; Set Interrupt disable flag
 
-; 79
-EM_ADC a_y,Absolute_Index_Y
-E0_ADC a_y,Absolute_Index_Y
-
 ; 7A
 E0_PULL16 B_Y,E0_PLY
 E0_PULL8 B_Y,EX_PLY
@@ -1435,10 +1403,6 @@ EXPORT_C ALL_JMP_Oa_xO
  mov eax,C_LABEL(Blank)
  jmp short .read_direct
 %endif
-
-; 7D
-EM_ADC a_x,Absolute_Index_X
-E0_ADC a_x,Absolute_Index_X
 
 ; 80
 
@@ -1588,10 +1552,6 @@ E0_LDA IdI_y,Direct_Indirect_Indexed_Long
 ; B8
 _CLx V,ALL_CLV          ; Clear oVerflow flag
 
-; B9
-EM_LDA a_y,Absolute_Index_Y
-E0_LDA a_y,Absolute_Index_Y
-
 ; BA
 _TxX B_S,8,EX_TSX
 _TxX B_S,16,E0_TSX
@@ -1599,10 +1559,6 @@ _TxX B_S,16,E0_TSX
 ; BB
 _TxX B_Y,8,EX_TYX
 _TxX B_Y,16,E0_TYX
-
-; BD
-EM_LDA a_x,Absolute_Index_X
-E0_LDA a_x,Absolute_Index_X
 
 ; C1
 EM_CMP Od_xO,Direct_Indexed_Indirect
@@ -1800,10 +1756,6 @@ E0_CMP IdI_y,Direct_Indirect_Indexed_Long
 ; D8
 _CLx D,ALL_CLD          ; Clear Decimal mode flag
 
-; D9
-EM_CMP a_y,Absolute_Index_Y
-E0_CMP a_y,Absolute_Index_Y
-
 ; DA
 E0_PUSH16 B_X,E0_PHX
 E0_PUSH8 B_X,EX_PHX
@@ -1880,10 +1832,6 @@ EXPORT_C ALL_JML_OaO
  mov edx,C_LABEL(Blank)
  jmp short .read_direct
 %endif
-
-; DD
-EM_CMP a_x,Absolute_Index_X
-E0_CMP a_x,Absolute_Index_X
 
 ; E1
 EM_SBC Od_xO,Direct_Indexed_Indirect
@@ -2043,10 +1991,6 @@ E0_SBC IdI_y,Direct_Indirect_Indexed_Long
 ; F8
 _SEx D,ALL_SED          ; Set Decimal mode flag
 
-; F9
-EM_SBC a_y,Absolute_Index_Y
-E0_SBC a_y,Absolute_Index_Y
-
 ; FA
 E0_PULL16 B_X,E0_PLX
 E0_PULL8 B_X,EX_PLX
@@ -2158,7 +2102,3 @@ EXPORT_C E1_JSR_Oa_xO
  mov eax,C_LABEL(Blank)
  jmp short .read_direct
 %endif
-
-; FD
-EM_SBC a_x,Absolute_Index_X
-E0_SBC a_x,Absolute_Index_X
