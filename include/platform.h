@@ -71,7 +71,6 @@ EXTERN char dat_name[MAXPATH];
 
 EXTERN char start_dir[MAXPATH];
 
-EXTERN void LoadConfig_Old(void);
 EXTERN int LoadConfig(void);
 EXTERN void SaveConfig(void);
 EXTERN void cmdhelp(void);
