@@ -107,21 +107,17 @@ section .bss
 ;#H = tiles/pixels for layer # (high priority)
 ;#S = sprites (# priority) 34 24 14 04
 ;BA = back area 00
-;L7 = mode-7 EXTBG low priority 1
-;N7 = mode-7 EXTBG low priority 2, mode-7 w/o EXTBG
-;H7 = mode-7 EXTBG high priority
+;L7 = (2L) mode-7 EXTBG low priority 1
+;N7 = (1L) mode-7 EXTBG low priority 2, mode-7 w/o EXTBG
+;H7 = (2H) mode-7 EXTBG high priority
 
 ;modes 0-1
 ;layer 3H 3S 1H 2H 2S 1L 2L 1S 3H 4H 0S 3L 4L BA
 ;Z     38 34 32 31 24 22 21 14 12 11 04 02 01 00
 
-;modes 2-6
+;modes 2-7
 ;layer 3S 1H 2S 2H 1S 1L 0S 2L BA
 ;Z     34 32 24 22 14 12 04 02 00
-
-;mode 7
-;layer 3S 2S H7 1S N7 0S L7 BA
-;Z     34 24 22 14 12 04 02 00
 
 ALIGNB
 EXPORT DisplayZ,skipb (8+256+8)
