@@ -44,14 +44,22 @@ ALIGNC
 %%decimal_mode:
  mov cl,B_C_flag
  mov bl,al
- mov al,B_A
  add cl,255 ;MAKE_CARRY
+ mov al,B_A
+ mov ecx,ebx
+ mov edx,eax
  adc al,bl
  daa
  mov B_A,al
- seto B_V_flag
  sbb bl,bl
  STORE_FLAGS_NZC al,bl
+;al = result, cl = argument, dl = old accumulator
+ xor cl,dl ;accum ^ arg
+ xor al,dl ;accum ^ result
+ xor cl,-1 ;~(accum ^ arg)
+ and al,0x80
+ and al,cl ;(~((accum ^ arg)) & ((accum ^ result)) & 0x80)
+ STORE_FLAGS_V al
  OPCODE_EPILOG
 %endmacro
 
@@ -78,8 +86,10 @@ ALIGNC
 %%decimal_mode:
  mov cl,B_C_flag
  mov ebx,eax
- mov eax,B_A
  add cl,255 ;MAKE_CARRY
+ mov eax,B_A
+ mov ecx,ebx
+ mov edx,eax
  adc al,bl
  daa
  mov bl,al
@@ -87,13 +97,19 @@ ALIGNC
  adc al,bh
  daa
  mov bh,al
- seto B_V_flag
  sbb al,al
  STORE_FLAGS_N bh
  mov B_A,bx
  or bl,bh
  STORE_FLAGS_C al
  STORE_FLAGS_Z bl
+;ax = result, cx = argument, dx = old accumulator
+ xor ch,dh ;accum ^ arg
+ xor ah,dh ;accum ^ result
+ xor ch,-1 ;~(accum ^ arg)
+ and ah,0x80
+ and ah,ch ;(~((accum ^ arg)) & ((accum ^ result)) & 0x80)
+ STORE_FLAGS_V ah
  OPCODE_EPILOG
 %endmacro
 
@@ -685,17 +701,24 @@ ALIGNC
 %%decimal_mode:
  mov cl,B_C_flag
  mov bl,al
- mov al,B_A
  cmp cl,1   ;MAKE_NOT_CARRY
+ mov al,B_A
+ mov ecx,ebx
+ mov edx,eax
  sbb al,bl
  das
  mov B_A,al
- seto B_V_flag
  sbb bl,bl
  STORE_FLAGS_N al
  xor bl,0xFF
  STORE_FLAGS_Z al
  STORE_FLAGS_C bl
+;al = result, cl = argument, dl = old accumulator
+ xor cl,dl ;accum ^ arg
+ xor al,dl ;accum ^ result
+ and cl,0x80
+ and al,cl ;(((accum ^ arg)) & ((accum ^ result)) & 0x80)
+ STORE_FLAGS_V al
  OPCODE_EPILOG
 %endmacro
 
@@ -723,8 +746,10 @@ ALIGNC
 %%decimal_mode:
  mov cl,B_C_flag
  mov ebx,eax
- mov eax,B_A
  cmp cl,1   ;MAKE_NOT_CARRY
+ mov eax,B_A
+ mov ecx,ebx
+ mov edx,eax
  sbb al,bl
  das
  mov bl,al
@@ -732,7 +757,6 @@ ALIGNC
  sbb al,bh
  das
  mov bh,al
- seto B_V_flag
  sbb al,al
  STORE_FLAGS_N bh
  xor al,0xFF
@@ -740,6 +764,12 @@ ALIGNC
  or bl,bh
  STORE_FLAGS_C al
  STORE_FLAGS_Z bl
+;ax = result, cx = argument, dx = old accumulator
+ xor ch,dh ;accum ^ arg
+ xor ah,dh ;accum ^ result
+ and ch,0x80
+ and ah,ch ;(((accum ^ arg)) & ((accum ^ result)) & 0x80)
+ STORE_FLAGS_V ah
  OPCODE_EPILOG
 %endmacro
 
