@@ -77,6 +77,11 @@ ALIGNC
  mov ecx,ebx
  mov edx,eax
  adc al,bl
+ lahf
+ mov bl,0x10
+ and bl,ah
+ sub al,bl
+ sahf
  daa
  mov B_A,al
  sbb bl,bl
@@ -113,10 +118,20 @@ ALIGNC
  mov ecx,ebx
  mov edx,eax
  adc al,bl
+ lahf
+ mov bl,0x10
+ and bl,ah
+ sub al,bl
+ sahf
  daa
  mov bl,al
- mov al,ah
+ mov al,dh
  adc al,bh
+ lahf
+ mov bh,0x10
+ and bh,ah
+ sub al,bh
+ sahf
  daa
  mov bh,al
  sbb al,al
@@ -521,6 +536,15 @@ ALIGNC
  mov ecx,ebx
  mov edx,eax
  sbb al,bl
+ lahf
+ and ah,0x10
+ add al,ah
+ sahf
+ lahf
+ mov bl,0x10
+ and bl,ah
+ add al,bl
+ sahf
  das
  mov B_A,al
  sbb bl,bl
@@ -560,10 +584,20 @@ ALIGNC
  mov ecx,ebx
  mov edx,eax
  sbb al,bl
+ lahf
+ mov bl,0x10
+ and bl,ah
+ add al,bl
+ sahf
  das
  mov bl,al
- mov al,ah
+ mov al,dh
  sbb al,bh
+ lahf
+ mov bh,0x10
+ and bh,ah
+ add al,bh
+ sahf
  das
  mov bh,al
  sbb al,al

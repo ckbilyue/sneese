@@ -22,6 +22,8 @@ Changes
 
 
  0.832
+  5A22: Corrected decimal fixup in ADC/SBC instructions to not
+   allow multiple carries/borrows [TRAC]
   Input: Prevented input code from reading sticks that were not
    providing digital input due to needing calibration [TRAC]
   Memory map: Corrected a scarcely used area of the LoROM map [TRAC]
