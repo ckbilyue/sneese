@@ -59,6 +59,7 @@ You must read and accept the license prior to use.
 ; Implied
 %macro ADDR_Implied 0
  inc R_PC
+ add R_Cycles,_5A22_FAST_CYCLE
 %endmacro
 
 
@@ -73,7 +74,7 @@ You must read and accept the license prior to use.
 %else
  mov eax,B_A
 %endif
-;add R_Cycles,_5A22_FAST_CYCLE
+ add R_Cycles,_5A22_FAST_CYCLE
  %1
 %if M_8bit
  mov B_A,al
@@ -89,7 +90,7 @@ You must read and accept the license prior to use.
 %else
  mov eax,B_X
 %endif
-;add R_Cycles,_5A22_FAST_CYCLE
+ add R_Cycles,_5A22_FAST_CYCLE
  %1
 %if X_8bit
  mov B_X,al
@@ -105,7 +106,7 @@ You must read and accept the license prior to use.
 %else
  mov eax,B_Y
 %endif
-;add R_Cycles,_5A22_FAST_CYCLE
+ add R_Cycles,_5A22_FAST_CYCLE
  %1
 %if X_8bit
  mov B_Y,al
@@ -142,6 +143,7 @@ You must read and accept the license prior to use.
 %endif
 %else
  add R_PC,byte 2
+ add R_Cycles,_5A22_FAST_CYCLE
 %endif
 %endmacro
 
@@ -158,7 +160,7 @@ You must read and accept the license prior to use.
  push eax
  mov al,B_PB
  E0_PUSH_B
-;add R_Cycles,_5A22_FAST_CYCLE
+ add R_Cycles,_5A22_FAST_CYCLE
  GET_PBPC ebx
  GET_BYTE
  movzx ecx,al
@@ -183,13 +185,35 @@ You must read and accept the license prior to use.
 ;    TSB-0C  ASL-0E  TRB-1C  ROL-2E  LSR-4E  ROR-6E  DEC-CE  INC-EE
 ;
 ; if present, argument specifies post-index
-%macro ADDR_Absolute 0-1 0
+%macro ADDR_Absolute 0-2 0,0
  mov eax,B_DB_Shifted   ;implied bank
  READ16_Immediate
+
 %ifnidni %1,0           ;helper: index
+
+%ifidni %2,0
+%define %%wrapcheck X_8bit
+%else
+%define %%wrapcheck 0
+%endif
+
+%if %%wrapcheck         ;time always taken
  mov ebx,(1 << 24) - 1  ;clip for indexing
  add eax,%1
  and ebx,eax
+ add R_Cycles,%2
+%else                   ;penalty for address wrap
+ mov ebx,(1 << 24) - 1  ;clip for indexing
+ mov edx,eax
+ add eax,%1
+ sub dh,ah
+ and ebx,eax
+ add dh,255
+ sbb edx,edx
+ and edx,_5A22_FAST_CYCLE   ;address page wrap?
+ add R_Cycles,edx
+%endif
+
 %else
  mov ebx,eax
 %endif
@@ -219,7 +243,7 @@ You must read and accept the license prior to use.
 
 %macro RMW_Absolute 1
  READ %+ M_size %+ _Absolute
-;add R_Cycles,_5A22_FAST_CYCLE
+ add R_Cycles,_5A22_FAST_CYCLE
  %1
 %if M_8bit
  SET_BYTE
@@ -292,7 +316,7 @@ You must read and accept the license prior to use.
  and ebx,eax            ;bank 00
  Check_DL_Not_Zero
 %ifnidni %1,0
-;add R_Cycles,_5A22_FAST_CYCLE
+ add R_Cycles,_5A22_FAST_CYCLE
 %endif
 %endmacro
 
@@ -325,7 +349,7 @@ You must read and accept the license prior to use.
 
 %macro RMW_Direct 1
  READ %+ M_size %+ _Direct
-;add R_Cycles,_5A22_FAST_CYCLE
+ add R_Cycles,_5A22_FAST_CYCLE
  %1
 %if M_8bit
  SET_BYTE
@@ -336,16 +360,39 @@ You must read and accept the license prior to use.
 
 
 ; if present, argument specifies post-index
-%macro ADDR_Direct_Indirect_Base 0-1 0
+%macro ADDR_Direct_Indirect_Base 0-2 0,0
  mov eax,B_DB_Shifted   ;implied bank
  GET_WORD
 %ifnidni %1,0           ;helper: post-index
+
+%ifidni %2,0
+%define %%wrapcheck X_8bit
+%else
+%define %%wrapcheck 0
+%endif
+
+%if %%wrapcheck         ;time always taken
  mov ebx,(1 << 24) - 1  ;clip for indexing
  add eax,%1
  and ebx,eax
+ add R_Cycles,%2
+%else                   ;penalty for address wrap
+ mov ebx,(1 << 24) - 1  ;clip for indexing
+ mov edx,eax
+ add eax,%1
+ sub dh,ah
+ and ebx,eax
+ add dh,255
+ sbb edx,edx
+ and edx,_5A22_FAST_CYCLE   ;address page wrap?
+ add R_Cycles,edx
+%endif
+
 %else
  mov ebx,eax
 %endif
+
+%undef %%wrapcheck
 %endmacro
 
 ; Direct Indirect (corrupts eax)
@@ -368,9 +415,9 @@ You must read and accept the license prior to use.
 ;   (if 16-bit data)
 ;   (1) 5a  1  1   1  0 DBR,AA+1    Data Low    1/0
 ; if present, first argument = pre-index, second = post-index
-%macro ADDR_Direct_Indirect 0-2 0,0
+%macro ADDR_Direct_Indirect 0-3 0,0,0
  ADDR_Direct %1
- ADDR_Direct_Indirect_Base %2
+ ADDR_Direct_Indirect_Base %2,%3
 %endmacro
 
 %macro READ8_Direct_Indirect 0
@@ -414,8 +461,8 @@ You must read and accept the license prior to use.
 ;       5   1  1   1  0 DBR,AA+Y        Data Low    1/0
 ;   (if 16-bit data)
 ;   (1) 5a  1  1   1  1 DBR,AA+Y+1      Data High   1/0
-%macro ADDR_Direct_Indirect_Indexed 0
- ADDR_Direct_Indirect 0,B_Y
+%macro ADDR_Direct_Indirect_Indexed 0-1 0
+ ADDR_Direct_Indirect 0,B_Y,%1
 %endmacro
 
 %macro READ8_Direct_Indirect_Indexed 0
@@ -429,13 +476,13 @@ You must read and accept the license prior to use.
 %endmacro
 
 %macro WRITE8_Direct_Indirect_Indexed 1
- ADDR_Direct_Indirect_Indexed
+ ADDR_Direct_Indirect_Indexed _5A22_FAST_CYCLE
  mov al,%1
  SET_BYTE
 %endmacro
 
 %macro WRITE16_Direct_Indirect_Indexed 1
- ADDR_Direct_Indirect_Indexed
+ ADDR_Direct_Indirect_Indexed _5A22_FAST_CYCLE
  mov eax,%1
  SET_WORD
 %endmacro
@@ -573,7 +620,7 @@ You must read and accept the license prior to use.
 
 %macro RMW_Direct_Index_X 1
  READ %+ M_size %+ _Direct_Index_X
-;add R_Cycles,_5A22_FAST_CYCLE
+ add R_Cycles,_5A22_FAST_CYCLE
  %1
 %if M_8bit
  SET_BYTE
@@ -685,31 +732,31 @@ You must read and accept the license prior to use.
 %endif
 %endmacro
 
-%macro READ8_Absolute_Index_X 0
- ADDR_Absolute_Index_X
+%macro READ8_Absolute_Index_X 0-1 0
+ ADDR_Absolute_Index_X %1
  GET_BYTE
 %endmacro
 
-%macro READ16_Absolute_Index_X 0
- ADDR_Absolute_Index_X
+%macro READ16_Absolute_Index_X 0-1 0
+ ADDR_Absolute_Index_X %1
  GET_WORD
 %endmacro
 
 %macro WRITE8_Absolute_Index_X 1
- ADDR_Absolute_Index_X
+ ADDR_Absolute_Index_X _5A22_FAST_CYCLE
  mov al,%1
  SET_BYTE
 %endmacro
 
 %macro WRITE16_Absolute_Index_X 1
- ADDR_Absolute_Index_X
+ ADDR_Absolute_Index_X _5A22_FAST_CYCLE
  mov eax,%1
  SET_WORD
 %endmacro
 
 %macro RMW_Absolute_Index_X 1
- READ %+ M_size %+ _Absolute_Index_X ;_5A22_FAST_CYCLE
-;add R_Cycles,_5A22_FAST_CYCLE
+ READ %+ M_size %+ _Absolute_Index_X _5A22_FAST_CYCLE
+ add R_Cycles,_5A22_FAST_CYCLE
  %1
 %if M_8bit
  SET_BYTE
@@ -753,13 +800,13 @@ You must read and accept the license prior to use.
 %endmacro
 
 %macro WRITE8_Absolute_Index_Y 1
- ADDR_Absolute_Index_Y
+ ADDR_Absolute_Index_Y _5A22_FAST_CYCLE
  mov al,%1
  SET_BYTE
 %endmacro
 
 %macro WRITE16_Absolute_Index_Y 1
- ADDR_Absolute_Index_Y
+ ADDR_Absolute_Index_Y _5A22_FAST_CYCLE
  mov eax,%1
  SET_WORD
 %endmacro
@@ -822,6 +869,7 @@ You must read and accept the license prior to use.
 %macro ADDR_Stack_Relative 0
  READ8_Immediate
  mov ebx,B_S    ; Add stack pointer to make address
+ add R_Cycles,_5A22_FAST_CYCLE
  add ebx,eax
  and ebx,(1 << 16) - 1
 %endmacro
@@ -870,6 +918,7 @@ You must read and accept the license prior to use.
  mov eax,B_DB_Shifted
  GET_WORD
  mov ebx,B_Y
+ add R_Cycles,_5A22_FAST_CYCLE
  add ebx,eax
  and ebx,(1 << 24) - 1  ; Ensure 24-bit address
 %endmacro
@@ -943,7 +992,7 @@ You must read and accept the license prior to use.
  READ16_Immediate JMP
  mov ebx,eax
 %endif
-;add R_Cycles,_5A22_FAST_CYCLE
+ add R_Cycles,_5A22_FAST_CYCLE
  add bx,B_X
  xor eax,eax
  GET_WORD

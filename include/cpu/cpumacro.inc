@@ -180,7 +180,7 @@ ALIGNC
  READ8_Immediate
  JUMP_FLAG %1,C_LABEL(CPU_RETURN),near  ; flag set
  movsx eax,al                   ; sign extend for addition
- add R_Cycles,byte 6            ; branch taken
+ add R_Cycles,_5A22_FAST_CYCLE  ; branch taken
  add R_PC,ax
 %endmacro
 
@@ -189,14 +189,14 @@ ALIGNC
  READ8_Immediate
  JUMP_NOT_FLAG %1,C_LABEL(CPU_RETURN),near  ; flag clear
  movsx eax,al                   ; sign extend for addition
- add R_Cycles,byte 6            ; branch taken
+ add R_Cycles,_5A22_FAST_CYCLE  ; branch taken
  add R_PC,ax
 %endmacro
 
 %macro _BRA 0
  READ8_Immediate
  movsx eax,al                   ; sign extend for addition
-;add R_Cycles,byte 6            ; branch taken
+ add R_Cycles,_5A22_FAST_CYCLE  ; branch taken
  add R_PC,ax
 %endmacro
 
@@ -397,6 +397,7 @@ ALIGNC
  mov ebx,B_DB_Shifted
  add ebx,B_Y        ; Dest address
  SET_BYTE
+ add R_Cycles,_5A22_FAST_CYCLE * 2
  mov eax,B_A
 %ifidni %1,MVN
  inc ebx            ; MVN, Forward copy
@@ -416,7 +417,6 @@ ALIGNC
  test R_Cycles,R_Cycles
  jge .event
  mov B_A,ax
- add R_Cycles,[esp]
  GET_PBPC ebx
  GET_BYTE
  jmp .again
@@ -653,6 +653,7 @@ ALIGNC
 ;%1 = register
 %macro _PULL8 1
  ADDR_Implied
+ add R_Cycles,_5A22_FAST_CYCLE
  PULL_B
  mov %1,al
  STORE_FLAGS_NZ al
@@ -661,6 +662,7 @@ ALIGNC
 ;%1 = register, %2 = new
 %macro _PULL16 1-2 0
  ADDR_Implied
+ add R_Cycles,_5A22_FAST_CYCLE
  PULL_W %2
  STORE_FLAGS_N ah
  mov %1,eax

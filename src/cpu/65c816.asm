@@ -20,7 +20,6 @@ You must read and accept the license prior to use.
 ; To do: move cycle addition into opcode handlers
 ;        improved bus speed selection
 
-;%define ADD_CYCLES_FIRST
 ;CPU instruction tracker is broken!
 ;DO NOT UNCOMMENT THE FOLLOWING LINE!
 ;%define TRACKERS 1048576
@@ -3928,18 +3927,8 @@ _debug:db 0
 section .text
 %macro OPCODE_EPILOG 0
 %if 0
-%ifndef ADD_CYCLES_FIRST
- pop ebx
-;mov edx,B_EventTrip
- add R_Cycles,ebx   ; Update cycle counter
-%else
-;mov edx,B_EventTrip
-%endif
  xor eax,eax        ; Zero for table offset
 
-;cmp R_Cycles,edx
-;jb near C_LABEL(CPU_START_NEXT)
-;jmp near HANDLE_EVENT
  test R_Cycles,R_Cycles
  jl near C_LABEL(CPU_START_NEXT)
  jmp near HANDLE_EVENT
@@ -4349,7 +4338,7 @@ section .text
  jnb %%not_within_wram
  mov byte [C_LABEL(WRAM)+ebx],%1
 %%not_within_wram:
- add R_Cycles,8
+ add R_Cycles,_5A22_SLOW_CYCLE
 %endmacro
 
 %macro FAST_GET_BYTE_STACK_NATIVE_MODE 1
@@ -4357,17 +4346,17 @@ section .text
  jnb %%not_within_wram
  mov %1,byte [C_LABEL(WRAM)+ebx]
 %%not_within_wram:
- add R_Cycles,8
+ add R_Cycles,_5A22_SLOW_CYCLE
 %endmacro
 
 %macro FAST_SET_BYTE_STACK_EMULATION_MODE 1
  mov byte [C_LABEL(WRAM)+ebx],%1
- add R_Cycles,8
+ add R_Cycles,_5A22_SLOW_CYCLE
 %endmacro
 
 %macro FAST_GET_BYTE_STACK_EMULATION_MODE 1
  mov %1,byte [C_LABEL(WRAM)+ebx]
- add R_Cycles,8
+ add R_Cycles,_5A22_SLOW_CYCLE
 %endmacro
 
 ; Native mode - push byte (S--)
@@ -4839,10 +4828,9 @@ CPU_START:
  mov al,[CPU_Execution_Mode]
  test al,al
  jz .normal_execution
-%if 1
+
  cmp al,CEM_Instruction_After_IRQ_Enable
  je .instruction_after_irq_enable
-%endif
  xor R_Cycles,R_Cycles
 ;SAVE_CYCLES
  mov edx,[C_LABEL(EventTrip)]
@@ -4875,14 +4863,8 @@ EXPORT_C CPU_RETURN
  jz Op_0xDB     ;STP
 %endif
 
-%ifndef ADD_CYCLES_FIRST
- pop ebx
- xor eax,eax        ; Zero for table offset
- add R_Cycles,ebx   ; Update cycle counter
-%else
  xor eax,eax        ; Zero for table offset
  test R_Cycles,R_Cycles
-%endif
 
  jge HANDLE_EVENT
 
@@ -4979,16 +4961,6 @@ EXTERN_C DisplayStatus,readkey,keypressed
  GET_BYTE               ; Get opcode
  mov edx,B_OpTable
  xor ebx,ebx
-
- ; Bus speed selected by modifying code
- mov bl,[0x400+edx+eax] ; SlowROM, timing * 8, FastROM, timing * 6
-EXPORT_EQU_C CycleTable,$-3 ; Address of '04'
-
-%ifndef ADD_CYCLES_FIRST
- push ebx
-%else
- add R_Cycles,ebx   ; Update cycle counter
-%endif
 
  jmp dword [edx+eax*4]  ; Call opcode handler
 

@@ -81,6 +81,7 @@ OPCODE_PROLOG(0x30) ; BMI r
 OPCODE_EPILOG
 
 OPCODE_PROLOG(0x40) ; RTI s
+ add R_Cycles,_5A22_FAST_CYCLE * 2
  PULL_B
  mov bl,B_I_flag
  push ebx
@@ -126,6 +127,7 @@ OPCODE_PROLOG(0x50) ; BVC r
 OPCODE_EPILOG
 
 OPCODE_PROLOG(0x60) ; RTS s
+ add R_Cycles,_5A22_FAST_CYCLE * 2
  PULL_W
  inc ax
  mov R_PC,ax
@@ -133,12 +135,14 @@ OPCODE_EPILOG
 
 OPCODE_PROLOG(0x62) ; PER s
  READ16_Immediate
+ add R_Cycles,_5A22_FAST_CYCLE
  GET_PBPC ebx
  add eax,ebx
  PUSH_W
 OPCODE_EPILOG
 
 OPCODE_PROLOG(0x6B) ; RTL s
+ add R_Cycles,_5A22_FAST_CYCLE * 2
  E0_PULL_L
  Stack_Fixup
  mov R_PBPC,eax
@@ -179,6 +183,7 @@ OPCODE_EPILOG
 
 OPCODE_PROLOG(0xC2) ; REP #
  READ8_Immediate
+ add R_Cycles,_5A22_FAST_CYCLE
 
  mov bl,B_I_flag
 
@@ -258,6 +263,7 @@ OPCODE_EPILOG
 
 OPCODE_PROLOG(0xE2) ; SEP #
  READ8_Immediate
+ add R_Cycles,_5A22_FAST_CYCLE
 
  test al,REAL_SNES_FLAG_C
  jz .no_change_carry

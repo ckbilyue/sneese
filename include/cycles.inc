@@ -15,6 +15,8 @@ You must read and accept the license prior to use.
 %define SNEeSe_cycles_inc
 
 %define _5A22_FAST_CYCLE 6
+%define _5A22_SLOW_CYCLE 8
+%define _5A22_LEGACY_CYCLE 12
 
 %define CYCLES_PER_DOT 4
 %define DOTS_PER_SCANLINE 335

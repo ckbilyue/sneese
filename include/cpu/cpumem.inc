@@ -74,7 +74,7 @@ alternate macro does not support NoSave or Double.
 %%read_done:
  pop edx
  movzx edx,byte [C_LABEL(BlockSpeed)+edx]
-;add R_Cycles,edx
+ add R_65c816_Cycles,edx
 %endmacro
 
 %macro GET_WORD 0-1 0
@@ -110,7 +110,7 @@ alternate macro does not support NoSave or Double.
  dec bx
 %endif
  call [C_LABEL(Read_Bank8Mapping)+edx*4]
-;add R_Cycles,ecx
+ add R_65c816_Cycles,ecx
  mov edx,[esp+4]
  mov ah,al
 %ifnidni %1,wrap
@@ -119,7 +119,7 @@ alternate macro does not support NoSave or Double.
  inc bx
 %endif
  call [C_LABEL(Read_Bank8Mapping)+edx*4]
-;add R_Cycles,ecx
+ add R_65c816_Cycles,ecx
  pop ecx
  ror ax,8
  pop edx
@@ -129,7 +129,7 @@ alternate macro does not support NoSave or Double.
  mov ax,[edx+ebx-1]
  pop edx
  movzx edx,byte [C_LABEL(BlockSpeed)+edx]
-;lea R_Cycles,[R_Cycles+edx*2]
+;lea R_65c816_Cycles,[R_65c816_Cycles+edx*2]
 %%read_done:
 %endmacro
 
@@ -167,7 +167,7 @@ alternate macro does not support NoSave or Double.
  sub bx,2
 %endif
  call [C_LABEL(Read_Bank8Mapping)+edx*4]
-;add R_Cycles,ecx
+ add R_65c816_Cycles,ecx
  mov edx,[esp+4]
  mov ah,al
 %ifnidni %1,wrap
@@ -176,7 +176,7 @@ alternate macro does not support NoSave or Double.
  inc bx
 %endif
  call [C_LABEL(Read_Bank8Mapping)+edx*4]
-;add R_Cycles,ecx
+ add R_65c816_Cycles,ecx
  mov edx,[esp+4]
 %ifnidni %1,wrap
  inc ebx
@@ -185,7 +185,7 @@ alternate macro does not support NoSave or Double.
 %endif
  bswap eax
  call [C_LABEL(Read_Bank8Mapping)+edx*4]
-;add R_Cycles,ecx
+ add R_65c816_Cycles,ecx
  pop ecx
  ror eax,16
  pop edx
@@ -197,9 +197,9 @@ alternate macro does not support NoSave or Double.
  mov ax,[edx+ebx-2]
  pop edx
  movzx edx,byte [C_LABEL(BlockSpeed)+edx]
-;add R_Cycles,edx
+ add R_65c816_Cycles,edx
  add edx,edx
-;add R_Cycles,edx
+ add R_65c816_Cycles,edx
 %%read_done:
 %endmacro
 
@@ -218,7 +218,7 @@ alternate macro does not support NoSave or Double.
 %%write_done:
  pop edx
  movzx edx,byte [C_LABEL(BlockSpeed)+edx]
-;add R_Cycles,edx
+ add R_65c816_Cycles,edx
 %endmacro
 
 ;%1 = NoSave/Double

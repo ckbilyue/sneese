@@ -469,6 +469,7 @@ OPCODE_EPILOG
 OPCODE_PROLOG(0x82) ; BRL rl
 ; Branch always long (-32768 to 32767)
  READ16_Immediate
+ add R_Cycles,_5A22_FAST_CYCLE
  add R_PC,ax
 OPCODE_EPILOG
 
@@ -478,14 +479,11 @@ OPCODE_EPILOG
 
 ; Wait for interrupt
 OPCODE_PROLOG(0xCB) ; WAI i
+ add R_Cycles,_5A22_FAST_CYCLE * 2
+
  mov al,[IRQ_pin]
  test al,al
  jnz .irq_active
-
-%ifndef ADD_CYCLES_FIRST
- pop ebx
- add R_Cycles,ebx
-%endif
 
  ; Put CPU in WAI mode
  mov byte [CPU_Execution_Mode],CEM_Waiting_For_Interrupt
@@ -500,7 +498,7 @@ ALIGNC
 
 %ifdef WAI_DELAY
  ; WAI delay after interrupt signal: 2 IO
- add R_Cycles,byte 12   ;*
+ add R_Cycles,_5A22_FAST_CYCLE * 2  ;*
 %endif
 OPCODE_EPILOG
 
@@ -510,10 +508,7 @@ OPCODE_EPILOG
 
 ; Stop the clock
 OPCODE_PROLOG(0xDB) ; STP i
-%ifndef ADD_CYCLES_FIRST
- pop ebx
- add R_Cycles,ebx
-%endif
+ add R_Cycles,_5A22_FAST_CYCLE * 2
 
  ; Put CPU in STP mode
  mov byte [CPU_Execution_Mode],CEM_Clock_Stopped
@@ -538,6 +533,7 @@ OPCODE_EPILOG
 OPCODE_PROLOG(0xEB) ; XBA i
  ADDR_Implied
  mov ah,B_A
+ add R_Cycles,_5A22_FAST_CYCLE
  mov al,B_B
  STORE_FLAGS_NZ al
  mov B_A,eax

@@ -335,13 +335,12 @@ IRQ_Enabled_Event:
  LOAD_BASE
  JUMP_FLAG SNES_FLAG_I,.irq_disabled    ; Interrupts disabled?
  LOAD_CYCLES
+ add R_65c816_Cycles,byte 12    ; IRQ processing: 2 IO
  JUMP_NOT_FLAG SNES_FLAG_E,.native_irq
- add R_65c816_Cycles,byte 52    ; IRQ processing: 2 IO + 5 bank0
  call E1_IRQ
  jmp .irq_return
 ALIGNC
 .native_irq:
- add R_65c816_Cycles,byte 60    ; IRQ processing: 2 IO + 6 bank0
  call E0_IRQ
 .irq_return:
  SAVE_CYCLES
@@ -848,16 +847,11 @@ NMI_Event:
  push edi
  LOAD_BASE
  LOAD_CYCLES
-%ifdef FAST_STACK_ACCESS_EMULATION_MODE
+ add R_65c816_Cycles,byte 12    ; NMI processing: 2 IO
  JUMP_NOT_FLAG SNES_FLAG_E,.E0_NMI,near ; Are we in emulation mode?
-%else
- JUMP_NOT_FLAG SNES_FLAG_E,.E0_NMI,near ; Are we in emulation mode?
-%endif
 
 .E1_NMI:
  ; Emulation mode NMI
-
- add R_65c816_Cycles,byte 52    ; IRQ processing: 2 IO + 5 bank0
 
  mov eax,[CPU_LABEL(PC)]
  E1_PUSH_W
@@ -879,8 +873,6 @@ NMI_Event:
 ALIGNC
 .E0_NMI:
  ; Native mode NMI
-
- add R_65c816_Cycles,byte 60    ; IRQ processing: 2 IO + 6 bank0
 
  mov al,[CPU_LABEL(PB)]
  E0_PUSH_B
@@ -961,16 +953,16 @@ HIRQ_Event:
  LOAD_BASE
  JUMP_FLAG SNES_FLAG_I,.irq_disabled    ; Interrupts disabled?
  LOAD_CYCLES
+ add R_65c816_Cycles,byte 12    ; IRQ processing: 2 IO
  JUMP_NOT_FLAG SNES_FLAG_E,.native_irq
- add R_65c816_Cycles,byte 52    ; IRQ processing: 2 IO + 5 bank0
  call E1_IRQ
  jmp .irq_return
 ALIGNC
 .native_irq:
- add R_65c816_Cycles,byte 60    ; IRQ processing: 2 IO + 6 bank0
  call E0_IRQ
 .irq_return:
  SAVE_CYCLES
+
 .irq_disabled:
  pop edi
 
