@@ -138,7 +138,7 @@ OBJDIRS = $(OBJ_BASE) $(OBJ_BASE)/$(PLATFORM) $(OBJ) \
 maketree: $(sort $(OBJDIRS))
 
 $(sort $(OBJDIRS)):
-	@-$(foreach dir,$@,$(MD) $(dir))
+	@-$(MD) $@
 
 clean:
 	@echo Removing C/C++ output files
