@@ -109,6 +109,11 @@ void SetupTables(void)
    BrightnessAdjust_64[t][e] = (t + 1) * e / 8;
    BrightnessAdjust_256[t][e] = (t + 1) * e / 2;
   }
+ }
+
+ for (t = 0; t < 16; t++)
+ {
+  int e;
 
   for (e = 0; e < 256; e++)
   {

@@ -30,6 +30,7 @@ EXTERN Screen_Mode
 
 EXTERN palette_2bpl,palette_4bpl
 
+EXTERN MosaicCountdown
 EXTERN BGLineCount
 
 EXTERN LineAddress,LineAddressY
@@ -207,6 +208,7 @@ EXTERN_C Win%1_Bands
  mov dword [C_LABEL(Current_Line_Render)],0
  mov dword [Ready_Line_Render],0
  mov dword [NMI_Event_Handler],C_LABEL(NMI)
+ mov dword [MosaicCountdown],0
 %endmacro
 
 %macro Render_Start_Frame_Skipped 0

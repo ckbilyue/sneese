@@ -21,7 +21,9 @@ You must read and accept the license prior to use.
 
 %define RO8x8M_MAX_LINE_COUNT 8
 
-%define RO8x8M_Local_Bytes 64+8+24
+%define RO8x8M_Local_Bytes 72+8+24
+%define RO8x8M_Countdown esp+68+8+24
+%define RO8x8M_Current_Line_Mosaic esp+64+8+24
 %define RO8x8M_Plotter_Table esp+60+8+24
 %define RO8x8M_Clipped esp+56+8+24
 %define RO8x8M_BG_Table esp+52+8+24
@@ -323,13 +325,15 @@ Render_Offset_8x8M 8
 
 ALIGNC
 Render_Offset_8x8M_Base:
+ push dword [MosaicCountdown]
+ push dword [LineCounter+edx]
  push ecx
  push esi
  push edx ;BG_Table
  push ebx ;Current_Line
  push edi ;BaseDestPtr
  push ebp ;Lines
- sub esp,byte RO8x8M_Local_Bytes-24
+ sub esp,byte RO8x8M_Local_Bytes-32
 
  ; ch contains bit for determining planes to affect
  mov ch,[OC_Flag+edx]
@@ -340,21 +344,22 @@ Render_Offset_8x8M_Base:
 .next_line:
  mov edx,[RO8x8M_BG_Table]
 
- mov eax,[RO8x8M_Current_Line]
- mov ebx,[Mosaic_Size_Select]
- xor ecx,ecx
- mov cl,[C_LABEL(MosaicCount)+eax+ebx]
- mov al,[C_LABEL(MosaicLine)+eax+ebx]
- mov [RO8x8M_Current_Line_Offset],eax
- mov [RO8x8MR_LineCount],ecx
+ mov eax,[RO8x8M_Current_Line_Mosaic]
+;mov eax,[RO8x8M_Current_Line]
+;mov ebx,[Mosaic_Size_Select]
+;xor ecx,ecx
+;mov cl,[C_LABEL(MosaicCount)+eax+ebx]
+;mov al,[C_LABEL(MosaicLine)+eax+ebx]
+;mov [RO8x8M_Current_Line_Offset],eax
+;mov [RO8x8MR_LineCount],ecx
  call Sort_Screen_Height
 
- mov eax,[RO8x8M_Current_Line_Offset]
+ mov eax,[RO8x8M_Current_Line_Mosaic]
  SORT_TILES_8_TALL [RO8x8M_MapAddress_Current]
 
  ; Corrupts eax,ecx,ebp
  mov eax,[TLMapAddress+edx]
- mov ecx,[RO8x8M_Current_Line_Offset]
+ mov ecx,[RO8x8M_Current_Line_Mosaic]
  mov edi,[BLMapAddress+edx]
  mov ebp,[VScroll+edx]
  mov [RO8x8M_TMapAddress],eax
@@ -381,8 +386,13 @@ Render_Offset_8x8M_Base:
  sub eax,ecx
  mov [RO8x8M_RMapDifference],eax
 
+ mov ecx,[RO8x8M_Countdown]
+ test ecx,ecx
+ jnz .no_reload
+ mov ecx,[Mosaic_Size]
+ mov [RO8x8M_Countdown],ecx
+.no_reload:
  mov ebp,[RO8x8M_Lines]
- mov ecx,[RO8x8MR_LineCount]
 
  cmp ecx,ebp
  ja .no_multi
@@ -393,6 +403,7 @@ Render_Offset_8x8M_Base:
  mov ebp,RO8x8M_MAX_LINE_COUNT
 .not_too_many:
  mov [RO8x8MR_LineCount],ebp
+
  mov ecx,[RO8x8M_Plotter_Table]
  lea eax,[ecx+ebp*8-8]
  mov [RO8x8MR_Plotter_Table],eax    ;renderer
@@ -457,21 +468,28 @@ Render_Offset_8x8M_Base:
 .done:
 
  mov ebp,[RO8x8MR_LineCount]
- mov ecx,[RO8x8M_Lines]
+
  mov eax,[RO8x8M_Current_Line]
- sub ecx,ebp
+ mov ecx,[RO8x8M_Lines]
+ mov edx,[RO8x8M_Countdown]
  add eax,ebp
- mov [RO8x8M_Lines],ecx
+ sub edx,ebp
+ jne .no_update_linecounter
+ mov [RO8x8M_Current_Line_Mosaic],eax
+.no_update_linecounter:
  mov edi,[RO8x8M_BaseDestPtr]
  mov [RO8x8M_Current_Line],eax
  mov eax,ebp
+ mov [RO8x8M_Countdown],edx
  shl eax,8
- lea ecx,[edi+ebp*GfxBufferLineSlack]
- add eax,ecx
+ lea edx,[edi+ebp*GfxBufferLineSlack]
+ add eax,edx
+ sub ecx,ebp
  mov [RO8x8M_BaseDestPtr],eax
+ mov [RO8x8M_Lines],ecx
 
 %ifndef LAYERS_PER_LINE
- cmp dword [RO8x8M_Lines],0
+;cmp dword [RO8x8M_Lines],0
  jnz near .next_line
 %endif
 
@@ -547,7 +565,7 @@ EXPORT_C %1     ; Define label, entry point
  test dh,[RO8x8M_OC_Flag+RO8x8M_Inner+12]   ; V-offset enabled?
  jz .No_VChange
  mov dl,[esi+eax]
- mov eax,[RO8x8M_Current_Line_Offset+RO8x8M_Inner+12]
+ mov eax,[RO8x8M_Current_Line_Mosaic+RO8x8M_Inner+12]
  add eax,edx
 
 .calc_v_offset:
@@ -791,7 +809,7 @@ EXPORT_C %1     ; Define label, entry point
  push ebp
 
  mov ebp,[RO8x8M_FirstTile+RO8x8M_Inner+12]
- mov eax,[RO8x8M_Current_Line_Offset+RO8x8M_Inner+12]
+ mov eax,[RO8x8M_Current_Line_Mosaic+RO8x8M_Inner+12]
  test dh,[RO8x8M_OC_Flag+RO8x8M_Inner+12]   ; Offset enabled?
  jz .No_VChange
 
@@ -1048,7 +1066,7 @@ EXPORT_C %1     ; Define label, entry point
  push ebp
 
  mov ebp,[RO8x8M_FirstTile+RO8x8M_Inner+12]
- mov eax,[RO8x8M_Current_Line_Offset+RO8x8M_Inner+12]
+ mov eax,[RO8x8M_Current_Line_Mosaic+RO8x8M_Inner+12]
  test dh,[RO8x8M_OC_Flag+RO8x8M_Inner+12]   ; Offset enabled?
  jz .No_VChange
 

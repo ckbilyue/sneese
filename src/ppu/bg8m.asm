@@ -217,7 +217,9 @@ Render_8x8M_Run:
 .last_run:
  jmp [R8x8MR_Plotter+R8x8MR_Inner]
 
-%define R8x8M_Local_Bytes 24
+%define R8x8M_Local_Bytes 32
+%define R8x8M_Countdown esp+28
+%define R8x8M_Current_Line_Mosaic esp+24
 %define R8x8M_Plotter_Table esp+20
 %define R8x8M_Clipped esp+16
 %define R8x8M_BG_Table esp+12
@@ -250,6 +252,8 @@ Render_8x8M 8
 
 ALIGNC
 Render_8x8M_Base:
+ push dword [MosaicCountdown]
+ push dword [LineCounter+edx]
  push ecx
  push esi
  push edx
@@ -263,17 +267,23 @@ Render_8x8M_Base:
 .next_line:
  mov edx,[R8x8M_BG_Table]
 
- mov eax,[R8x8M_Current_Line]
- call Sort_Screen_Height_Mosaic
+ mov eax,[R8x8M_Current_Line_Mosaic]
+ call Sort_Screen_Height
 
- mov eax,[R8x8M_Current_Line]
- mov ebx,[Mosaic_Size_Select]
- xor ecx,ecx
- mov cl,[C_LABEL(MosaicCount)+eax+ebx]
- mov al,[C_LABEL(MosaicLine)+eax+ebx]
- push ecx
+ mov eax,[R8x8M_Current_Line_Mosaic]
+;mov ebx,[Mosaic_Size_Select]
+;xor ecx,ecx
+;mov cl,[C_LABEL(MosaicCount)+eax+ebx]
+;mov al,[C_LABEL(MosaicLine)+eax+ebx]
+;push ecx
  SORT_TILES_8_TALL
- pop ecx
+;pop ecx
+ mov ecx,[R8x8M_Countdown]
+ test ecx,ecx
+ jnz .no_reload
+ mov ecx,[Mosaic_Size]
+ mov [R8x8M_Countdown],ecx
+.no_reload:
  mov ebp,[R8x8M_Lines]
 
  cmp ecx,ebp
@@ -357,9 +367,15 @@ Render_8x8M_Base:
 
  mov eax,[R8x8M_Current_Line]
  mov ecx,[R8x8M_Lines]
+ mov edx,[R8x8M_Countdown]
  add eax,ebp
+ sub edx,ebp
+ jne .no_update_linecounter
+ mov [R8x8M_Current_Line_Mosaic],eax
+.no_update_linecounter:
  sub ecx,ebp
  mov [R8x8M_Current_Line],eax
+ mov [R8x8M_Countdown],edx
  mov [R8x8M_Lines],ecx
 
 %ifndef LAYERS_PER_LINE

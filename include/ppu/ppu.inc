@@ -72,6 +72,7 @@ EXTERN TileWidthBG%1
 EXTERN MosaicBG%1
 EXTERN NBABG%1      ; Unused in BG3/4
 EXTERN NBATableBG%1 ; Unused in BG3/4
+EXTERN LineCounter_BG%1
 EXTERN M0_Color_BG%1
 EXTERN BG_Flag_BG%1
 EXTERN OC_Flag_BG%1 ; Unused in BG3/4
@@ -134,18 +135,19 @@ EXTERN_C Update_Layering
 %define BLMapAddress 0x2C
 %define BRMapAddress 0x30
 %define NBATable 0x34
-%define M0_Color 0x38
-%define BG_Flag 0x3C
-%define OC_Flag 0x3D
+%define LineCounter 0x38
+%define M0_Color 0x3C
+%define BG_Flag 0x40
+%define OC_Flag 0x41
 
-%define BG_Win_Main 0x3E
-%define BG_Win_Sub 0x45
-%define BG_Win_Low 0x4C
-%define BG_Win_High 0x53
-%define BG_Win_Both 0x5A
+%define BG_Win_Main 0x42
+%define BG_Win_Sub 0x49
+%define BG_Win_Low 0x50
+%define BG_Win_High 0x57
+%define BG_Win_Both 0x5E
 
-%define Priority_Used 0x61
-%define Priority_Unused 0x62
+%define Priority_Used 0x65
+%define Priority_Unused 0x66
 
 ; Offsets from _TableWin*
 %define Win_Count 0

@@ -21,7 +21,9 @@ You must read and accept the license prior to use.
 
 %define RO16x16M_MAX_LINE_COUNT 8
 
-%define RO16x16M_Local_Bytes 64+8+24
+%define RO16x16M_Local_Bytes 72+8+24
+%define RO16x16M_Countdown esp+68+8+24
+%define RO16x16M_Current_Line_Mosaic esp+64+8+24
 %define RO16x16M_Plotter_Table esp+60+8+24
 %define RO16x16M_Clipped esp+56+8+24
 %define RO16x16M_BG_Table esp+52+8+24
@@ -313,6 +315,7 @@ EXPORT_C Render_Offset_16x16M_C%1
 
  mov ecx,C_LABEL(Plot_Lines_V_Offset_16x16M_Table_C%1)
 .have_plotter:
+
  jmp Render_Offset_16x16M_Base
 %endmacro
 
@@ -322,13 +325,15 @@ Render_Offset_16x16M 8
 
 ALIGNC
 Render_Offset_16x16M_Base:
+ push dword [MosaicCountdown]
+ push dword [LineCounter+edx]
  push ecx
  push esi
  push edx ;BG_Table
  push ebx ;Current_Line
  push edi ;BaseDestPtr
  push ebp ;Lines
- sub esp,byte RO16x16M_Local_Bytes-24
+ sub esp,byte RO16x16M_Local_Bytes-32
 
  ; ch contains bit for determining planes to affect
  mov ch,[OC_Flag+edx]
@@ -339,21 +344,22 @@ Render_Offset_16x16M_Base:
 .next_line:
  mov edx,[RO16x16M_BG_Table]
 
- mov eax,[RO16x16M_Current_Line]
- mov ebx,[Mosaic_Size_Select]
- xor ecx,ecx
- mov cl,[C_LABEL(MosaicCount)+eax+ebx]
- mov al,[C_LABEL(MosaicLine)+eax+ebx]
- mov [RO16x16M_Current_Line_Offset],eax
- mov [RO16x16MR_LineCount],ecx
+ mov eax,[RO16x16M_Current_Line_Mosaic]
+;mov eax,[RO16x16M_Current_Line]
+;mov ebx,[Mosaic_Size_Select]
+;xor ecx,ecx
+;mov cl,[C_LABEL(MosaicCount)+eax+ebx]
+;mov al,[C_LABEL(MosaicLine)+eax+ebx]
+;mov [RO16x16M_Current_Line_Offset],eax
+;mov [RO16x16MR_LineCount],ecx
  call Sort_Screen_Height
 
- mov eax,[RO16x16M_Current_Line_Offset]
+ mov eax,[RO16x16M_Current_Line_Mosaic]
  SORT_TILES_16_TALL [RO16x16M_MapAddress_Current]
 
  ; Corrupts eax,ecx,ebp
  mov eax,[TLMapAddress+edx]
- mov ecx,[RO16x16M_Current_Line_Offset]
+ mov ecx,[RO16x16M_Current_Line_Mosaic]
  mov edi,[BLMapAddress+edx]
  mov ebp,[VScroll+edx]
  mov [RO16x16M_TMapAddress],eax
@@ -379,8 +385,13 @@ Render_Offset_16x16M_Base:
  sub eax,ecx
  mov [RO16x16M_RMapDifference],eax
 
+ mov ecx,[RO16x16M_Countdown]
+ test ecx,ecx
+ jnz .no_reload
+ mov ecx,[Mosaic_Size]
+ mov [RO16x16M_Countdown],ecx
+.no_reload:
  mov ebp,[RO16x16M_Lines]
- mov ecx,[RO16x16MR_LineCount]
 
  cmp ecx,ebp
  ja .no_multi
@@ -391,6 +402,7 @@ Render_Offset_16x16M_Base:
  mov ebp,RO16x16M_MAX_LINE_COUNT
 .not_too_many:
  mov [RO16x16MR_LineCount],ebp
+
  mov ecx,[RO16x16M_Plotter_Table]
  lea eax,[ecx+ebp*8-8]
  mov [RO16x16MR_Plotter_Table],eax  ;renderer
@@ -455,21 +467,28 @@ Render_Offset_16x16M_Base:
 .done:
 
  mov ebp,[RO16x16MR_LineCount]
- mov ecx,[RO16x16M_Lines]
+
  mov eax,[RO16x16M_Current_Line]
- sub ecx,ebp
+ mov ecx,[RO16x16M_Lines]
+ mov edx,[RO16x16M_Countdown]
  add eax,ebp
- mov [RO16x16M_Lines],ecx
+ sub edx,ebp
+ jne .no_update_linecounter
+ mov [RO16x16M_Current_Line_Mosaic],eax
+.no_update_linecounter:
  mov edi,[RO16x16M_BaseDestPtr]
  mov [RO16x16M_Current_Line],eax
  mov eax,ebp
+ mov [RO16x16M_Countdown],edx
  shl eax,8
- lea ecx,[edi+ebp*GfxBufferLineSlack]
- add eax,ecx
+ lea edx,[edi+ebp*GfxBufferLineSlack]
+ add eax,edx
+ sub ecx,ebp
  mov [RO16x16M_BaseDestPtr],eax
+ mov [RO16x16M_Lines],ecx
 
 %ifndef LAYERS_PER_LINE
- cmp dword [RO16x16M_Lines],0
+;cmp dword [RO16x16M_Lines],0
  jnz near .next_line
 %endif
 
@@ -481,8 +500,6 @@ Render_Offset_16x16M_Base:
 
  add esp,byte RO16x16M_Local_Bytes
  ret
-
-;%define RO16x16M_Inner 12
 
 ;%1 = label, %2 = priority - 0 = none, 1 = low, 2 = high, %3 = lines
 %macro Plot_Lines_Offset_16x16M_C4 3

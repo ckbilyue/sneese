@@ -134,6 +134,25 @@ EXPORT BaseDestPtr      ,skipl
 EXPORT Render_Select,skipl  ; Base renderer
 EXPORT Render_Mode  ,skipl  ; Mode renderer
 
+%if 0
+MOSAIC
+Mosaic effect uses a scanline countdown register, which is loaded at
+scanline 1, and reloaded at start of every scanline where it is 0.
+
+Backgrounds with enable bits set in MOSAIC register do not update their
+scanline counters except on MOSAIC countdown reload.  If mosaic effect is
+enabled on a non-reload scanline, it will continue to use the previous
+line's counter.  If enabled on a reload scanline, it will use the current
+line's counter.
+
+Countdown register always counts down on every line during display period
+(force blank not tested), even when effect is not enabled on any
+background, or when size is set to 0.  Countdown register is shared for all
+backgrounds.
+%endif
+;Countdown register for MOSAIC
+EXPORT MosaicCountdown  ,skipl
+
 EXPORT BGLineCount ,skipl
 
 EXPORT LineAddress ,skipl   ; Address of tileset, + offset to line in tile
@@ -481,16 +500,51 @@ EXPORT_C Update_Display
  mov edx,[Ready_Line_Render]
  push eax
  sub edx,[C_LABEL(Current_Line_Render)]
- mov ah,[C_LABEL(INIDISP)]
  mov [Display_Needs_Update],dh
- test ah,ah         ; Check for screen off
- js near .screen_off
+
  push ebx
  push ecx
  push edi
  push ebp
  push esi
  push edx
+
+;handle mosaic - setup linecounters for first line drawn
+%if 0
+LineCounter_BG[no mosaic] = current_line
+if (!MosaicCountdown)
+{
+ LineCounter_BG[mosaic] = current_line
+}
+%endif
+ mov cl,[MosaicCountdown]
+ mov al,[MOSAIC]
+ mov ebx,[C_LABEL(Current_Line_Render)]
+ add cl,255
+ sbb cl,cl
+ inc ebx
+ and al,cl
+
+ test al,1
+ jnz .no_update_linecounter_bg1
+ mov [LineCounter_BG1],ebx
+.no_update_linecounter_bg1:
+ test al,2
+ jnz .no_update_linecounter_bg2
+ mov [LineCounter_BG2],ebx
+.no_update_linecounter_bg2:
+ test al,4
+ jnz .no_update_linecounter_bg3
+ mov [LineCounter_BG3],ebx
+.no_update_linecounter_bg3:
+ test al,8
+ jnz .no_update_linecounter_bg4
+ mov [LineCounter_BG4],ebx
+.no_update_linecounter_bg4:
+
+ mov ah,[C_LABEL(INIDISP)]
+ test ah,ah         ; Check for screen off
+ js near .screen_off
 
  xor eax,eax
  mov [Priority_Used_BG1],ax
@@ -551,12 +605,83 @@ EXTERN_C BreaksLast
  call dword [Render_Select]
 
  pop edx
+ mov ebx,[C_LABEL(Current_Line_Render)]
+ add ebx,edx
+ mov [C_LABEL(Current_Line_Render)],ebx
+
+ mov al,[MOSAIC]
+ test al,1
+ jnz .mosaic_bg1
+ mov [LineCounter_BG1],ebx
+.mosaic_bg1:
+ test al,2
+ jnz .mosaic_bg2
+ mov [LineCounter_BG2],ebx
+.mosaic_bg2:
+ test al,4
+ jnz .mosaic_bg3
+ mov [LineCounter_BG3],ebx
+.mosaic_bg3:
+ test al,8
+ jnz .mosaic_bg4
+ mov [LineCounter_BG4],ebx
+.mosaic_bg4:
+
+;if (countdown >= linecount) countdown -= linecount;
+;else
+;{
+; line += countdown + MosaicLine[linecount - countdown - 1];
+; countdown = MosaicCount[linecount - countdown];
+; if (countdown == size) countdown = 0;
+;}
+ mov eax,[MosaicCountdown]
+ mov ebp,eax
+ sub eax,edx
+ jge .mosaic_fixup_done
+
+ mov esi,[Mosaic_Size_Select]
+ xor eax,-1
+ xor ecx,ecx
+ xor ebx,ebx
+ mov ecx,[C_LABEL(MosaicCount)+esi+eax+1]
+ mov ebx,[C_LABEL(MosaicLine)+esi+eax+1-1]
+ mov eax,[Mosaic_Size]
+ add ebx,ebp
+ cmp ecx,eax
+ sbb eax,eax
+ and ecx,eax
+ mov [MosaicCountdown],cl
+
+ mov al,[MOSAIC]
+ mov ebx,[LineCounter_BG1]
+ mov ecx,[LineCounter_BG2]
+ mov esi,[LineCounter_BG3]
+ mov edi,[LineCounter_BG4]
+
+ test al,1
+ jz .no_mosaic_bg1
+ add [LineCounter_BG1],ebp
+.no_mosaic_bg1:
+ test al,2
+ jz .no_mosaic_bg2
+ add [LineCounter_BG2],ebp
+.no_mosaic_bg2:
+ test al,4
+ jz .no_mosaic_bg3
+ add [LineCounter_BG3],ebp
+.no_mosaic_bg3:
+ test al,8
+ jz .no_mosaic_bg4
+ add [LineCounter_BG4],ebp
+.no_mosaic_bg4:
+
+.mosaic_fixup_done:
+ mov [MosaicCountdown],eax
  pop esi
  pop ebp
  pop edi
  pop ecx
  pop ebx
- add [C_LABEL(Current_Line_Render)],edx
 
  mov eax,GfxBufferLinePitch
  imul eax,edx
@@ -567,13 +692,6 @@ EXTERN_C BreaksLast
 
 ALIGNC
 .screen_off:
- push ebx
- push ecx
- push edi
- push ebp
- push esi
- push edx
-
  mov ebp,edx
  mov edi,[C_LABEL(SNES_Screen8)]    ; (256+16)*(239+1) framebuffer
  mov ebx,[BaseDestPtr]

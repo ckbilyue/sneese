@@ -51,7 +51,6 @@ void Render_16x16M_Run
 )
 {
  UINT16 *screen_address;
-;FFE7
  output += nextpixel;
 
  int clipped_count = Mosaic_Count[nextpixel];
@@ -204,8 +203,6 @@ Render_16x16M_Run:
 ; if (numpixels <= 0) return;
 ; output += count;
 
-;H3 FFEB NP 204 PC 19 PO B?
-
  call [R16x16MR_Plotter+R16x16MR_Inner]
 
  mov ebp,[R16x16MR_Next_Pixel+R16x16MR_Inner]
@@ -231,7 +228,9 @@ Render_16x16M_Run:
 .last_run:
  jmp [R16x16MR_Plotter+R16x16MR_Inner]
 
-%define R16x16M_Local_Bytes 24
+%define R16x16M_Local_Bytes 32
+%define R16x16M_Countdown esp+28
+%define R16x16M_Current_Line_Mosaic esp+24
 %define R16x16M_Plotter_Table esp+20
 %define R16x16M_Clipped esp+16
 %define R16x16M_BG_Table esp+12
@@ -264,6 +263,8 @@ Render_16x16M 8
 
 ALIGNC
 Render_16x16M_Base:
+ push dword [MosaicCountdown]
+ push dword [LineCounter+edx]
  push ecx
  push esi
  push edx
@@ -277,17 +278,23 @@ Render_16x16M_Base:
 .next_line:
  mov edx,[R16x16M_BG_Table]
 
- mov eax,[R16x16M_Current_Line]
- call Sort_Screen_Height_Mosaic
+ mov eax,[R16x16M_Current_Line_Mosaic]
+ call Sort_Screen_Height
 
- mov eax,[R16x16M_Current_Line]
- mov ebx,[Mosaic_Size_Select]
- xor ecx,ecx
- mov cl,[C_LABEL(MosaicCount)+eax+ebx]
- mov al,[C_LABEL(MosaicLine)+eax+ebx]
- push ecx
+ mov eax,[R16x16M_Current_Line_Mosaic]
+;mov ebx,[Mosaic_Size_Select]
+;xor ecx,ecx
+;mov cl,[C_LABEL(MosaicCount)+eax+ebx]
+;mov al,[C_LABEL(MosaicLine)+eax+ebx]
+;push ecx
  SORT_TILES_16_TALL
- pop ecx
+;pop ecx
+ mov ecx,[R16x16M_Countdown]
+ test ecx,ecx
+ jnz .no_reload
+ mov ecx,[Mosaic_Size]
+ mov [R16x16M_Countdown],ecx
+.no_reload:
  mov ebp,[R16x16M_Lines]
 
  cmp ecx,ebp
@@ -371,9 +378,15 @@ Render_16x16M_Base:
 
  mov eax,[R16x16M_Current_Line]
  mov ecx,[R16x16M_Lines]
+ mov edx,[R16x16M_Countdown]
  add eax,ebp
+ sub edx,ebp
+ jne .no_update_linecounter
+ mov [R16x16M_Current_Line_Mosaic],eax
+.no_update_linecounter:
  sub ecx,ebp
  mov [R16x16M_Current_Line],eax
+ mov [R16x16M_Countdown],edx
  mov [R16x16M_Lines],ecx
 
 %ifndef LAYERS_PER_LINE

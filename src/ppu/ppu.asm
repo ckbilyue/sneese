@@ -474,6 +474,7 @@ EXPORT BLMapAddressBG%1,skipl
 EXPORT BRMapAddressBG%1,skipl
 
 NBATableBG%1:   skipl       ; Unused in BG3/4
+EXPORT LineCounter_BG%1,skipl
 EXPORT M0_Color_BG%1,skipl
 EXPORT BG_Flag_BG%1,skipb
 EXPORT OC_Flag_BG%1,skipb   ; Unused in BG3/4
@@ -786,8 +787,8 @@ ALIGNC
  Set_21_Write 0x19,SNES_W2119_NORM
 %%full_done:
 %endif
- Set_21_Read 0x39,SNES_R2139_First
- Set_21_Read 0x3A,SNES_R213A_First
+;Set_21_Read 0x39,SNES_R2139_First
+;Set_21_Read 0x3A,SNES_R213A_First
 
 %ifndef NO_DMA_WRITE
  call C_LABEL(Update_DMA_PPU_Handlers)
@@ -1531,23 +1532,8 @@ SNES_W2106: ; MOSAIC
 %ifdef FORCE_MOSAIC
  mov al,0x0F + (FORCE_MOSAIC << 4) ;***
 %endif
- test al,0xF0   ;Is mosaic enabled?
  mov [MOSAIC],al
  mov edx,eax
- jnz .mosaic_enabled
- mov al,0
- mov [MosaicBG1],al
- mov [MosaicBG2],al
- mov [MosaicBG3],al
- mov [MosaicBG4],al
- mov eax,edx
-%ifdef FORCE_MOSAIC
- pop eax    ;***
-%endif
-.no_change:
- ret
-ALIGNC
-.mosaic_enabled:
  and al,0x01
  mov [MosaicBG1],al
  mov eax,edx
@@ -1570,6 +1556,7 @@ ALIGNC
 %ifdef FORCE_MOSAIC
  pop eax    ;***
 %endif
+.no_change:
  ret
 
 ALIGNC
