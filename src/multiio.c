@@ -114,14 +114,14 @@ int unzip_goto_file(unzFile file, int file_index)
  return retval;
 }
 
-static void unzip_seek_helper(FILE *file, int offset)
+static int unzip_seek_helper(FILE *file, int offset)
 {
 #define MAXBUFSIZE 32768
  char buffer[MAXBUFSIZE];
- int n, pos = unztell(file);                    // returns ftell() of the "current file"
+ int n, tmp, pos = unztell(file);               // returns ftell() of the "current file"
 
  if (pos == offset)
-  return;
+  return 0;
  else if (pos > offset)
  {
   unzCloseCurrentFile(file);
@@ -131,7 +131,13 @@ static void unzip_seek_helper(FILE *file, int offset)
  }
  n = offset - pos;
  while (n > 0 && !unzeof(file))
-  n -= unzReadCurrentFile(file, buffer, n > MAXBUFSIZE ? MAXBUFSIZE : n);
+ {
+  tmp = unzReadCurrentFile(file, buffer, n > MAXBUFSIZE ? MAXBUFSIZE : n);
+  if (tmp < 0)
+   return -1;
+  n -= tmp;
+ }
+ return n;
 }
 #endif // ZLIB
 
@@ -142,9 +148,9 @@ FILE *fopen2(const char *filename, const char *mode)
  st_finfo_t *finfo;
  FILE *file = NULL;
 
-// printf ("opening %s", filename);
  if (fh_map == NULL)
   init_fh_map();
+
  for (n = 0; n < len; n++)
  {
   switch (mode[n])
@@ -200,12 +206,12 @@ FILE *fopen2(const char *filename, const char *mode)
    }
    else
 #endif
-   /*
-     Files that are opened with mode "r+" will probably be written to.
-     zlib doesn't support mode "r+", so we have to use FM_NORMAL.
-     Mode "r" doesn't require FM_NORMAL and FM_GZIP works, but we
-     shouldn't introduce needless overhead.
-   */
+    /*
+      Files that are opened with mode "r+" will probably be written to.
+      zlib doesn't support mode "r+", so we have to use FM_NORMAL.
+      Mode "r" doesn't require FM_NORMAL and FM_GZIP works, but we
+      shouldn't introduce needless overhead.
+    */
     fmode = FM_NORMAL;
     fclose(fh);
   }
@@ -233,13 +239,6 @@ FILE *fopen2(const char *filename, const char *mode)
  finfo = &finfo_list[fmode * 2 + compressed];
  fh_map = map_put(fh_map, file, finfo);
 
-/*
- printf (", ptr = %p, mode = %s, fmode = %s\n", file, mode,
-  fmode == FM_NORMAL ? "FM_NORMAL" :
-   (fmode == FM_GZIP ? "FM_GZIP" :
-    (fmode == FM_ZIP ? "FM_ZIP" : "FM_UNDEF")));
- map_dump (fh_map);
-*/
  return file;
 }
 
@@ -281,8 +280,18 @@ int fseek2(FILE *file, long offset, int mode)
   */
   if (!finfo->compressed)
    gzrewind(file);
-  gzseek(file, offset, mode);
-  return gzeof(file);
+  if (mode == SEEK_END)                         // zlib doesn't support SEEK_END
+  {
+   // Note that this is _slow_...
+   while (!gzeof(file))
+   {
+    gzgetc(file); // necessary for _uncompressed_ files in order to set EOF
+    gzseek(file, 1024 * 1024, SEEK_CUR);
+   }
+   offset += gztell(file);
+   mode = SEEK_SET;
+  }
+  return gzseek(file, offset, mode);
  }
  else if (finfo->fmode == FM_ZIP)
  {
@@ -301,8 +310,7 @@ int fseek2(FILE *file, long offset, int mode)
    unzGetCurrentFileInfo(file, &info, NULL, 0, NULL, 0, NULL, 0);
    base = info.uncompressed_size;
   }
-  unzip_seek_helper(file, base + offset);
-  return unzeof(file);
+  return unzip_seek_helper(file, base + offset);
  }
 #endif // ZLIB
  return -1;

@@ -1,14 +1,14 @@
 #
 #
 # SNEeSe, an Open Source Super NES emulator.
-# 
-# 
+#
+#
 # Copyright (c) 1998-2003 Charles Bilyue'.
 # Portions Copyright (c) 2003 Daniel Horchner.
-# 
+#
 # This is free software.  See 'LICENSE' for details.
 # You must read and accept the license prior to use.
-# 
+#
 #
 
 # Set up some defaults
@@ -70,12 +70,16 @@ endif
 
 OFLAGS = -march=i486 -mcpu=pentium -O3 -ffast-math $(PFLAGS) \
  -fno-rtti -fno-exceptions -fstrength-reduce -fthread-jumps \
- -fexpensive-optimizations -fschedule-insns -fschedule-insns2 \
- -fgcse
+ -fexpensive-optimizations -fschedule-insns2 -fgcse
 
 # Probably just a gcc < 3 problem. I'll upgrade soon. Really ;-)
 ifneq ($(OSTYPE),beos)
 OFLAGS += -foptimize-sibling-calls -fgcse-lm -fgcse-sm
+
+# gcc version 2.9-beos-991026 (the "default" gcc version for BeOS
+# R5 PE) is broken. Adding -fschedule-insns produces faulty code
+# and causes SNEeSe to crash when opening a ROM.
+OFLAGS += -fschedule-insns
 endif
 
 

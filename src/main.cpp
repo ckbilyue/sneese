@@ -87,7 +87,7 @@ int main(int argc, char **argv)
   }
 
 #if defined(ALLEGRO_DOS) || defined(ALLEGRO_UNIX) || defined(ALLEGRO_BEOS)
-  cout << endl << "Press any key to continue..." << endl;
+  cout << endl << "Press any key to continue...";
   cout.flush();
 
   // We have to create a window or else the keyboard functions won't work
@@ -102,6 +102,7 @@ int main(int argc, char **argv)
 
   while (!keypressed());
   readkey();
+  cout << " continueing" << endl;
 #endif
  }
 

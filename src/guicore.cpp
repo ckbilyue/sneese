@@ -191,7 +191,7 @@ void CopyGUIScreen(){
 
 int WINDOW::add(CTL *control){
  if ((numctls + 1) == 0) return control->handle = 0;
- CTL *temp, *last;
+ CTL *temp = 0, *last = 0;
  unsigned handle = 1;
 
  if (!first){

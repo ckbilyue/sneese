@@ -790,9 +790,6 @@ unsigned check_for_header(FILE *fp, int filesize)
 {
  unsigned ROM_start;
 
- fseek2(fp, 0, SEEK_END);
- filesize = ftell2(fp);
-
  // Easiest way to detect ROM header
   // Improvement suggested by Gridle (implemented 22/4/99)
   // check against even multiple of 1k instead of 32k

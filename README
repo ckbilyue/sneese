@@ -10,7 +10,7 @@ The SNES emulator with the extra e's...
         SSSSS   NN    NN  EEEEEE   eeee    SSSSS    eeee
 
                                             v0.779 (Public BETA)
-                                            xx March 2003
+                                            xx April 2003
 
   Please read the license (LICENSE file) before using or distributing
    SNEeSe in any way!
@@ -510,7 +510,7 @@ TO DO:
 
  GUI: interface cleanup/rewrite/ease-of-use/versatility/mouse
 
- ROM loader: More memory maps, compressed ROMs...
+ ROM loader: More memory maps
  Savestates: ...
 
 Thanks go out to...
