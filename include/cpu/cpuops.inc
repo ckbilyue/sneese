@@ -486,7 +486,9 @@ OPCODE_EPILOG
 
 ; Wait for interrupt
 OPCODE_PROLOG(0xCB) ; WAI i
+%ifndef WAI_DELAY
  add R_Cycles,_5A22_FAST_CYCLE * 2
+%endif
 
  mov al,[IRQ_pin]
  test al,al
@@ -505,7 +507,7 @@ ALIGNC
 
 %ifdef WAI_DELAY
  ; WAI delay after interrupt signal: 2 IO
- add R_Cycles,_5A22_FAST_CYCLE * 2  ;*
+ add R_Cycles,_5A22_FAST_CYCLE * 2
 %endif
 OPCODE_EPILOG
 

@@ -31,6 +31,10 @@ Changes
    after the 'long' dots near the end of scanlines [TRAC]
   Timing: Adjusted hardware interrupt timing, thanks to some info from
    DMV27 [TRAC]
+  Timing: Fixed latch behavior with respect to I/O port; improved latch
+   reporting code [TRAC]
+  5A22: Moved WAI delay to after hardware interrupt detection, thanks to
+   anomie for verifying this [TRAC]
  0.832
   Documentation: Updated grossly insufficient copyright attributations
    [TRAC]

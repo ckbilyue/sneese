@@ -35,6 +35,8 @@ You must read and accept the license prior to use.
 
 %define VERSION_NUMBER_5A22 2
 
+%define WAI_DELAY
+
 ;%define SINGLE_STEP
 
 ;%define WATCH_FLAG_BREAKS

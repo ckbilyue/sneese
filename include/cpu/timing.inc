@@ -414,7 +414,7 @@ section .text
 
 %ifdef WAI_DELAY
  ; WAI delay after interrupt signal: 2 IO
- add dword [C_LABEL(SNES_Cycles)],byte 12   ;*
+ add dword [C_LABEL(SNES_Cycles)],_5A22_FAST_CYCLE * 2
 %endif
 
  inc word [CPU_LABEL(PC)]
@@ -1052,7 +1052,7 @@ section .text
 
 %ifdef WAI_DELAY
  ; WAI delay after interrupt signal: 2 IO
- add dword [C_LABEL(SNES_Cycles)],byte 12   ;*
+ add dword [C_LABEL(SNES_Cycles)],_5A22_FAST_CYCLE * 2
 %endif
 
  inc word [CPU_LABEL(PC)]
@@ -1146,7 +1146,7 @@ section .text
 
 %ifdef WAI_DELAY
  ; WAI delay after interrupt signal: 2 IO
- add dword [C_LABEL(SNES_Cycles)],byte 12   ;*
+ add dword [C_LABEL(SNES_Cycles)],_5A22_FAST_CYCLE * 2
 %endif
 
  inc word [CPU_LABEL(PC)]
@@ -1294,12 +1294,20 @@ IRQ_Check_Late:
  mov [Event_Handler],ebx
  ret
 
+EXTERN PPU2_Latch_External
+
+
 ALIGNC
 EXPORT SNES_R2137 ; SLHV  ; This latches the counter for horizontal/vertical data!
  ;counters cannot be latched if I/O port bit 7 held low
  mov al,[C_LABEL(WRIO)]
  and al,[C_LABEL(RDIO)]
  jns .no_change
+
+ cmp byte [PPU2_Latch_External],0
+ jnz .no_change
+.latch:
+ or byte [STAT78],(1 << 6)  ; Raise latch flag
 
  push ebx
  GET_CYCLES ebx
@@ -1630,6 +1638,12 @@ ALIGNC
 EXPORT SNES_R4213 ; RDIO
  mov al,[C_LABEL(RDIO)]
  and al,[C_LABEL(WRIO)]
+
+ cmp byte [PPU2_Latch_External],0
+ jz .no_latch
+ and al,~(1 << 7)
+.no_latch:
+
  ret
 
 ALIGNC
@@ -1765,18 +1779,28 @@ EXPORT SNES_W4200 ; NMITIMEN
 
 ALIGNC
 EXPORT SNES_W4201 ; WRIO
- ;latch only on 1-to-0 transition
  mov dl,[C_LABEL(WRIO)]
  xor dl,al
- mov [C_LABEL(WRIO)],al
- jns .no_latch  ;no change?
- test al,al
- js .no_latch   ;not clearing?
+ jz .no_change ;no latch?
+ mov dl,[C_LABEL(WRIO)]
+ push eax
 
+ ;latch only on 1-to-0 transition
+ or dl,al
+ xor dl,al
+ jns .no_latch
+
+ ; dodgy way to simulate latch delay
+ add R_Cycles,CYCLES_PER_DOT
  call SNES_R2137
+ sub R_Cycles,CYCLES_PER_DOT
 
  mov al,[C_LABEL(WRIO)]
 .no_latch:
+ pop eax
+ mov [C_LABEL(WRIO)],al
+
+.no_change:
  ret
 
 ALIGNC
