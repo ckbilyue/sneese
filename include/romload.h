@@ -114,7 +114,7 @@ bool CreateSRAMFilename(char *ROM_filename);
 
 int Allocate_ROM(void);
 
-int open_rom(char *FileName);
+int open_rom(const char *FileName);
 void DisplayRomStats(SNESRomInfoStruct *RomInfo);
 
 #endif /* defined(__cplusplus)||defined(c_plusplus) */

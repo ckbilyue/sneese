@@ -266,7 +266,7 @@ int WaitForKeyPress();
 extern BORDER_WINDOW File_window;
 
 void UpdateFileWindow(int SelFile, int NumFiles, int FirstFile = 0);
-int FileWindow();
+const char *FileWindow();
 
 #endif /* defined(__cplusplus)||defined(c_plusplus) */
 

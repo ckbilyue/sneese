@@ -68,6 +68,8 @@ int main(int argc, char **argv)
  // Perform platform-specific initialization
  if (platform_init(argc, argv)) return 1;
 
+ atexit(platform_exit);
+
  // Load saved configuration, using defaults for missing settings
  if (LoadConfig()) return 1;
 
@@ -78,9 +80,13 @@ int main(int argc, char **argv)
 
  if (name != NULL)
  {
+  char filename[MAXPATH];
+
   cout << "Attempting to load " << name << endl;
 
-  if (!open_rom(name))
+  fix_filename_path(filename, name, MAXPATH);
+
+  if (!open_rom(filename))
   {
    cout << "Failed to load cartridge ROM: " << name << endl;
    return 1;

@@ -177,7 +177,7 @@ char SRAM_filename[MAXPATH];
 char save_dir[MAXPATH];
 char save_extension[MAXEXT];
 
-ROMFileType GetROMFileType(char *ROM_filename)
+ROMFileType GetROMFileType(const char *ROM_filename)
 {
  fnsplit(ROM_filename, fn_drive, fn_dir, fn_file, fn_ext);
  if (!fn_ext) return ROMFileType_normal;
@@ -805,7 +805,7 @@ HiROM checksums at FFDC/FFDE, 101DC/101DE with header
  return ROM_start;
 }
 
-static bool open_rom_normal(char *Filename)
+static bool open_rom_normal(const char *Filename)
 {
  FILE *infile = fopen2(Filename, "rb");
  if (!infile) return FALSE; // File aint there m8
@@ -952,7 +952,7 @@ static bool open_rom_normal(char *Filename)
  return TRUE;
 }
 
-bool Load_32k_split(FILE *infile, char *Filename, int parts, long total_size)
+bool Load_32k_split(FILE *infile, const char *Filename, int parts, long total_size)
 {
  char tempname[MAXPATH];
  long bytes_read = 0;
@@ -1043,7 +1043,7 @@ bool Load_32k_split(FILE *infile, char *Filename, int parts, long total_size)
  return TRUE;
 }
 
-static bool open_rom_split(char *Filename)
+static bool open_rom_split(const char *Filename)
 {
  char tempname[MAXPATH];
  int parts;
@@ -1259,54 +1259,38 @@ static bool open_rom_split(char *Filename)
  return TRUE;
 }
 
-int open_rom(char *Filename)
+/* Filename must contain a full path */
+int open_rom(const char *Filename)
 {
  ROMFileType filetype;
-
- char drive[MAXDRIVE], dir[MAXDIR], file[MAXFILE], ext[MAXEXT],
-      FullFilename[MAXFILE];
-
- /*
-   Current SNEeSe switches to it's home dir at startup (dos.c:
-    platform_init()), but Filename might not contain the full path
-    to the ROM.  So, if Filename does not contain a path, prepend
-    contents of start_dir to create a full filename.
-   TODO: Handle relative paths
- */
- fnsplit(Filename, drive, dir, file, ext);
- if (strlen(drive) || strlen(dir))
-  strcpy(FullFilename, Filename);
- else
-  sprintf(FullFilename, "%s%s%s", start_dir, FILE_SEPARATOR, Filename);
 
  SaveSRAM(SRAM_filename);   // Ensures SRAM saved before loading new ROM
  snes_rom_loaded = FALSE;
  SaveRamLength = 0;
- if (ROM_filename){ free(ROM_filename); ROM_filename = 0; }
 
- filetype = GetROMFileType(FullFilename);
+ filetype = GetROMFileType(Filename);
 
- ROM_filename = (char *) malloc(strlen(FullFilename));
- if (!rom_romfile) rom_romfile=(char *)malloc(100);
- if (!rom_romhilo) rom_romhilo=(char *)malloc(100);
- if (!rom_romtype) rom_romtype=(char *)malloc(50);
- if (!rom_romsize) rom_romsize=(char *)malloc(50);
- if (!rom_romname) rom_romname=(char *)malloc(50);
- if (!rom_sram)    rom_sram   =(char *)malloc(50);
- if (!rom_country) rom_country=(char *)malloc(50);
+ if (!ROM_filename) ROM_filename = (char *) malloc(MAXPATH);
+ if (!rom_romfile) rom_romfile   = (char *) malloc(MAXPATH);
+ if (!rom_romhilo) rom_romhilo   = (char *) malloc(100);
+ if (!rom_romtype) rom_romtype   = (char *) malloc(50);
+ if (!rom_romsize) rom_romsize   = (char *) malloc(50);
+ if (!rom_romname) rom_romname   = (char *) malloc(50);
+ if (!rom_sram)    rom_sram      = (char *) malloc(50);
+ if (!rom_country) rom_country   = (char *) malloc(50);
  if (!ROM_filename || !rom_romfile || !rom_romhilo
   || !rom_romtype || !rom_romsize || !rom_romname
   || !rom_sram || !rom_country)
   return FALSE;
 
- strcpy(ROM_filename,FullFilename);
- strcpy(rom_romfile, FullFilename);
+ strcpy(ROM_filename, Filename);
+ strcpy(rom_romfile, Filename);
 
  switch (filetype)
  {
-  case ROMFileType_split: snes_rom_loaded = open_rom_split(FullFilename); break;
+  case ROMFileType_split: snes_rom_loaded = open_rom_split(Filename); break;
   case ROMFileType_normal:
-  default: snes_rom_loaded = open_rom_normal(FullFilename);
+  default: snes_rom_loaded = open_rom_normal(Filename);
  }
 
  if (snes_rom_loaded == FALSE) return FALSE;

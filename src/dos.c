@@ -50,10 +50,11 @@ END_COLOR_DEPTH_LIST
 #include "guicore.h"
 #include "version.h"
 
-char cfg_name[MAXPATH];
 char home_dir[MAXPATH];
-char start_dir[MAXPATH];
+char cfg_name[MAXPATH];
 char dat_name[MAXPATH];
+
+char start_dir[MAXPATH] = "";
 
 static float cfg_version;
 static int cfg_changed;
@@ -506,6 +507,14 @@ int platform_init(int argc, char **argv)
 #endif
 
  return 0;
+}
+
+void platform_exit(void)
+{
+ if (strlen(start_dir))
+ {
+  chdir(start_dir);
+ }
 }
 
 int parse_args(int argc, char **argv, char **names, int maxnames)

@@ -1139,7 +1139,7 @@ WINDOW *ROMInfo_window=0;
 
 void RomInfo(void)
 {
- char drive[MAXDRIVE], dir[MAXDIR], file[MAXFILE], ext[MAXEXT];
+ char drive[MAXDRIVE], dir[MAXDIR], file[MAXFILE+MAXEXT], ext[MAXEXT];
 
  ROMInfo_window->refresh();
 
@@ -1739,15 +1739,20 @@ GUI_ERROR GUI()
 
    if (CursorAt == MAIN_LOAD_ROM)
    {
-    char TempBufferP[MAXPATH]; // For saving the current directory to use!
+    const char *filename = FileWindow();
 
-    getcwd(TempBufferP,MAXPATH);
-    if (FileWindow() == 0)
+    if (filename)
     {
-     chdir(TempBufferP);
-     goto resume_emulation;
+     // open_rom() needs the full path to the file
+     if (!open_rom(filename))
+     {
+      //printf("Failed to load cartridge ROM.");
+     }
+     else
+     {
+      goto resume_emulation;
+     }
     }
-    chdir(TempBufferP);
     break;
    }
 

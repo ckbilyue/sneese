@@ -65,16 +65,18 @@ typedef struct {
 } SNEESE_GFX_BUFFER;
 
 
-EXTERN char cfg_name[MAXPATH];
 EXTERN char home_dir[MAXPATH];
-EXTERN char start_dir[MAXPATH];
+EXTERN char cfg_name[MAXPATH];
 EXTERN char dat_name[MAXPATH];
+
+EXTERN char start_dir[MAXPATH];
 
 EXTERN void LoadConfig_Old(void);
 EXTERN int LoadConfig(void);
 EXTERN void SaveConfig(void);
 EXTERN void cmdhelp(void);
 EXTERN int platform_init(int argc, char **argv);
+EXTERN void platform_exit(void);
 EXTERN int parse_args(int argc, char **argv, char **names, int maxnames);
 EXTERN void *platform_get_gfx_buffer(
  int depth, int width, int height, int hslack, int vslack,

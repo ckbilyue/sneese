@@ -663,7 +663,7 @@ void UpdateFileWindow(int SelFile, int NumFiles, int FirstFile){
  CopyGUIScreen();
 }
 
-int FileWindow()
+const char *FileWindow()
 {
  clear_keybuf();
  static int FileListPos = 0;
@@ -671,6 +671,7 @@ int FileWindow()
  int NumFiles;
  int keypress, key_asc, key_scan;
  static char current_file_window_dir[MAXPATH] = ".";
+ static char filename[MAXPATH];
 
  chdir(current_file_window_dir);
  NumFiles = GetDirList("*.*", DirList, FileListPos, max_listed_files);
@@ -768,7 +769,7 @@ int FileWindow()
     continue;
 
    case KEY_ESC:
-    return -1;
+    return NULL;
 
    case KEY_ENTER:
     if (DirList[FileListPos + SelFile].Directory)
@@ -785,15 +786,12 @@ int FileWindow()
       FileListPos);
      continue;
     } else {
-     // open_rom() needs to construct the full path to the file
-     getcwd(start_dir, MAXPATH);
-     if (!open_rom(DirList[FileListPos + SelFile].Name)){
-      //printf("Failed to load cartridge ROM.");
-      return -1;
-     }
-     return 0;
+     fix_filename_path(filename, DirList[FileListPos + SelFile].Name,
+      MAXPATH);
+
+     return filename;
     }
   }
  }
- return -1;
+ return NULL;
 }
