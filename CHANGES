@@ -21,7 +21,7 @@ Changes
   DBJH          Daniel Horchner
 
 
- 0.81
+ 0.801
   Render: Fixed an off-by-6 bug in mode 7 vertical flip [TRAC]
   Input: Fixed a few bugs related to multiple 'sticks' in
    joystick/joypad code, thanks to Harekiet for reporting [TRAC]
