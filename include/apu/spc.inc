@@ -82,16 +82,9 @@ EXTERN_C SPC_T2_cycle_latch,SPC_T2_counter
 %macro Execute_SPC 0-1 0
  pusha
 %ifidni %1,SaveCycles
- cmp byte [In_CPU],0
- jz %%not_in_cpu
 ;GET_CYCLES eax
  mov eax,[C_LABEL(EventTrip)]
  add dword eax,R_65c816_Cycles
- jmp short %%got_cycles
-
-%%not_in_cpu:
- mov eax,[C_LABEL(SNES_Cycles)]
-%%got_cycles:
 
  cmp eax,CYCLES_REFRESH_START
  jb %%before_refresh

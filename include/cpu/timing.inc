@@ -268,8 +268,10 @@ HDMA_Event:
  mov [Fixed_Event],eax
  cmp byte [HDMAON],0
  jz .no_HDMA
- add dword [C_LABEL(SNES_Cycles)],byte 18   ; HDMA processing
+ LOAD_CYCLES
+ add R_65c816_Cycles,byte 18    ; HDMA processing
  call do_HDMA
+ SAVE_CYCLES
 %ifdef TRAP_HDMA_RELATCH
  pusha
  push byte 2
@@ -332,15 +334,17 @@ IRQ_Enabled_Event:
  push edi
  LOAD_BASE
  JUMP_FLAG SNES_FLAG_I,.irq_disabled    ; Interrupts disabled?
+ LOAD_CYCLES
  JUMP_NOT_FLAG SNES_FLAG_E,.native_irq
- add dword [C_LABEL(SNES_Cycles)],byte 52   ; IRQ processing: 2 IO + 5 bank0
+ add R_65c816_Cycles,byte 52    ; IRQ processing: 2 IO + 5 bank0
  call E1_IRQ
  jmp .irq_return
 ALIGNC
 .native_irq:
- add dword [C_LABEL(SNES_Cycles)],byte 60   ; IRQ processing: 2 IO + 6 bank0
+ add R_65c816_Cycles,byte 60    ; IRQ processing: 2 IO + 6 bank0
  call E0_IRQ
 .irq_return:
+ SAVE_CYCLES
 .irq_disabled:
  pop edi
 
@@ -805,6 +809,7 @@ CheckNMI:
  mov ebx,[CPU_LABEL(PB_Shifted)]
  mov bx,[CPU_LABEL(PC)]
 
+ LOAD_CYCLES
  GET_BYTE
  mov [C_LABEL(Map_Byte)],al
 
@@ -842,6 +847,7 @@ NMI_Event:
 .no_wai:
  push edi
  LOAD_BASE
+ LOAD_CYCLES
 %ifdef FAST_STACK_ACCESS_EMULATION_MODE
  JUMP_NOT_FLAG SNES_FLAG_E,.E0_NMI,near ; Are we in emulation mode?
 %else
@@ -850,6 +856,9 @@ NMI_Event:
 
 .E1_NMI:
  ; Emulation mode NMI
+
+ add R_65c816_Cycles,byte 52    ; IRQ processing: 2 IO + 5 bank0
+
  mov eax,[CPU_LABEL(PC)]
  E1_PUSH_W
 ;CLR_FLAG SNES_FLAG_B   ; Clear break bit on stack
@@ -868,9 +877,10 @@ NMI_Event:
 
 ALIGNC
 .E0_NMI:
- add dword [C_LABEL(SNES_Cycles)],byte 8    ; NMI processing: +1 bank0 for E=0
-
  ; Native mode NMI
+
+ add R_65c816_Cycles,byte 60    ; IRQ processing: 2 IO + 6 bank0
+
  mov al,[CPU_LABEL(PB)]
  E0_PUSH_B
  mov eax,[CPU_LABEL(PC)]
@@ -884,7 +894,6 @@ ALIGNC
  mov [CPU_LABEL(PC)],eax        ; Setup PC vector
  mov [C_LABEL(PBOffset)],ebx
  mov byte [CPU_LABEL(PB)],0     ; Setup bank
- add dword [C_LABEL(SNES_Cycles)],byte 52   ; NMI processing: +1 bank0 for E=0
 ;SET_FLAG SNES_FLAG_I   ; Disable IRQs
  STORE_FLAGS_I 1
 %ifndef NO_FASTROM
@@ -892,6 +901,7 @@ ALIGNC
 %endif
 ;CLR_FLAG SNES_FLAG_D   ; Disable decimal mode
  STORE_FLAGS_D 0
+ SAVE_CYCLES
  pop edi
 .no_nmi:
  call HIRQ_Check_Late   ; chain
@@ -949,15 +959,17 @@ HIRQ_Event:
  push edi
  LOAD_BASE
  JUMP_FLAG SNES_FLAG_I,.irq_disabled    ; Interrupts disabled?
+ LOAD_CYCLES
  JUMP_NOT_FLAG SNES_FLAG_E,.native_irq
- add dword [C_LABEL(SNES_Cycles)],byte 52   ; IRQ processing: 2 IO + 5 bank0
+ add R_65c816_Cycles,byte 52    ; IRQ processing: 2 IO + 5 bank0
  call E1_IRQ
  jmp .irq_return
 ALIGNC
 .native_irq:
- add dword [C_LABEL(SNES_Cycles)],byte 60   ; IRQ processing: 2 IO + 6 bank0
+ add R_65c816_Cycles,byte 60    ; IRQ processing: 2 IO + 6 bank0
  call E0_IRQ
 .irq_return:
+ SAVE_CYCLES
 .irq_disabled:
  pop edi
 
@@ -971,13 +983,7 @@ ALIGNC
 ALIGNC
 ; This can only trash ebx/edx!
 HIRQ_Check:
- cmp byte [In_CPU],0
- jz .not_in_cpu
- GET_CYCLES edx
- jmp short .got_cycles
-.not_in_cpu:
- mov edx,[C_LABEL(SNES_Cycles)]
-.got_cycles:
+ SAVE_CYCLES edx
  push edx
  mov bl,[C_LABEL(NMITIMEN)]
  test bl,0x10       ; H-IRQ enabled?
@@ -1003,6 +1009,7 @@ HIRQ_Check:
  mov [Event_Handler],ebx
 .no_irq:
  pop edx
+ LOAD_CYCLES
  ret
 
 ALIGNC
@@ -1040,13 +1047,7 @@ EXPORT SNES_R2137 ; SLHV  ; This latches the counter for horizontal/vertical dat
  jns .no_change
 
  push ebx
- cmp byte [In_CPU],0
- jz .not_in_cpu
  GET_CYCLES ebx
- jmp short .got_cycles
-.not_in_cpu:
- mov ebx,[C_LABEL(SNES_Cycles)]
-.got_cycles:
 
  xor edx,edx
 
@@ -1300,13 +1301,7 @@ EXPORT SNES_R4212 ; HVBJOY
 ;
 ; My current theory is that this time is used for refreshing RAM.
 ; *End excerpts*
- cmp byte [In_CPU],0
- jz .not_in_cpu
  GET_CYCLES edx
- jmp short .got_cycles
-.not_in_cpu:
- mov edx,[C_LABEL(SNES_Cycles)]
-.got_cycles:
  mov al,[HVBJOY]
  cmp edx,CYCLES_HBLANK_START    ; Hblank after display
  jae .hblank
