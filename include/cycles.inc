@@ -15,7 +15,7 @@ You must read and accept the license prior to use.
 %define SNEeSe_cycles_inc
 
 %define CYCLES_PER_DOT 4
-%define DOTS_PER_SCANLINE 342
+%define DOTS_PER_SCANLINE 335
 %define DOTS_IN_REFRESH 10
 %define DOTS_BEFORE_DISPLAY 0
 %define DOTS_BEFORE_REFRESH 128

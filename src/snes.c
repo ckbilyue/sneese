@@ -128,10 +128,13 @@ void snes_reset(void)
 
 extern unsigned FPSMaxTicks;
 
+#define PAL_TICKS (TIMERS_PER_SECOND / (21281370.0 / 312 / 4 / 335))
+#define NTSC_TICKS (TIMERS_PER_SECOND / (189.0e7 / 88 / 262 / 4 / 335))
+
 void set_snes_pal(void)
 {
  SNES_COUNTRY = 0x10;
- set_timer_throttle_ticks(23930);
+ set_timer_throttle_ticks(PAL_TICKS);
  FPSMaxTicks = 50;
  LastVBLLine = 311;
 
@@ -143,7 +146,7 @@ void set_snes_pal(void)
 void set_snes_ntsc(void)
 {
  SNES_COUNTRY = 0x00;
- set_timer_throttle_ticks(19912);
+ set_timer_throttle_ticks(NTSC_TICKS);
  FPSMaxTicks = 60;
  LastVBLLine = 261;
 

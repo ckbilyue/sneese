@@ -49,6 +49,9 @@ Changes
    information [TRAC]
   Render: Added support for the undocumented OBJ size settings,
    thanks to Charles MacDonald for research [TRAC]
+  Timing: Changed scanline length to 335 dots and adjusted frame timers
+   to compensate, to match the 61.17Hz NTSC SGB framerate; fixes demon
+   fusion in Shin Megami Tensei [TRAC]
  0.80
   Misc: Fixed a flaw where divide result registers were not changed
    by division-by-zero [TRAC]
