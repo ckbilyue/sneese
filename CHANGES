@@ -42,6 +42,8 @@ Changes
   5A22: Changed DMA to no longer be able to access internal CPU registers
    [TRAC]
   5A22: Added open bus emulation to A-bus [TRAC]
+  Render: Fixed a serious bug which could have some pointers used by
+   offset-change rendering not be initialized [TRAC]
   PPU: Corrected a behavior of the H/V latches; reading register $2137
    (SLHV) does NOT reset which bits will be read next [TRAC]
   Sound: Changed APU code to build with update-on-RAM-change by default
