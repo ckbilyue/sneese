@@ -31,7 +31,7 @@ You must read and accept the license prior to use.
  mov al,B_PB
  PUSH_B
 %endif
- GET_PC eax
+ GET_PBPC eax
  PUSH_W
  SETUPFLAGS     ; Put flags into true 65c816 format
  PUSH_B
@@ -50,33 +50,11 @@ You must read and accept the license prior to use.
 %endif
 
  GET_WORD
- mov R_NativePC,eax     ; PC = vector
+ mov R_PBPC,eax         ; PC = vector
  mov B_PB,byte 0        ; Setup bank
 
  STORE_FLAGS_I 1        ; Disable IRQs
  STORE_FLAGS_D 0        ; Disable decimal mode
-
- shr eax,13
- mov eax,[C_LABEL(Read_Bank8Offset)+eax*4]
- test eax,eax
- jz %%read_non_linear
-
-%%read_direct:
-
- add R_NativePC,eax
- mov B_PBOffset,eax
-
- OPCODE_EPILOG
-
-%%read_non_linear:
-%ifdef TRAP_INVALID_JUMP
- mov byte [C_LABEL(Map_Byte)+3],0x00
- mov [C_LABEL(Map_Address)],ebx
- jmp _InvalidJump
-%else
- mov eax,C_LABEL(Blank)
- jmp short %%read_direct
-%endif
 %endmacro
 
 
@@ -203,7 +181,7 @@ ALIGNC
  JUMP_FLAG %1,C_LABEL(CPU_RETURN),near  ; flag set
  movsx eax,al                   ; sign extend for addition
  add R_Cycles,byte 6            ; branch taken
- add R_NativePC,eax
+ add R_PC,ax
 %endmacro
 
 ;%1 = flag
@@ -212,14 +190,14 @@ ALIGNC
  JUMP_NOT_FLAG %1,C_LABEL(CPU_RETURN),near  ; flag clear
  movsx eax,al                   ; sign extend for addition
  add R_Cycles,byte 6            ; branch taken
- add R_NativePC,eax
+ add R_PC,ax
 %endmacro
 
 %macro _BRA 0
  READ8_Immediate
  movsx eax,al                   ; sign extend for addition
 ;add R_Cycles,byte 6            ; branch taken
- add R_NativePC,eax
+ add R_PC,ax
 %endmacro
 
 ;%1 = addr
@@ -434,12 +412,12 @@ ALIGNC
  mov B_Y,bx
 %endif
  jc  .done
- sub R_NativePC,byte 3
+ sub R_PC,byte 3
  test R_Cycles,R_Cycles
  jge .event
  mov B_A,ax
  add R_Cycles,[esp]
- GET_PC ebx
+ GET_PBPC ebx
  GET_BYTE
  jmp .again
 ALIGNC

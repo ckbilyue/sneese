@@ -150,7 +150,8 @@ EXPORT_C CPU_bss_start
 
 %define R_Base      R_65c816_Base   ; Base pointer to register set
 %define R_Cycles    R_65c816_Cycles ; Cycle counter
-%define R_NativePC  R_65c816_NativePC
+%define R_PBPC      R_65c816_PBPC
+%define R_PC        R_65c816_PC
 
 ;  True 65816 layout, Native Mode    = |E|N|V|M|X|D|I|Z|C|
 ;  True 65816 layout, Emulation Mode = |E|N|V|1|B|D|I|Z|C|
@@ -4126,22 +4127,27 @@ section .text
  mov dword R_Base,CPU_Register_Base
 %endmacro
 
-; Load register R_NativePC with pointer to code at PB:PC
+
+; Load register R_PBPC with PB:PC
 %macro LOAD_PC 0
- mov dword R_NativePC,[C_LABEL(PBOffset)]
- add dword R_NativePC,[CPU_LABEL(PC)]
+ mov dword R_PBPC,[CPU_LABEL(PB_Shifted)]
+ add dword R_PBPC,[CPU_LABEL(PC)]
 %endmacro
 
-; Get PC from register R_NativePC
+; Get PC from register R_PBPC
 ;%1 = with
 %macro GET_PC 1
-%ifnidn %1,R_NativePC
- mov dword %1,R_NativePC
-%endif
- sub dword %1,[C_LABEL(PBOffset)]
+ movzx dword %1,word R_PC
 %endmacro
 
-; Save PC from register R_NativePC
+; Get PB:PC from register R_PBPC
+;%1 = with
+%macro GET_PBPC 1
+%ifnidn %1,R_PBPC
+ mov dword %1,R_PBPC
+%endif
+%endmacro
+
 ;%1 = with
 %macro SAVE_PC 1
  GET_PC %1
@@ -4989,9 +4995,8 @@ EXTERN_C DisplayStatus,readkey,keypressed
  popa
 .off:
 %endif
-;GET_PC ebx
-;GET_BYTE
- mov al,[R_NativePC]    ; Get opcode
+ GET_PBPC ebx
+ GET_BYTE               ; Get opcode
  mov edx,B_OpTable
  xor ebx,ebx
 
@@ -5009,7 +5014,7 @@ EXPORT_EQU_C CycleTable,$-3 ; Address of '04'
 
 ALIGNC
 HANDLE_EVENT:
- SAVE_PC R_NativePC
+ SAVE_PC R_PBPC
 
  mov byte [In_CPU],0
 

@@ -415,38 +415,8 @@ OPCODE_PROLOG(0x42) ; WDM
 OPCODE_EPILOG
 
 OPCODE_PROLOG(0x4C) ; JMP a
-%ifdef TRAP_INVALID_JUMP
- GET_PC eax
- mov [C_LABEL(Map_Byte)],eax
-%endif
  ADDR_Absolute_JMP
-
- mov ebx,B_PB_Shifted
- mov R_NativePC,eax
- or eax,ebx
-
- shr eax,13
- mov eax,[C_LABEL(Read_Bank8Offset)+eax*4]
- test eax,eax
- jz .read_non_linear
-
- add eax,ebx
-.read_direct:
-
- add R_NativePC,eax
- mov B_PBOffset,eax
-
- OPCODE_EPILOG
-
-.read_non_linear:
-%ifdef TRAP_INVALID_JUMP
- mov byte [C_LABEL(Map_Byte)+3],0x4C
- mov [C_LABEL(Map_Address)],ebx
- jmp _InvalidJump
-%else
- mov eax,C_LABEL(Blank)
- jmp short .read_direct
-%endif
+ mov R_PC,ax
 OPCODE_EPILOG
 
 OPCODE_PROLOG(0x58) ; CLI i
@@ -472,84 +442,15 @@ OPCODE_PROLOG(0x5B) ; TCD i
 OPCODE_EPILOG
 
 OPCODE_PROLOG(0x5C) ; JML al
-%ifdef TRAP_INVALID_JUMP
- GET_PC eax
- mov [C_LABEL(Map_Byte)],eax
-%endif
  ADDR_Absolute_Long_JMP
- mov ebx,eax
- shr ebx,16
-
- mov R_NativePC,(1 << 16) - 1
- mov B_PB,bl
- and R_NativePC,eax
-
- test [MEMSEL],bl       ; Check bus speed against PB
- mov bl,[C_LABEL(FastROM_offset)]
- jnz .fastrom
- mov bl,4
-.fastrom:
-%ifndef NO_FASTROM
- mov [C_LABEL(CycleTable)],bl   ; Update bus speed
-%endif
-
- shr eax,13
- mov eax,[C_LABEL(Read_Bank8Offset)+eax*4]
- test eax,eax
- jz .read_non_linear
-
- add eax,B_PB_Shifted
-.read_direct:
-
- add R_NativePC,eax
- mov B_PBOffset,eax
-
- OPCODE_EPILOG
-
-.read_non_linear:
-%ifdef TRAP_INVALID_JUMP
- mov byte [C_LABEL(Map_Byte)+3],0x5C
- mov [C_LABEL(Map_Address)],ebx
- jmp _InvalidJump
-%else
- mov edx,C_LABEL(Blank)
- jmp short .read_direct
-%endif
+ mov R_PBPC,eax
+ shr eax,16
+ mov B_PB,al
 OPCODE_EPILOG
 
 OPCODE_PROLOG(0x6C) ; JMP (a)
-%ifdef TRAP_INVALID_JUMP
- GET_PC eax
- mov [C_LABEL(Map_Byte)],eax
-%endif
  ADDR_Absolute_Indirect_JMP
-
- mov ebx,B_PB_Shifted
- mov R_NativePC,eax
- add eax,ebx
-
- shr eax,13
- mov eax,[C_LABEL(Read_Bank8Offset)+eax*4]
- test eax,eax
- jz .read_non_linear
-
- add eax,ebx
-.read_direct:
-
- add R_NativePC,eax
- mov B_PBOffset,eax
-
- OPCODE_EPILOG
-
-.read_non_linear:
-%ifdef TRAP_INVALID_JUMP
- mov byte [C_LABEL(Map_Byte)+3],0x6C
- mov [C_LABEL(Map_Address)],ebx
- jmp _InvalidJump
-%else
- mov eax,C_LABEL(Blank)
- jmp short .read_direct
-%endif
+ mov R_PC,ax
 OPCODE_EPILOG
 
 OPCODE_PROLOG(0x78) ; SEI i
@@ -561,75 +462,14 @@ OPCODE_PROLOG(0x7B) ; TDC i
 OPCODE_EPILOG
 
 OPCODE_PROLOG(0x7C) ; JMP (a,x)
-%ifdef TRAP_INVALID_JUMP
- GET_PC eax
- mov [C_LABEL(Map_Byte)],eax
-%endif
  ADDR_Absolute_Indexed_Indirect
-
- mov ebx,B_PB_Shifted
- mov R_NativePC,eax
- add eax,ebx
-
- shr eax,13
- mov eax,[C_LABEL(Read_Bank8Offset)+eax*4]
- test eax,eax
- jz .read_non_linear
-
- add eax,ebx
-.read_direct:
-
- add R_NativePC,eax
- mov B_PBOffset,eax
-
- OPCODE_EPILOG
-
-.read_non_linear:
-%ifdef TRAP_INVALID_JUMP
- mov byte [C_LABEL(Map_Byte)+3],0x7C
- mov [C_LABEL(Map_Address)],ebx
- jmp _InvalidJump
-%else
- mov eax,C_LABEL(Blank)
- jmp short .read_direct
-%endif
+ mov R_PC,ax
 OPCODE_EPILOG
 
 OPCODE_PROLOG(0x82) ; BRL rl
 ; Branch always long (-32768 to 32767)
-%ifdef TRAP_INVALID_JUMP
- mov [C_LABEL(Map_Byte)],ebx
-%endif
  READ16_Immediate
- GET_PC ebx
- add eax,ebx
- and eax,0xFFFF
- mov ebx,B_PB_Shifted
- mov R_NativePC,eax
- or eax,ebx
-
- shr eax,13
- mov eax,[C_LABEL(Read_Bank8Offset)+eax*4]
- test eax,eax
- jz .read_non_linear
-
- add eax,ebx
-.read_direct:
-
- add R_NativePC,eax
- mov B_PBOffset,eax
-
- OPCODE_EPILOG
-
-.read_non_linear:
-%ifdef TRAP_INVALID_JUMP
- mov byte [C_LABEL(Map_Byte)+3],0x82
- mov [C_LABEL(Map_Address)],ebx
- jmp _InvalidJump
-%else
- mov eax,C_LABEL(Blank)
- jmp short .read_direct
-%endif
+ add R_PC,ax
 OPCODE_EPILOG
 
 OPCODE_PROLOG(0xB8) ; CLV i
@@ -656,7 +496,7 @@ OPCODE_PROLOG(0xCB) ; WAI i
  jmp HANDLE_EVENT
 ALIGNC
 .irq_active:
- inc R_NativePC
+ inc R_PC
 
 %ifdef WAI_DELAY
  ; WAI delay after interrupt signal: 2 IO
@@ -685,49 +525,10 @@ OPCODE_PROLOG(0xDB) ; STP i
 OPCODE_EPILOG
 
 OPCODE_PROLOG(0xDC) ; JML [a]
-%ifdef TRAP_INVALID_JUMP
- GET_PC eax
- mov [C_LABEL(Map_Byte)],eax
-%endif
  ADDR_Absolute_Indirect_Long_JMP
- mov ebx,eax
- shr ebx,16
-
- mov B_PB,bl
- mov R_NativePC,(1 << 16) - 1
- and R_NativePC,eax
-
- test [MEMSEL],bl   ; Check bus speed against PB
- mov bl,[C_LABEL(FastROM_offset)]
- jnz .fastrom
- mov bl,4
-.fastrom:
-%ifndef NO_FASTROM
- mov [C_LABEL(CycleTable)],bl   ; Update bus speed
-%endif
-
- shr eax,13
- mov eax,[C_LABEL(Read_Bank8Offset)+eax*4]
- test eax,eax
- jz .read_non_linear
-
- add eax,B_PB_Shifted
-.read_direct:
-
- add R_NativePC,eax
- mov B_PBOffset,eax
-
- OPCODE_EPILOG
-
-.read_non_linear:
-%ifdef TRAP_INVALID_JUMP
- mov byte [C_LABEL(Map_Byte)+3],0xDC
- mov [C_LABEL(Map_Address)],ebx
- jmp _InvalidJump
-%else
- mov edx,C_LABEL(Blank)
- jmp short .read_direct
-%endif
+ mov R_PBPC,eax
+ shr eax,16
+ mov B_PB,al
 OPCODE_EPILOG
 
 OPCODE_PROLOG(0xEA) ; NOP i

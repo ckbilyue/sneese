@@ -22,7 +22,8 @@ You must read and accept the license prior to use.
 %define R_65c816_P_B                cl
 %define R_65c816_Base               edi
 %define R_65c816_Cycles             ebp
-%define R_65c816_NativePC           esi
+%define R_65c816_PBPC               esi
+%define R_65c816_PC                 si
 %define R_65c816_MemMap_Trash       edx
 
 %endif ; !defined(SNEeSe_cpu_regs_inc)

@@ -58,7 +58,7 @@ You must read and accept the license prior to use.
 
 ; Implied
 %macro ADDR_Implied 0
- inc R_NativePC
+ inc R_PC
 %endmacro
 
 
@@ -126,30 +126,32 @@ You must read and accept the license prior to use.
 %endmacro
 
 %macro READ8_Immediate 0
- mov al,[1+R_NativePC]
- add R_NativePC,byte 2
+ GET_PBPC ebx
+ inc bx
+ GET_BYTE
+ add R_PC,byte 2
 %endmacro
 
 %macro READ16_Immediate 0-1 0
- mov al,[1+R_NativePC]
- mov ah,[2+R_NativePC]
+ GET_PBPC ebx
+ inc bx
+ GET_WORD
 %ifnidni %1,JSR
 %ifnidni %1,JMP
- add R_NativePC,byte 3
+ add R_PC,byte 3
 %endif
 %else
- add R_NativePC,byte 2
+ add R_PC,byte 2
 %endif
 %endmacro
 
 %macro READ24_Immediate 0-1 0
+ GET_PBPC ebx
+ inc bx
 %ifnidni %1,JSR
- mov al,[3+R_NativePC]
- shl eax,16
- mov al,[1+R_NativePC]
- mov ah,[2+R_NativePC]
+ GET_LONG
 %ifnidni %1,JMP
- add R_NativePC,byte 4
+ add R_PC,byte 4
 %endif
 %else
  READ16_Immediate
@@ -157,12 +159,13 @@ You must read and accept the license prior to use.
  mov al,B_PB
  E0_PUSH_B
 ;add R_Cycles,_5A22_FAST_CYCLE
- mov al,[R_NativePC]
+ GET_PBPC ebx
+ GET_BYTE
  movzx ecx,al
  shl ecx,16
  pop eax
  add ecx,eax
- GET_PC eax
+ GET_PBPC eax
  E0_PUSH_W
  mov eax,ecx
  Stack_Fixup
@@ -927,10 +930,13 @@ You must read and accept the license prior to use.
  mov eax,B_PB_Shifted
  READ8_Immediate
  push eax
- GET_PC eax
+ GET_PBPC eax
  PUSH_W New
  pop eax
- mov ah,[R_NativePC]
+ mov ah,al
+ GET_PBPC ebx
+ GET_BYTE
+ ror ax,8
  mov ebx,eax
 %else
  mov eax,B_PB_Shifted
