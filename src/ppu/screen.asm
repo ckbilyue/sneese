@@ -542,6 +542,11 @@ if (!MosaicCountdown)
  test ah,ah         ; Check for screen off
  js near .screen_off
 
+ cmp byte [Redo_Layering],0
+ jz .no_layering_recalc_needed
+ call C_LABEL(Update_Layering)
+.no_layering_recalc_needed:
+
  xor eax,eax
  mov [Priority_Used_BG1],ax
  mov [Priority_Used_BG2],ax
@@ -579,11 +584,6 @@ EXTERN_C BreaksLast
  SORT_OFFSET_CHANGE
 
 .no_tile_layers:
-
- cmp byte [Redo_Layering],0
- jz .no_layering_recalc_needed
- call C_LABEL(Update_Layering)
-.no_layering_recalc_needed:
 
  cmp byte [Redo_Windowing],0
  jz .no_window_recalc_needed
