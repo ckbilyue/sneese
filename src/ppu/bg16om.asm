@@ -313,11 +313,6 @@ EXPORT_C Render_Offset_16x16M_C%1
 
  mov ecx,C_LABEL(Plot_Lines_V_Offset_16x16M_Table_C%1)
 .have_plotter:
-%if %1 == 2
- mov esi,[M0_Color+edx]
- mov [Palette_Base],esi
-%endif
-
  jmp Render_Offset_16x16M_Base
 %endmacro
 
@@ -1146,6 +1141,7 @@ EXPORT_C %1     ; Define label, entry point
 
 .flip_y:
  shl esi,3
+ and ebx,byte 1
  add esi,ebp
 
  add al,al      ; Get X flip (now in MSB)

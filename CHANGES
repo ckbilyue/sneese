@@ -22,6 +22,10 @@ Changes
 
 
  0.801
+  Render: Fixed a tileset lookup bug in mosaic effect in mode 4 on BG1 
+   with 16x16 tiles enabled [TRAC]
+  Render: Fixed a register corruption bug in mosaic effect in mode 4 on
+   BG2 with 16x16 tiles enabled [TRAC]
   SRAM: Fixed a problem where SRAMs smaller than 64kbit would not be
    mirrored on load
   Render: Fixed an off-by-6 bug in mode 7 vertical flip [TRAC]
