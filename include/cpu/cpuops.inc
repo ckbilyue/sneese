@@ -497,10 +497,6 @@ BFC BPL,SNES_FLAG_N
 EM_ORA OdO,Direct_Indirect
 E0_ORA OdO,Direct_Indirect
 
-; 15
-EM_ORA d_x,Direct_Index_X
-E0_ORA d_x,Direct_Index_X
-
 ; 17
 EM_ORA IdI_y,Direct_Indirect_Indexed_Long
 E0_ORA IdI_y,Direct_Indirect_Indexed_Long
@@ -758,14 +754,6 @@ BFS BMI,SNES_FLAG_N
 EM_AND OdO,Direct_Indirect
 E0_AND OdO,Direct_Indirect
 
-; 34
-EM_BIT d_x,Direct_Index_X
-E0_BIT d_x,Direct_Index_X
-
-; 35
-EM_AND d_x,Direct_Index_X
-E0_AND d_x,Direct_Index_X
-
 ; 37
 EM_AND IdI_y,Direct_Indirect_Indexed_Long
 E0_AND IdI_y,Direct_Indirect_Indexed_Long
@@ -985,10 +973,6 @@ EXPORT_C E0_MVN
 ALIGNC
 EXPORT_C EX_MVN
  ALL_MVX 1,MVN
-
-; 55
-EM_EOR d_x,Direct_Index_X
-E0_EOR d_x,Direct_Index_X
 
 ; 57
 EM_EOR IdI_y,Direct_Indirect_Indexed_Long
@@ -1328,10 +1312,6 @@ BFS BVS,SNES_FLAG_V
 EM_ADC OdO,Direct_Indirect
 E0_ADC OdO,Direct_Indirect
 
-; 75
-EM_ADC d_x,Direct_Index_X
-E0_ADC d_x,Direct_Index_X
-
 ; 77
 EM_ADC IdI_y,Direct_Indirect_Indexed_Long
 E0_ADC IdI_y,Direct_Indirect_Indexed_Long
@@ -1500,18 +1480,6 @@ BFS BCS,SNES_FLAG_C
 ; B2
 EM_LDA OdO,Direct_Indirect
 E0_LDA OdO,Direct_Indirect
-
-; B4
-EX_LDY d_x,Direct_Index_X
-E0_LDY d_x,Direct_Index_X
-
-; B5
-EM_LDA d_x,Direct_Index_X
-E0_LDA d_x,Direct_Index_X
-
-; B6
-EX_LDX d_y,Direct_Index_Y
-E0_LDX d_y,Direct_Index_Y
 
 ; B7
 EM_LDA IdI_y,Direct_Indirect_Indexed_Long
@@ -1704,10 +1672,6 @@ EXPORT_C E1_PEI
  READ16_Direct
  E1_PUSH_W
  OPCODE_EPILOG
-
-; D5
-EM_CMP d_x,Direct_Index_X
-E0_CMP d_x,Direct_Index_X
 
 ; D7
 EM_CMP IdI_y,Direct_Indirect_Indexed_Long
@@ -1931,10 +1895,6 @@ EXPORT_C E1_PEA
  add R_NativePC,byte 3
  E1_PUSH_W
  OPCODE_EPILOG
-
-; F5
-EM_SBC d_x,Direct_Index_X
-E0_SBC d_x,Direct_Index_X
 
 ; F7
 EM_SBC IdI_y,Direct_Indirect_Indexed_Long
