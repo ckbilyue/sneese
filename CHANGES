@@ -35,6 +35,8 @@ Changes
    reporting code [TRAC]
   5A22: Moved WAI delay to after hardware interrupt detection, thanks to
    anomie for verifying this [TRAC]
+  SPC700: Improved flag behavior of ADDW, SUBW, and MUL opcodes, thanks
+   to anomie for research [TRAC]
  0.832
   Documentation: Updated grossly insufficient copyright attributations
    [TRAC]

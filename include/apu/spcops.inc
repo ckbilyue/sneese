@@ -831,7 +831,8 @@ EXPORT_C SPC_ADDW_YA_dp
  ADDR_dp
  GET_WORD_SPC        ; get DP word
  mov ebx,B_YA
- add bx,ax
+ add bl,al
+ adc bh,ah
  lahf
  mov B_YA,ebx
  jno .no_overflow
@@ -974,7 +975,8 @@ EXPORT_C SPC_SUBW_YA_dp
  ADDR_dp
  GET_WORD_SPC        ; get DP word
  mov ebx,B_YA
- sub bx,ax
+ sub bl,al
+ sbb bh,ah
  lahf
  mov B_YA,ebx
  jno .no_overflow
@@ -1234,9 +1236,8 @@ EXPORT_C SPC_MUL
  mul byte B_A
  mov cl,al
  mov B_YA,eax
- or cl,ah
  STORE_FLAGS_N ah
- STORE_FLAGS_Z cl
+ STORE_FLAGS_Z ah
  OPCODE_EPILOG
 
 ; D0
