@@ -21,6 +21,10 @@ Changes
   DBJH          Daniel Horchner
 
 
+ 0.831
+  5A22: Changed emulation-mode interrupts to NOT zero data bank
+   register - thanks to Overload for pointing out that the SNES CPU
+   does not do this [TRAC]
  0.83 [TRAC]
   Sound: Fixed a bug in envelope height reading of channels that weren't
    playing; value to be read wasn't being updated, fixes Secret of

@@ -925,12 +925,6 @@ NMI_Event:
 ;SET_FLAG SNES_FLAG_B
  E1_PUSH_B
 
- mov eax,[C_LABEL(NMI_Evector)] ; Get Emulation mode NMI vector
-;7.12.2 In the Emulation mode, the PBR and DBR registers are cleared to 00
-;when a hardware interrupt, BRK or COP is executed. In this case, previous
-;contents of the PBR are not automatically saved.
- mov byte [CPU_LABEL(DB)],0
-
  mov ebx,0xFFFA         ; Get Emulation mode IRQ vector
 
  jmp .NMI_completion

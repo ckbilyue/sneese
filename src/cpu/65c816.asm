@@ -2161,6 +2161,8 @@ EXPORT E1_RESET
 ;7.12.2 In the Emulation mode, the PBR and DBR registers are cleared to 00
 ;when a hardware interrupt, BRK or COP is executed. In this case, previous
 ;contents of the PBR are not automatically saved.
+
+;NOTE - DB is ONLY cleared on RESET!
  mov byte [CPU_LABEL(DB)],0
 
  mov ebx,0xFFFC         ; Get Emulation mode IRQ vector
@@ -2184,11 +2186,6 @@ EXPORT E1_IRQ
  E1_SETUPFLAGS 0        ; put flags into SNES packed flag format
 ;SET_FLAG SNES_FLAG_B
  E1_PUSH_B
-
-;7.12.2 In the Emulation mode, the PBR and DBR registers are cleared to 00
-;when a hardware interrupt, BRK or COP is executed. In this case, previous
-;contents of the PBR are not automatically saved.
- mov byte [CPU_LABEL(DB)],0
 
  mov ebx,0xFFFE         ; Get Emulation mode IRQ vector
 

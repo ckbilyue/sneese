@@ -39,11 +39,6 @@ You must read and accept the license prior to use.
  xor eax,eax
 
 %if S_8bit      ; emulation mode interrupt
-;7.12.2 In the Emulation mode, the PBR and DBR registers are cleared to 00
-;when a hardware interrupt, BRK or COP is executed. In this case, previous
-;contents of the PBR are not automatically saved.
- mov B_DB,byte 0
-
  mov ebx,%1
 %else           ; native mode interrupt
  mov ebx,%2
