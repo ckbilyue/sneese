@@ -22,6 +22,8 @@ Changes
 
 
  0.801
+  SPC700: Fixed a serious bug in the handling of some 16-bit reads,
+   thanks to Brad Martin for alerting me to the problem [TRAC]
   Render: Added countdown register support to mosaic effect in
    modes 0-6 [TRAC]
   Render: Fixed a tileset lookup bug in mosaic effect in mode 4 on BG1 

@@ -437,6 +437,7 @@ EXTERN_C InvalidSPCHWWrite
 
  cmp bl,0xF0-1
  jb %%read_direct
+ je %%read_mapper
 
  cmp bl,0xFF
  je %%read_mapper
