@@ -20,8 +20,10 @@ EXTERN_C memmap_text_start,memmap_data_start,memmap_bss_start
 EXTERN_C Read_Bank8Mapping,Write_Bank8Mapping
 EXTERN_C Read_Bank8Offset,Write_Bank8Offset
 EXTERN_C Dummy
+EXTERN_C Last_Bus_Value_A
 EXTERN_C SNES_GET_WORD,SNES_GET_WORD_WRAP
 EXTERN_C SNES_GET_LONG,SNES_GET_LONG_WRAP
+EXTERN_C CPU_OPEN_BUS_READ,CPU_OPEN_BUS_READ_LEGACY
 EXTERN_C UNSUPPORTED_READ,UNSUPPORTED_WRITE,IGNORE_WRITE
 EXTERN_C PPU_READ,PPU_WRITE
 EXTERN_C SRAM_READ,SRAM_WRITE
@@ -71,6 +73,7 @@ alternate macro does not support NoSave or Double.
  jmp short %%read_done
 %%read_direct:
  mov al,[edx+ebx]
+ mov [C_LABEL(Last_Bus_Value_A)],al
 %%read_done:
  pop edx
  movzx edx,byte [C_LABEL(BlockSpeed)+edx]
@@ -128,8 +131,9 @@ alternate macro does not support NoSave or Double.
 %%read_direct:
  mov ax,[edx+ebx-1]
  pop edx
+ mov [C_LABEL(Last_Bus_Value_A)],ah
  movzx edx,byte [C_LABEL(BlockSpeed)+edx]
-;lea R_65c816_Cycles,[R_65c816_Cycles+edx*2]
+ lea R_65c816_Cycles,[R_65c816_Cycles+edx*2]
 %%read_done:
 %endmacro
 
@@ -193,6 +197,7 @@ alternate macro does not support NoSave or Double.
 
 %%read_direct:
  mov al,[edx+ebx]
+ mov [C_LABEL(Last_Bus_Value_A)],al
  shl eax,16
  mov ax,[edx+ebx-2]
  pop edx
@@ -204,6 +209,7 @@ alternate macro does not support NoSave or Double.
 %endmacro
 
 %macro SET_BYTE 0
+ mov [C_LABEL(Last_Bus_Value_A)],al
  mov edx,ebx
  shr edx,13
  push edx

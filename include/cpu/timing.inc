@@ -1126,10 +1126,12 @@ EXPORT SNES_W4016 ; JOYC1
  pop eax
 .no_ready_reset:
  mov [JOYC1],al
+ add R_65c816_Cycles,_5A22_LEGACY_CYCLE - _5A22_FAST_CYCLE
  ret
 
 ALIGNC
 EXPORT SNES_W4017 ; JOYC2
+ add R_65c816_Cycles,_5A22_LEGACY_CYCLE - _5A22_FAST_CYCLE
  ret
 
 ; Read from 40xx handlers
@@ -1150,6 +1152,7 @@ EXPORT SNES_R4016 ; JOYC1
  jz .read_enabled
  mov al,0
  or al,0x40     ;open bus kludge
+ add R_65c816_Cycles,_5A22_LEGACY_CYCLE - _5A22_FAST_CYCLE
  ret
 
 .read_enabled:
@@ -1168,6 +1171,7 @@ EXPORT SNES_R4016 ; JOYC1
  pop ebx
  pop ecx
  or al,0x40     ;open bus kludge
+ add R_65c816_Cycles,_5A22_LEGACY_CYCLE - _5A22_FAST_CYCLE
  ret
 
 .unused:
@@ -1176,6 +1180,7 @@ EXPORT SNES_R4016 ; JOYC1
  pop ebx
  pop ecx
  or al,0x40     ;open bus kludge
+ add R_65c816_Cycles,_5A22_LEGACY_CYCLE - _5A22_FAST_CYCLE
  ret
 
 ALIGNC
@@ -1191,6 +1196,7 @@ ALIGNC
  pop ebx
  pop ecx
  or al,0x40     ;open bus kludge
+ add R_65c816_Cycles,_5A22_LEGACY_CYCLE - _5A22_FAST_CYCLE
  ret
 
 ALIGNC
@@ -1199,6 +1205,7 @@ EXPORT SNES_R4017 ; JOYC2
  jz .read_enabled
  mov al,0
  or al,0x5C     ;open bus kludge
+ add R_65c816_Cycles,_5A22_LEGACY_CYCLE - _5A22_FAST_CYCLE
  ret
 
 .read_enabled:
@@ -1217,6 +1224,7 @@ EXPORT SNES_R4017 ; JOYC2
  pop ebx
  pop ecx
  or al,0x5C     ;open bus kludge
+ add R_65c816_Cycles,_5A22_LEGACY_CYCLE - _5A22_FAST_CYCLE
  ret
 
 .unused:
@@ -1225,6 +1233,7 @@ EXPORT SNES_R4017 ; JOYC2
  pop ebx
  pop ecx
  or al,0x5C     ;open bus kludge
+ add R_65c816_Cycles,_5A22_LEGACY_CYCLE - _5A22_FAST_CYCLE
  ret
 
 ALIGNC
@@ -1240,25 +1249,11 @@ ALIGNC
  pop ebx
  pop ecx
  or al,0x5C     ;open bus kludge
+ add R_65c816_Cycles,_5A22_LEGACY_CYCLE - _5A22_FAST_CYCLE
  ret
 
 
 ; Read from 42xx handlers
-ALIGNC
-EXPORT SNES_R4200 ; NMITIMEN
- mov al,[C_LABEL(NMITIMEN)]
- ret
-
-ALIGNC
-EXPORT SNES_R4202 ; WRMPYA
- mov al,[WRMPYA]
- ret
-
-ALIGNC
-EXPORT SNES_R4203 ; WRMPYB
- mov al,[WRMPYB]
- ret
-
 ALIGNC
 EXPORT SNES_R4210 ; RDNMI
  mov al,[RDNMI]

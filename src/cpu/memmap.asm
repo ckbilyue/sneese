@@ -41,6 +41,7 @@ You must read and accept the license prior to use.
 %include "ppu/ppu.inc"
 %include "cpu/regs.inc"
 %include "cpu/dma.inc"
+%include "cycles.inc"
 
 section .text
 EXPORT_C memmap_text_start
@@ -60,6 +61,8 @@ EXPORT_C Write_Bank8Mapping ,skipl 256*8
 EXPORT_C Read_Bank8Offset   ,skipl 256*8
 EXPORT_C Write_Bank8Offset  ,skipl 256*8
 EXPORT_C Dummy              ,skipk 64
+
+EXPORT_C Last_Bus_Value_A   ,skipb
 
 section .text
 ALIGNC
@@ -112,8 +115,15 @@ EXPORT_C SNES_GET_LONG_WRAP
 
 ALIGNC
 EXPORT_C CPU_OPEN_BUS_READ
-    mov al,0    ;not implemented
+    mov al,[C_LABEL(Last_Bus_Value_A)]
     ret
+
+ALIGNC
+EXPORT_C CPU_OPEN_BUS_READ_LEGACY
+    mov al,[C_LABEL(Last_Bus_Value_A)]
+    add R_65c816_Cycles,_5A22_LEGACY_CYCLE - _5A22_FAST_CYCLE
+    ret
+
 
 ALIGNC
 EXPORT_C IGNORE_WRITE
@@ -127,6 +137,7 @@ extern _InvalidHWWrite
     popa
 %endif
 %endif
+    mov [C_LABEL(Last_Bus_Value_A)],al
     ret
 
 
@@ -143,6 +154,7 @@ extern _InvalidHWRead
     popa
 %endif
 %endif
+    mov [C_LABEL(Last_Bus_Value_A)],al
     ret
 
 ALIGNC
@@ -157,6 +169,7 @@ extern _InvalidHWWrite
     popa
 %endif
 %endif
+    mov [C_LABEL(Last_Bus_Value_A)],al
     ret
 
 
@@ -166,6 +179,7 @@ EXPORT_C Read_Direct_Safeguard
  shr edx,13
  mov edx,[C_LABEL(Read_Bank8Offset)+edx*4]
  mov al,[edx+ebx]
+ mov [C_LABEL(Last_Bus_Value_A)],al
  ret
 
 ALIGNC
@@ -174,6 +188,7 @@ EXPORT_C Write_Direct_Safeguard
  shr edx,13
  mov edx,[C_LABEL(Write_Bank8Offset)+edx*4]
  mov [edx+ebx],al
+ mov [C_LABEL(Last_Bus_Value_A)],al
  ret
 
 ALIGNC
@@ -182,13 +197,20 @@ EXPORT_C PPU_READ
     mov edx,(1 << 16) - 1
     and edx,ebx
 
+    cmp dh,0x21
+    je .b_bus_read
     cmp byte [In_DMA],0
     jz .access_ok
-    cmp edx,0x4000
+    cmp dh,0x40
     jb .access_ok
     cmp edx,0x437F
     jbe C_LABEL(CPU_OPEN_BUS_READ)
 .access_ok:
+    call [(C_LABEL(Read_Map_20_5F)-0x2000*4)+edx*4]
+    mov [C_LABEL(Last_Bus_Value_A)],al
+    ret
+
+.b_bus_read:
     jmp [(C_LABEL(Read_Map_20_5F)-0x2000*4)+edx*4]
 
 ALIGNC
@@ -197,13 +219,18 @@ EXPORT_C PPU_WRITE
     mov edx,(1 << 16) - 1
     and edx,ebx
 
+    cmp dh,0x21
+    je .b_bus_write
+
+    mov [C_LABEL(Last_Bus_Value_A)],al
     cmp byte [In_DMA],0
     jz .access_ok
-    cmp edx,0x4000
+    cmp dh,0x40
     jb .access_ok
     cmp edx,0x437F
     jbe C_LABEL(IGNORE_WRITE)
 .access_ok:
+.b_bus_write:
     jmp [(C_LABEL(Write_Map_20_5F)-0x2000*4)+edx*4]
 
 ALIGNC
@@ -212,6 +239,7 @@ EXPORT_C SRAM_READ
     and edx,ebx
     add edx,[C_LABEL(SRAM)]
     mov al,[edx]
+    mov [C_LABEL(Last_Bus_Value_A)],al
     ret
 
 ALIGNC
@@ -220,6 +248,7 @@ EXPORT_C SRAM_WRITE
     and edx,ebx
     add edx,[C_LABEL(SRAM)]
     mov [edx],al
+    mov [C_LABEL(Last_Bus_Value_A)],al
     ret
 
 ALIGNC
@@ -236,6 +265,7 @@ EXPORT_C SRAM_WRITE_ALT
     and edx,edi
     add edx,[C_LABEL(SRAM)]
     mov [edx],al
+    mov [C_LABEL(Last_Bus_Value_A)],al
     pop edi
     pop ecx
     ret
@@ -253,6 +283,7 @@ EXPORT_C SRAM_WRITE_HIROM
     and edx,ecx
     mov ecx,[C_LABEL(SRAM)]
     mov [edx+ecx],al
+    mov [C_LABEL(Last_Bus_Value_A)],al
     pop ecx
     ret
 
@@ -265,6 +296,7 @@ EXPORT_C SRAM_WRITE_2k
     mov [edx+2048],al
     mov [edx+4096],al
     mov [edx+6144],al
+    mov [C_LABEL(Last_Bus_Value_A)],al
     ret
 
 ALIGNC
@@ -274,6 +306,7 @@ EXPORT_C SRAM_WRITE_4k
     add edx,[C_LABEL(SRAM)]
     mov [edx],al
     mov [edx+4096],al
+    mov [C_LABEL(Last_Bus_Value_A)],al
     ret
 
 section .text

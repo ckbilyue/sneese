@@ -196,7 +196,7 @@ $(OBJ)/apu/spc700.$(ASM_OBJ_EXT): $(SRC)/apu/spc700.asm $(OBJFIX) \
  ppu/ppu.inc)
 $(OBJ)/cpu/memmap.$(ASM_OBJ_EXT): $(SRC)/cpu/memmap.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, misc.inc cpu/memmap.inc cpu/cpumem.inc \
- cpu/regs.inc ppu/ppu.inc cpu/dma.inc)
+ cpu/regs.inc ppu/ppu.inc cpu/dma.inc cycles.inc)
 $(OBJ)/cpu/dma.$(ASM_OBJ_EXT): $(SRC)/cpu/dma.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, misc.inc cpu/dma.inc cpu/regs.inc ppu/ppu.inc \
  cpu/cpumem.inc)

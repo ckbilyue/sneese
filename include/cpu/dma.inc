@@ -11,6 +11,8 @@ You must read and accept the license prior to use.
 
 %endif
 
+%include "cpu/cpumem.inc"
+
 %ifndef SNEeSe_dma_inc
 %define SNEeSe_dma_inc
 
@@ -147,7 +149,10 @@ EXTERN_MAP_WRITE_DMA 7
  dd MAP_READ_A2L%1
  dd MAP_READ_A2H%1
  dd MAP_READ_NTRL%1
- DUPLICATE dd,5,C_LABEL(UNSUPPORTED_READ)
+ dd C_LABEL(UNSUPPORTED_READ)
+ ; 43xC-43xE: Open Bus A
+ DUPLICATE dd,3,C_LABEL(CPU_OPEN_BUS_READ)
+ dd C_LABEL(UNSUPPORTED_READ)
 %endmacro
 
 %macro MAP_WRITE_DMA_LIST 1
