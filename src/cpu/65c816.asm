@@ -4735,13 +4735,17 @@ EXPORT_C Reset_CPU
  mov [SPC_CPU_cycles_mul],eax
 
  ; Reset CPU
+
  mov [In_CPU],al
  mov [CPU_Execution_Mode],al ;CEM_Normal_Execution == 0
  mov dword [OpTable],OpTableE1  ; Set current opcode emulation table
- mov [C_LABEL(SNES_Cycles)],eax ; Clear cycle counts
+
+ ; Clear cycle counts
+ mov [C_LABEL(SNES_Cycles)],eax
+ mov [C_LABEL(EventTrip)],eax
 
  LOAD_BASE
- LOAD_CYCLES
+ LOAD_CYCLES edx
 
  mov dword [CPU_LABEL(S)],0x01FF
  mov [CPU_LABEL(A)],eax ; Clear A, D, X, Y
