@@ -95,6 +95,14 @@ void fill_backdrop(BITMAP *gui_screen)
  }
 }
 
+void refresh_gui(void)
+{
+ fill_backdrop(Allegro_Bitmap);
+ draw_sprite(Allegro_Bitmap, GUI_Bitmap, 0, 0);
+ vsync();
+ CopyGUIScreen();
+}
+
 const char *GUI_init()
 {
  char *errormsg;
@@ -146,18 +154,88 @@ char *Main_Options[MAIN_NUM_OPTIONS]={
  "BG window status",
  "Exit SNEeSe :("};
 
-void UpdateGUI(int Selected)
-{
- clear(GUI_Bitmap);
- Main_window->refresh();
- for(int a=0;a<MAIN_NUM_OPTIONS;a++)
-  if(a!=Selected) PlotMenuItem(Main_window,default_font,Main_Options[a],0,default_font->get_heightspace()*a,16);
-  else PlotSelectedMenuItem(Main_window,default_font,Main_Options[a],0,default_font->get_heightspace()*a,16);
+WINDOW *Config_window=0;
 
- fill_backdrop(Allegro_Bitmap);
- draw_sprite(Allegro_Bitmap, GUI_Bitmap, 0, 0);
- vsync();
-}
+enum {
+ CONFIG_SCREEN_MODE,
+ CONFIG_CONTROLLERS,
+ CONFIG_SOUND,
+ CONFIG_ENABLE_SPC,
+ CONFIG_STRETCH_H,
+ CONFIG_STRETCH_V,
+ CONFIG_FRAMESKIP_MIN,
+ CONFIG_FRAMESKIP_MAX,
+ CONFIG_ENABLE_FPS_COUNTER,
+ CONFIG_NUM_OPTIONS
+};
+
+char min_frameskip_str[] = "Min Frameskip: ???????";
+char max_frameskip_str[] = "Max Frameskip: ???????";
+
+char fps_counter_str[] = "FPS counter: off";
+char stretch_h_str[] = "H stretch: full";
+char stretch_v_str[] = "V stretch: full";
+
+const char *Config_Options[CONFIG_NUM_OPTIONS]={
+ 0,                             // screen mode
+ "Configure controllers",       // controller configuration menu
+ "Configure sound",
+ 0,                             // SPC enable setting
+ stretch_h_str,                 // screen stretch settings
+ stretch_v_str,
+ min_frameskip_str,
+ max_frameskip_str,
+ fps_counter_str
+};
+
+WINDOW *Sound_window=0;
+
+enum {
+ SOUND_ENABLE_SOUND,
+ SOUND_SAMPLE_SIZE,
+ SOUND_ENABLE_ECHO,
+ SOUND_ENABLE_GAUSS,
+ SOUND_ENABLE_ENVX,
+ SOUND_NUM_OPTIONS
+};
+
+char sample_size_str[] = "Sample size: xx-bit";
+
+const char *Sound_Options[SOUND_NUM_OPTIONS]={
+ 0,                             // Sound enable setting
+ sample_size_str,               // Sound sample size
+ 0,                             // Sound echo/FIR filter enable
+ 0,                             // Sound gauss filter enable
+ 0                              // Sound ENVX reading enable
+};
+
+WINDOW *Controls_window=0;
+
+enum {
+#if 0
+#ifdef ALLEGRO_DOS
+ CONTROLS_JOYSTICK_DRIVER,
+#endif
+#endif
+ CONTROLS_CONTROLLER_1,
+ CONTROLS_CONTROLLER_2,
+ CONTROLS_MAP_1,
+ CONTROLS_MAP_2,
+ CONTROLS_NUM_OPTIONS
+};
+
+const char *Controls_Options[CONTROLS_NUM_OPTIONS]=
+{
+#if 0
+#ifdef ALLEGRO_DOS
+ "Joystick: **************",    // joystick driver
+#endif
+#endif
+ "-------- on player 1",        // controls: first player
+ "-------- on player 2",        // controls: second player
+ "Define keys for player 1",
+ "Define keys for player 2"
+};
 
 WINDOW *Screen_window=0;
 #if defined(ALLEGRO_DOS)
@@ -187,16 +265,49 @@ char *Screen_Options[NUM_SCREEN_OPTIONS]={
 #error Unsupported platform.
 #endif
 
+void UpdateGUI(int Selected)
+{
+ clear(GUI_Bitmap);
+ Main_window->refresh();
+ for(int a=0;a<MAIN_NUM_OPTIONS;a++)
+  if(a!=Selected) PlotMenuItem(Main_window,default_font,Main_Options[a],0,default_font->get_heightspace()*a,16);
+  else PlotSelectedMenuItem(Main_window,default_font,Main_Options[a],0,default_font->get_heightspace()*a,16);
+}
+
+void UpdateConfigWindow(int Selected)
+{
+ Config_window->refresh();
+ for(int a=0;a<CONFIG_NUM_OPTIONS;a++)
+  if(a!=Selected) PlotMenuItem(Config_window,default_font,Config_Options[a],0,default_font->get_heightspace()*a,24);
+  else PlotSelectedMenuItem(Config_window,default_font,Config_Options[a],0,default_font->get_heightspace()*a,24);
+}
+
 void UpdateScreenWindow(int Selected)
 {
+ UpdateConfigWindow(CONFIG_SCREEN_MODE);
  Screen_window->refresh();
  for(int a=0;a<NUM_SCREEN_OPTIONS;a++)
   if(a!=Selected) PlotMenuItem(Screen_window,default_font,Screen_Options[a],0,default_font->get_heightspace()*a,20);
   else PlotSelectedMenuItem(Screen_window,default_font,Screen_Options[a],0,default_font->get_heightspace()*a,20);
- fill_backdrop(Allegro_Bitmap);
- draw_sprite(Allegro_Bitmap, GUI_Bitmap, 0, 0);
- vsync();
- CopyGUIScreen();
+}
+
+void UpdateSoundWindow(int Selected)
+{
+ UpdateConfigWindow(CONFIG_SOUND);
+ Sound_window->refresh();
+ for(int a=0;a<SOUND_NUM_OPTIONS;a++)
+  if(a!=Selected) PlotMenuItem(Sound_window,default_font,Sound_Options[a],0,default_font->get_heightspace()*a,24);
+  else PlotSelectedMenuItem(Sound_window,default_font,Sound_Options[a],0,default_font->get_heightspace()*a,24);
+}
+
+void UpdateControlsWindow(int Selected)
+{
+ UpdateConfigWindow(CONFIG_CONTROLLERS);
+ Controls_window->refresh();
+ for(int a=0;a<CONTROLS_NUM_OPTIONS;a++)
+  if(a!=Selected) PlotMenuItem(Controls_window,default_font,Controls_Options[a],0,default_font->get_heightspace()*a,24);
+  else PlotSelectedMenuItem(Controls_window,default_font,Controls_Options[a],0,default_font->get_heightspace()*a,24);
+ refresh_gui();
 }
 
 int ScreenWindow()
@@ -208,6 +319,7 @@ int ScreenWindow()
  for(;;)
  {
   UpdateScreenWindow(CursorAt);
+  refresh_gui();
   while (!keypressed());
   keypress = readkey();
   key_asc = keypress & 0xFF;
@@ -234,39 +346,6 @@ int ScreenWindow()
 
 char *on_off[2]={ "off", "on" };
 char *en_dis[2]={ "enabled", "disabled" };
-
-char sample_size_str[] = "Sample size: xx-bit";
-
-WINDOW *Sound_window=0;
-
-enum {
- SOUND_ENABLE_SOUND,
- SOUND_SAMPLE_SIZE,
- SOUND_ENABLE_ECHO,
- SOUND_ENABLE_GAUSS,
- SOUND_ENABLE_ENVX,
- SOUND_NUM_OPTIONS
-};
-
-const char *Sound_Options[SOUND_NUM_OPTIONS]={
- 0,                             // Sound enable setting
- sample_size_str,               // Sound sample size
- 0,                             // Sound echo/FIR filter enable
- 0,                             // Sound gauss filter enable
- 0                              // Sound ENVX reading enable
-};
-
-void UpdateSoundWindow(int Selected)
-{
- Sound_window->refresh();
- for(int a=0;a<SOUND_NUM_OPTIONS;a++)
-  if(a!=Selected) PlotMenuItem(Sound_window,default_font,Sound_Options[a],0,default_font->get_heightspace()*a,24);
-  else PlotSelectedMenuItem(Sound_window,default_font,Sound_Options[a],0,default_font->get_heightspace()*a,24);
- fill_backdrop(Allegro_Bitmap);
- draw_sprite(Allegro_Bitmap, GUI_Bitmap, 0, 0);
- vsync();
- CopyGUIScreen();
-}
 
 int SoundWindow()
 {
@@ -306,6 +385,7 @@ int SoundWindow()
  for(;;)
  {
   UpdateSoundWindow(CursorAt);
+  refresh_gui();
   while (!keypressed());
   keypress = readkey();
   key_asc = keypress & 0xFF;
@@ -421,34 +501,6 @@ int SoundWindow()
  return 1;          // Signify normal exit
 }
 
-WINDOW *Controls_window=0;
-
-enum {
-#if 0
-#ifdef ALLEGRO_DOS
- CONTROLS_JOYSTICK_DRIVER,
-#endif
-#endif
- CONTROLS_CONTROLLER_1,
- CONTROLS_CONTROLLER_2,
- CONTROLS_MAP_1,
- CONTROLS_MAP_2,
- CONTROLS_NUM_OPTIONS
-};
-
-const char *Controls_Options[CONTROLS_NUM_OPTIONS]=
-{
-#if 0
-#ifdef ALLEGRO_DOS
- "Joystick: **************",    // joystick driver
-#endif
-#endif
- "-------- on player 1",        // controls: first player
- "-------- on player 2",        // controls: second player
- "Define keys for player 1",
- "Define keys for player 2"
-};
-
 #if 0
 const int joydriver_id[] =
 {
@@ -531,18 +583,6 @@ const char *get_joydriver_str(int driver)
 }
 #endif
 
-void UpdateControlsWindow(int Selected)
-{
- Controls_window->refresh();
- for(int a=0;a<CONTROLS_NUM_OPTIONS;a++)
-  if(a!=Selected) PlotMenuItem(Controls_window,default_font,Controls_Options[a],0,default_font->get_heightspace()*a,24);
-  else PlotSelectedMenuItem(Controls_window,default_font,Controls_Options[a],0,default_font->get_heightspace()*a,24);
- fill_backdrop(Allegro_Bitmap);
- draw_sprite(Allegro_Bitmap, GUI_Bitmap, 0, 0);
- vsync();
- CopyGUIScreen();
-}
-
 WINDOW *ControlSetup_window=0;
 
 
@@ -621,9 +661,7 @@ int AskKey(const char *msg, int *whatkey, SNES_CONTROLLER_INPUTS *input)
  PlotStringShadow(ControlSetup_window, default_font,
   msg, 84, 96, 15, 8);
 
- fill_backdrop(Allegro_Bitmap);
- draw_sprite(Allegro_Bitmap, GUI_Bitmap, 0, 0);
- CopyGUIScreen();
+ refresh_gui();
 
  do tmp = lastkeypressed(); while (!tmp);
  if (keypressed()) readkey(); /* throw away the key */
@@ -658,9 +696,7 @@ void AskControllerInputs(SNES_CONTROLLER_INPUTS *input)
   if (AskKey("Press key for START", &input->start, input))
  {
   PlotStringShadow(ControlSetup_window,default_font,"Press ESC to exit",84,96,15,8);
-  fill_backdrop(Allegro_Bitmap);
-  draw_sprite(Allegro_Bitmap, GUI_Bitmap, 0, 0);
-  CopyGUIScreen();
+  refresh_gui();
 
   for (;;)
   {
@@ -785,53 +821,6 @@ int ControlsWindow()
 }
 
 
-char min_frameskip_str[] = "Min Frameskip: ???????";
-char max_frameskip_str[] = "Max Frameskip: ???????";
-
-WINDOW *Config_window=0;
-
-char fps_counter_str[] = "FPS counter: off";
-char stretch_h_str[] = "H stretch: full";
-char stretch_v_str[] = "V stretch: full";
-
-enum {
- CONFIG_SCREEN_MODE,
- CONFIG_CONTROLLERS,
- CONFIG_SOUND,
- CONFIG_ENABLE_SPC,
- CONFIG_STRETCH_H,
- CONFIG_STRETCH_V,
- CONFIG_FRAMESKIP_MIN,
- CONFIG_FRAMESKIP_MAX,
- CONFIG_ENABLE_FPS_COUNTER,
- CONFIG_NUM_OPTIONS
-};
-
-const char *Config_Options[CONFIG_NUM_OPTIONS]={
- 0,                             // screen mode
- "Configure controllers",       // controller configuration menu
- "Configure sound",
- 0,                             // SPC enable setting
- stretch_h_str,                 // screen stretch settings
- stretch_v_str,
- min_frameskip_str,
- max_frameskip_str,
- fps_counter_str
-};
-
-
-void UpdateConfigWindow(int Selected)
-{
- Config_window->refresh();
- for(int a=0;a<CONFIG_NUM_OPTIONS;a++)
-  if(a!=Selected) PlotMenuItem(Config_window,default_font,Config_Options[a],0,default_font->get_heightspace()*a,24);
-  else PlotSelectedMenuItem(Config_window,default_font,Config_Options[a],0,default_font->get_heightspace()*a,24);
- fill_backdrop(Allegro_Bitmap);
- draw_sprite(Allegro_Bitmap, GUI_Bitmap, 0, 0);
- vsync();
- CopyGUIScreen();
-}
-
 int ConfigWindow()
 {
  int temp;
@@ -880,6 +869,7 @@ int ConfigWindow()
  for(;;)
  {
   UpdateConfigWindow(CursorAt);
+  refresh_gui();
   while (!keypressed());
   keypress = readkey();
   key_asc = keypress & 0xFF;
@@ -1066,8 +1056,6 @@ int ConfigWindow()
 
       set_palette_range(&GUIPal[-240],240,255,1);    // Set the GUI palette up.
 #endif
-
-      fill_backdrop(Allegro_Bitmap);
      }
      UpdateGUI(MAIN_CONFIGURE);
      break;
@@ -1149,10 +1137,7 @@ void RomInfo(void)
  PlotString(ROMInfo_window,default_font,"Country: ",0,default_font->get_heightspace()*6);
  PlotString(ROMInfo_window,default_font,rom_country,default_font->get_widthspace()*9,default_font->get_heightspace()*6);
 
- fill_backdrop(Allegro_Bitmap);
- draw_sprite(Allegro_Bitmap, GUI_Bitmap, 0, 0);
- vsync();
- CopyGUIScreen();
+ refresh_gui();
 
  for (;;)
  {
@@ -1283,10 +1268,7 @@ void HWStatus(void)
  sprintf(Number, "%02X", (unsigned) Win2_Bands_Out[3]);
  PlotString(HWStatus_window,default_font,Number,default_font->get_widthspace()*24,default_font->get_heightspace()*8);
 
- fill_backdrop(Allegro_Bitmap);
- draw_sprite(Allegro_Bitmap, GUI_Bitmap, 0, 0);
- vsync();
- CopyGUIScreen();
+ refresh_gui();
 
  for (;;)
  {
@@ -1387,10 +1369,7 @@ void DMAStatus(void)
  (unsigned) DASB_7,(unsigned) DASH_7,(unsigned) DASL_7);
  PlotString(DMAStatus_window,default_font,Line,0,default_font->get_heightspace()*8);
 
- fill_backdrop(Allegro_Bitmap);
- draw_sprite(Allegro_Bitmap, GUI_Bitmap, 0, 0);
- vsync();
- CopyGUIScreen();
+ refresh_gui();
 
  for (;;)
  {
@@ -1421,10 +1400,7 @@ void APUStatus(void)
   }
  }
 
- fill_backdrop(Allegro_Bitmap);
- draw_sprite(Allegro_Bitmap, GUI_Bitmap, 0, 0);
- vsync();
- CopyGUIScreen();
+ refresh_gui();
 
  for (;;)
  {
@@ -1536,10 +1512,7 @@ void BGWinStatus(void)
  PlotString(BGWinStatus_window,default_font,Line,
   0, 7 * default_font->get_heightspace());
 
- fill_backdrop(Allegro_Bitmap);
- draw_sprite(Allegro_Bitmap, GUI_Bitmap, 0, 0);
- vsync();
- CopyGUIScreen();
+ refresh_gui();
 
  for (;;)
  {
@@ -1646,7 +1619,7 @@ GUI_ERROR GUI()
   int keypress, key_asc, key_scan;
 
   UpdateGUI(CursorAt);
-  CopyGUIScreen();
+  refresh_gui();
   while (!keypressed());
   keypress = readkey();
   key_asc = keypress & 0xFF;
