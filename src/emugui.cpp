@@ -40,6 +40,9 @@ You must read and accept the license prior to use.
 
 extern PALETTE sneesepal;
 
+extern BITMAP *sneese;
+extern BITMAP *joypad;
+
 extern SCREEN screenmodes[];
 
 // Used to configure the screen and set internal variables for rendering!
@@ -56,7 +59,7 @@ BITMAP *SetGUIScreen(int ScreenMode)
   switch(ScreenMode)
   {
    case 0:
-   case 1:
+   case 2:
    case 3:
     return (BITMAP *) 0;
     break;
@@ -71,14 +74,23 @@ BITMAP *SetGUIScreen(int ScreenMode)
  Allegro_Bitmap = create_bitmap(ScreenX, ScreenY);
  if (!Allegro_Bitmap) return (BITMAP *) 0;
  clear(Allegro_Bitmap);
- SNES_Screen = (unsigned char *) Allegro_Bitmap->line[0];
- Reload_Bitmaps();  // We reload to convert to correct bit depth
+
+#ifndef NO_LOGO
+ // We reload to convert to correct bit depth
+ {
+  char logo_name[MAXPATH];
+
+  if (sneese) destroy_bitmap(sneese);
+
+  strcpy(logo_name, dat_name);
+  strcat(logo_name, "#sneese");
+
+  sneese = load_pcx(logo_name, sneesepal);
+ }
+#endif
 
  return Allegro_Bitmap;
 }
-
-extern BITMAP *sneese;
-extern BITMAP *joypad;
 
 void fill_backdrop(BITMAP *gui_screen)
 {
@@ -111,15 +123,20 @@ const char *GUI_init()
 
 
  errormsg = GUI_core_init();
-
  if (errormsg) return errormsg;
 
- if (joypad) destroy_bitmap(joypad);
+ set_color_conversion(COLORCONV_NONE);
 
- strcpy(joypad_name, dat_name);
- strcat(joypad_name, "#joypad");
+ if (!joypad)
+ {
+  strcpy(joypad_name, dat_name);
+  strcat(joypad_name, "#joypad");
 
- joypad = load_pcx(joypad_name, sneesepal);
+  joypad = load_pcx(joypad_name, NULL);
+ }
+
+ set_color_conversion(COLORCONV_TOTAL);
+
 
  return 0;
 }

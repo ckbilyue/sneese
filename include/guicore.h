@@ -202,7 +202,7 @@ class BORDER_WINDOW : public WINDOW {
 public:
  BORDER_WINDOW(int x,int y,int width,int height,char *title=0)
  : WINDOW(x,y,width,height,title){
-//add(&border);
+  add(&border);
  }
 };
 
@@ -236,8 +236,6 @@ public:
  }
  void refresh(WINDOW *parent);
 };
-
-void Reload_Bitmaps();
 
 void PlotChar(WINDOW *window,pGUI_FONT font,
  char Character,int x,int y,int color);

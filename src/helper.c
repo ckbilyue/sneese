@@ -154,7 +154,6 @@ signed char PaletteChanged;
 SNEESE_GFX_BUFFER gbSNES_Screen8;
 SNEESE_GFX_BUFFER gbSNES_Screen16;
 
-unsigned char *SNES_Screen;
 unsigned char *SNES_Screen8;
 unsigned short *SNES_Screen16;
 

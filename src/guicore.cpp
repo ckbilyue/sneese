@@ -351,6 +351,7 @@ void CTL_BITMAP::refresh(WINDOW *parent){
  if(!bitmap) return;
  if(!*bitmap) return;
  int sx=0,sy=0,dx=x,dy=y,width=(*bitmap)->w,height=(*bitmap)->h;
+
  if(dx<0){ width+=dx; sx-=dx; dx=0; }
  if((dx+width)>parent->get_width()){
   width=parent->get_width()-dx;
@@ -359,6 +360,7 @@ void CTL_BITMAP::refresh(WINDOW *parent){
  if((dy+height)>parent->get_height()){
   height=parent->get_height()-dy;
  }
+
  masked_blit(*bitmap,GUI_Bitmap,sx,sy,
   parent->get_x()+dx,parent->get_y()+dy,width,height);
 }
@@ -438,20 +440,6 @@ void PlotSelectedMenuItem(WINDOW *window, pGUI_FONT font, const char *String, in
 PALETTE sneesepal;
 BITMAP *sneese=0;
 BITMAP *joypad=0;
-
-void Reload_Bitmaps()
-{
-#ifndef NO_LOGO
- char logo_name[MAXPATH];
-
- if (sneese) destroy_bitmap(sneese);
-
- strcpy(logo_name, dat_name);
- strcat(logo_name, "#sneese");
-
- sneese = load_pcx(logo_name, sneesepal);
-#endif
-}
 
 void PlotChar(WINDOW *window,pGUI_FONT font,
  char Character,int x,int y,int bcolor,int fcolor){

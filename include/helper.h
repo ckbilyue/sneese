@@ -76,7 +76,6 @@ EXTERN signed char PaletteChanged;
 EXTERN SNEESE_GFX_BUFFER gbSNES_Screen8;
 EXTERN SNEESE_GFX_BUFFER gbSNES_Screen16;
 
-EXTERN unsigned char *SNES_Screen;
 EXTERN unsigned char *SNES_Screen8;
 EXTERN unsigned short *SNES_Screen16;
 
