@@ -962,10 +962,8 @@ void RomInfo(void)
  // Don't display the full path to the file, it might not fit in the (small) window
  fnsplit(rom_romfile,drive,dir,file,ext);
  if (strlen(ext))
- {
-  if (file[0] != '.') strcat(file,".");
   strcat(file,ext);
- }
+
  PlotString(ROMInfo_window,default_font,"File name: ",0,0);
  PlotString(ROMInfo_window,default_font,file,default_font->get_widthspace()*11,0);
 

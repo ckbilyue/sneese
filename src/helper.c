@@ -914,7 +914,7 @@ void fnsplit(const char *in0, char *drive, char *dir, char *file, char *ext)
 /* Note: We assume "in0" points to a correct filename */
 {
  struct stat fstate;
- char *p1, *p2, in[MAXFILE];
+ char *p1, *p2, in[FILENAME_MAX];
 
  strcpy(in, in0);     /* don't modify in0 parameter */
 
@@ -966,8 +966,13 @@ void fnsplit(const char *in0, char *drive, char *dir, char *file, char *ext)
 
  if ((p1 = strrchr(file, '.')))
  {
-  *p1 = 0;
-  strcpy(ext, p1 + 1);
+  if (p1 > file)
+  {
+   strcpy(ext, p1);   /* save period in ext */
+   *p1 = 0;
+  }
+  else                /* file name with leading period */
+   *ext = 0;
  }
  else
   *ext = 0;
