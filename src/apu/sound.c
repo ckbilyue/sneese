@@ -34,15 +34,11 @@ You must read and accept the license prior to use.
 //#define LOG_SOUND_DSP_WRITE
 //#define LOG_SOUND_VOICE_OFF
 
-//#define NO_UPDATE_ON_DSP_READ
-//#define NO_UPDATE_ON_DSP_WRITE
-
 #define MASK_PITCH_H
 
 //#define DISALLOW_ENVX_OUTX_WRITE
 
 #define ZERO_ENVX_ON_KEY_ON
-//#define ATTACK_15_IS_INSTANT
 
 typedef enum {
  ATTACK,    /* A of ADSR */
@@ -53,7 +49,8 @@ typedef enum {
  EXP,       /* GAIN exponential decrease mode */
  INCREASE,  /* GAIN linear increase mode */
  BENT,      /* GAIN bent line increase mode */
- DIRECT     /* Directly specify ENVX */
+ DIRECT,    /* Directly specify ENVX */
+ VOICE_OFF  /* Voice is not playing */
 } ENVSTATE;
 
 extern unsigned char SPCRAM[65536];
@@ -196,33 +193,7 @@ static const int envelope_update_time[32] =
  0x0C00, 0x0F00, 0x1400, 0x1800, 0x1E00, 0x2800, 0x3C00, 0x7800
 };
 
-static const int attack_time[16] =
-{
- (int) (SPC_CLOCK_HZ * 4.096 / 64), (int) (SPC_CLOCK_HZ * 2.560 / 64),
- (int) (SPC_CLOCK_HZ * 1.536 / 64), (int) (SPC_CLOCK_HZ * 1.024 / 64),
- (int) (SPC_CLOCK_HZ * 0.640 / 64), (int) (SPC_CLOCK_HZ * 0.384 / 64),
- (int) (SPC_CLOCK_HZ * 0.256 / 64), (int) (SPC_CLOCK_HZ * 0.160 / 64),
- (int) (SPC_CLOCK_HZ * 0.096 / 64), (int) (SPC_CLOCK_HZ * 0.064 / 64),
- (int) (SPC_CLOCK_HZ * 0.040 / 64), (int) (SPC_CLOCK_HZ * 0.024 / 64),
- (int) (SPC_CLOCK_HZ * 0.016 / 64), (int) (SPC_CLOCK_HZ * 0.010 / 64),
- (int) (SPC_CLOCK_HZ * 0.006 / 64),
-#ifdef ATTACK_15_IS_INSTANT
- 0
-#else
- /*(int) (SPC_CLOCK_HZ * 0.0000625 / 64)*/ /* actual effective time */
- SOUND_CYCLES_PER_SAMPLE
-#endif
-};
-
-static const int decay_time[16] =
-{
- (int) (SPC_CLOCK_HZ * 1.2000 / 600), (int) (SPC_CLOCK_HZ * 0.7500 / 600),
- (int) (SPC_CLOCK_HZ * 0.4500 / 600), (int) (SPC_CLOCK_HZ * 0.3000 / 600),
- (int) (SPC_CLOCK_HZ * 0.1875 / 600), (int) (SPC_CLOCK_HZ * 0.1125 / 600),
- (int) (SPC_CLOCK_HZ * 0.0750 / 600), (int) (SPC_CLOCK_HZ * 0.0375 / 600)
-};
-
-static const int linear_time[32] =
+static const int envelope_update_cycles[32] =
 {
  0 - 1                            , (int) (SPC_CLOCK_HZ * 4.096 / 64),
  (int) (SPC_CLOCK_HZ * 3.072 / 64), (int) (SPC_CLOCK_HZ * 2.560 / 64),
@@ -242,45 +213,11 @@ static const int linear_time[32] =
  (int) (SPC_CLOCK_HZ * 0.004 / 64), (int) (SPC_CLOCK_HZ * 0.002 / 64)
 };
 
-static const int exp_time[32] =
-{
- 0 - 1                               , (int) (SPC_CLOCK_HZ * 38.4000 / 600),
- (int) (SPC_CLOCK_HZ * 28.8000 / 600), (int) (SPC_CLOCK_HZ * 24.0000 / 600),
- (int) (SPC_CLOCK_HZ * 19.2000 / 600), (int) (SPC_CLOCK_HZ * 14.4000 / 600),
- (int) (SPC_CLOCK_HZ * 12.0000 / 600), (int) (SPC_CLOCK_HZ * 9.60000 / 600),
- (int) (SPC_CLOCK_HZ * 7.20000 / 600), (int) (SPC_CLOCK_HZ * 6.00000 / 600),
- (int) (SPC_CLOCK_HZ * 4.80000 / 600), (int) (SPC_CLOCK_HZ * 3.60000 / 600),
- (int) (SPC_CLOCK_HZ * 3.00000 / 600), (int) (SPC_CLOCK_HZ * 2.40000 / 600),
- (int) (SPC_CLOCK_HZ * 1.80000 / 600), (int) (SPC_CLOCK_HZ * 1.50000 / 600),
- (int) (SPC_CLOCK_HZ * 1.20000 / 600), (int) (SPC_CLOCK_HZ * 0.90000 / 600),
- (int) (SPC_CLOCK_HZ * 0.75000 / 600), (int) (SPC_CLOCK_HZ * 0.60000 / 600),
- (int) (SPC_CLOCK_HZ * 0.45000 / 600), (int) (SPC_CLOCK_HZ * 0.37500 / 600),
- (int) (SPC_CLOCK_HZ * 0.30000 / 600), (int) (SPC_CLOCK_HZ * 0.22500 / 600),
- (int) (SPC_CLOCK_HZ * 0.18750 / 600), (int) (SPC_CLOCK_HZ * 0.15000 / 600),
- (int) (SPC_CLOCK_HZ * 0.11250 / 600), (int) (SPC_CLOCK_HZ * 0.09375 / 600),
- (int) (SPC_CLOCK_HZ * 0.07500 / 600), (int) (SPC_CLOCK_HZ * 0.05625 / 600),
- (int) (SPC_CLOCK_HZ * 0.03750 / 600), (int) (SPC_CLOCK_HZ * 0.01875 / 600)
-};
-
-static const int bent_time[32] =
-{
- 0 - 1                              , (int) (SPC_CLOCK_HZ * 7.1680 / 112),
- (int) (SPC_CLOCK_HZ * 5.3760 / 112), (int) (SPC_CLOCK_HZ * 4.4800 / 112),
- (int) (SPC_CLOCK_HZ * 3.5840 / 112), (int) (SPC_CLOCK_HZ * 2.6880 / 112),
- (int) (SPC_CLOCK_HZ * 2.2400 / 112), (int) (SPC_CLOCK_HZ * 1.7920 / 112),
- (int) (SPC_CLOCK_HZ * 1.3440 / 112), (int) (SPC_CLOCK_HZ * 1.1200 / 112),
- (int) (SPC_CLOCK_HZ * 0.8960 / 112), (int) (SPC_CLOCK_HZ * 0.6720 / 112),
- (int) (SPC_CLOCK_HZ * 0.5600 / 112), (int) (SPC_CLOCK_HZ * 0.4480 / 112),
- (int) (SPC_CLOCK_HZ * 0.3360 / 112), (int) (SPC_CLOCK_HZ * 0.2800 / 112),
- (int) (SPC_CLOCK_HZ * 0.2240 / 112), (int) (SPC_CLOCK_HZ * 0.1680 / 112),
- (int) (SPC_CLOCK_HZ * 0.1400 / 112), (int) (SPC_CLOCK_HZ * 0.1120 / 112),
- (int) (SPC_CLOCK_HZ * 0.0840 / 112), (int) (SPC_CLOCK_HZ * 0.0700 / 112),
- (int) (SPC_CLOCK_HZ * 0.0560 / 112), (int) (SPC_CLOCK_HZ * 0.0420 / 112),
- (int) (SPC_CLOCK_HZ * 0.0350 / 112), (int) (SPC_CLOCK_HZ * 0.0280 / 112),
- (int) (SPC_CLOCK_HZ * 0.0210 / 112), (int) (SPC_CLOCK_HZ * 0.0175 / 112),
- (int) (SPC_CLOCK_HZ * 0.0140 / 112), (int) (SPC_CLOCK_HZ * 0.0105 / 112),
- (int) (SPC_CLOCK_HZ * 0.0070 / 112), (int) (SPC_CLOCK_HZ * 0.0035 / 112)
-};
+#define attack_time(x) (envelope_update_cycles[(x) * 2 + 1])
+#define decay_time(x)  (envelope_update_cycles[(x) * 2 + 16])
+#define linear_time(x) (envelope_update_cycles[(x)])
+#define exp_time(x)    (envelope_update_cycles[(x)])
+#define bent_time(x)   (envelope_update_cycles[(x)])
 
 static const unsigned noise_frequencies[32] =
 {
@@ -384,21 +321,53 @@ void Wrap_SPC_Cyclecounter(){
 #endif
 #endif
 
+static void SPC_VoiceOff(int voice, const char *reason)
+{
+ if (SNDkeys & (1 << voice))
+ {
+#ifdef LOG_SOUND_VOICE_OFF
+ printf("Voice off: %d (%s)\n", voice, reason);
+#endif
+
+ SNDkeys &= ~(1 << voice);
+
+ SNDvoices[voice].env_state = VOICE_OFF;
+ SNDvoices[voice].env_update_time = (0 - 1);
+
+#ifdef ZERO_OUTX_ON_VOICE_OFF
+ SPC_DSP[(voice << 4) + DSP_VOICE_OUTX] = SNDvoices[voice].outx = 0;
+#else
+ SPC_DSP[(voice << 4) + DSP_VOICE_OUTX] = SNDvoices[voice].outx;
+#endif
+#ifdef ZERO_ENVX_ON_VOICE_OFF
+ SPC_DSP[(voice << 4) + DSP_VOICE_ENVX] = SNDvoices[voice].envx = 0;
+#else
+ SPC_DSP[(voice << 4) + DSP_VOICE_ENVX] = SNDvoices[voice].envx >>
+  ENVX_DOWNSHIT_BITS;
+#endif
+ }
+}
+
+static void SPC_VoicesOff(int voices, const char *reason)
+{
+ int voice;
+
+ voices &= SNDkeys;
+
+ for (voice = 0; voice < 8; voice++)
+ {
+  if (voices & (1 << voice))
+  {
+   SPC_VoiceOff(voice, reason);
+  }
+ }
+}
+
 static INLINE int validate_brr_address(int voice)
 {
  if (SNDvoices[voice].brrptr < 0x10000) return 0;
 
- SNDkeys &= ~(1 << voice);
-#ifdef LOG_SOUND_VOICE_OFF
- printf("Voice off: %d (BRR address overflow)\n", voice);
-#endif
-#ifdef ZERO_OUTX_ON_VOICE_OFF
- SPC_DSP[(voice << 4) + DSP_VOICE_OUTX] = 0;
-#endif
-#ifdef ZERO_ENVX_ON_VOICE_OFF
- SPC_DSP[(voice << 4) + DSP_VOICE_ENVX] = 0;
- SNDvoices[voice].envx = 0;
-#endif
+ SPC_VoiceOff(voice, "BRR address overflow");
 
  return 1;
 }
@@ -429,17 +398,7 @@ static int get_brr_block(int voice, struct voice_state *pvs)
     }
     else
     {
-     SNDkeys &= ~(1 << voice);
-#ifdef LOG_SOUND_VOICE_OFF
-     printf("Voice off: %d (end block completed without loop)\n", voice);
-#endif
-#ifdef ZERO_OUTX_ON_VOICE_OFF
-     SPC_DSP[(voice << 4) + DSP_VOICE_OUTX] = 0;
-#endif
-#ifdef ZERO_ENVX_ON_VOICE_OFF
-     SPC_DSP[(voice << 4) + DSP_VOICE_ENVX] = 0;
-     SNDvoices[voice].envx = 0;
-#endif
+     SPC_VoiceOff(voice, "end block completed without loop");
     }
    }
 
@@ -537,26 +496,18 @@ INLINE static unsigned UpdateEnvelopeHeight(int voice)
         switch (pvs->env_state)
         {
             case ATTACK:
-#ifdef ATTACK_15_IS_INSTANT
-            if (env_update_time != 0)
-#else
             if (env_update_time == SOUND_CYCLES_PER_SAMPLE)
             {
                 pvs->env_cycle_latch += env_update_time;
                 envx += ENVX_MAX_BASE / 2; //add 1/2nd
             }
             else
-#endif
             {
                 pvs->env_cycle_latch += env_update_time;
                 envx += ENVX_MAX_BASE / 64; //add 1/64th
             }
 
-#ifdef ATTACK_15_IS_INSTANT
-            if (envx >= ENVX_MAX || env_update_time == 0)
-#else
             if (envx >= ENVX_MAX)
-#endif
             {
                 envx = ENVX_MAX;
 
@@ -590,15 +541,8 @@ INLINE static unsigned UpdateEnvelopeHeight(int voice)
             envx -= (ENVX_MAX_BASE >> 8);   //sub 1/256th
             if ((envx == 0) || (envx > ENVX_MAX))
             {
-                SNDkeys &= ~(1 << voice);
-#ifdef LOG_SOUND_VOICE_OFF
-     printf("Voice off: %d (release)\n", voice);
-#endif
-#ifdef ZERO_OUTX_ON_VOICE_OFF
-                SPC_DSP[(voice << 4) + DSP_VOICE_OUTX] = 0;
-#endif
-                SPC_DSP[(voice << 4) + DSP_VOICE_ENVX] = 0;
-                envx = 0;
+                pvs->envx = envx;
+                SPC_VoiceOff(voice, "release");
                 break;
             }
             continue;
@@ -654,6 +598,7 @@ INLINE static unsigned UpdateEnvelopeHeight(int voice)
             }
             continue;
 
+            //case VOICE_OFF:
             //case DIRECT:
             //break;
         }
@@ -717,6 +662,7 @@ INLINE static void SPC_KeyOn(int voices)
    {
     SPC_DSP[(voice << 4) + DSP_VOICE_ENVX] = 0;
     pvs->envx = 0;
+    SPC_DSP[(voice << 4) + DSP_VOICE_OUTX] = 0;
     pvs->outx = 0;
    }
 
@@ -737,6 +683,7 @@ INLINE static void SPC_KeyOn(int voices)
     {
      SPC_DSP[(voice << 4) + DSP_VOICE_ENVX] = 0;
      pvs->envx = 0;
+     SPC_DSP[(voice << 4) + DSP_VOICE_OUTX] = 0;
      pvs->outx = 0;
     }
 
@@ -809,10 +756,11 @@ void Reset_Sound_DSP()
   SNDvoices[i].last2 = SNDvoices[i].last1 = 0;
   SNDvoices[i].envx = 0;
   SNDvoices[i].outx = 0;
+  SNDvoices[i].env_state = VOICE_OFF;
   SNDvoices[i].env_cycle_latch = sound_cycle_latch;
-  SNDvoices[i].ar = attack_time[0];
-  SNDvoices[i].dr = decay_time[0];
-  SNDvoices[i].sr = exp_time[0];
+  SNDvoices[i].ar = attack_time(0);
+  SNDvoices[i].dr = decay_time(0);
+  SNDvoices[i].sr = exp_time(0);
   SNDvoices[i].sl = ENVX_MAX_BASE / 8;
   SNDvoices[i].lvol = 0;
   SNDvoices[i].rvol = 0;
@@ -1481,16 +1429,20 @@ void update_sound(void)
     unsigned char voices_were_on;
     unsigned char voice_bit;
 
-    if (!SPC_ENABLED || !sound_enabled) return;
+    if (!SPC_ENABLED) return;
 
-    samples = (TotalCycles - sound_cycle_latch) / SOUND_CYCLES_PER_SAMPLE;
+    samples = ((TotalCycles + SOUND_CYCLES_PER_SAMPLE) -
+     sound_cycle_latch) / SOUND_CYCLES_PER_SAMPLE;
     if (!samples) return;
-    samples_output += samples;
 
     SPC_KeyOn(SPC_DSP[DSP_KON]);
     SPC_KeyOff(SPC_DSP[DSP_KOF]);
 
-    sound_cycle_latch += (TotalCycles - sound_cycle_latch) & ~(SOUND_CYCLES_PER_SAMPLE - 1);
+    sound_cycle_latch = (TotalCycles + SOUND_CYCLES_PER_SAMPLE) &
+     ~(SOUND_CYCLES_PER_SAMPLE - 1);
+    if (!sound_enabled) return;
+    samples_output += samples;
+
     first = sound_output_position;
 
     buffer_size = 2 * SOUND_FREQ / SOUND_LAG;
@@ -1505,11 +1457,10 @@ void update_sound(void)
 #endif
     }
 
-#ifdef LOG_SOUND_VOICE_OFF
     if (SNDkeys & ~SPC_MASK)
-     printf("Voices off: %d (SPC_MASK)\n", SNDkeys & ~SPC_MASK);
-#endif
-    SNDkeys &= SPC_MASK;
+    {
+     SPC_VoicesOff(~SPC_MASK, "SPC_MASK");
+    }
 
     if (SNDkeys & SPC_DSP[DSP_NON])
     {
@@ -1588,19 +1539,7 @@ void update_sound(void)
          /* If voice was on, but turned off for any reason */
          if (!(SNDkeys & voice_bit))
          {
-#ifdef LOG_SOUND_VOICE_OFF
-     printf("Voice off: %d (?)\n", voice);
-#endif
-#ifdef ZERO_ENVX_ON_VOICE_OFF
-          SPC_DSP[(voice << 4) + DSP_VOICE_ENVX] = 0;
-          SNDvoices[voice].envx = 0;
-#endif
-#ifdef ZERO_OUTX_ON_VOICE_OFF
-          SPC_DSP[(voice << 4) + DSP_VOICE_OUTX] = 0;
-#else
-          SPC_DSP[(voice << 4) + DSP_VOICE_OUTX] =
-           SNDvoices[voice].outx;
-#endif
+          SPC_VoiceOff(voice, "?");
          }
          else
          {
@@ -1647,13 +1586,14 @@ void SPC_READ_DSP()
 #endif
 
 //  printf("\nSound update");
-#ifndef NO_UPDATE_ON_DSP_READ
+
     update_sound();
-#endif
+
     switch(addr_lo)
     {
     case DSP_VOICE_ENVX:
-                if (!sound_enabled) SNDvoices[addr_hi].voice_cycle_latch = TotalCycles;
+                if (!sound_enabled) SNDvoices[addr_hi].voice_cycle_latch =
+                 sound_cycle_latch;
 #if defined(ZERO_ENVX_ON_VOICE_OFF) && !defined(DSP_SPEED_HACK)
                 if (ENVX_ENABLED && (SNDkeys & (1 << addr_hi)))
 #else
@@ -1698,9 +1638,9 @@ void SPC_WRITE_DSP()
   ((SNDkeys | (SPC_DSP[DSP_KON] & ~SPC_DSP[DSP_KOF])) & (1 << addr_hi)))
  {
 #endif
-#ifndef NO_UPDATE_ON_DSP_WRITE
+
   update_sound();
-#endif
+
 //printf("\nSound update");
 #ifdef DSP_SPEED_HACK
  }
@@ -1739,11 +1679,12 @@ void SPC_WRITE_DSP()
  */
  // Channel - ADSR 1
  case DSP_VOICE_ADSR1:
-  if (!sound_enabled) SNDvoices[addr_hi].voice_cycle_latch = TotalCycles;
+  if (!sound_enabled) SNDvoices[addr_hi].voice_cycle_latch =
+   sound_cycle_latch;
   if (SNDkeys & (1 << addr_hi)) UpdateEnvelopeHeight(addr_hi);
 
-  SNDvoices[addr_hi].ar = attack_time[SPC_DSP_DATA & 0xF];
-  SNDvoices[addr_hi].dr = decay_time[(SPC_DSP_DATA >> 4) & 7];
+  SNDvoices[addr_hi].ar = attack_time(SPC_DSP_DATA & 0xF);
+  SNDvoices[addr_hi].dr = decay_time((SPC_DSP_DATA >> 4) & 7);
 
   /* If voice releasing or not playing, nothing else to update */
   if (!(SNDkeys & (1 << addr_hi)) ||
@@ -1798,10 +1739,11 @@ void SPC_WRITE_DSP()
 
  // Channel - ADSR 2
  case DSP_VOICE_ADSR2:
-  if (!sound_enabled) SNDvoices[addr_hi].voice_cycle_latch = TotalCycles;
+  if (!sound_enabled) SNDvoices[addr_hi].voice_cycle_latch =
+   sound_cycle_latch;
   if (SNDkeys & (1 << addr_hi)) UpdateEnvelopeHeight(addr_hi);
 
-  SNDvoices[addr_hi].sr = exp_time[SPC_DSP_DATA & 0x1F];
+  SNDvoices[addr_hi].sr = exp_time(SPC_DSP_DATA & 0x1F);
   SNDvoices[addr_hi].sl = ((SPC_DSP_DATA >> 5) == 7) ? ENVX_MAX :
    (ENVX_MAX_BASE / 8) * ((SPC_DSP_DATA >> 5) + 1);
 
@@ -1812,7 +1754,8 @@ void SPC_WRITE_DSP()
 
  // Channel - GAIN
  case DSP_VOICE_GAIN:
-  if (!sound_enabled) SNDvoices[addr_hi].voice_cycle_latch = TotalCycles;
+  if (!sound_enabled) SNDvoices[addr_hi].voice_cycle_latch =
+   sound_cycle_latch;
   if (SNDkeys & (1 << addr_hi)) UpdateEnvelopeHeight(addr_hi);
 
   if (SPC_DSP_DATA & 0x80)
@@ -1822,17 +1765,17 @@ void SPC_WRITE_DSP()
     case INCREASE:
     case DECREASE:
      SNDvoices[addr_hi].gain_update_time =
-      linear_time[SPC_DSP_DATA & 0x1F];
+      linear_time(SPC_DSP_DATA & 0x1F);
      break;
 
     case BENT:
      SNDvoices[addr_hi].gain_update_time =
-      bent_time[SPC_DSP_DATA & 0x1F];
+      bent_time(SPC_DSP_DATA & 0x1F);
      break;
 
     case EXP:
      SNDvoices[addr_hi].gain_update_time =
-      exp_time[SPC_DSP_DATA & 0x1F];
+      exp_time(SPC_DSP_DATA & 0x1F);
    }
   }
   else
@@ -1919,20 +1862,12 @@ void SPC_WRITE_DSP()
 
     for (voice = 0; voice < 7; voice++)
     {
-     SPC_DSP[(voice << 4) + DSP_VOICE_ENVX] = 0;
-     SPC_DSP[(voice << 4) + DSP_VOICE_OUTX] = 0;
+     SPC_VoicesOff(SNDkeys, "DSP reset");
     }
 
     SPC_DSP[DSP_ENDX] = 0;
     SPC_DSP[DSP_KON] = 0;
     SPC_DSP[DSP_KOF] = 0;
-
-#ifdef LOG_SOUND_VOICE_OFF
-   if (SNDkeys)
-     printf("Voices off: %02X (DSP reset)\n", (unsigned) SNDkeys);
-#endif
-
-    SNDkeys = 0;
    }
    break;
 

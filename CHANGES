@@ -25,6 +25,8 @@ Changes
   Sound: Fixed a bug in envelope height reading of channels that weren't
    playing; value to be read wasn't being updated, fixes Secret of
    Evermore [TRAC]
+  Sound: Improved envelope timing when envelope settings changed for
+   playing voices [TRAC]
  0.81
   PPU: Greatly simplied VRAM read/write handling and readded VRAM read
    buffering, thanks to anomie for convincing me to give it another
