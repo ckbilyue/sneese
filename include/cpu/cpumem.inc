@@ -49,10 +49,6 @@ SET_BYTE_00     Set byte in bank 00
 SET_WORD_00     Set word in bank 00
 SET_WORD_HL_00  Set word in bank 00 for RMW operations
 
-GET_WORD may be passed an optional 'Reverse' parameter to skip the last
-xchg. If this is done, the low byte will be returned in ah, high byte
-in al.
-
 SET_WORD may be passed an optional 'NoSave' parameter to prevent the
 push/pop used to preserve the data word.
 
@@ -87,15 +83,7 @@ direct and stack addressing accesses.
  GET_BYTE
 %endmacro
 
-;%1 = Reverse
-%macro GET_WORD 0-1 0
-%ifidni %1,Reverse
- GET_BYTE
- mov ah,al
- inc ebx
- and ebx,0x00FFFFFF
- GET_BYTE
-%else
+%macro GET_WORD 0
  inc ebx
  test ebx,0x1FFF
  jnz %%single_block
@@ -122,17 +110,9 @@ direct and stack addressing accesses.
 %%read_direct:
  mov ax,[edx+ebx-1]
 %%read_done:
-%endif
 %endmacro
 
-;%1 = Reverse
-%macro GET_WORD_00 0-1 0
-%ifidni %1,Reverse
- GET_BYTE_00
- mov ah,al
- inc bx
- GET_BYTE_00
-%else
+%macro GET_WORD_00 0
  inc ebx
  test ebx,0x1FFF
  jnz %%single_block
@@ -159,7 +139,6 @@ direct and stack addressing accesses.
 %%read_direct:
  mov ax,[edx+ebx-1]
 %%read_done:
-%endif
 %endmacro
 
 %macro SET_BYTE 0

@@ -70,10 +70,9 @@ You must read and accept the license prior to use.
  GET_BYTE
 %endmacro
 
-;%1 = Reverse
-%macro READ16_Absolute 0-1 0
+%macro READ16_Absolute 0
  ADDR_Absolute
- GET_WORD %1
+ GET_WORD
 %endmacro
 
 ; Absolute Long (corrupts eax)
@@ -96,10 +95,9 @@ You must read and accept the license prior to use.
  GET_BYTE
 %endmacro
 
-;%1 = Reverse
-%macro READ16_Absolute_Long 0-1 0
+%macro READ16_Absolute_Long 0
  ADDR_Absolute_Long
- GET_WORD %1
+ GET_WORD
 %endmacro
 
 ; Direct (corrupts eax)
@@ -123,10 +121,9 @@ You must read and accept the license prior to use.
  GET_BYTE_00
 %endmacro
 
-;%1 = Reverse
-%macro READ16_Direct 0-1 0
+%macro READ16_Direct 0
  ADDR_Direct
- GET_WORD_00 %1
+ GET_WORD_00
 %endmacro
 
 ; Direct Indirect Indexed (corrupts eax)
@@ -162,10 +159,9 @@ You must read and accept the license prior to use.
  GET_BYTE
 %endmacro
 
-;%1 = Reverse
-%macro READ16_Direct_Indirect_Indexed 0-1 0
+%macro READ16_Direct_Indirect_Indexed 0
  ADDR_Direct_Indirect_Indexed
- GET_WORD %1
+ GET_WORD
 %endmacro
 
 ; Direct Indirect Indexed Long (corrupts eax)
@@ -202,10 +198,9 @@ You must read and accept the license prior to use.
  GET_BYTE
 %endmacro
 
-;%1 = Reverse
-%macro READ16_Direct_Indirect_Indexed_Long 0-1 0
+%macro READ16_Direct_Indirect_Indexed_Long 0
  ADDR_Direct_Indirect_Indexed_Long
- GET_WORD %1
+ GET_WORD
 %endmacro
 
 ; Direct index X (corrupts eax)
@@ -258,10 +253,9 @@ You must read and accept the license prior to use.
  GET_BYTE_00
 %endmacro
 
-;%1 = Reverse
-%macro READ16_Direct_Index_X 0-1 0
+%macro READ16_Direct_Index_X 0
  ADDR_Direct_Index_X
- GET_WORD_00 %1
+ GET_WORD_00
 %endmacro
 
 ; Direct index Y (corrupts eax)
@@ -294,10 +288,9 @@ You must read and accept the license prior to use.
  GET_BYTE_00
 %endmacro
 
-;%1 = Reverse
-%macro READ16_Direct_Index_Y 0-1 0
+%macro READ16_Direct_Index_Y 0
  ADDR_Direct_Index_Y
- GET_WORD_00 %1
+ GET_WORD_00
 %endmacro
 
 ; Direct Indexed Indirect (corrupts eax)
@@ -329,10 +322,9 @@ You must read and accept the license prior to use.
  GET_BYTE
 %endmacro
 
-;%1 = Reverse
-%macro READ16_Direct_Indexed_Indirect 0-1 0
+%macro READ16_Direct_Indexed_Indirect 0
  ADDR_Direct_Indexed_Indirect
- GET_WORD %1
+ GET_WORD
 %endmacro
 
 ; Absolute Index X (corrupts eax)
@@ -384,10 +376,9 @@ You must read and accept the license prior to use.
  GET_BYTE
 %endmacro
 
-;%1 = Reverse
-%macro READ16_Absolute_Index_X 0-1 0
+%macro READ16_Absolute_Index_X 0
  ADDR_Absolute_Index_X
- GET_WORD %1
+ GET_WORD
 %endmacro
 
 ; Absolute Index Y (corrupts eax)
@@ -421,10 +412,9 @@ You must read and accept the license prior to use.
  GET_BYTE
 %endmacro
 
-;%1 = Reverse
-%macro READ16_Absolute_Index_Y 0-1 0
+%macro READ16_Absolute_Index_Y 0
  ADDR_Absolute_Index_Y
- GET_WORD %1
+ GET_WORD
 %endmacro
 
 ; Absolute Long Index X (corrupts eax)
@@ -458,10 +448,9 @@ You must read and accept the license prior to use.
  GET_BYTE
 %endmacro
 
-;%1 = Reverse
-%macro READ16_Absolute_Long_Index_X 0-1 0
+%macro READ16_Absolute_Long_Index_X 0
  ADDR_Absolute_Long_Index_X
- GET_WORD %1
+ GET_WORD
 %endmacro
 
 ; Direct Indirect (corrupts eax)
@@ -494,10 +483,9 @@ You must read and accept the license prior to use.
  GET_BYTE
 %endmacro
 
-;%1 = Reverse
-%macro READ16_Direct_Indirect 0-1 0
+%macro READ16_Direct_Indirect 0
  ADDR_Direct_Indirect
- GET_WORD %1
+ GET_WORD
 %endmacro
 
 ; Direct Indirect Long (corrupts eax)
@@ -532,10 +520,9 @@ You must read and accept the license prior to use.
  GET_BYTE
 %endmacro
 
-;%1 = Reverse
-%macro READ16_Direct_Indirect_Long 0-1 0
+%macro READ16_Direct_Indirect_Long 0
  ADDR_Direct_Indirect_Long
- GET_WORD %1
+ GET_WORD
 %endmacro
 
 ; Stack Relative (corrupts eax)
@@ -565,10 +552,9 @@ You must read and accept the license prior to use.
  GET_BYTE_00
 %endmacro
 
-;%1 = Reverse
-%macro READ16_Stack_Relative 0-1 0
+%macro READ16_Stack_Relative 0
  ADDR_Stack_Relative
- GET_WORD_00 %1
+ GET_WORD_00
 %endmacro
 
 ; Stack Relative Indirect Indexed (corrupts eax)
@@ -602,10 +588,9 @@ You must read and accept the license prior to use.
  GET_BYTE
 %endmacro
 
-;%1 = Reverse
-%macro READ16_Stack_Relative_Indirect_Indexed 0-1 0
+%macro READ16_Stack_Relative_Indirect_Indexed 0
  ADDR_Stack_Relative_Indirect_Indexed
- GET_WORD %1
+ GET_WORD
 %endmacro
 
 ; Absolute Indexed Indirect (corrupts eax)
