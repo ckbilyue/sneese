@@ -337,6 +337,8 @@ IRQ_Enabled_Event:
  jz .no_irq
 
  mov al,[CPU_Execution_Mode]
+ cmp al,CEM_In_DMA
+ je .no_irq
  cmp al,CEM_Clock_Stopped
  je .no_irq
  cmp al,CEM_Waiting_For_Interrupt
@@ -807,6 +809,12 @@ CheckNMI:
  mov eax,[CPU_LABEL(PC)]
  mov [C_LABEL(OLD_PC)],eax  ; Save program counter
 %endif
+ cmp byte [NMI_pin],NMI_Raised  ;NMI input raised previously?
+ je .setup_nmi
+
+ cmp byte [NMI_pin],NMI_Acknowledged
+ jz .CHECK_KEYS
+
  test byte [RDNMI],RDNMI_VBLANK_START
  jz .CHECK_KEYS
 
@@ -818,6 +826,7 @@ CheckNMI:
 
  mov byte [NMI_pin],NMI_Raised          ;raise NMI input
 
+.setup_nmi:
  ;NMI executes after one opcode
  mov eax,[C_LABEL(SNES_Cycles)]
  inc eax
@@ -840,9 +849,6 @@ CheckNMI:
 
 
 ; Return to emulation
- cmp byte [NMI_pin],NMI_Raised
- je CPU_START.execute_opcode
-
  mov eax,[C_LABEL(Current_Line_Timing)] ; Get current scanline
  jmp near CPU_START_IRQ ; Return to CPU
 
@@ -854,9 +860,6 @@ CheckNMI:
  GET_BYTE
  mov [C_LABEL(Map_Byte)],al
 
-
- cmp byte [NMI_pin],NMI_Raised
- je .no_irq_check
 
  mov eax,[C_LABEL(Current_Line_Timing)] ; Get current scanline
  CheckVIRQ
@@ -880,16 +883,16 @@ NMI_Setup_Event:
 
 ALIGNC
 NMI_Event:
- mov byte [NMI_pin],NMI_Acknowledged    ;acknowledge NMI input
-
  mov eax,[NMI_Next_Event]
  mov [Fixed_Event],eax
  mov eax,[NMI_Next_Trip]
  mov [FixedTrip],eax
 
  mov al,[CPU_Execution_Mode]
+ cmp al,CEM_In_DMA
+ je .no_nmi
  cmp al,CEM_Clock_Stopped
- je near .no_nmi
+ je .no_nmi
  cmp al,CEM_Waiting_For_Interrupt
  jne .no_wai
 
@@ -903,9 +906,12 @@ NMI_Event:
  mov byte [CPU_Execution_Mode],CEM_Normal_Execution
 
 .no_wai:
+ mov byte [NMI_pin],NMI_Acknowledged    ;acknowledge NMI input
+
  push edi
  LOAD_BASE
  LOAD_CYCLES
+
  add R_65c816_Cycles,byte 12    ; NMI processing: 2 IO
  JUMP_NOT_FLAG SNES_FLAG_E,.E0_NMI,near ; Are we in emulation mode?
 
@@ -1323,10 +1329,10 @@ EXPORT SNES_R4210 ; RDNMI
 
  mov edx,[C_LABEL(Current_Line_Timing)]
  cmp edx,[C_LABEL(LastRenderLine)]
- jb .got_nmi_source
+ jb .no_reset
 
  test byte [RDNMI_mask],RDNMI_VBLANK_START
- jns .got_nmi_source
+ jns .no_reset
 
  GET_CYCLES edx
 
@@ -1335,26 +1341,37 @@ EXPORT SNES_R4210 ; RDNMI
  ;if we're on the next scanline, add 1 to the scanline count
  cmp edx,USABLE_DOTS_PER_SCANLINE       ;dot count excluding refresh period
  sbb edx,edx
- inc edx
+;inc edx        ;don't add 1, as comparing against NMI line - 1
 
  add edx,[C_LABEL(Current_Line_Timing)]
 
  cmp edx,[C_LABEL(LastRenderLine)]
- jb .got_nmi_source
+ jb .no_reset
 
  or al,RDNMI_VBLANK_START
 
 .got_nmi_source:
+ and al,[RDNMI_mask]    ; ensure only one NMI per frame
+ jns .no_reset  ;RDNMI_VBLANK_START not set
+
+ test byte [C_LABEL(NMITIMEN)],0x80
+ jz .no_nmi             ; NMI masked off?
+
+ cmp byte [NMI_pin],NMI_None
+ jne .no_nmi
+
+ mov byte [NMI_pin],NMI_Raised ;*NMI
+ ; event should trigger after this opcode, triggering NMI
+.no_nmi:
+
+ mov byte [RDNMI],VERSION_NUMBER_5A22   ; clear NMI source
+ mov byte [RDNMI_mask],0x7F
+.no_reset:
  ;merge in open bus bits
  mov dl,[C_LABEL(Last_Bus_Value_A)]
  and dl,RDNMI_OPEN_BUS_BITS
 
  or al,dl
- jns .no_reset  ;RDNMI_VBLANK_START not set
-
- mov byte [RDNMI],VERSION_NUMBER_5A22   ; clear NMI source
- mov byte [RDNMI_mask],0x7F
-.no_reset:
  ret
 
 ALIGNC
@@ -1518,9 +1535,10 @@ EXPORT SNES_W4200 ; NMITIMEN
  mov edx,NMI_Setup_Event
  mov [Fixed_Event],edx
  mov [Event_Handler],edx
- GET_CYCLES edx
+ SAVE_CYCLES edx
  mov [FixedTrip],edx
  mov [C_LABEL(EventTrip)],edx
+ LOAD_CYCLES edx
 
 .no_nmi_change:
  test bl,0x30
@@ -1535,22 +1553,14 @@ EXPORT SNES_W4200 ; NMITIMEN
 ALIGNC
 EXPORT SNES_W4201 ; WRIO
  mov dl,[C_LABEL(WRIO)]
- cmp dl,al
- je .no_change
-
- push eax
  xor dl,al
+ mov [C_LABEL(WRIO)],al
  jns .no_latch
 
- test al,al
- js .no_latch
-
  call SNES_R2137
-.no_latch:
 
- pop eax
- mov [C_LABEL(WRIO)],al
-.no_change:
+ mov al,[C_LABEL(WRIO)]
+.no_latch:
  ret
 
 ALIGNC

@@ -4656,6 +4656,9 @@ section .text
  mov bl,[C_LABEL(NMITIMEN)]
  mov edx,[FixedTrip]
 
+ cmp byte [NMI_pin],NMI_Raised
+ je %%nmi_bypass
+
  test bl,0x30       ; IRQ enabled?
  jz %%no_irq
 
@@ -4686,6 +4689,7 @@ section .text
  jnb %%irq_before_next_event
 
 %%no_irq:
+%%nmi_bypass:
  mov edi,edx
  mov ebx,[Fixed_Event]
 %%irq_before_next_event:
