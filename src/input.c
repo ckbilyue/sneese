@@ -258,8 +258,8 @@ int joystick_vkey_state(int vkey)
   if (stick >= joy[joystick].num_sticks) return FALSE;
 
   // ignore sticks that aren't providing digital reports
-  if (joy[joystick].stick[stick].flags & JOYSTICK_CALIB_DIGITAL)
-   return false;
+  if (joy[joystick].stick[stick].flags & JOYFLAG_CALIB_DIGITAL)
+   return FALSE;
 
   vkey &= (JOYSTICK_MAX_AXES_PER_STICK * 2) - 1;
 
