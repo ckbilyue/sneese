@@ -21,6 +21,7 @@ You must read and accept the license prior to use.
 %define CYCLES_PER_DOT 4
 %define DOTS_PER_SCANLINE 341
 %define DOTS_IN_REFRESH 10
+%define USABLE_DOTS_PER_SCANLINE (DOTS_PER_SCANLINE - DOTS_IN_REFRESH)
 %define DOTS_BEFORE_DISPLAY 0
 %define DOTS_BEFORE_REFRESH 0x85
 %define DOTS_IN_DISPLAY 256

@@ -1109,9 +1109,9 @@ EXPORT SNES_R2137 ; SLHV  ; This latches the counter for horizontal/vertical dat
  ; (open bus kludge)
  shr ebx,2
  mov al,0xFE
- cmp ebx,128
+ cmp ebx,DOTS_BEFORE_REFRESH
  jb .before_refresh
- add ebx,byte 10    ; Adjust for memory refresh cycles
+ add ebx,DOTS_IN_REFRESH        ; Adjust for memory refresh cycles
 .before_refresh:
 
  cmp ebx,DOTS_PER_SCANLINE
@@ -1331,13 +1331,9 @@ EXPORT SNES_R4210 ; RDNMI
  GET_CYCLES edx
 
  shr edx,2
- cmp edx,128
- jb .before_refresh
- add edx,byte 10    ; Adjust for memory refresh cycles
-.before_refresh:
 
  ;if we're on the next scanline, add 1 to the scanline count
- cmp edx,DOTS_PER_SCANLINE
+ cmp edx,USABLE_DOTS_PER_SCANLINE       ;dot count excluding refresh period
  sbb edx,edx
  inc edx
 
