@@ -19,7 +19,7 @@ PLATFORM := unix
 
 # How to call the tools we need to use
 
-NASM   := nasm -w+orphan-labels -w+macro-params -O3 -DUNIX
+NASM   := nasm -w+orphan-labels -w+macro-params -O20 -DUNIX
 GCC    := gcc -Werror -Wall -Wno-deprecated -DUNIX
 # GCC of DJGPP and Cygwin defines unix, __unix__ and __unix.
 RM     := rm -f

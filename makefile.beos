@@ -19,7 +19,7 @@ PLATFORM := beos
 
 # How to call the tools we need to use
 
-NASM   := nasm -w+orphan-labels -w+macro-params -O3
+NASM   := nasm -w+orphan-labels -w+macro-params -O20
 GCC    := gcc -Werror -Wall
 # -Wno-deprecated
 RM     := rm -f

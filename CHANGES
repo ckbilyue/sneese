@@ -51,6 +51,7 @@ Changes
    Tensei [TRAC]
   Timing: Improved NMI emulation; now supports delayed NMI,
    as well as re-acknowledgement of NMI [TRAC]
+  Timing: Added consumption of clock cycles by general DMA [TRAC]
   Sound: Changed APU code to build with update-on-RAM-change by default
    [TRAC]
   ROM loader: Added support for loading ROMs up to 64Mbit (autodetection

@@ -380,16 +380,13 @@ ALIGNC
 
 ALIGNC
 DMA_Event:
- mov eax,[C_LABEL(EventTrip)]
- mov [Last_Trip],eax
+ mov byte [CPU_Execution_Mode],CEM_In_DMA
 
  mov eax,[DMA_Next_Event]
-;mov [Event_Handler],eax
  mov [Fixed_Event],eax
  mov eax,[DMA_Next_Trip]
-;mov [C_LABEL(EventTrip)],eax
  mov [FixedTrip],eax
-;do DMA here
+
  call HIRQ_Check_Late   ; chain
 
  LOAD_CYCLES
@@ -798,7 +795,6 @@ EXPORT_C NMI_NoRender
  mov al,RDNMI_VBLANK_START | VERSION_NUMBER_5A22
  and al,[RDNMI_mask]    ; ensure only one vblank NMI per frame
  mov [RDNMI],al         ; Set NMI enabled bit in 0x4210
- mov byte [NMI_pin],NMI_Raised          ;raise NMI input
 
  mov eax,[C_LABEL(Current_Line_Timing)]
  inc eax
@@ -817,6 +813,10 @@ CheckNMI:
  test byte [C_LABEL(NMITIMEN)],0x80
  jz .CHECK_KEYS         ; NMI off? (via hardware register)
 
+ cmp byte [CPU_Execution_Mode],CEM_In_DMA
+ je .CHECK_KEYS
+
+ mov byte [NMI_pin],NMI_Raised          ;raise NMI input
 
  ;NMI executes after one opcode
  mov eax,[C_LABEL(SNES_Cycles)]
@@ -984,6 +984,8 @@ HIRQ_Event:
  or [IRQ_pin],dh
 
  mov al,[CPU_Execution_Mode]
+ cmp al,CEM_In_DMA
+ je .no_irq
  cmp al,CEM_Clock_Stopped
  je .no_irq
  cmp al,CEM_Instruction_After_IRQ_Enable
@@ -1723,6 +1725,40 @@ EXPORT SNES_W420A ; VTIMEH   ; Handled in screen core!
  pop ebx
  pop eax
  ret
+
+
+ALIGNC
+EXPORT SNES_W420B ; MDMAEN
+ mov [C_LABEL(MDMAEN)],al
+
+ test al,al
+ jz .no_dma
+
+ push ebx
+
+ SAVE_CYCLES ebx
+
+ ;setup event chain for DMA
+ mov edx,[FixedTrip]
+
+ mov [FixedTrip],ebx
+ mov [C_LABEL(EventTrip)],ebx
+
+ mov [DMA_Next_Trip],edx
+
+ mov ebx,[Fixed_Event]
+ mov edx,DMA_Event
+ mov [DMA_Next_Event],ebx
+ mov [Fixed_Event],edx
+ mov [Event_Handler],edx
+
+ LOAD_CYCLES edx
+
+ pop ebx
+
+.no_dma:
+ ret
+
 
 ALIGNC
 EXPORT SNES_W420D ; MEMSEL    ; FastROM switch

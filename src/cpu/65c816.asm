@@ -105,6 +105,7 @@ You must read and accept the license prior to use.
 %include "ppu/screen.inc"
 %include "cpu/regs.inc"
 %include "ppu/ppu.inc"
+%include "cpu/dma.inc"
 
 EXTERN_C Map_Address,Map_Byte
 EXTERN_C OLD_PB,OLD_PC
@@ -333,10 +334,14 @@ EXPORT CPU_Execution_Mode,skipb
 ;CPU in a state where no instructions are executed (this
 ; number and all above it)
 %define CEM_Do_Not_Execute 2
+
+;CPU is performing DMA transfer
+%define CEM_In_DMA 2
+
 ;CPU is waiting for an interrupt after executing WAI opcode
-%define CEM_Waiting_For_Interrupt 2
+%define CEM_Waiting_For_Interrupt 3
 ;CPU has stopped its clock after executing STP opcode
-%define CEM_Clock_Stopped 3
+%define CEM_Clock_Stopped 4
 
 EXPORT IRQ_pin      ,skipb
 _E_flag:skipb
@@ -4754,7 +4759,7 @@ EXPORT_C Reset_CPU
  mov [NMI_pin],al
 
  ; Clear cycle counts
- mov [C_LABEL(SNES_Cycles)],eax
+ mov dword [C_LABEL(SNES_Cycles)],0x82  ;32.5 dots before reset (?)
  mov [C_LABEL(EventTrip)],eax
 
  LOAD_BASE
@@ -4817,6 +4822,62 @@ EXPORT_C Reset_CPU
  ret
 
 ALIGNC
+EXPORT do_DMA
+ LOAD_CYCLES
+
+ cmp byte [C_LABEL(MDMAEN)],0
+ jz .dma_done
+
+ cmp byte [DMA_Pending_B_Address],0
+ jge .dma_started
+
+ ;first bus cycle doesn't overlap
+ add R_65c816_Cycles,_5A22_SLOW_CYCLE
+.dma_started:
+
+ DMAOPERATION 0,.early_out
+ DMAOPERATION 1,.early_out
+ DMAOPERATION 2,.early_out
+ DMAOPERATION 3,.early_out
+ DMAOPERATION 4,.early_out
+ DMAOPERATION 5,.early_out
+ DMAOPERATION 6,.early_out
+ DMAOPERATION 7,.early_out
+
+.dma_done:
+ mov byte [CPU_Execution_Mode],CEM_Normal_Execution
+ SAVE_CYCLES
+
+ cmp byte [NMI_pin],NMI_Raised
+ jne .no_nmi
+
+ ;setup NMI to execute after one opcode
+
+ mov edx,[FixedTrip]
+ mov [NMI_Next_Trip],edx
+ mov edx,[Fixed_Event]
+ mov [NMI_Next_Event],edx
+
+ mov edx,NMI_Event
+ mov [Fixed_Event],edx
+ mov [Event_Handler],edx
+ mov eax,[C_LABEL(SNES_Cycles)]
+ inc eax
+ mov [FixedTrip],eax
+ mov [C_LABEL(EventTrip)],eax
+
+ jmp CPU_START
+
+.no_nmi:
+ mov byte [CPU_Execution_Mode],CEM_Instruction_After_IRQ_Enable
+ jmp CPU_START
+
+.early_out:
+ SAVE_CYCLES
+ jmp dword [Event_Handler]
+
+
+ALIGNC
 EXPORT_C Do_CPU
  pusha
  mov byte [C_LABEL(PaletteChanged)],1   ; Make sure we get our palette
@@ -4850,6 +4911,9 @@ CPU_START:
  mov al,[CPU_Execution_Mode]
  test al,al
  jz .normal_execution
+
+ cmp al,CEM_In_DMA
+ je do_DMA
 
  cmp al,CEM_Instruction_After_IRQ_Enable
  je .instruction_after_irq_enable

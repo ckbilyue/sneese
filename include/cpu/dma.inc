@@ -12,6 +12,7 @@ You must read and accept the license prior to use.
 %endif
 
 %include "cpu/cpumem.inc"
+%include "cycles.inc"
 
 %ifndef SNEeSe_dma_inc
 %define SNEeSe_dma_inc
@@ -60,8 +61,9 @@ EXTERN_DMA_DATA 7
 
 EXTERN_C MDMAEN,HDMAEN
 EXTERN HDMAON,In_DMA
+EXTERN DMA_Pending_B_Address,DMA_Pending_Data
 EXTERN_C Do_DMA_Channel,Do_HDMA_Channel
-EXTERN SNES_R420B,SNES_R420C,SNES_W420B,SNES_W420C
+EXTERN SNES_W420C
 EXTERN do_HDMA
 EXTERN Reset_DMA
 
@@ -111,6 +113,12 @@ EXTERN_MAP_WRITE_DMA 5
 EXTERN_MAP_WRITE_DMA 6
 EXTERN_MAP_WRITE_DMA 7
 %endif
+
+                         ; 0000dccc | d = in DMA/HDMA, if 0 all should be 0
+;EXPORT In_DMA           ; c = channel # 0-7
+%define DMA_IN_PROGRESS (1 << 3)
+%define DMA_CHANNEL_MASK ((1 << 3) - 1)
+
 
 ; Offsets from TableDMA#
 %define DMAP 0
@@ -174,6 +182,25 @@ EXTERN_MAP_WRITE_DMA 7
  mov edi,TableDMA%1
 %endmacro
 
+;%1 = num, 2 = branch target for early-exit
+%macro DMAOPERATION 2
+ mov al,[C_LABEL(MDMAEN)]
+ test al,1 << (%1)
+ jz %%no_dma
+
+ mov byte [In_DMA],(%1) | DMA_IN_PROGRESS
+ LOAD_DMA_TABLE %1
+
+ call C_LABEL(Do_DMA_Channel)
+
+ cmp byte [In_DMA],0
+ jnz %2
+
+ and byte [C_LABEL(MDMAEN)],~(1 << (%1))
+
+%%no_dma:
+%endmacro
+
 %macro HDMAOPERATION 1
   mov al,[HDMAON]
   test al,(1<<%1)
@@ -181,7 +208,7 @@ EXTERN_MAP_WRITE_DMA 7
 
   add dword R_65c816_Cycles,byte 8  ; HDMA processing
 
-  mov byte [In_DMA],((%1) << 2) | DMA_IN_PROGRESS
+  mov byte [In_DMA],(%1) | DMA_IN_PROGRESS
   LOAD_DMA_TABLE %1
   call C_LABEL(Do_HDMA_Channel) ; CF clear if channel disabled
 

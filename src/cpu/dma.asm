@@ -56,7 +56,7 @@ db  4,4,2,4
 section .bss
 %macro DMA_DATA 1
 ALIGNB
-TableDMA%1:
+EXPORT TableDMA%1
 ; dh0bcttt d=CPU->PPU,h=addr,b=inc/dec,c=inc/fixed,t=type
 EXPORT_C DMAP_%1    ,skipb
 EXPORT_C BBAD_%1    ; Low byte of 0x21??
@@ -103,9 +103,10 @@ DMA_Transfer_Size:skipl ;Size for active DMA transfer
 EXPORT_C MDMAEN,skipb   ; DMA enable
 EXPORT_C HDMAEN,skipb   ; HDMA enable
 EXPORT HDMAON,skipb     ; HDMA enabled this refresh
-                        ; 00dcccaa | d = in DMA/HDMA, if 0 all should be 0
-EXPORT In_DMA,skipb     ; c = channel # 0-7 | a = address # 0-3
-%define DMA_IN_PROGRESS 0x40
+                        ; 0000dccc | d = in DMA/HDMA, if 0 all should be 0
+EXPORT In_DMA,skipb     ; c = channel # 0-7
+EXPORT DMA_Pending_B_Address,skipb  ; address # 0-3, or -1 if n/a
+EXPORT DMA_Pending_Data,skipb       ; data for DMA transfer awaiting write
 
 section .text
 ;macro for getting A bus alias for B bus address for DMA access
@@ -148,15 +149,38 @@ section .text
  ACCESS_B_BUS SET_BYTE_NO_UPDATE_CYCLES,%1
 %endmacro
 
-;macro for HDMA transfers, and DMA transfers in PPU write mode
-%macro TRANSFER_A_TO_B 1
+;macro for HDMA transfers
+%macro HDMA_TRANSFER_A_TO_B 1
  GET_BYTE_NO_UPDATE_CYCLES
  SET_BYTE_B_BUS %1
 %endmacro
 
+
+;macro for DMA transfers in PPU write mode
+%macro DMA_TRANSFER_A_TO_B 3
+ GET_BYTE_NO_UPDATE_CYCLES
+ mov [DMA_Pending_Data],al
+ mov byte [DMA_Pending_B_Address],%1
+
+ test R_65c816_Cycles,R_65c816_Cycles
+ jge %3
+%2:
+
+ add R_65c816_Cycles,_5A22_SLOW_CYCLE
+ SET_BYTE_B_BUS [edi+DMA_B%1]
+%endmacro
+
 ;macro for DMA transfers in PPU read mode
-%macro TRANSFER_B_TO_A 1
- GET_BYTE_B_BUS %1
+%macro DMA_TRANSFER_B_TO_A 3
+ GET_BYTE_B_BUS [edi+DMA_B%1]
+ mov [DMA_Pending_Data],al
+ mov byte [DMA_Pending_B_Address],%1
+
+ test R_65c816_Cycles,R_65c816_Cycles
+ jge %3
+%2:
+
+ add R_65c816_Cycles,_5A22_SLOW_CYCLE
  SET_BYTE_NO_UPDATE_CYCLES
 %endmacro
 
@@ -178,115 +202,95 @@ EXPORT_C Do_DMA_Channel
  inc ecx
  mov [DMA_Transfer_Size],ecx
 
-;mov ecx,ebp
-;shl ecx,3
-;add [SNES_Cycles],ecx
-  
  mov al,[edi+DMAP]
- xor ecx,ecx
  movsx esi,byte [edi+DMA_Inc]   ; Get address adjustment
  test al,al     ; Is the operation CPU->PPU?
  jns .ppu_write
 
 ; PPU->CPU
- cmp dword [DMA_Transfer_Size],byte 4
- jb .lpr_less_than_4
+ movsx edx,byte [DMA_Pending_B_Address]
+ test edx,edx
+ js .loop_ppu_read
 
+ mov al,[DMA_Pending_Data]
+ jmp [.ppu_read_resume_table+edx*4]
+
+section .data
+.ppu_read_resume_table:
+dd  .lpr_access0,.lpr_access1,.lpr_access2,.lpr_access3
+
+section .text
 .loop_ppu_read:
- TRANSFER_B_TO_A [edi+DMA_B0]
- add bx,si
-
- TRANSFER_B_TO_A [edi+DMA_B1]
- add bx,si
-
- TRANSFER_B_TO_A [edi+DMA_B2]
- add bx,si
-
- TRANSFER_B_TO_A [edi+DMA_B3]
- add bx,si
- sub dword [DMA_Transfer_Size],byte 4
- jz .ppu_read_done
- cmp dword [DMA_Transfer_Size],byte 4
- jnb .loop_ppu_read
-
-.lpr_less_than_4:
- TRANSFER_B_TO_A [edi+DMA_B0]
+ DMA_TRANSFER_B_TO_A 0,.lpr_access0,.early_out
  add bx,si
  dec dword [DMA_Transfer_Size]
  jz .ppu_read_done
 
- TRANSFER_B_TO_A [edi+DMA_B1]
+ DMA_TRANSFER_B_TO_A 1,.lpr_access1,.early_out
  add bx,si
  dec dword [DMA_Transfer_Size]
  jz .ppu_read_done
 
- TRANSFER_B_TO_A [edi+DMA_B2]
+ DMA_TRANSFER_B_TO_A 2,.lpr_access2,.early_out
  add bx,si
  dec dword [DMA_Transfer_Size]
  jz .ppu_read_done
 
- TRANSFER_B_TO_A [edi+DMA_B3]
+ DMA_TRANSFER_B_TO_A 3,.lpr_access3,.early_out
  add bx,si
  dec dword [DMA_Transfer_Size]
  jnz .loop_ppu_read
 
 .ppu_read_done:
+.ppu_write_done:
+ mov byte [In_DMA],0
+ mov byte [DMA_Pending_B_Address],-1
+
+.early_out:
  mov eax,[DMA_Transfer_Size]
  mov [edi+A1T],bx       ; v0.15 forgot to update DMA pointers!
  mov word [edi+DAS],ax
  ret
+
 
 ALIGNC
 ; CPU->PPU
 .ppu_write:
- cmp dword [DMA_Transfer_Size],byte 4
- jb .lpw_less_than_4
+ movsx edx,byte [DMA_Pending_B_Address]
+ test edx,edx
+ js .loop_ppu_write
+
+ mov al,[DMA_Pending_Data]
+ jmp [.ppu_write_resume_table+edx*4]
+
+section .data
+.ppu_write_resume_table:
+dd  .lpw_access0,.lpw_access1,.lpw_access2,.lpw_access3
+
+section .text
 
 .loop_ppu_write:
- TRANSFER_A_TO_B [edi+DMA_B0]
- add bx,si
-
- TRANSFER_A_TO_B [edi+DMA_B1]
- add bx,si
-
- TRANSFER_A_TO_B [edi+DMA_B2]
- add bx,si
-
- TRANSFER_A_TO_B [edi+DMA_B3]
- add bx,si
-
- sub dword [DMA_Transfer_Size],byte 4
- jz .ppu_write_done
- cmp dword [DMA_Transfer_Size],byte 4
- jnb .loop_ppu_write
-
-.lpw_less_than_4:
- TRANSFER_A_TO_B [edi+DMA_B0]
+ DMA_TRANSFER_A_TO_B 0,.lpw_access0,.early_out
  add bx,si
  dec dword [DMA_Transfer_Size]
  jz .ppu_write_done
 
- TRANSFER_A_TO_B [edi+DMA_B1]
+ DMA_TRANSFER_A_TO_B 1,.lpw_access1,.early_out
  add bx,si
  dec dword [DMA_Transfer_Size]
  jz .ppu_write_done
 
- TRANSFER_A_TO_B [edi+DMA_B2]
+ DMA_TRANSFER_A_TO_B 2,.lpw_access2,.early_out
  add bx,si
  dec dword [DMA_Transfer_Size]
  jz .ppu_write_done
 
- TRANSFER_A_TO_B [edi+DMA_B3]
+ DMA_TRANSFER_A_TO_B 3,.lpw_access3,.early_out
  add bx,si
  dec dword [DMA_Transfer_Size]
  jnz .loop_ppu_write
+ jmp .ppu_write_done
 
-.ppu_write_done:
- mov eax,[DMA_Transfer_Size]
- mov [edi+A1T],bx       ; v0.15 forgot to update DMA pointers!
- mov word [edi+DAS],ax
-.abort_channel:
- ret
 
 ALIGNC
 EXPORT_C Do_HDMA_Channel
@@ -314,26 +318,26 @@ Do_HDMA_Absolute:
  mov [edi+A2T],ebx      ; Save new table address
 
 .Next_Transfer:
- TRANSFER_A_TO_B [edi+DMA_B0]
+ HDMA_TRANSFER_A_TO_B [edi+DMA_B0]
 
  add R_65c816_Cycles,byte 8     ; HDMA transfer
  cmp cl,2
  inc bx                 ; Adjust temporary table pointer
  jb .End_Transfer
 
- TRANSFER_A_TO_B [edi+DMA_B1]
+ HDMA_TRANSFER_A_TO_B [edi+DMA_B1]
 
  add R_65c816_Cycles,byte 8     ; HDMA transfer
  cmp cl,4
  inc bx                 ; Adjust temporary table pointer
  jb .End_Transfer
 
- TRANSFER_A_TO_B [edi+DMA_B2]
+ HDMA_TRANSFER_A_TO_B [edi+DMA_B2]
 
  add R_65c816_Cycles,byte 8     ; HDMA transfer
  inc bx
 
- TRANSFER_A_TO_B [edi+DMA_B3]
+ HDMA_TRANSFER_A_TO_B [edi+DMA_B3]
 
  add R_65c816_Cycles,byte 8     ; HDMA transfer
 
@@ -378,26 +382,26 @@ Do_HDMA_Indirect:
  mov ebx,[edi+DAS]
  and ebx,(1 << 24) - 1
 
- TRANSFER_A_TO_B [edi+DMA_B0]
+ HDMA_TRANSFER_A_TO_B [edi+DMA_B0]
 
  add R_65c816_Cycles,byte 8     ; HDMA transfer
  cmp cl,2
  inc bx                 ; Adjust temporary table pointer
  jb .End_Transfer
 
- TRANSFER_A_TO_B [edi+DMA_B1]
+ HDMA_TRANSFER_A_TO_B [edi+DMA_B1]
 
  add R_65c816_Cycles,byte 8     ; HDMA transfer
  cmp cl,4
  inc bx                 ; Adjust temporary table pointer
  jb .End_Transfer
 
- TRANSFER_A_TO_B [edi+DMA_B2]
+ HDMA_TRANSFER_A_TO_B [edi+DMA_B2]
 
  add R_65c816_Cycles,byte 8     ; HDMA transfer
  inc bx
 
- TRANSFER_A_TO_B [edi+DMA_B3]
+ HDMA_TRANSFER_A_TO_B [edi+DMA_B3]
 
  add R_65c816_Cycles,byte 8     ; HDMA transfer
 
@@ -406,83 +410,6 @@ Do_HDMA_Indirect:
 .Continue:
  dec byte [edi+NTRL]
  stc
- ret
-
-;%1 = num
-%macro DMAOPERATION 1
- mov al,[C_LABEL(MDMAEN)]
- test al,1 << (%1)
- jz %%no_dma
-
- mov byte [In_DMA],((%1) << 2) | DMA_IN_PROGRESS
- LOAD_DMA_TABLE %1
- call C_LABEL(Do_DMA_Channel)
-%%no_dma:
-%endmacro
-
-ALIGNC
-EXPORT SNES_R420B ; MDMAEN
- mov al,0
- ret
-
-ALIGNC
-EXPORT SNES_R420C ; HDMAEN
- mov al,[HDMAON]
- ret
-
-ALIGNC
-EXPORT SNES_W420B ; MDMAEN
-%if 0
- push eax
- push ecx
-;push edx
- or eax,~0xFF
- push eax
-extern C_LABEL(Dump_DMA)
- call C_LABEL(Dump_DMA)
- add esp,byte 4
-;pop edx
- pop ecx
- pop eax
-%endif
- mov [C_LABEL(MDMAEN)],al
-%ifdef NO_DMA
- ret
-%endif
-;mov [SNES_Cycles],R_65c816_Cycles  ;
- push eax
- push ebx
- push ecx
- push edi
-;push ebp   ;R_65c816_Cycles
- push esi
-
- mov al,[In_CPU]
- push eax
-; Need to save/restore CPU core register set here if in use
- mov byte [In_CPU],0
-
- DMAOPERATION 0
- DMAOPERATION 1
- DMAOPERATION 2
- DMAOPERATION 3
- DMAOPERATION 4
- DMAOPERATION 5
- DMAOPERATION 6
- DMAOPERATION 7
- mov byte [In_DMA],0
-
- pop eax
- mov [In_CPU],al
-
- pop esi
-;pop ebp    ;R_65c816_Cycles
- pop edi
- pop ecx
- pop ebx
- pop eax
-
-;mov R_65c816_Cycles,[SNES_Cycles] ;
  ret
 
 ALIGNC
@@ -586,6 +513,7 @@ EXPORT Reset_DMA
  mov [C_LABEL(HDMAEN)],al
  mov [HDMAON],al
  mov [In_DMA],al
+ mov byte [DMA_Pending_B_Address],-1
 
  ; Now (1 << 24) - 1...
  mov eax,(1 << 24) - 1

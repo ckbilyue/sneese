@@ -416,12 +416,13 @@ Emulation details:
  - 65c816-alike 5A22 main CPU with 254/256 opcodes implemented.
     The last two (WDM and STP) remain unimplemented since they
     do nothing important and can help detect runaway ROMs!
- - NMI/IRQ interrupts running (timings are a little out).
+ - NMI/IRQ interrupts running (timings may be slightly off).
  - Hblank/Vblank CPU timing.
- - Partial SlowROM/FastROM support (fixed-cycle, buggy).
+ - Variable speed CPU bus timing.
+ - Open bus states emulated (currently on A bus only).
  - DMA and HDMA, all 8 channels, modes 0-4 (5-7 supported but possibly
-    incorrect), partial HDMA timing, HDMA may have some bugs. General
-    DMA timing is not implemented.
+    incorrect).  General DMA timing (possibly not 100% correct).
+    Partial HDMA timing,  HDMA may have some bugs.
 
  - SPC700 sound CPU with 250/256 opcodes implemented, running with
     on-demand execution.
@@ -431,10 +432,12 @@ Emulation details:
     sample data, OUTX/ENVX registers, pitch modulation, and the echo
     effect and its corresponding FIR filter.
 
- - LoROM and HiROM memory maps (up to 32Mbit).
+ - LoROM and HiROM memory maps (up to 64Mbit).
 
  - ROM loader supporting whole and split (*.1) ROM images, LoROM,
-    HiROM, and interleaved HiROM, with or without 512-byte copier header(s)
+    HiROM, and interleaved HiROM, with or without 512-byte copier
+    header(s) - note, memory map autodetection of ROMs > 32Mbit is very
+    poor.
 
  - Most hardware registers emulated.
 
@@ -518,9 +521,10 @@ TO DO:
             Better joypad hardware emulation
 
  Command-line interface: More control, especially over configuration
- CPU      : Variable bus timing, DMA timing
+ CPU      : Getting timing inaccuracies eliminated, including interlace
+             timing and dots dropped every other frame
 
- SPC      : Needs better communication with sound DSP
+ SPC      : Correct bus timing (need info)
   Skipper  : Fails to work on MANY ROMs, need at least an alternate skipper
  Sound DSP: Correct noise, etc.
 
@@ -567,9 +571,12 @@ Thanks go out to...
  MKendora, Lord_Nightmare: for all the support, and always reaffirming
   my belief that there's a reason to continue.
 
+ anomie, Overload, for all your research...
+
+
  Beta testing:
   RibOnIzEr, QbProgger, AC/DC, Malenko, Richard Ferreira, rOss, Siloh,
-   MKendora, akito
+   MKendora, akito, slow
 
   Y0ssarian, PoleStar, Steve, Vilmar, Enternal, [E|YSiUM], Goku-X, JaguarPaw,
   JJJJ, KnucklesD, dps, Cowering, Lanice, EddyB43 from EFnet-#snesromz and
