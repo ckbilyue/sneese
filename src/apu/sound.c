@@ -27,7 +27,7 @@ You must read and accept the license prior to use.
 //#define FAULT_ON_PITCH_MODULATION_USE
 
 #define DSP_SPEED_HACK
-#define DUMP_SOUND
+//#define DUMP_SOUND
 
 #define ZERO_ENVX_ON_VOICE_OFF
 #define ZERO_OUTX_ON_VOICE_OFF
