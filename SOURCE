@@ -20,11 +20,10 @@ SNEeSe source
   FastROM emulation.
 
 - Win32 -
- This source can build under MinGW32.  GCC 3.2 and Allegro 4.1.10 are
-  required.  A patched build of NASM 0.98.34 is also required to add
-  support for MinGW32's object format.  Diffs for patching NASM are
-  included in the nasmming folder in source release distributions only.
-  NASM patch files are not included in CVS.  Use 'make -f makefile.win'.
+ This source can build under MinGW32.  GCC 3.2, NASM 0.98.34, and
+  Allegro 4.1.10 are required.  MinGW32 is not compatible with the
+  standard Win32 object format, such as produced by NASM, so a fixup
+  utility is used to convert them.  Use 'make -f makefile.win'.
  NASM should be a build made with a Win32 compiler, else it may not work
   properly with MinGW32 make.
 

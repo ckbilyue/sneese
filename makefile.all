@@ -68,6 +68,16 @@ EXE    := sneese$(SUFFIX)$(EXE_EXT)
 
 endif
 
+
+all: $(EXE)
+
+.PHONY: all maketree clean badplatform
+
+
+ifdef OBJFIX_INCLUDE
+include $(OBJFIX_INCLUDE)
+endif
+
 OFLAGS = -march=i486 -mcpu=pentium -O3 -ffast-math $(PFLAGS) \
  -fstrength-reduce -fthread-jumps -fexpensive-optimizations \
  -fschedule-insns2 -fgcse
@@ -110,24 +120,21 @@ OBJBASE := o
 endif
 
 
-OBJS   := $(addsuffix .$(ASM_OBJ_EXT), \
+ASMOBJS := $(addsuffix .$(ASM_OBJ_EXT), \
             $(addprefix cpu/, 65c816 memmap dma) \
             $(addprefix apu/, spc700 apuskip) \
             $(addprefix ppu/, screen windows mode7 tiles sprites ppu \
              bg8 bg8m bg8o bg8om bg16 bg16m bg16o bg16om bg16e bg16me \
              bg16oe bg16ome) \
-            clear scrmode font) \
-          main.o romload.o snes.o timers.o debug.o input.o helper.o \
-          apu/sound.o dos.o guicore.o emugui.o map.o multiio.o
+           clear scrmode font)
+OBJS   := $(ASMOBJS) main.o romload.o snes.o timers.o debug.o input.o \
+           helper.o apu/sound.o dos.o guicore.o emugui.o map.o multiio.o
 ifdef ZLIB
 OBJS += unzip.o
 endif
 
-all: maketree $(EXE)
-
-.PHONY: all maketree clean badplatform
-
-OBJDIRS = $(OBJ_BASE) $(OBJ_BASE)/$(PLATFORM) $(OBJ) $(OBJ)/cpu $(OBJ)/apu $(OBJ)/ppu
+OBJDIRS = $(OBJ_BASE) $(OBJ_BASE)/$(PLATFORM) $(OBJ) \
+    $(addprefix $(OBJ)/, cpu apu ppu $(PLATFORM_OBJDIRS))
 
 maketree: $(sort $(OBJDIRS))
 
@@ -152,8 +159,11 @@ endif
 	@-$(RM) $(OBJ)/cpu/*.$(ASM_OBJ_EXT)
 	@-$(RM) $(OBJ)/ppu/*.$(ASM_OBJ_EXT)
 
-$(OBJ)/%.$(ASM_OBJ_EXT): $(SRC)/%.asm
+$(OBJ)/%.$(ASM_OBJ_EXT): $(SRC)/%.asm $(OBJFIX)
 	$(NASM) $(AFLAGS) $(DFLAGS) -o $@ $<
+ifdef OBJFIX
+	$(OBJFIX) $@
+endif
 
 $(OBJ)/%.o: $(OBJ)/%.s
 	$(GCC) -c $(DFLAGS) -o $@ $<
@@ -175,79 +185,79 @@ $(EXE): $(addprefix $(OBJ)/, $(OBJS))
 # Note that the order of arguments matters for libraries!
 
 
-$(OBJ)/cpu/65c816.$(ASM_OBJ_EXT): $(SRC)/cpu/65c816.asm \
+$(OBJ)/cpu/65c816.$(ASM_OBJ_EXT): $(SRC)/cpu/65c816.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, cpu/cpuaddr.inc cpu/cpumacro.inc cpu/cpuops.inc \
  cpu/timing.inc cpu/regs.inc cpu/cpumem.inc cpu/dma.inc apu/spc.inc \
  cycles.inc misc.inc ppu/ppu.inc ppu/screen.inc ppu/sprites.inc)
-$(OBJ)/apu/spc700.$(ASM_OBJ_EXT): $(SRC)/apu/spc700.asm \
+$(OBJ)/apu/spc700.$(ASM_OBJ_EXT): $(SRC)/apu/spc700.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, apu/spc.inc apu/regs.inc apu/spcaddr.inc \
  apu/spcmacro.inc apu/spcops.inc cpu/regs.inc cycles.inc misc.inc \
  ppu/ppu.inc)
-$(OBJ)/cpu/memmap.$(ASM_OBJ_EXT): $(SRC)/cpu/memmap.asm \
+$(OBJ)/cpu/memmap.$(ASM_OBJ_EXT): $(SRC)/cpu/memmap.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, misc.inc cpu/memmap.inc cpu/cpumem.inc ppu/ppu.inc)
-$(OBJ)/cpu/dma.$(ASM_OBJ_EXT): $(SRC)/cpu/dma.asm \
+$(OBJ)/cpu/dma.$(ASM_OBJ_EXT): $(SRC)/cpu/dma.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, misc.inc cpu/dma.inc cpu/regs.inc ppu/ppu.inc \
  cpu/cpumem.inc)
-$(OBJ)/ppu/ppu.$(ASM_OBJ_EXT): $(SRC)/ppu/ppu.asm \
+$(OBJ)/ppu/ppu.$(ASM_OBJ_EXT): $(SRC)/ppu/ppu.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, misc.inc ppu/ppu.inc cpu/dma.inc ppu/sprites.inc \
  ppu/screen.inc ppu/tiles.inc cpu/cpumem.inc)
-$(OBJ)/apu/apuskip.$(ASM_OBJ_EXT): $(SRC)/apu/apuskip.asm \
+$(OBJ)/apu/apuskip.$(ASM_OBJ_EXT): $(SRC)/apu/apuskip.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, misc.inc ppu/ppu.inc)
-$(OBJ)/clear.$(ASM_OBJ_EXT): $(SRC)/clear.asm $(INCLUDE)/misc.inc
-$(OBJ)/ppu/mode7.$(ASM_OBJ_EXT): $(SRC)/ppu/mode7.asm \
+$(OBJ)/clear.$(ASM_OBJ_EXT): $(SRC)/clear.asm $(INCLUDE)/misc.inc $(OBJFIX) 
+$(OBJ)/ppu/mode7.$(ASM_OBJ_EXT): $(SRC)/ppu/mode7.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, misc.inc ppu/sprites.inc ppu/screen.inc \
  ppu/ppu.inc)
-$(OBJ)/ppu/screen.$(ASM_OBJ_EXT): $(SRC)/ppu/screen.asm \
+$(OBJ)/ppu/screen.$(ASM_OBJ_EXT): $(SRC)/ppu/screen.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, ppu/sprites.inc ppu/ppu.inc ppu/tiles.inc \
  ppu/screen.inc misc.inc clear.inc)
 
-$(OBJ)/ppu/bg8.$(ASM_OBJ_EXT): $(SRC)/ppu/bg8.asm \
+$(OBJ)/ppu/bg8.$(ASM_OBJ_EXT): $(SRC)/ppu/bg8.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, misc.inc ppu/ppu.inc ppu/tiles.inc \
  ppu/screen.inc)
-$(OBJ)/ppu/bg8m.$(ASM_OBJ_EXT): $(SRC)/ppu/bg8m.asm \
+$(OBJ)/ppu/bg8m.$(ASM_OBJ_EXT): $(SRC)/ppu/bg8m.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, misc.inc ppu/ppu.inc ppu/tiles.inc \
  ppu/screen.inc)
-$(OBJ)/ppu/bg8o.$(ASM_OBJ_EXT): $(SRC)/ppu/bg8o.asm \
+$(OBJ)/ppu/bg8o.$(ASM_OBJ_EXT): $(SRC)/ppu/bg8o.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, misc.inc ppu/ppu.inc ppu/tiles.inc \
  ppu/screen.inc)
-$(OBJ)/ppu/bg8om.$(ASM_OBJ_EXT): $(SRC)/ppu/bg8om.asm \
+$(OBJ)/ppu/bg8om.$(ASM_OBJ_EXT): $(SRC)/ppu/bg8om.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, misc.inc ppu/ppu.inc ppu/tiles.inc \
  ppu/screen.inc)
-$(OBJ)/ppu/bg16.$(ASM_OBJ_EXT): $(SRC)/ppu/bg16.asm \
+$(OBJ)/ppu/bg16.$(ASM_OBJ_EXT): $(SRC)/ppu/bg16.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, misc.inc ppu/ppu.inc ppu/tiles.inc \
  ppu/screen.inc)
-$(OBJ)/ppu/bg16m.$(ASM_OBJ_EXT): $(SRC)/ppu/bg16m.asm \
+$(OBJ)/ppu/bg16m.$(ASM_OBJ_EXT): $(SRC)/ppu/bg16m.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, misc.inc ppu/ppu.inc ppu/tiles.inc \
  ppu/screen.inc)
-$(OBJ)/ppu/bg16o.$(ASM_OBJ_EXT): $(SRC)/ppu/bg16o.asm \
+$(OBJ)/ppu/bg16o.$(ASM_OBJ_EXT): $(SRC)/ppu/bg16o.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, misc.inc ppu/ppu.inc ppu/tiles.inc \
  ppu/screen.inc)
-$(OBJ)/ppu/bg16om.$(ASM_OBJ_EXT): $(SRC)/ppu/bg16om.asm \
+$(OBJ)/ppu/bg16om.$(ASM_OBJ_EXT): $(SRC)/ppu/bg16om.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, misc.inc ppu/ppu.inc ppu/tiles.inc \
  ppu/screen.inc)
-$(OBJ)/ppu/bg16e.$(ASM_OBJ_EXT): $(SRC)/ppu/bg16e.asm \
+$(OBJ)/ppu/bg16e.$(ASM_OBJ_EXT): $(SRC)/ppu/bg16e.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, misc.inc ppu/ppu.inc ppu/tiles.inc \
  ppu/screen.inc)
-$(OBJ)/ppu/bg16me.$(ASM_OBJ_EXT): $(SRC)/ppu/bg16me.asm \
+$(OBJ)/ppu/bg16me.$(ASM_OBJ_EXT): $(SRC)/ppu/bg16me.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, misc.inc ppu/ppu.inc ppu/tiles.inc \
  ppu/screen.inc)
-$(OBJ)/ppu/bg16oe.$(ASM_OBJ_EXT): $(SRC)/ppu/bg16oe.asm \
+$(OBJ)/ppu/bg16oe.$(ASM_OBJ_EXT): $(SRC)/ppu/bg16oe.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, misc.inc ppu/ppu.inc ppu/tiles.inc \
  ppu/screen.inc)
-$(OBJ)/ppu/bg16ome.$(ASM_OBJ_EXT): $(SRC)/ppu/bg16ome.asm \
+$(OBJ)/ppu/bg16ome.$(ASM_OBJ_EXT): $(SRC)/ppu/bg16ome.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, misc.inc ppu/ppu.inc ppu/tiles.inc \
  ppu/screen.inc)
 
-$(OBJ)/ppu/windows.$(ASM_OBJ_EXT): $(SRC)/ppu/windows.asm \
+$(OBJ)/ppu/windows.$(ASM_OBJ_EXT): $(SRC)/ppu/windows.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, ppu/ppu.inc ppu/screen.inc misc.inc)
-$(OBJ)/ppu/tiles.$(ASM_OBJ_EXT): $(SRC)/ppu/tiles.asm \
+$(OBJ)/ppu/tiles.$(ASM_OBJ_EXT): $(SRC)/ppu/tiles.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, misc.inc ppu/ppu.inc ppu/tiles.inc ppu/screen.inc)
-$(OBJ)/ppu/sprites.$(ASM_OBJ_EXT): $(SRC)/ppu/sprites.asm \
+$(OBJ)/ppu/sprites.$(ASM_OBJ_EXT): $(SRC)/ppu/sprites.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, misc.inc clear.inc ppu/tiles.inc ppu/screen.inc \
  ppu/ppu.inc)
-$(OBJ)/scrmode.$(ASM_OBJ_EXT): $(SRC)/scrmode.asm \
+$(OBJ)/scrmode.$(ASM_OBJ_EXT): $(SRC)/scrmode.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, misc.inc ppu/screen.inc)
-$(OBJ)/font.$(ASM_OBJ_EXT): $(SRC)/font.asm $(INCLUDE)/misc.inc
+$(OBJ)/font.$(ASM_OBJ_EXT): $(SRC)/font.asm $(INCLUDE)/misc.inc $(OBJFIX)
 
 $(OBJ)/main.$(OBJBASE): $(SRC)/main.cpp \
  $(addprefix $(INCLUDE)/, platform.h font.h misc.h romload.h helper.h \

@@ -1,0 +1,8 @@
+# Rules for autogenerating object file fixup utility
+# Needed to convert MS Win32 object files for use with MinGW32
+OBJFIX = $(OBJ)/objfix$(EXE_EXT)
+
+$(OBJFIX): $(OBJ)/win/objfix.o
+	gcc -o $@ $<
+
+$(OBJ)/win/objfix.o: $(SRC)/win/objfix.c

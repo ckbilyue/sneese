@@ -23,7 +23,7 @@ ALLEG  := -lalleg
 # Set up build for this platform.
 
 SUFFIX := w
-AFLAGS := -f gnuwin32
+AFLAGS := -f win32
 GXX    := g++
 NO_SELF_MODIFY := 1
 
@@ -31,6 +31,11 @@ NO_SELF_MODIFY := 1
 ifdef ZLIB
 MIOFLAGS := -lz
 endif
+
+
+# Extra step needed for MinGW32
+OBJFIX_INCLUDE = objfix.win
+PLATFORM_OBJDIRS = win
 
 
 include makefile.all
