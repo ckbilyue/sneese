@@ -493,10 +493,6 @@ E1_PUSH16 B_D,E1_PHD,New
 ; 10
 BFC BPL,SNES_FLAG_N
 
-; 12
-EM_ORA OdO,Direct_Indirect
-E0_ORA OdO,Direct_Indirect
-
 ; 17
 EM_ORA IdI_y,Direct_Indirect_Indexed_Long
 E0_ORA IdI_y,Direct_Indirect_Indexed_Long
@@ -750,10 +746,6 @@ E1_PULL16 B_D,E1_PLD
 ; 30
 BFS BMI,SNES_FLAG_N
 
-; 32
-EM_AND OdO,Direct_Indirect
-E0_AND OdO,Direct_Indirect
-
 ; 37
 EM_AND IdI_y,Direct_Indirect_Indexed_Long
 E0_AND IdI_y,Direct_Indirect_Indexed_Long
@@ -959,10 +951,6 @@ EXPORT_C ALL_JMP_a
 
 ; 50
 BFC BVC,SNES_FLAG_V
-
-; 52
-EM_EOR OdO,Direct_Indirect
-E0_EOR OdO,Direct_Indirect
 
 ; 54
 
@@ -1308,10 +1296,6 @@ EXPORT_C ALL_JMP_OaO
 ; 70
 BFS BVS,SNES_FLAG_V
 
-; 72
-EM_ADC OdO,Direct_Indirect
-E0_ADC OdO,Direct_Indirect
-
 ; 77
 EM_ADC IdI_y,Direct_Indirect_Indexed_Long
 E0_ADC IdI_y,Direct_Indirect_Indexed_Long
@@ -1476,10 +1460,6 @@ E1_PULL8 B_DB,E1_PLB
 
 ; B0
 BFS BCS,SNES_FLAG_C
-
-; B2
-EM_LDA OdO,Direct_Indirect
-E0_LDA OdO,Direct_Indirect
 
 ; B7
 EM_LDA IdI_y,Direct_Indirect_Indexed_Long
@@ -1654,10 +1634,6 @@ ALIGNC
 
 ; D0
 BFC BNE,SNES_FLAG_Z
-
-; D2
-EM_CMP OdO,Direct_Indirect
-E0_CMP OdO,Direct_Indirect
 
 ; D4
 
@@ -1873,10 +1849,6 @@ EXPORT_C ALL_XBA
 
 ; F0
 BFS BEQ,SNES_FLAG_Z
-
-; F2
-EM_SBC OdO,Direct_Indirect
-E0_SBC OdO,Direct_Indirect
 
 ; F4
 
