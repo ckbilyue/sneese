@@ -40,6 +40,7 @@ You must read and accept the license prior to use.
 %include "cpu/cpumem.inc"
 %include "ppu/ppu.inc"
 %include "cpu/regs.inc"
+%include "cpu/dma.inc"
 
 section .text
 EXPORT_C memmap_text_start
@@ -108,6 +109,27 @@ EXPORT_C SNES_GET_LONG_WRAP
  ror eax,16
  ret
 
+
+ALIGNC
+EXPORT_C CPU_OPEN_BUS_READ
+    mov al,0    ;not implemented
+    ret
+
+ALIGNC
+EXPORT_C IGNORE_WRITE
+%ifdef DEBUG
+%ifdef TRAP_IGNORED_WRITES
+extern _InvalidHWWrite
+    mov [C_LABEL(Map_Address)],ebx  ; Set up Map Address so message works!
+    mov [C_LABEL(Map_Byte)],al      ; Set up Map Byte so message works
+    pusha
+    call C_LABEL(InvalidHWWrite)   ; Unmapped hardware address!
+    popa
+%endif
+%endif
+    ret
+
+
 ALIGNC
 EXPORT_C UNSUPPORTED_READ
     mov al,0
@@ -137,19 +159,6 @@ extern _InvalidHWWrite
 %endif
     ret
 
-ALIGNC
-EXPORT_C IGNORE_WRITE
-%ifdef DEBUG
-%ifdef TRAP_IGNORED_WRITES
-extern _InvalidHWWrite
-    mov [C_LABEL(Map_Address)],ebx  ; Set up Map Address so message works!
-    mov [C_LABEL(Map_Byte)],al      ; Set up Map Byte so message works
-    pusha
-    call C_LABEL(InvalidHWWrite)   ; Unmapped hardware address!
-    popa
-%endif
-%endif
-    ret
 
 ALIGNC
 EXPORT_C Read_Direct_Safeguard
@@ -172,6 +181,14 @@ ALIGNC
 EXPORT_C PPU_READ
     mov edx,(1 << 16) - 1
     and edx,ebx
+
+    cmp byte [In_DMA],0
+    jz .access_ok
+    cmp edx,0x4000
+    jb .access_ok
+    cmp edx,0x437F
+    jbe C_LABEL(CPU_OPEN_BUS_READ)
+.access_ok:
     jmp [(C_LABEL(Read_Map_20_5F)-0x2000*4)+edx*4]
 
 ALIGNC
@@ -179,6 +196,14 @@ ALIGNC
 EXPORT_C PPU_WRITE
     mov edx,(1 << 16) - 1
     and edx,ebx
+
+    cmp byte [In_DMA],0
+    jz .access_ok
+    cmp edx,0x4000
+    jb .access_ok
+    cmp edx,0x437F
+    jbe C_LABEL(IGNORE_WRITE)
+.access_ok:
     jmp [(C_LABEL(Write_Map_20_5F)-0x2000*4)+edx*4]
 
 ALIGNC

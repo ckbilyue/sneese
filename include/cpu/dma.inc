@@ -199,7 +199,7 @@ EXTERN_MAP_WRITE_DMA 7
 
   add dword [C_LABEL(SNES_Cycles)],byte 8   ; HDMA processing
 
-  mov byte [In_DMA],%1
+  mov byte [In_DMA],((%1) << 2) | DMA_IN_PROGRESS
   LOAD_DMA_TABLE %1
   call C_LABEL(Do_HDMA_Channel) ; CF clear if channel disabled
 
