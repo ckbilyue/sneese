@@ -27,6 +27,8 @@ You must read and accept the license prior to use.
 ;  V-IRQ - short time after beginning of a specific scanline
 ;  H+V-IRQ - on a specific point on the frame
 
+;%define REPORT_EVENTS
+
 %define ZERO_TRIP_CYCLE_COUNTER
 
 
@@ -277,8 +279,45 @@ EXTERN_C Dump_DMA
  Update_FPS_Counter
  ret
 
+EXTERN_C print_str,print_decnum,print_hexnum
+section .data
+gap_str:db " ",0
+nl_str:db 10,0
+section .text
+
+%macro report_event 0
+%ifdef REPORT_EVENTS
+ push 8
+ push dword [C_LABEL(EventTrip)]
+ call C_LABEL(print_hexnum)
+
+ push gap_str
+ call C_LABEL(print_str)
+
+ push 8
+ push dword [C_LABEL(SNES_Cycles)]
+ call C_LABEL(print_hexnum)
+
+ push .str
+ call C_LABEL(print_str)
+
+ push dword [C_LABEL(Current_Line_Timing)]
+ call C_LABEL(print_decnum)
+
+ push nl_str
+ call C_LABEL(print_str)
+ add esp,4*8
+%endif
+%endmacro
+
 ALIGNC
 HDMA_Event:
+section .data
+.str:db " HDMA ",0
+section .text
+
+ report_event
+
  mov eax,[C_LABEL(EventTrip)]
  mov [Last_Trip],eax
 
@@ -313,6 +352,12 @@ HDMA_Event:
 
 ALIGNC
 Enabling_IRQ_Event:
+section .data
+.str:db " enabling IRQ ",0
+section .text
+
+ report_event
+
  call IRQ_Check_Late    ; chain
 
  LOAD_CYCLES
@@ -324,6 +369,12 @@ Enabling_IRQ_Event:
 
 ALIGNC
 IRQ_Enabled_Event:
+section .data
+.str:db " enabled IRQ ",0
+section .text
+
+ report_event
+
  mov al,[CPU_Execution_Mode]
  cmp al,CEM_Instruction_After_IRQ_Enable
  jne .mode_changed
@@ -382,6 +433,12 @@ ALIGNC
 
 ALIGNC
 DMA_Event:
+section .data
+.str:db " DMA ",0
+section .text
+
+ report_event
+
  mov byte [CPU_Execution_Mode],CEM_In_DMA
 
  mov eax,[DMA_Next_Event]
@@ -401,6 +458,12 @@ DMA_Event:
 
 ALIGNC
 Render_Event:
+section .data
+.str:db " render ",0
+section .text
+
+ report_event
+
  mov eax,[C_LABEL(EventTrip)]
  mov [Last_Trip],eax
 
@@ -427,6 +490,12 @@ speed_cap_wait_hlt:
  jmp near IRQNewFrame.speed_cap_wait
 ALIGNC
 EXPORT IRQNewFrame              ; Check IRQ, Frame Skip
+section .data
+.str:db " new frame ",0
+section .text
+
+ report_event
+
 %ifdef DELAY_FRAMES
  push dword DELAY_FRAMES
 EXTERN_C rest
@@ -580,6 +649,12 @@ EXTERN_C Profiler_Start
 
 ALIGNC
 EXPORT_C IRQFirstRender ; Check HDMA, IRQ, Render
+section .data
+.str:db " irqfirstrender ",0
+section .text
+
+ report_event
+
  mov dword [Last_Trip],0
 
 ;mov dword [C_LABEL(EventTrip)],CYCLES_DISPLAY_START
@@ -601,6 +676,12 @@ EXPORT_C IRQFirstRender ; Check HDMA, IRQ, Render
 
 ALIGNC
 EXPORT_C IRQRender  ; Check HDMA, IRQ, Render
+section .data
+.str:db " irqrender ",0
+section .text
+
+ report_event
+
  mov dword [Last_Trip],0
 
  Update_Cycles
@@ -625,6 +706,12 @@ ALIGNC
 
 ALIGNC
 VBL_Update_Controllers:
+section .data
+.str:db " update controllers ",0
+section .text
+
+ report_event
+
  mov dword [Last_Trip],0
 
  Update_Cycles
@@ -647,6 +734,12 @@ EXTERN_C update_controllers
 
 ALIGNC
 VBL:
+section .data
+.str:db " vblank ",0
+section .text
+
+ report_event
+
  mov dword [Last_Trip],0
 
  Update_Cycles
@@ -663,6 +756,12 @@ VBL:
 
 ALIGNC
 EXPORT_C IRQFirst   ; Check HDMA, IRQ, Render
+section .data
+.str:db " irqfirst ",0
+section .text
+
+ report_event
+
  mov dword [Last_Trip],0
 
 ;mov dword [C_LABEL(EventTrip)],CYCLES_HDMA_START
@@ -682,6 +781,12 @@ EXPORT_C IRQFirst   ; Check HDMA, IRQ, Render
 
 ALIGNC
 IRQNoRender:            ; Check HDMA, IRQ
+section .data
+.str:db " irqnorender ",0
+section .text
+
+ report_event
+
  mov dword [Last_Trip],0
 
  Update_Cycles
@@ -783,6 +888,12 @@ EXPORT_C NMI
  pop eax
  mov [C_LABEL(Real_SNES_Palette)],ax
 EXPORT_C NMI_NoRender
+section .data
+.str:db " nmi_norender ",0
+section .text
+
+ report_event
+
  mov dword [Last_Trip],0
 
  mov dword [Event_Handler],VBL_Update_Controllers
@@ -871,6 +982,12 @@ CheckNMI:
 
 ALIGNC
 NMI_Setup_Event:
+section .data
+.str:db " nmi setup ",0
+section .text
+
+ report_event
+
  ;NMI executes after one opcode
  mov eax,[C_LABEL(SNES_Cycles)]
  inc eax
@@ -885,6 +1002,12 @@ NMI_Setup_Event:
 
 ALIGNC
 NMI_Event:
+section .data
+.str:db " nmi ",0
+section .text
+
+ report_event
+
  mov eax,[NMI_Next_Event]
  mov [Fixed_Event],eax
  mov eax,[NMI_Next_Trip]
@@ -967,6 +1090,12 @@ ALIGNC
 
 ALIGNC
 IRQ_Event:
+section .data
+.str:db " irq ",0
+section .text
+
+ report_event
+
  mov eax,[C_LABEL(EventTrip)]
  mov [Last_Trip],eax
 
@@ -1094,12 +1223,12 @@ IRQ_Check:
 ALIGNC
 ; This can only trash ebx/edi!
 IRQ_Check_Late:
- cmp byte [NMI_pin],NMI_Raised
- je .nmi_bypass
-
  mov bl,[C_LABEL(NMITIMEN)]
 
  mov edi,[FixedTrip]
+
+ cmp byte [NMI_pin],NMI_Raised
+ je .nmi_bypass
 
  test bl,0x30       ; IRQ enabled?
  jz .no_irq
@@ -1118,11 +1247,11 @@ IRQ_Check_Late:
  mov dword [Event_Handler],IRQ_Event
  ret
 
+.nmi_bypass:
 .no_irq:
  mov ebx,[Fixed_Event]
  mov [C_LABEL(EventTrip)],edi
  mov [Event_Handler],ebx
-.nmi_bypass:
  ret
 
 ALIGNC
