@@ -410,129 +410,6 @@ OPCODE_PROLOG(0x3B) ; TSC i
  _TxC B_S
 OPCODE_EPILOG
 
-; 40
-
-ALIGNC
-EXPORT_C E0_RTI
-%ifdef TRAP_INVALID_JUMP
- GET_PC eax
- mov [C_LABEL(Map_Byte)],eax
-%endif
- E0_PULL_B
- mov bl,B_I_flag
- push ebx
- E0_RESTOREFLAGS
- E0_PULL_W
- mov R_NativePC,eax
- E0_PULL_B
- mov B_PB,al
- test [MEMSEL],al   ; Check bus speed against PB
- mov bl,[C_LABEL(FastROM_offset)]
- jnz .fastrom
- mov bl,4
-.fastrom:
- mov ah,0
-%ifndef NO_FASTROM
- mov [C_LABEL(CycleTable)],bl   ; Update bus speed
-%endif
- mov edx,R_NativePC
- shl eax,16
- add edx,eax
-
- shr edx,13
- mov edx,[C_LABEL(Read_Bank8Offset)+edx*4]
- test edx,edx
- jz .read_non_linear
-
- add edx,eax
-.read_direct:
-
- add R_NativePC,edx
- mov B_PBOffset,edx
-
- pop ebx
-
- test bl,bl
- jz .no_irq_enable
- JUMP_FLAG SNES_FLAG_I,.no_irq_enable
- mov al,CEM_Instruction_After_IRQ_Enable
- mov [CPU_Execution_Mode],al
- xor edx,edx
- SAVE_CYCLES
- mov [C_LABEL(EventTrip)],edx
- mov edx,Enabling_IRQ_Event
- LOAD_CYCLES
- mov [Event_Handler],edx
-
-.no_irq_enable:
- SET_TABLE_MX
-
-.read_non_linear:
-%ifdef TRAP_INVALID_JUMP
- add esp,byte 4
- mov byte [C_LABEL(Map_Byte)+3],0x40
- mov [C_LABEL(Map_Address)],ebx
- jmp _InvalidJump
-%else
- mov eax,C_LABEL(Blank)
- jmp .read_direct ;*
-%endif
-
-ALIGNC
-EXPORT_C E1_RTI
-%ifdef TRAP_INVALID_JUMP
- GET_PC eax
- mov [C_LABEL(Map_Byte)],eax
-%endif
- E1_PULL_B
- mov bl,B_I_flag
- push ebx
- E1_RESTOREFLAGS
- E1_PULL_W
-
- mov ebx,B_PB_Shifted
- mov R_NativePC,eax
- or eax,ebx
-
- shr eax,13
- mov eax,[C_LABEL(Read_Bank8Offset)+eax*4]
- test eax,eax
- jz .read_non_linear
-
- add eax,ebx
-.read_direct:
-
- add R_NativePC,eax
- mov B_PBOffset,eax
-
- pop ebx
-
- test bl,bl
- jz .no_irq_enable
- JUMP_FLAG SNES_FLAG_I,C_LABEL(CPU_RETURN),near
- mov al,CEM_Instruction_After_IRQ_Enable
- mov [CPU_Execution_Mode],al
- xor edx,edx
- SAVE_CYCLES
- mov [C_LABEL(EventTrip)],edx
- mov edx,Enabling_IRQ_Event
- LOAD_CYCLES
- mov [Event_Handler],edx
-
-.no_irq_enable:
- OPCODE_EPILOG
-
-.read_non_linear:
-%ifdef TRAP_INVALID_JUMP
- add esp,byte 4
- mov byte [C_LABEL(Map_Byte)+3],0x40
- mov [C_LABEL(Map_Address)],ebx
- jmp _InvalidJump
-%else
- mov eax,C_LABEL(Blank)
- jmp .read_direct
-%endif
-
 OPCODE_PROLOG(0x42) ; WDM
  READ8_Immediate
 OPCODE_EPILOG
@@ -603,32 +480,29 @@ OPCODE_PROLOG(0x5C) ; JML al
  mov ebx,eax
  shr ebx,16
 
- mov B_PB,bl
  mov R_NativePC,(1 << 16) - 1
+ mov B_PB,bl
  and R_NativePC,eax
 
  test [MEMSEL],bl       ; Check bus speed against PB
- mov al,[C_LABEL(FastROM_offset)]
+ mov bl,[C_LABEL(FastROM_offset)]
  jnz .fastrom
- mov al,4
+ mov bl,4
 .fastrom:
 %ifndef NO_FASTROM
- mov [C_LABEL(CycleTable)],al   ; Update bus speed
+ mov [C_LABEL(CycleTable)],bl   ; Update bus speed
 %endif
- mov edx,R_NativePC
- shl ebx,16
- or edx,ebx
 
- shr edx,13
- mov edx,[C_LABEL(Read_Bank8Offset)+edx*4]
- test edx,edx
+ shr eax,13
+ mov eax,[C_LABEL(Read_Bank8Offset)+eax*4]
+ test eax,eax
  jz .read_non_linear
 
- add edx,ebx
+ add eax,B_PB_Shifted
 .read_direct:
 
- add R_NativePC,edx
- mov B_PBOffset,edx
+ add R_NativePC,eax
+ mov B_PBOffset,eax
 
  OPCODE_EPILOG
 
@@ -642,176 +516,6 @@ OPCODE_PROLOG(0x5C) ; JML al
  jmp short .read_direct
 %endif
 OPCODE_EPILOG
-
-; 60
-
-ALIGNC
-EXPORT_C E0_RTS
-%ifdef TRAP_INVALID_JUMP
- GET_PC eax
- mov [C_LABEL(Map_Byte)],eax
-%endif
- E0_PULL_W
- inc ax     ; This is a MAD processor!
-
- mov ebx,B_PB_Shifted
- mov R_NativePC,eax
- or eax,ebx
-
- shr eax,13
- mov eax,[C_LABEL(Read_Bank8Offset)+eax*4]
- test eax,eax
- jz .read_non_linear
-
- add eax,ebx
-.read_direct:
-
- add R_NativePC,eax
- mov B_PBOffset,eax
-
- OPCODE_EPILOG
-
-.read_non_linear:
-%ifdef TRAP_INVALID_JUMP
- mov byte [C_LABEL(Map_Byte)+3],0x60
- mov [C_LABEL(Map_Address)],ebx
- jmp _InvalidJump
-%else
- mov eax,C_LABEL(Blank)
- jmp short .read_direct
-%endif
-
-ALIGNC
-EXPORT_C E1_RTS
-%ifdef TRAP_INVALID_JUMP
- GET_PC eax
- mov [C_LABEL(Map_Byte)],eax
-%endif
- E1_PULL_W
- inc ax     ; This is a MAD processor!
-
- mov ebx,B_PB_Shifted
- mov R_NativePC,eax
- or eax,ebx
-
- shr eax,13
- mov eax,[C_LABEL(Read_Bank8Offset)+eax*4]
- test eax,eax
- jz .read_non_linear
-
- add eax,ebx
-.read_direct:
-
- add R_NativePC,eax
- mov B_PBOffset,eax
-
- OPCODE_EPILOG
-
-.read_non_linear:
-%ifdef TRAP_INVALID_JUMP
- mov byte [C_LABEL(Map_Byte)+3],0x60
- mov [C_LABEL(Map_Address)],ebx
- jmp _InvalidJump
-%else
- mov eax,C_LABEL(Blank)
- jmp short .read_direct
-%endif
-
-; 6B
-
-ALIGNC
-EXPORT_C E0_RTL
-%ifdef TRAP_INVALID_JUMP
- GET_PC eax
- mov [C_LABEL(Map_Byte)],eax
-%endif
- E0_PULL_W
- inc ax     ; This is a MAD processor!
- mov R_NativePC,eax
- E0_PULL_B
- mov B_PB,al
- test [MEMSEL],al   ; Check bus speed against PB
- mov bl,[C_LABEL(FastROM_offset)]
- jnz .fastrom
- mov bl,4
-.fastrom:
- mov ah,0
-%ifndef NO_FASTROM
- mov [C_LABEL(CycleTable)],bl   ; Update bus speed
-%endif
- mov edx,R_NativePC
- shl eax,16
- or edx,eax
-
- shr edx,13
- mov edx,[C_LABEL(Read_Bank8Offset)+edx*4]
- test edx,edx
- jz .read_non_linear
-
- add edx,eax
-.read_direct:
-
- add R_NativePC,edx
- mov B_PBOffset,edx
-
- OPCODE_EPILOG
-
-.read_non_linear:
-%ifdef TRAP_INVALID_JUMP
- mov byte [C_LABEL(Map_Byte)+3],0x6B
- mov [C_LABEL(Map_Address)],ebx
- jmp _InvalidJump
-%else
- mov edx,C_LABEL(Blank)
- jmp short .read_direct
-%endif
-
-ALIGNC
-EXPORT_C E1_RTL
-%ifdef TRAP_INVALID_JUMP
- GET_PC eax
- mov [C_LABEL(Map_Byte)],eax
-%endif
- E1_PULL_W
- inc ax     ; This is a MAD processor!
- mov R_NativePC,eax
- E1_PULL_B
- mov B_PB,al
- test [MEMSEL],al   ; Check bus speed against PB
- mov bl,[C_LABEL(FastROM_offset)]
- jnz .fastrom
- mov bl,4
-.fastrom:
- mov ah,0
-%ifndef NO_FASTROM
- mov [C_LABEL(CycleTable)],bl   ; Update bus speed
-%endif
- mov edx,R_NativePC
- shl eax,16
- or edx,eax
-
- shr edx,13
- mov edx,[C_LABEL(Read_Bank8Offset)+edx*4]
- test edx,edx
- jz .read_non_linear
-
- add edx,eax
-.read_direct:
-
- add R_NativePC,edx
- mov B_PBOffset,edx
-
- OPCODE_EPILOG
-
-.read_non_linear:
-%ifdef TRAP_INVALID_JUMP
- mov byte [C_LABEL(Map_Byte)+3],0x6B
- mov [C_LABEL(Map_Address)],ebx
- jmp _InvalidJump
-%else
- mov edx,C_LABEL(Blank)
- jmp short .read_direct
-%endif
 
 OPCODE_PROLOG(0x6C) ; JMP (a)
 %ifdef TRAP_INVALID_JUMP
