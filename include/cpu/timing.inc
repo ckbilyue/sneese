@@ -216,7 +216,7 @@ section .text
  cmp edx,byte 1
  ja %%fps_update
  mov dword [C_LABEL(FPSLast)],0
- jmp short %%less_than_1_fps
+ jmp %%less_than_1_fps
 %%fps_update:
  mov [C_LABEL(FPSLast)],edx
 %%less_than_1_fps:
@@ -349,7 +349,7 @@ section .text
  jmp dword [Event_Handler]
 .no_chain:
 
- jmp near CPU_START     ; Return to CPU
+ jmp CPU_START  ; Return to CPU
 
 ALIGNC
 Enabling_IRQ_Event:
@@ -373,7 +373,7 @@ section .text
  jl .no_chain
  jmp dword [Event_Handler]
 .no_chain:
- jmp near CPU_START     ; Return to CPU
+ jmp CPU_START  ; Return to CPU
 
 ALIGNC
 IRQ_Enabled_Event:
@@ -437,7 +437,7 @@ ALIGNC
  jl .no_chain
  jmp dword [Event_Handler]
 .no_chain:
- jmp near CPU_START     ; Return to CPU
+ jmp CPU_START  ; Return to CPU
 
 ALIGNC
 DMA_Event:
@@ -462,7 +462,7 @@ section .text
  jmp dword [Event_Handler]
 .no_chain:
 
- jmp near CPU_START     ; Return to CPU
+ jmp CPU_START  ; Return to CPU
 
 ALIGNC
 Render_Event:
@@ -490,12 +490,12 @@ section .text
  jmp dword [Event_Handler]
 .no_chain:
 
- jmp near CPU_START     ; Return to CPU
+ jmp CPU_START  ; Return to CPU
 
 ALIGNC
 speed_cap_wait_hlt:
  hlt
- jmp near IRQNewFrame.speed_cap_wait
+ jmp IRQNewFrame.speed_cap_wait
 ALIGNC
 EXPORT IRQNewFrame              ; Check IRQ, Frame Skip
 section .data
@@ -551,7 +551,7 @@ EXTERN_C rest
  dec dword [FrameCount] ; Should we redraw the screen this frame?
  mov [C_LABEL(Current_Line_Timing)],eax ; Reset scanline counter
  mov edi,C_LABEL(IRQFirst)
- jnz near .no_redraw
+ jnz .no_redraw
 
  ; this frame not skipped - determine how many frames following to skip
  inc dword [FPSCount]   ; For FPS counter - 0.25b14
@@ -588,7 +588,7 @@ EXTERN_C fast_forward_enabled
 .fast_forward:
  mov ebx,[C_LABEL(FRAME_SKIP_MAX)]
  mov [C_LABEL(Timer_Counter_Throttle)],eax  ; Reset speed-throttle timer
- jmp short .have_skip_count
+ jmp .have_skip_count
 
 .no_cap_max_skip:
  sub [C_LABEL(Timer_Counter_Throttle)],ebx  ; Update speed-throttle timer
@@ -653,7 +653,7 @@ EXTERN_C Profiler_Start
  popa
 
  xor eax,eax
- jmp near CPU_START_IRQ ; Return to CPU
+ jmp CPU_START_IRQ      ; Return to CPU
 
 ALIGNC
 EXPORT_C IRQFirstRender ; Check HDMA, IRQ, Render
@@ -680,7 +680,7 @@ section .text
  mov eax,[C_LABEL(Current_Line_Timing)] ; Get current scanline
  inc eax
  mov [C_LABEL(Current_Line_Timing)],eax
- jmp near CPU_START_IRQ ; Return to CPU
+ jmp CPU_START_IRQ      ; Return to CPU
 
 ALIGNC
 EXPORT_C IRQRender  ; Check HDMA, IRQ, Render
@@ -704,13 +704,13 @@ section .text
  mov [C_LABEL(Current_Line_Timing)],eax
  cmp [C_LABEL(LastRenderLine)],eax
  jbe .end_of_display
- jmp near CPU_START_IRQ ; Return to CPU
+ jmp CPU_START_IRQ      ; Return to CPU
 ALIGNC
 .end_of_display:
  mov eax,[NMI_Event_Handler]
  mov [Render_Next_Event],eax
  mov dword [Render_Next_Trip],CYCLES_NEW_SCANLINE
- jmp near CPU_START_IRQ ; Return to CPU
+ jmp CPU_START_IRQ      ; Return to CPU
 
 ALIGNC
 VBL_Update_Controllers:
@@ -738,7 +738,7 @@ EXTERN_C update_controllers
  and byte [HVBJOY],~HVBJOY_CONTROLLERS_BUSY ; Controllers ready
 .no_controller_update:
  mov eax,[C_LABEL(Current_Line_Timing)] ; Get current scanline
- jmp near CPU_START_IRQ ; Return to CPU
+ jmp CPU_START_IRQ      ; Return to CPU
 
 ALIGNC
 VBL:
@@ -760,7 +760,7 @@ section .text
  mov dword [Event_Handler],IRQNewFrame
  mov dword [Fixed_Event],IRQNewFrame
 .not_end_of_frame:
- jmp near CPU_START_IRQ ; Return to CPU
+ jmp CPU_START_IRQ      ; Return to CPU
 
 ALIGNC
 EXPORT_C IRQFirst   ; Check HDMA, IRQ, Render
@@ -785,7 +785,7 @@ section .text
  mov eax,[C_LABEL(Current_Line_Timing)] ; Get current scanline
  inc eax
  mov [C_LABEL(Current_Line_Timing)],eax
- jmp near CPU_START_IRQ ; Return to CPU
+ jmp CPU_START_IRQ      ; Return to CPU
 
 ALIGNC
 IRQNoRender:            ; Check HDMA, IRQ
@@ -808,13 +808,13 @@ section .text
  mov dword [FixedTrip],CYCLES_HDMA_START
 ;mov dword [Event_Handler],HDMA_Event
  mov dword [Fixed_Event],HDMA_Event
- jmp near CPU_START_IRQ ; Return to CPU
+ jmp CPU_START_IRQ      ; Return to CPU
 ALIGNC
 .end_of_display:
  mov eax,[NMI_Event_Handler]
  mov [Event_Handler],eax
  mov [Fixed_Event],eax
- jmp near CPU_START_IRQ ; Return to CPU
+ jmp CPU_START_IRQ      ; Return to CPU
 
 ALIGNC
 EXPORT_C NMI
@@ -970,7 +970,7 @@ CheckNMI:
 
 ; Return to emulation
  mov eax,[C_LABEL(Current_Line_Timing)] ; Get current scanline
- jmp near CPU_START_IRQ ; Return to CPU
+ jmp CPU_START_IRQ      ; Return to CPU
 
 .break:
  mov ebx,[CPU_LABEL(PB_Shifted)]
@@ -1046,7 +1046,7 @@ section .text
  LOAD_CYCLES
 
  add R_65c816_Cycles,byte 12    ; NMI processing: 2 IO
- JUMP_NOT_FLAG SNES_FLAG_E,.E0_NMI,near ; Are we in emulation mode?
+ JUMP_NOT_FLAG SNES_FLAG_E,.E0_NMI      ; Are we in emulation mode?
 
 .E1_NMI:
  ; Emulation mode NMI
@@ -1094,7 +1094,7 @@ ALIGNC
  jmp dword [Event_Handler]
 .no_chain:
 
- jmp near CPU_START
+ jmp CPU_START  ; Return to CPU
 
 ALIGNC
 IRQ_Event:
@@ -1152,7 +1152,7 @@ ALIGNC
  mov ebx,[Fixed_Event]
  mov [C_LABEL(EventTrip)],edi
  mov [Event_Handler],ebx
- jmp near CPU_START
+ jmp CPU_START  ; Return to CPU
 
 ALIGNC
 IRQ_Check_Newline:
@@ -1800,7 +1800,7 @@ Update_HTimer:
  cmp edx,CYCLES_REFRESH_END     ; During memory refresh
  jb .in_refresh
  sub edx,byte CYCLES_IN_REFRESH
- jmp short .not_in_refresh
+ jmp .not_in_refresh
 ALIGNC
 .in_refresh:
  mov edx,CYCLES_REFRESH_START   ; During memory refresh

@@ -60,7 +60,7 @@ EXPORT_C SPC_TCALL_%1
 ALIGNC
 EXPORT_C SPC_%1
  add R_NativePC,byte 2
- JUMP_FLAG_SPC %2,near SPC_RETURN   ; flag set
+ JUMP_FLAG_SPC %2,SPC_RETURN            ; flag set
  movsx eax,byte [-1+R_NativePC]     ; sign extend for addition
  short_branch
  OPCODE_EPILOG
@@ -71,7 +71,7 @@ EXPORT_C SPC_%1
 ALIGNC
 EXPORT_C SPC_%1
  add R_NativePC,byte 2
- JUMP_NOT_FLAG_SPC %2,near SPC_RETURN   ; flag set
+ JUMP_NOT_FLAG_SPC %2,SPC_RETURN        ; flag set
  movsx eax,byte [-1+R_NativePC]     ; sign extend for addition
  short_branch
  OPCODE_EPILOG

@@ -359,7 +359,7 @@ EXPORT_C Render_Offset_16x%2_Even_C%1
 %ifndef NO_OFFSET_CHANGE
 %ifndef NO_OFFSET_CHANGE_DISABLE
  cmp byte [C_LABEL(Offset_Change_Disable)],0    ; Hack to disable offset change
- jnz near C_LABEL(Render_16x%2_Even_C%1)
+ jnz C_LABEL(Render_16x%2_Even_C%1)
 %endif  ; !NO_OFFSET_CHANGE_DISABLE
 %else   ; NO_OFFSET_CHANGE
  jmp C_LABEL(Render_16x%2_Even_C%1)
@@ -369,11 +369,11 @@ EXPORT_C Render_Offset_16x%2_Even_C%1
  ;mode 6: 4-plane tiles, split offset table
  mov cl,[OffsetChangeDetect3]
  test cl,[OC_Flag+edx]
- jz near C_LABEL(Render_16x%2_Even_C%1)
+ jz C_LABEL(Render_16x%2_Even_C%1)
 %endif
 
  cmp byte [Mosaic+edx],0
- jnz near C_LABEL(Render_Offset_16x%2M_Even_C%1)
+ jnz C_LABEL(Render_Offset_16x%2M_Even_C%1)
 
 %ifndef NO_NP_RENDER
  mov ecx,C_LABEL(Plot_Lines_NP_Offset_16x%2_Even_Table_C%1)
@@ -501,7 +501,7 @@ EXPORT_C Render_Offset_16x%2_Even_C%1
  add edi,GfxBufferLinePitch
  dec dword [RO16E_Lines]
  mov [RO16E_BaseDestPtr],edi ; Point screen to next line
- jnz near .next_line
+ jnz .next_line
 %endif
 
  mov edx,[RO16E_BG_Table]
@@ -588,7 +588,7 @@ EXPORT_C %1     ; Define label, entry point
  add esi,ecx
 %endif
  pop ecx
- jmp short .have_v_offset
+ jmp .have_v_offset
 
 .LeftEdge:
  push esi
@@ -616,7 +616,7 @@ EXPORT_C %1     ; Define label, entry point
 .tile_in_screen_map_left:
 
  mov al,[esi+1]
- Check_Tile_Priority %2, near %1_check
+ Check_Tile_Priority %2, %1_check
 
  mov ebp,[RO16E_LineAddressOffsetY+RO16E_Inner+8]
  test al,al         ; Check Y flip
@@ -635,7 +635,7 @@ EXPORT_C %1     ; Define label, entry point
  mov edx,[TilesetAddress]
 
  add al,al      ; Get X flip (now in MSB)
- js near .xflip
+ js .xflip
 
  and esi,0x3FF * 8 + 7  ; Clip to tileset
  add esi,edx
@@ -659,7 +659,7 @@ EXPORT_C %1     ; Define label, entry point
  mov [Tile_Priority_Used],cl
 %endif
  dec cl
- jnz near .next_tile
+ jnz .next_tile
 
  ret
 
@@ -688,7 +688,7 @@ ALIGNC
  mov [Tile_Priority_Used],cl
 %endif
  dec cl
- jnz near .next_tile
+ jnz .next_tile
 
  ret
 %endmacro

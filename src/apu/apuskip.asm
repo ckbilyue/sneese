@@ -70,7 +70,7 @@ EXPORT_C Reset_APU_Skipper
 ALIGNC
 SNES_R2140_SKIP:    ; APUI00
  cmp byte [C_LABEL(APUI00b)],0
- jne short .return_xl
+ jne .return_xl
 
  mov al,[C_LABEL(cpu_65c816_A)]
  inc byte [C_LABEL(APUI00b)]
@@ -79,7 +79,7 @@ SNES_R2140_SKIP:    ; APUI00
 
 .return_xl:
  cmp byte [C_LABEL(APUI00b)],1
- jne short .return_yl
+ jne .return_yl
 
  mov al,[C_LABEL(cpu_65c816_X)]
  inc byte [C_LABEL(APUI00b)]
@@ -88,7 +88,7 @@ SNES_R2140_SKIP:    ; APUI00
 
 .return_yl:
  cmp byte [C_LABEL(APUI00b)],2
- jne short .return_zero
+ jne .return_zero
 
  mov al,[C_LABEL(cpu_65c816_Y)]
  inc byte [C_LABEL(APUI00b)]
@@ -97,7 +97,7 @@ SNES_R2140_SKIP:    ; APUI00
 
 .return_zero:
  cmp byte [C_LABEL(APUI00b)],3
- jne short .return_FF
+ jne .return_FF
 
  mov al,0
  inc byte [C_LABEL(APUI00b)]
@@ -105,7 +105,7 @@ SNES_R2140_SKIP:    ; APUI00
 
 .return_FF:
  cmp byte [C_LABEL(APUI00b)],4
- jne short .return_55
+ jne .return_55
 
  mov al,0xff
  inc byte [C_LABEL(APUI00b)]
@@ -113,7 +113,7 @@ SNES_R2140_SKIP:    ; APUI00
 
 .return_55:
  cmp byte [C_LABEL(APUI00b)],5
- jne short .return_1
+ jne .return_1
 
  mov al,0x55
  inc byte [C_LABEL(APUI00b)]
@@ -121,7 +121,7 @@ SNES_R2140_SKIP:    ; APUI00
 
 .return_1:
  cmp byte [C_LABEL(APUI00b)],6
- jne short .return_AA
+ jne .return_AA
 
  mov al,1
  inc byte [C_LABEL(APUI00b)]
@@ -129,7 +129,7 @@ SNES_R2140_SKIP:    ; APUI00
 
 .return_AA:
  cmp byte [C_LABEL(APUI00b)],7
- jne short .return_written
+ jne .return_written
 
  mov al,0xAA
  mov byte [C_LABEL(APUI01b)],6
@@ -138,7 +138,7 @@ SNES_R2140_SKIP:    ; APUI00
 
 .return_written:
  cmp byte [C_LABEL(APUI00b)],8
- jne short .return_all
+ jne .return_all
 
  mov al,[C_LABEL(APUI00a)]
  inc byte [C_LABEL(APUI00b)]
@@ -149,7 +149,7 @@ SNES_R2140_SKIP:    ; APUI00
  inc byte [C_LABEL(APUI00c)]
  mov byte [C_LABEL(APUI01b)],0xb    ; This keeps high word at 0 during cycle (for now at least)
  cmp byte [C_LABEL(APUI00c)],0
- je  short .reset_skipper
+ je  .reset_skipper
  ret
 
 .reset_skipper:
@@ -161,7 +161,7 @@ SNES_R2140_SKIP:    ; APUI00
 ALIGNC
 SNES_R2141_SKIP:    ; APUI01
  cmp byte [C_LABEL(APUI01b)],0
- jne short .return_xh
+ jne .return_xh
 
  mov al,[C_LABEL(cpu_65c816_A)+1]
  inc byte [C_LABEL(APUI01b)]
@@ -169,7 +169,7 @@ SNES_R2141_SKIP:    ; APUI01
 
 .return_xh:
  cmp byte [C_LABEL(APUI01b)],1
- jne short .return_yh
+ jne .return_yh
 
  mov al,[C_LABEL(cpu_65c816_X)+1]
  inc byte [C_LABEL(APUI01b)]
@@ -177,7 +177,7 @@ SNES_R2141_SKIP:    ; APUI01
 
 .return_yh:
  cmp byte [C_LABEL(APUI01b)],2
- jne short .return_al
+ jne .return_al
 
  mov al,[C_LABEL(cpu_65c816_Y)+1]
  inc byte [C_LABEL(APUI01b)]
@@ -185,7 +185,7 @@ SNES_R2141_SKIP:    ; APUI01
 
 .return_al:
  cmp byte [C_LABEL(APUI01b)],3
- jne short .return_xl
+ jne .return_xl
 
  mov al,[C_LABEL(cpu_65c816_A)]
  inc byte [C_LABEL(APUI01b)]
@@ -193,7 +193,7 @@ SNES_R2141_SKIP:    ; APUI01
 
 .return_xl:
  cmp byte [C_LABEL(APUI01b)],4
- jne short .return_yl
+ jne .return_yl
 
  mov al,[C_LABEL(cpu_65c816_X)]
  inc byte [C_LABEL(APUI01b)]
@@ -201,7 +201,7 @@ SNES_R2141_SKIP:    ; APUI01
 
 .return_yl:
  cmp byte [C_LABEL(APUI01b)],5
- jne short .return_BB
+ jne .return_BB
 
  mov al,[C_LABEL(cpu_65c816_Y)]
  inc byte [C_LABEL(APUI01b)]
@@ -209,7 +209,7 @@ SNES_R2141_SKIP:    ; APUI01
 
 .return_BB:
  cmp byte [C_LABEL(APUI01b)],6
- jne short .return_zero
+ jne .return_zero
 
  mov al,0xBB
  inc byte [C_LABEL(APUI01b)]
@@ -217,7 +217,7 @@ SNES_R2141_SKIP:    ; APUI01
 
 .return_zero:
  cmp byte [C_LABEL(APUI01b)],7
- jne short .return_FF
+ jne .return_FF
 
  mov al,0
  inc byte [C_LABEL(APUI01b)]
@@ -225,7 +225,7 @@ SNES_R2141_SKIP:    ; APUI01
 
 .return_FF:
  cmp byte [C_LABEL(APUI01b)],8
- jne short .return_55
+ jne .return_55
 
  mov al,0xff
  inc byte [C_LABEL(APUI01b)]
@@ -233,7 +233,7 @@ SNES_R2141_SKIP:    ; APUI01
 
 .return_55:
  cmp byte [C_LABEL(APUI01b)],9
- jne short .return_written
+ jne .return_written
 
  mov al,0x55
  inc byte [C_LABEL(APUI01b)]
@@ -241,7 +241,7 @@ SNES_R2141_SKIP:    ; APUI01
 
 .return_written:
  cmp byte [C_LABEL(APUI01b)],10
- jne short .return_special
+ jne .return_special
 
  mov al,[C_LABEL(APUI01a)]
  mov byte [C_LABEL(APUI01b)],0
@@ -254,7 +254,7 @@ SNES_R2141_SKIP:    ; APUI01
 ALIGNC
 SNES_R2142_SKIP:    ; APUI02
  cmp byte [C_LABEL(APUI02b)],0
- jne short .return_xl
+ jne .return_xl
 
  mov al,[C_LABEL(cpu_65c816_A)]
  inc byte [C_LABEL(APUI02b)]
@@ -263,7 +263,7 @@ SNES_R2142_SKIP:    ; APUI02
 
 .return_xl:
  cmp byte [C_LABEL(APUI02b)],1
- jne short .return_yl
+ jne .return_yl
 
  mov al,[C_LABEL(cpu_65c816_X)]
  inc byte [C_LABEL(APUI02b)]
@@ -272,7 +272,7 @@ SNES_R2142_SKIP:    ; APUI02
 
 .return_yl:
  cmp byte [C_LABEL(APUI02b)],2
- jne short .return_zero
+ jne .return_zero
 
  mov al,[C_LABEL(cpu_65c816_Y)]
  inc byte [C_LABEL(APUI02b)]
@@ -281,7 +281,7 @@ SNES_R2142_SKIP:    ; APUI02
 
 .return_zero:
  cmp byte [C_LABEL(APUI02b)],3
- jne short .return_FF
+ jne .return_FF
 
  mov al,0
  inc byte [C_LABEL(APUI02b)]
@@ -289,7 +289,7 @@ SNES_R2142_SKIP:    ; APUI02
 
 .return_FF:
  cmp byte [C_LABEL(APUI02b)],4
- jne short .return_55
+ jne .return_55
 
  mov al,0xff
  inc byte [C_LABEL(APUI02b)]
@@ -297,7 +297,7 @@ SNES_R2142_SKIP:    ; APUI02
 
 .return_55:
  cmp byte [C_LABEL(APUI02b)],5
- jne short .return_AA
+ jne .return_AA
 
  mov al,0x55
  inc byte [C_LABEL(APUI02b)]
@@ -305,7 +305,7 @@ SNES_R2142_SKIP:    ; APUI02
 
 .return_AA:
  cmp byte [C_LABEL(APUI02b)],6
- jne short .return_written
+ jne .return_written
 
  mov al,0xAA
  mov byte [C_LABEL(APUI03b)],6
@@ -320,7 +320,7 @@ SNES_R2142_SKIP:    ; APUI02
 ALIGNC
 SNES_R2143_SKIP:    ; APUI03
  cmp byte [C_LABEL(APUI03b)],0
- jne short .return_xh
+ jne .return_xh
 
  mov al,[C_LABEL(cpu_65c816_A)+1]
  inc byte [C_LABEL(APUI03b)]
@@ -328,7 +328,7 @@ SNES_R2143_SKIP:    ; APUI03
 
 .return_xh:
  cmp byte [C_LABEL(APUI03b)],1
- jne short .return_yh
+ jne .return_yh
 
  mov al,[C_LABEL(cpu_65c816_X)+1]
  inc byte [C_LABEL(APUI03b)]
@@ -336,7 +336,7 @@ SNES_R2143_SKIP:    ; APUI03
 
 .return_yh:
  cmp byte [C_LABEL(APUI03b)],2
- jne short .return_al
+ jne .return_al
 
  mov al,[C_LABEL(cpu_65c816_Y)+1]
  inc byte [C_LABEL(APUI03b)]
@@ -344,7 +344,7 @@ SNES_R2143_SKIP:    ; APUI03
 
 .return_al:
  cmp byte [C_LABEL(APUI03b)],3
- jne short .return_xl
+ jne .return_xl
 
  mov al,[C_LABEL(cpu_65c816_A)]
  inc byte [C_LABEL(APUI03b)]
@@ -352,7 +352,7 @@ SNES_R2143_SKIP:    ; APUI03
 
 .return_xl:
  cmp byte [C_LABEL(APUI03b)],4
- jne short .return_yl
+ jne .return_yl
 
  mov al,[C_LABEL(cpu_65c816_X)]
  inc byte [C_LABEL(APUI03b)]
@@ -360,7 +360,7 @@ SNES_R2143_SKIP:    ; APUI03
 
 .return_yl:
  cmp byte [C_LABEL(APUI03b)],5
- jne short .return_BB
+ jne .return_BB
 
  mov al,[C_LABEL(cpu_65c816_Y)]
  inc byte [C_LABEL(APUI03b)]
@@ -368,7 +368,7 @@ SNES_R2143_SKIP:    ; APUI03
 
 .return_BB:
  cmp byte [C_LABEL(APUI03b)],6
- jne short .return_zero
+ jne .return_zero
 
  mov al,0xBB
  inc byte [C_LABEL(APUI03b)]
@@ -376,7 +376,7 @@ SNES_R2143_SKIP:    ; APUI03
 
 .return_zero:
  cmp byte [C_LABEL(APUI03b)],7
- jne short .return_FF
+ jne .return_FF
 
  mov al,0
  inc byte [C_LABEL(APUI03b)]
@@ -384,7 +384,7 @@ SNES_R2143_SKIP:    ; APUI03
 
 .return_FF:
  cmp byte [C_LABEL(APUI03b)],8
- jne short .return_55
+ jne .return_55
 
  mov al,0xFF
  inc byte [C_LABEL(APUI03b)]
@@ -392,7 +392,7 @@ SNES_R2143_SKIP:    ; APUI03
 
 .return_55:
  cmp byte [C_LABEL(APUI03b)],9
- jne short .return_written
+ jne .return_written
 
  mov al,0x55
  inc byte [C_LABEL(APUI03b)]
@@ -407,7 +407,7 @@ ALIGNC
 SNES_W2140_SKIP:    ; APUI00
  mov [C_LABEL(APUI00a)],al
 ;cmp al,0xff
-;je short .alt
+;je .alt
 ;mov byte [C_LABEL(APUI00b)],0
  ret
 ;.alt:

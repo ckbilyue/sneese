@@ -320,7 +320,7 @@ Render_16x16_Run:
 ALIGNC
 EXPORT_C Render_16x16_C%1
  cmp byte [Mosaic+edx],0
- jnz near C_LABEL(Render_16x16M_C%1)
+ jnz C_LABEL(Render_16x16M_C%1)
 
 %if %1 == 2
  mov ecx,[M0_Color+edx]
@@ -336,7 +336,7 @@ EXPORT_C Render_16x16_C%1
  mov ecx,C_LABEL(Plot_Lines_V_16x16_Table_C%1)
 
 .have_plotter:
- jmp short Render_16x16_Base
+ jmp Render_16x16_Base
 %endmacro
 
 Render_16x16 2
@@ -457,7 +457,7 @@ Render_16x16_Base:
 
 %ifndef LAYERS_PER_LINE
 ;cmp dword [R16x16_Lines],0
- jnz near .next_line
+ jnz .next_line
 %endif
 
  mov edx,[R16x16_BG_Table]
@@ -525,7 +525,7 @@ EXPORT_C %1     ; Define label, entry point
 %endif
 
  push esi
- js near %%xflip
+ js %%xflip
 
  and esi,0x3FF * 8 + 7  ; Clip to tileset
  add esi,edx
@@ -539,7 +539,7 @@ EXPORT_C %1     ; Define label, entry point
 %else
  dec cl
 %endif
- jle near %%early_out
+ jle %%early_out
 %%leftedge_noflip:
  add esi,byte 8
  and esi,0x3FF * 8 + 7  ; Clip to tileset
@@ -562,7 +562,7 @@ EXPORT_C %1     ; Define label, entry point
 %endif
  add edi,byte 16
  dec cl
- jg near %%next_tile
+ jg %%next_tile
  ret
 
 %%early_out:
@@ -588,7 +588,7 @@ ALIGNC
 %else
  dec cl
 %endif
- jle near %%early_out
+ jle %%early_out
 %%leftedge_xflip:
  and esi,0x3FF * 8 + 7  ; Clip to tileset
  add esi,[TilesetAddress]
@@ -609,13 +609,13 @@ ALIGNC
 %endif
  add edi,byte 16
  dec cl
- jg near %%next_tile
+ jg %%next_tile
  ret
 
 .LeftEdge:
  mov al,[ebx+1]
 
- Check_Tile_Priority %2, near %1_check
+ Check_Tile_Priority %2, %1_check
 
  dec cl
  mov ebp,[LineAddressY]
@@ -648,7 +648,7 @@ ALIGNC
  mov ebx,[BGLineCount]
 %endif
 
- jns near %%leftedge_noflip
+ jns %%leftedge_noflip
  jmp %%leftedge_xflip
 %endmacro
 
@@ -706,7 +706,7 @@ EXPORT_C %1     ; Define label, entry point
 %endif
 
  push esi
- js near %%xflip
+ js %%xflip
 
  and esi,0x3FF * 8 + 7  ; Clip to tileset
  add esi,edx
@@ -720,7 +720,7 @@ EXPORT_C %1     ; Define label, entry point
 %else
  dec cl
 %endif
- jle near %%early_out
+ jle %%early_out
 %%leftedge_noflip:
  add esi,byte 8
  and esi,0x3FF * 8 + 7  ; Clip to tileset
@@ -743,7 +743,7 @@ EXPORT_C %1     ; Define label, entry point
 %endif
  add edi,byte 16
  dec cl
- jg near %%next_tile
+ jg %%next_tile
  ret
 
 %%early_out:
@@ -769,7 +769,7 @@ ALIGNC
 %else
  dec cl
 %endif
- jle near %%early_out
+ jle %%early_out
 %%leftedge_xflip:
  and esi,0x3FF * 8 + 7  ; Clip to tileset
  add esi,[TilesetAddress]
@@ -790,13 +790,13 @@ ALIGNC
 %endif
  add edi,byte 16
  dec cl
- jg near %%next_tile
+ jg %%next_tile
  ret
 
 .LeftEdge:
  mov al,[ebx+1]
 
- Check_Tile_Priority %2, near %1_check
+ Check_Tile_Priority %2, %1_check
 
  dec cl
  mov ebp,[LineAddressY]
@@ -827,7 +827,7 @@ ALIGNC
  mov ebx,[BGLineCount]
 %endif
 
- jns near %%leftedge_noflip
+ jns %%leftedge_noflip
  jmp %%leftedge_xflip
 %endmacro
 
@@ -882,7 +882,7 @@ EXPORT_C %1     ; Define label, entry point
 %endif
 
  push esi
- js near %%xflip
+ js %%xflip
 
  and esi,0x3FF * 8 + 7  ; Clip to tileset
  add esi,ebp
@@ -896,7 +896,7 @@ EXPORT_C %1     ; Define label, entry point
 %else
  dec cl
 %endif
- jle near %%early_out
+ jle %%early_out
 %%leftedge_noflip:
  add esi,byte 8
  and esi,0x3FF * 8 + 7  ; Clip to tileset
@@ -918,7 +918,7 @@ EXPORT_C %1     ; Define label, entry point
 %endif
  add edi,byte 16
  dec cl
- jg near %%next_tile
+ jg %%next_tile
  ret
 
 %%early_out:
@@ -944,7 +944,7 @@ ALIGNC
 %else
  dec cl
 %endif
- jle near %%early_out
+ jle %%early_out
 %%leftedge_xflip:
  and esi,0x3FF * 8 + 7  ; Clip to tileset
  add esi,[TilesetAddress]
@@ -965,13 +965,13 @@ ALIGNC
 %endif
  add edi,byte 16
  dec cl
- jg near %%next_tile
+ jg %%next_tile
  ret
 
 .LeftEdge:
  mov al,[ebx+1]
 
- Check_Tile_Priority %2, near %1_check
+ Check_Tile_Priority %2, %1_check
 
  dec cl
  mov si,[ebx]       ; Get tile #
@@ -999,7 +999,7 @@ ALIGNC
  mov ebx,[BGLineCount]
 %endif
 
- jns near %%leftedge_noflip
+ jns %%leftedge_noflip
  jmp %%leftedge_xflip
 %endmacro
 

@@ -487,7 +487,7 @@ EXPORT_C SPC_CBNE_dp
  add R_NativePC,byte 3
  GET_BYTE_SPC           ; get (dp)
  cmp B_A,al
- je near SPC_RETURN
+ je SPC_RETURN
 
  movsx eax,byte [R_NativePC-1]  ; sign extend for addition
  short_branch
@@ -610,7 +610,7 @@ EXPORT_C SPC_AND1   ; Carry flag = Carry flag AND mem.bit
  ; C = C && (byte & bit)
  mov cl,[offset_to_bit+ecx]
  and al,cl
- jnz near SPC_RETURN    ; C && 1 = C
+ jnz SPC_RETURN     ; C && 1 = C
  STORE_FLAGS_C al   ; C && 0 = 0
  OPCODE_EPILOG
 
@@ -756,7 +756,7 @@ EXPORT_C SPC_AND1C  ; Carry flag = Carry flag AND !mem.bit
  ; C = C && !(byte & bit)
  mov cl,[offset_to_bit+ecx]
  and al,cl
- jz near SPC_RETURN     ; C && !0 = C
+ jz SPC_RETURN      ; C && !0 = C
  STORE_FLAGS_C 0    ; C && !1 = 0
  OPCODE_EPILOG
 
@@ -776,7 +776,7 @@ EXPORT_C SPC_DBNZ_dp
  dec al
  SET_BYTE_SPC
  test al,al
- jz near SPC_RETURN
+ jz SPC_RETURN
 
  movsx eax,byte [R_NativePC-1]  ; sign extend for addition
  short_branch
@@ -908,7 +908,7 @@ EXPORT_C SPC_EOR1   ; Carry flag = Carry flag EOR mem.bit
  GET_BYTE_SPC
  mov cl,[offset_to_bit+ecx]
  and al,cl
- jz near SPC_RETURN     ; C = C EOR 0 -> C = C
+ jz SPC_RETURN      ; C = C EOR 0 -> C = C
  mov al,B_C_flag
  cmp al,1
  sbb al,al
@@ -1274,7 +1274,7 @@ EXPORT_C SPC_CBNE_Odp_XO
  add bl,al
  GET_BYTE_SPC           ; Get (dp)
  cmp B_A,al
- je near SPC_RETURN
+ je SPC_RETURN
 
  movsx eax,byte [R_NativePC-1]  ; sign extend for addition
  short_branch
@@ -1380,7 +1380,7 @@ EXPORT_C SPC_DBNZ_Y
  add R_NativePC,byte 2
  dec al
  mov B_Y,al
- jz near SPC_RETURN
+ jz SPC_RETURN
 
  movsx eax,byte [R_NativePC-1]  ; sign extend for addition
  short_branch

@@ -302,10 +302,10 @@ section .text
 %macro OPCODE_EPILOG 0
 %if 0
  test R_Cycles,R_Cycles
- jle near SPC_START_NEXT
- jmp near SPC_OUT
+ jle SPC_START_NEXT
+ jmp SPC_OUT
 %else
- jmp near SPC_RETURN
+ jmp SPC_RETURN
 %endif
 %endmacro
 
@@ -419,10 +419,10 @@ EXTERN_C InvalidSPCHWWrite
  cmp bl,0xF0
  jb %%read_direct
  call C_LABEL(SPC_READ_FUNC)
- jmp short %%done
+ jmp %%done
 %%read_mapper:
  call C_LABEL(SPC_READ_RAM_ROM)
- jmp short %%done
+ jmp %%done
 %%read_direct:
  mov al,[C_LABEL(SPCRAM)+ebx]
 %%done:
@@ -447,10 +447,10 @@ EXTERN_C InvalidSPCHWWrite
  inc ebx
  call C_LABEL(SPC_READ_FUNC)
  ror ax,8
- jmp short %%done
+ jmp %%done
 %%read_mapper:
  call SPC_GET_WORD
- jmp short %%done
+ jmp %%done
 %%read_direct:
  mov ax,[C_LABEL(SPCRAM)+ebx]
  inc ebx
@@ -469,7 +469,7 @@ EXTERN_C InvalidSPCHWWrite
  cmp bl,0xF0
  jb %%write_direct
  call C_LABEL(SPC_WRITE_FUNC)
- jmp short %%done
+ jmp %%done
 %%write_direct:
  mov [C_LABEL(SPCRAM)+ebx],al
 %%done:
@@ -1148,7 +1148,7 @@ EXTERN_C BreaksLast
  LOAD_PC
  LOAD_BASE
  xor eax,eax
- jmp short SPC_START_NEXT
+ jmp SPC_START_NEXT
 
 ALIGNC
 SPC_RETURN:
@@ -1160,11 +1160,7 @@ SPC_RETURN:
 ;mov [_OLD_SPC_ADDRESS],ebx
 %endif
  test R_Cycles,R_Cycles
-%ifdef TRACKERS
- jg near SPC_OUT        ; Do another instruction if cycles left
-%else
  jg SPC_OUT             ; Do another instruction if cycles left
-%endif
 
 SPC_START_NEXT:
 

@@ -239,7 +239,7 @@ EXPORT_C Render_16x%2M_Even_C%1
  mov ecx,C_LABEL(Plot_Lines_V_16M_Even_Table_C%1)
 
 .have_plotter:
- jmp short Render_16x%2M_Even_Base
+ jmp Render_16x%2M_Even_Base
 %endmacro
 
 ;%1 = tile height
@@ -374,7 +374,7 @@ Render_16x%1M_Even_Base:
 
 %ifndef LAYERS_PER_LINE
 ;cmp dword [R16ME_Lines],0
- jnz near .next_line
+ jnz .next_line
 %endif
 
  mov edx,[R16ME_BG_Table]
@@ -459,7 +459,7 @@ EXPORT_C %1     ; Define label, entry point
 
  add al,al      ; Get X flip (now in MSB)
  mov eax,[Mosaic_Size]
- js near %%xflip
+ js %%xflip
 
 %%flip_none_same_tile:
  push esi
@@ -661,7 +661,7 @@ EXPORT_C %1     ; Define label, entry point
 
  add al,al      ; Get X flip (now in MSB)
  mov eax,[Mosaic_Size]
- js near %%xflip
+ js %%xflip
 
 %%flip_none_same_tile:
  push esi

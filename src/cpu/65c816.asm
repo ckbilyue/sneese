@@ -1035,96 +1035,96 @@ section .text
  xor eax,eax        ; Zero for table offset
 
  test R_Cycles,R_Cycles
- jl near C_LABEL(CPU_START_NEXT)
- jmp near HANDLE_EVENT
+ jl C_LABEL(CPU_START_NEXT)
+ jmp HANDLE_EVENT
 
 %else
 ;mov cl,0
- jmp near C_LABEL(CPU_RETURN)
+ jmp C_LABEL(CPU_RETURN)
 %endif
 %endmacro
 
-;%1 = flag, %2 = wheretogo, %3 = distance
-%macro JUMP_FLAG 2-3 short
+;%1 = flag, %2 = wheretogo
+%macro JUMP_FLAG 2
 %if %1 == SNES_FLAG_E
  mov ch,B_E_flag
  test ch,ch
- jnz %3 %2
+ jnz %2
 %elif %1 == SNES_FLAG_N
  mov ch,B_N_flag
  test ch,ch
- js %3 %2
+ js %2
 %elif %1 == SNES_FLAG_V
  mov ch,B_V_flag
  test ch,ch
- jnz %3 %2
+ jnz %2
 %elif %1 == SNES_FLAG_M
  mov ch,B_M1_flag
  test ch,ch
- jnz %3 %2
+ jnz %2
 %elif %1 == SNES_FLAG_X
  mov ch,B_XB_flag
  test ch,ch
- jnz %3 %2
+ jnz %2
 %elif %1 == SNES_FLAG_D
  mov ch,B_D_flag
  test ch,ch
- jnz %3 %2
+ jnz %2
 %elif %1 == SNES_FLAG_I
  mov ch,B_I_flag
  test ch,ch
- jnz %3 %2
+ jnz %2
 %elif %1 == SNES_FLAG_Z
  mov ch,B_Z_flag
  test ch,ch
- jz %3 %2
+ jz %2
 %elif %1 == SNES_FLAG_C
  mov ch,B_C_flag
  test ch,ch
- jnz %3 %2
+ jnz %2
 %else
 %error Unhandled flag in JUMP_FLAG
 %endif
 %endmacro
 
-;%1 = flag, %2 = wheretogo, %3 = distance
-%macro JUMP_NOT_FLAG 2-3 short
+;%1 = flag, %2 = wheretogo
+%macro JUMP_NOT_FLAG 2
 %if %1 == SNES_FLAG_E
  mov ch,B_E_flag
  test ch,ch
- jz %3 %2
+ jz %2
 %elif %1 == SNES_FLAG_N
  mov ch,B_N_flag
  test ch,ch
- jns %3 %2
+ jns %2
 %elif %1 == SNES_FLAG_V
  mov ch,B_V_flag
  test ch,ch
- jz %3 %2
+ jz %2
 %elif %1 == SNES_FLAG_M
  mov ch,B_M1_flag
  test ch,ch
- jz %3 %2
+ jz %2
 %elif %1 == SNES_FLAG_X
  mov ch,B_XB_flag
  test ch,ch
- jz %3 %2
+ jz %2
 %elif %1 == SNES_FLAG_D
  mov ch,B_D_flag
  test ch,ch
- jz %3 %2
+ jz %2
 %elif %1 == SNES_FLAG_I
  mov ch,B_I_flag
  test ch,ch
- jz %3 %2
+ jz %2
 %elif %1 == SNES_FLAG_Z
  mov ch,B_Z_flag
  test ch,ch
- jnz %3 %2
+ jnz %2
 %elif %1 == SNES_FLAG_C
  mov ch,B_C_flag
  test ch,ch
- jz %3 %2
+ jz %2
 %else
 %error Unhandled flag in JUMP_NOT_FLAG
 %endif
@@ -1986,7 +1986,7 @@ ALIGNC
  xor eax,eax        ; Zero for table offset
  mov byte [In_CPU],-1
 
- jmp short C_LABEL(CPU_START_NEXT)
+ jmp C_LABEL(CPU_START_NEXT)
 
 ALIGNC
 EXPORT_C CPU_RETURN
@@ -2045,7 +2045,7 @@ EXPORT_C CPU_START_NEXT
  test al,al             ;
  jnz .track_e1_flags    ;
  E0_SETUPFLAGS          ;
- jmp short .track_e0_flags  ;
+ jmp .track_e0_flags    ;
 .track_e1_flags:        ;
  E1_SETUPFLAGS          ;
 .track_e0_flags:        ;
@@ -2067,7 +2067,7 @@ EXPORT_C CPU_START_NEXT
  jnz .on
  dec dword [_waitcount]
  setz [_debug]
- jnz near .off
+ jnz .off
 .on:
  pusha
  GET_PC edx

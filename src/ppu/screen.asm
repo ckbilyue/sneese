@@ -276,7 +276,7 @@ Update_Offset_Change:
 
  mov al,0
  mov esi,edi
- jmp short .detect_loop
+ jmp .detect_loop
 
 .detect_end:
  mov [OffsetChangeDetect1],ah
@@ -324,7 +324,7 @@ EXPORT_C Clear_Scanlines
  cld
 
  cmp byte [C_LABEL(preload_cache)],0
- jnz near C_LABEL(Clear_Scanlines_Preload).clear_loop
+ jnz C_LABEL(Clear_Scanlines_Preload).clear_loop
 
 .clear_loop:
  rep stosd
@@ -381,7 +381,7 @@ ALIGNC
 EXPORT_C Clear_Scanlines_Preload
 ;edi = dest address, ebp = line count
  cmp byte [C_LABEL(preload_cache_2)],0
- jz near C_LABEL(Clear_Scanlines)
+ jz C_LABEL(Clear_Scanlines)
 
  mov al,[C_LABEL(use_fpu_copies)]
  test al,al
@@ -389,7 +389,7 @@ EXPORT_C Clear_Scanlines_Preload
 
  mov al,[C_LABEL(use_mmx)]
  test al,al
- jnz near .clear_mmx
+ jnz .clear_mmx
 
  xor eax,eax
 
@@ -540,7 +540,7 @@ if (!MosaicCountdown)
 
  mov ah,[C_LABEL(INIDISP)]
  test ah,ah         ; Check for screen off
- js near .screen_off
+ js .screen_off
 
  cmp byte [Redo_Layering],0
  jz .no_layering_recalc_needed
@@ -563,7 +563,7 @@ EXTERN_C BreaksLast
  or al,[SCR_TS]
  and al,bl
  mov [Tile_Layers_Enabled],al
- jz near .no_tile_layers
+ jz .no_tile_layers
 
  mov edi,[Tile_Recache_Set_End]
  inc edi
@@ -1250,7 +1250,7 @@ EXPORT_C SCREEN_MODE_1
  add edi,GfxBufferLinePitch
  dec dword [SM01_Lines]
  mov [SM01_BaseDestPtr],edi
- jnz near .next_line
+ jnz .next_line
 %endif
 
  add esp,byte SM01_Local_Bytes
@@ -1443,7 +1443,7 @@ EXPORT_C SCREEN_MODE_6
  add edi,GfxBufferLinePitch
  dec dword [SM26_Lines]
  mov [SM26_BaseDestPtr],edi
- jnz near .next_line
+ jnz .next_line
 %endif
 
  add esp,byte SM26_Local_Bytes

@@ -358,7 +358,7 @@ EXPORT_C Render_Offset_16x16_C%1
 %ifndef NO_OFFSET_CHANGE
 %ifndef NO_OFFSET_CHANGE_DISABLE
  cmp byte [C_LABEL(Offset_Change_Disable)],0    ; Hack to disable offset change
- jnz near C_LABEL(Render_16x16_C%1)
+ jnz C_LABEL(Render_16x16_C%1)
 %endif  ; !NO_OFFSET_CHANGE_DISABLE
 %else   ; NO_OFFSET_CHANGE
  jmp C_LABEL(Render_16x16_C%1)
@@ -368,16 +368,16 @@ EXPORT_C Render_Offset_16x16_C%1
 %if %1 == 4     ;mode 2: 4-plane tiles, split offset table
  mov cl,[OffsetChangeDetect3]
  test cl,[OC_Flag+edx]
- jz near C_LABEL(Render_16x16_C%1)
+ jz C_LABEL(Render_16x16_C%1)
 %else           ;mode 4: 2- and 8-plane tiles, unified offset table
  mov cl,[OffsetChangeDetect1]
  test cl,[OC_Flag+edx]
- jz near C_LABEL(Render_16x16_C%1)
+ jz C_LABEL(Render_16x16_C%1)
 %endif
 %endif
 
  cmp byte [Mosaic+edx],0
- jnz near C_LABEL(Render_Offset_16x16M_C%1)
+ jnz C_LABEL(Render_Offset_16x16M_C%1)
 
 %ifndef NO_NP_RENDER
  mov ecx,C_LABEL(Plot_Lines_NP_Offset_16x16_Table_C%1)
@@ -514,7 +514,7 @@ Render_Offset_16x16_Base:
  add edi,GfxBufferLinePitch
  dec dword [RO16x16_Lines]
  mov [RO16x16_BaseDestPtr],edi ; Point screen to next line
- jnz near .next_line
+ jnz .next_line
 %endif
 
  mov edx,[RO16x16_BG_Table]
@@ -589,7 +589,7 @@ EXPORT_C %1     ; Define label, entry point
  mov eax,[Tile_Offset_Table_16_8+eax]
  sub edx,eax
  add esi,ecx
- jmp short .have_v_offset
+ jmp .have_v_offset
 
 .LeftEdge:
  push ecx
@@ -619,7 +619,7 @@ EXPORT_C %1     ; Define label, entry point
  and ebp,byte ~1
 
  mov al,[esi+ebp+1] ; Combine X and Y offsets into tile map
- Check_Tile_Priority %2, near %1_check
+ Check_Tile_Priority %2, %1_check
 
  mov si,[esi+ebp]   ; Get tile #
  mov ebp,[RO16x16_LineAddressOffsetY+RO16x16_Inner+12]
@@ -636,7 +636,7 @@ EXPORT_C %1     ; Define label, entry point
  add al,al      ; Get X flip (now in MSB)
  mov ebp,[palette_4bpl+edx]
  mov edx,[TilesetAddress]
- js near .xflip
+ js .xflip
 
  lea esi,[esi+ebx*8]
  and esi,0x3FF * 8 + 7  ; Clip to tileset
@@ -654,7 +654,7 @@ EXPORT_C %1     ; Define label, entry point
  mov [Tile_Priority_Used],cl
 %endif
  dec cl
- jnz near .next_tile
+ jnz .next_tile
 
  ret
 
@@ -678,7 +678,7 @@ ALIGNC
  mov [Tile_Priority_Used],cl
 %endif
  dec cl
- jnz near .next_tile
+ jnz .next_tile
 
  ret
 %endmacro
@@ -745,7 +745,7 @@ EXPORT_C %1     ; Define label, entry point
  mov eax,[Tile_Offset_Table_16_8+eax]
  sub edx,eax
  add esi,ecx
- jmp short .have_v_offset
+ jmp .have_v_offset
 
 .LeftEdge:
  push ecx
@@ -775,7 +775,7 @@ EXPORT_C %1     ; Define label, entry point
  and ebp,byte ~1
 
  mov al,[esi+ebp+1] ; Combine X and Y offsets into tile map
- Check_Tile_Priority %2, near %1_check
+ Check_Tile_Priority %2, %1_check
 
  mov si,[esi+ebp]   ; Get tile #
  mov ebp,[RO16x16_LineAddressOffsetY+RO16x16_Inner+12]
@@ -792,7 +792,7 @@ EXPORT_C %1     ; Define label, entry point
  add al,al      ; Get X flip (now in MSB)
  mov ebp,[palette_2bpl+edx]
  mov edx,[TilesetAddress]
- js near .xflip
+ js .xflip
 
  lea esi,[esi+ebx*8]
  and esi,0x3FF * 8 + 7  ; Clip to tileset
@@ -810,7 +810,7 @@ EXPORT_C %1     ; Define label, entry point
  mov [Tile_Priority_Used],cl
 %endif
  dec cl
- jnz near .next_tile
+ jnz .next_tile
 
  ret
 
@@ -834,7 +834,7 @@ ALIGNC
  mov [Tile_Priority_Used],cl
 %endif
  dec cl
- jnz near .next_tile
+ jnz .next_tile
 
  ret
 %endmacro
@@ -901,7 +901,7 @@ EXPORT_C %1     ; Define label, entry point
  mov eax,[Tile_Offset_Table_16_8+eax]
  sub edx,eax
  add esi,ecx
- jmp short .have_v_offset
+ jmp .have_v_offset
 
 .LeftEdge:
  push ecx
@@ -931,7 +931,7 @@ EXPORT_C %1     ; Define label, entry point
  and ebp,byte ~1
 
  mov al,[esi+ebp+1] ; Combine X and Y offsets into tile map
- Check_Tile_Priority %2, near %1_check
+ Check_Tile_Priority %2, %1_check
 
  mov si,[esi+ebp]   ; Get tile #
  mov ebp,[RO16x16_LineAddressOffsetY+RO16x16_Inner+12]
@@ -945,7 +945,7 @@ EXPORT_C %1     ; Define label, entry point
  and ebx,byte 1
  add al,al      ; Get X flip (now in MSB)
  mov edx,[TilesetAddress]
- js near .xflip
+ js .xflip
 
  lea esi,[esi+ebx*8]
  and esi,0x3FF * 8 + 7  ; Clip to tileset
@@ -963,7 +963,7 @@ EXPORT_C %1     ; Define label, entry point
  mov [Tile_Priority_Used],cl
 %endif
  dec cl
- jnz near .next_tile
+ jnz .next_tile
 
  ret
 
@@ -987,7 +987,7 @@ ALIGNC
  mov [Tile_Priority_Used],cl
 %endif
  dec cl
- jnz near .next_tile
+ jnz .next_tile
 
  ret
 %endmacro

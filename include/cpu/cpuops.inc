@@ -487,7 +487,7 @@ OPCODE_PROLOG(0xCB) ; WAI i
  mov byte [CPU_Execution_Mode],CEM_Waiting_For_Interrupt
  ; Trigger next event
  test R_Cycles,R_Cycles
- jge near HANDLE_EVENT
+ jge HANDLE_EVENT
  xor R_Cycles,R_Cycles
  jmp HANDLE_EVENT
 ALIGNC
@@ -512,7 +512,7 @@ OPCODE_PROLOG(0xDB) ; STP i
  mov byte [CPU_Execution_Mode],CEM_Clock_Stopped
  ; Trigger next event
  test R_Cycles,R_Cycles
- jge near HANDLE_EVENT
+ jge HANDLE_EVENT
  xor R_Cycles,R_Cycles
  jmp HANDLE_EVENT
 OPCODE_EPILOG

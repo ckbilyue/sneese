@@ -279,7 +279,7 @@ Render_16_Even_Run:
 ALIGNC
 EXPORT_C Render_16x%2_Even_C%1
  cmp byte [Mosaic+edx],0
- jnz near C_LABEL(Render_16x%2M_Even_C%1)
+ jnz C_LABEL(Render_16x%2M_Even_C%1)
 
 %ifndef NO_NP_RENDER
  mov ecx,C_LABEL(Plot_Lines_NP_16_Even_Table_C%1)
@@ -290,7 +290,7 @@ EXPORT_C Render_16x%2_Even_C%1
  mov ecx,C_LABEL(Plot_Lines_V_16_Even_Table_C%1)
 
 .have_plotter:
- jmp short Render_16x%2_Even_Base
+ jmp Render_16x%2_Even_Base
 %endmacro
 
 ;%1 = tile height
@@ -410,7 +410,7 @@ Render_16x%1_Even_Base:
 
 %ifndef LAYERS_PER_LINE
 ;cmp dword [R16E_Lines],0
- jnz near .next_line
+ jnz .next_line
 %endif
 
  mov edx,[R16E_BG_Table]
@@ -489,7 +489,7 @@ EXPORT_C %1     ; Define label, entry point
  mov [Tile_Priority_Used],cl
 %endif
 
- js near %%xflip
+ js %%xflip
 
  and esi,0x3FF * 8 + 7  ; Clip to tileset
  add esi,edx
@@ -514,7 +514,7 @@ EXPORT_C %1     ; Define label, entry point
 
  add edi,byte 8
  dec cl
- jnz near %%next_tile
+ jnz %%next_tile
  ret
 
 ALIGNC
@@ -543,7 +543,7 @@ ALIGNC
 
  add edi,byte 8
  dec cl
- jnz near %%next_tile
+ jnz %%next_tile
  ret
 %endmacro
 
@@ -605,7 +605,7 @@ EXPORT_C %1     ; Define label, entry point
  mov [Tile_Priority_Used],cl
 %endif
 
- js near %%xflip
+ js %%xflip
 
  and esi,0x3FF * 8 + 7  ; Clip to tileset
  add esi,edx
@@ -630,7 +630,7 @@ EXPORT_C %1     ; Define label, entry point
 
  add edi,byte 8
  dec cl
- jnz near %%next_tile
+ jnz %%next_tile
  ret
 
 ALIGNC
@@ -659,7 +659,7 @@ ALIGNC
 
  add edi,byte 8
  dec cl
- jnz near %%next_tile
+ jnz %%next_tile
  ret
 %endmacro
 

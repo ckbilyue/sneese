@@ -280,7 +280,7 @@ Render_8x8_Run:
 ALIGNC
 EXPORT_C Render_8x8_C%1
  cmp byte [Mosaic+edx],0
- jnz near C_LABEL(Render_8x8M_C%1)
+ jnz C_LABEL(Render_8x8M_C%1)
 
 %if %1 == 2
  mov ecx,[M0_Color+edx]
@@ -326,7 +326,7 @@ ALIGNC
 %if %2 > 0
  mov cl,[Priority_Unused+edx+eax*2]
  test cl,cl
- jz near .no_plot
+ jz .no_plot
 %endif
 
  call Sort_Screen_Height
@@ -450,7 +450,7 @@ ALIGNC
 
 %ifndef LAYERS_PER_LINE
 ;cmp dword [R8x8_Lines],0
- jnz near .next_line
+ jnz .next_line
 %endif
 
 %if %2 == 0
@@ -500,7 +500,7 @@ ALIGNC
 
 %ifndef LAYERS_PER_LINE
 ;cmp dword [R8x8_Lines],0
- jnz near .next_line
+ jnz .next_line
 %endif
 
  add esp,byte R8x8_Local_Bytes_H
@@ -575,7 +575,7 @@ EXPORT_C %1     ; Define label, entry point
 %endif
 
  add al,al      ; Get X flip (now in MSB)
- js near %%xflip
+ js %%xflip
 
  Plot_8_Paletted_Lines_Clip_noflip (%3),C_LABEL(TileCache2)+esi*8,0,TileClip1
 %if %3
@@ -585,7 +585,7 @@ EXPORT_C %1     ; Define label, entry point
 
  add edi,byte 8
  dec cl
- jnz near %%next_tile
+ jnz %%next_tile
  ret
 
 ALIGNC
@@ -598,7 +598,7 @@ ALIGNC
 
  add edi,byte 8
  dec cl
- jnz near %%next_tile
+ jnz %%next_tile
  ret
 %endmacro
 
@@ -663,7 +663,7 @@ EXPORT_C %1     ; Define label, entry point
 %endif
 
  add al,al      ; Get X flip (now in MSB)
- js near %%xflip
+ js %%xflip
 
  Plot_8_Paletted_Lines_Clip_noflip (%3),C_LABEL(TileCache4)+esi*8,0,TileClip1
 %if %3
@@ -673,7 +673,7 @@ EXPORT_C %1     ; Define label, entry point
 
  add edi,byte 8
  dec cl
- jnz near %%next_tile
+ jnz %%next_tile
  ret
 
 ALIGNC
@@ -686,7 +686,7 @@ ALIGNC
 
  add edi,byte 8
  dec cl
- jnz near %%next_tile
+ jnz %%next_tile
  ret
 %endmacro
 
@@ -747,7 +747,7 @@ EXPORT_C %1     ; Define label, entry point
 %endif
 
  add al,al      ; Get X flip (now in MSB)
- js near %%xflip
+ js %%xflip
 
  Plot_8_Lines_Clip_noflip (%3),C_LABEL(TileCache8)+esi*8,0,TileClip1
 %if %3
@@ -757,7 +757,7 @@ EXPORT_C %1     ; Define label, entry point
 
  add edi,byte 8
  dec cl
- jnz near %%next_tile
+ jnz %%next_tile
  ret
 
 ALIGNC
@@ -770,7 +770,7 @@ ALIGNC
 
  add edi,byte 8
  dec cl
- jnz near %%next_tile
+ jnz %%next_tile
  ret
 %endmacro
 

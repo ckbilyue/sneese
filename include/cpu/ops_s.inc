@@ -52,7 +52,7 @@ OPCODE_PROLOG(0x28) ; PLP s
  test bl,bl
 %if S_8bit
  jz C_LABEL(CPU_RETURN)
- JUMP_FLAG SNES_FLAG_I,C_LABEL(CPU_RETURN),near
+ JUMP_FLAG SNES_FLAG_I,C_LABEL(CPU_RETURN)
 %else
  jz .no_irq_enable
  JUMP_FLAG SNES_FLAG_I,.no_irq_enable
@@ -229,7 +229,7 @@ OPCODE_PROLOG(0xC2) ; REP #
  test bl,bl
 %if S_8bit
  jz C_LABEL(CPU_RETURN)
- JUMP_FLAG SNES_FLAG_I,C_LABEL(CPU_RETURN),near
+ JUMP_FLAG SNES_FLAG_I,C_LABEL(CPU_RETURN)
 %else
  jz .no_irq_enable
  JUMP_FLAG SNES_FLAG_I,.no_irq_enable
@@ -319,7 +319,7 @@ OPCODE_EPILOG
 OPCODE_PROLOG(0xFB) ; XCE i
  ADDR_Implied
 %if S_8bit
- JUMP_FLAG SNES_FLAG_C,C_LABEL(CPU_RETURN),near
+ JUMP_FLAG SNES_FLAG_C,C_LABEL(CPU_RETURN)
  STORE_FLAGS_E ah
  mov al,1
  STORE_FLAGS_C al
@@ -327,7 +327,7 @@ OPCODE_PROLOG(0xFB) ; XCE i
  STORE_FLAGS_X al
  mov dword [OpTable],OpTableMX  ; Set current opcode emulation table
 %else
- JUMP_NOT_FLAG SNES_FLAG_C,C_LABEL(CPU_RETURN),near
+ JUMP_NOT_FLAG SNES_FLAG_C,C_LABEL(CPU_RETURN)
  mov B_XH,ah
  mov B_YH,ah
  STORE_FLAGS_C ah

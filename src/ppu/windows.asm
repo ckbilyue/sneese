@@ -147,7 +147,7 @@ EXPORT_C Recalc_Window_Bands
  jnz .flush_one_side    ; if (!Left && Right == 255) full range inside;
  ; Full range inside window
  mov byte [Win_Count_Out+edx],0     ; No bands outside window
- jmp short .done
+ jmp .done
 .not_flush_left:
  ; Window not flush left (1 inside, 1 or 2 outside)
  test cl,cl
@@ -163,7 +163,7 @@ EXPORT_C Recalc_Window_Bands
  mov byte [Win_Bands_Out+edx],0
  mov [Win_Bands_Out+edx+2],cl
  mov byte [Win_Bands_Out+edx+3],0
- jmp short .done
+ jmp .done
 .flush_one_side:
  ; Window flush left, not flush right (1 inside, 1 outside)
  ; Window flush right, not flush left (1 inside, 1 outside)
@@ -173,7 +173,7 @@ EXPORT_C Recalc_Window_Bands
  mov [Win_Bands_Out+edx+1],al
  mov byte [Win_Count_Out+edx],1 ; One band outside window (right+1,left-1)
  mov [Win_Bands_Out+edx],cl
- jmp short .done
+ jmp .done
 .full_outside:
  ; Full range outside window (0 inside, 1 outside)
  mov byte [Win_Count_Out+edx],1     ; One band outside window

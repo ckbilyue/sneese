@@ -71,7 +71,7 @@ byte accessed.
 
  mov edx,[esp]
  call [C_LABEL(Read_Bank8Mapping)+edx*4]
- jmp short %%read_done
+ jmp %%read_done
 %%read_direct:
  mov al,[edx+ebx]
  mov [C_LABEL(Last_Bus_Value_A)],al
@@ -93,7 +93,7 @@ byte accessed.
  dec ebx
  call C_LABEL(SNES_GET_WORD_WRAP)
 %endif
- jmp short %%read_done
+ jmp %%read_done
 
 %%single_block:
  mov edx,ebx
@@ -125,7 +125,7 @@ byte accessed.
  call [C_LABEL(Read_Bank8Mapping)+edx*4]
  ror ax,8
  pop edx
- jmp short %%read_done
+ jmp %%read_done
 
 %%read_direct:
  mov ax,[edx+ebx-1]
@@ -150,7 +150,7 @@ byte accessed.
  sub bx,2
  call C_LABEL(SNES_GET_LONG_WRAP)
 %endif
- jmp short %%read_done
+ jmp %%read_done
 
 %%single_block:
  mov edx,ebx
@@ -192,7 +192,7 @@ byte accessed.
  call [C_LABEL(Read_Bank8Mapping)+edx*4]
  ror eax,16
  pop edx
- jmp short %%read_done
+ jmp %%read_done
 
 %%read_direct:
  mov al,[edx+ebx]
@@ -220,7 +220,7 @@ byte accessed.
  jnz %%write_direct
  mov edx,[esp]
  call [C_LABEL(Write_Bank8Mapping)+edx*4]
- jmp short %%write_done
+ jmp %%write_done
 %%write_direct:
  mov [edx+ebx],al
 %%write_done:

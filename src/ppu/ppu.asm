@@ -603,11 +603,23 @@ EXPORT Reset_Ports
  mov [C_LABEL(WH1)],al
  mov [C_LABEL(WH3)],al
  dec eax
+
  mov [C_LABEL(WBGLOG)],al
  mov [C_LABEL(WOBJLOG)],al
+ mov [C_LABEL(WLOGBG1)],al
+ mov [C_LABEL(WLOGBG2)],al
+ mov [C_LABEL(WLOGBG3)],al
+ mov [C_LABEL(WLOGBG4)],al
+
  mov [C_LABEL(W12SEL)],al
  mov [C_LABEL(W34SEL)],al
  mov [C_LABEL(WOBJSEL)],al
+
+ mov [C_LABEL(WSELBG1)],al
+ mov [C_LABEL(WSELBG2)],al
+ mov [C_LABEL(WSELBG3)],al
+ mov [C_LABEL(WSELBG4)],al
+
  mov [C_LABEL(TM)],al
  mov [C_LABEL(TS)],al
  mov [C_LABEL(TMW)],al
@@ -897,7 +909,7 @@ SNES_W2105: ; BGMODE
 %endif
  ; Note: Render_Mode is declared in screen.asm
  cmp [C_LABEL(BGMODE)],al
- je near .no_change
+ je .no_change
 
  UpdateDisplay  ;*
 
@@ -984,7 +996,7 @@ SNES_W2105: ; BGMODE
  mov bl,[NBABG1]
  mov [DepthBG1],cl
  and ecx,byte 3
- jz near .no_more_tile_layers
+ jz .no_more_tile_layers
 
  mov ecx,[Depth_NBA_Table+ecx*4]
  mov [NBATableBG1],ecx
@@ -1047,7 +1059,7 @@ SNES_W2105: ; BGMODE
  and edx,byte 7
  xor ebx,ebx
  cmp edx,byte 5
- jae near .wide_mode
+ jae .wide_mode
 
  mov bl,[DepthBG1]
  test al,0x10
@@ -1173,7 +1185,7 @@ SNES_W2106: ; MOSAIC
 ALIGNC
 SNES_W2107: ; BG1SC
  cmp [C_LABEL(BG1SC)],al
- je near Update_BGSC.no_change
+ je Update_BGSC.no_change
  LOAD_BG_TABLE 1
 Update_BGSC:
  push edi
@@ -1203,20 +1215,20 @@ Update_BGSC:
  mov [BLMapAddress+edx],ebx
  mov [TRMapAddress+edx],edi
  mov [BRMapAddress+edx],edi
- jmp short .have_screen_addresses
+ jmp .have_screen_addresses
 
 .tall_screen:
  add edi,esi
  mov [TRMapAddress+edx],ebx
  mov [BLMapAddress+edx],edi
  mov [BRMapAddress+edx],edi
- jmp short .have_screen_addresses
+ jmp .have_screen_addresses
 
 .one_screen:
  mov [TRMapAddress+edx],ebx
  mov [BLMapAddress+edx],ebx
  mov [BRMapAddress+edx],ebx
- jmp short .have_screen_addresses
+ jmp .have_screen_addresses
 
 .four_screen:
  push eax
@@ -1555,10 +1567,10 @@ ALIGNC
 SNES_W2115: ; VMAIN
  mov [C_LABEL(VMAIN)],al    ; Get our copy of this
  and al,0x0C
- jz near .no_full
+ jz .no_full
  cmp al,2*4
  je .full_64
- ja near .full_128
+ ja .full_128
 
 .full_32:
  mov dword [VMDATAREAD_update],VMDATAREAD_update_FULL_32
@@ -1578,7 +1590,7 @@ ALIGNC
  mov dword [VMDATAREAD_update],VMDATAREAD_update_FULL_128
  Set_21_Write 0x18,SNES_W2118_FULL_128
  Set_21_Write 0x19,SNES_W2119_FULL_128
- jmp short .full_done
+ jmp .full_done
 
 ALIGNC
 .no_full:
@@ -1649,7 +1661,7 @@ SNES_W2117: ; VMADDH
  cmp ebx,-1
 %ifdef Check_Within_Tile_Set
  jne %%new_set
- jmp short %%extend_set_one_tile
+ jmp %%extend_set_one_tile
 %%check_within_set:
  ; Tile may be within set?
  cmp [Tile_Recache_Set_Begin],edx
@@ -1692,7 +1704,7 @@ ALIGNC
 SNES_W2118_FULL_%2:
  push ebx
 
- JUMP_NOT_VBLANK near .no_change
+ JUMP_NOT_VBLANK .no_change
 
  mov edx,[VRAMAddress]
  push edi
@@ -1736,7 +1748,7 @@ ALIGNC
 SNES_W2119_FULL_%2:
  push ebx
 
- JUMP_NOT_VBLANK near .no_change
+ JUMP_NOT_VBLANK .no_change
 
  mov edx,[VRAMAddress]
  push edi
@@ -1781,7 +1793,7 @@ ALIGNC
 SNES_W2118_NORM:
  push ebx
 
- JUMP_NOT_VBLANK near .no_change
+ JUMP_NOT_VBLANK .no_change
 
  mov ebx,C_LABEL(VRAM)
  mov edx,[VRAMAddress]
@@ -1812,7 +1824,7 @@ ALIGNC
 SNES_W2119_NORM:
  push ebx
 
- JUMP_NOT_VBLANK near .no_change
+ JUMP_NOT_VBLANK .no_change
 
  mov ebx,C_LABEL(VRAM)+1
  mov edx,[VRAMAddress]
@@ -2060,7 +2072,7 @@ EXPORT_C Update_Layering
 
  cmp byte [C_LABEL(Layering_Mode)],1
  je .Update_Layering_1
- ja near .Update_Layering_2
+ ja .Update_Layering_2
 .Update_Layering_0:
  mov dword [Render_Select],C_LABEL(Render_Layering_Option_0)
  mov dword [Window_Offset_First],BG_Win_Sub

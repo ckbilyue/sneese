@@ -489,7 +489,7 @@ Render_Offset_16x16M_Base:
 
 %ifndef LAYERS_PER_LINE
 ;cmp dword [RO16x16M_Lines],0
- jnz near .next_line
+ jnz .next_line
 %endif
 
  mov edx,[RO16x16M_BG_Table]
@@ -583,7 +583,7 @@ EXPORT_C %1     ; Define label, entry point
  sub edx,eax
  add esi,ecx
  pop ecx
- jmp short .have_v_offset
+ jmp .have_v_offset
 
 .LeftEdge:
  push esi
@@ -612,7 +612,7 @@ EXPORT_C %1     ; Define label, entry point
  and ebp,byte ~1
 
  mov al,[esi+ebp+1] ; Combine X and Y offsets into tile map
- Check_Tile_Priority %2, near %1_check
+ Check_Tile_Priority %2, %1_check
 
  mov si,[esi+ebp]   ; Get tile #
  mov ebp,[RO16x16M_LineAddressOffsetY+RO16x16M_Inner+12]
@@ -630,7 +630,7 @@ EXPORT_C %1     ; Define label, entry point
  mov ebp,[TilesetAddress]
  mov edx,[palette_4bpl+edx]
  mov eax,[Mosaic_Size]
- js near %%xflip
+ js %%xflip
 
  lea esi,[esi+ebx*8]
  and esi,0x3FF * 8 + 7  ; Clip to tileset
@@ -851,7 +851,7 @@ EXPORT_C %1     ; Define label, entry point
  sub edx,eax
  add esi,ecx
  pop ecx
- jmp short .have_v_offset
+ jmp .have_v_offset
 
 .LeftEdge:
  push esi
@@ -880,7 +880,7 @@ EXPORT_C %1     ; Define label, entry point
  and ebp,byte ~1
 
  mov al,[esi+ebp+1] ; Combine X and Y offsets into tile map
- Check_Tile_Priority %2, near %1_check
+ Check_Tile_Priority %2, %1_check
 
  mov si,[esi+ebp]   ; Get tile #
  mov ebp,[RO16x16M_LineAddressOffsetY+RO16x16M_Inner+12]
@@ -898,7 +898,7 @@ EXPORT_C %1     ; Define label, entry point
  mov ebp,[TilesetAddress]
  mov edx,[palette_2bpl+edx]
  mov eax,[Mosaic_Size]
- js near %%xflip
+ js %%xflip
 
  lea esi,[esi+ebx*8]
  and esi,0x3FF * 8 + 7  ; Clip to tileset
@@ -1119,7 +1119,7 @@ EXPORT_C %1     ; Define label, entry point
  sub edx,eax
  add esi,ecx
  pop ecx
- jmp short .have_v_offset
+ jmp .have_v_offset
 
 .LeftEdge:
  push esi
@@ -1148,7 +1148,7 @@ EXPORT_C %1     ; Define label, entry point
  and ebp,byte ~1
 
  mov al,[esi+ebp+1] ; Combine X and Y offsets into tile map
- Check_Tile_Priority %2, near %1_check
+ Check_Tile_Priority %2, %1_check
 
  mov si,[esi+ebp]   ; Get tile #
  mov ebp,[RO16x16M_LineAddressOffsetY+RO16x16M_Inner+12]
@@ -1164,7 +1164,7 @@ EXPORT_C %1     ; Define label, entry point
  add al,al      ; Get X flip (now in MSB)
  mov ebp,[TilesetAddress]
  mov eax,[Mosaic_Size]
- js near %%xflip
+ js %%xflip
 
  lea esi,[esi+ebx*8]
  and esi,0x3FF * 8 + 7  ; Clip to tileset

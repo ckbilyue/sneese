@@ -482,7 +482,7 @@ EXPORT_C Render_Offset_16x%2M_Even_C%1
 
 %ifndef LAYERS_PER_LINE
 ;cmp dword [RO16ME_Lines],0
- jnz near .next_line
+ jnz .next_line
 %endif
 
  mov edx,[RO16ME_BG_Table]
@@ -592,7 +592,7 @@ EXPORT_C %1     ; Define label, entry point
  add esi,ecx
 %endif
  pop ecx
- jmp short .have_v_offset
+ jmp .have_v_offset
 
 .LeftEdge:
  push esi
@@ -620,7 +620,7 @@ EXPORT_C %1     ; Define label, entry point
 .tile_in_screen_map_left:
 
  mov al,[esi+1]
- Check_Tile_Priority %2, near %1_check
+ Check_Tile_Priority %2, %1_check
 
  mov ebp,[RO16ME_LineAddressOffsetY+RO16ME_Inner+12]
  test al,al         ; Check Y flip
@@ -639,7 +639,7 @@ EXPORT_C %1     ; Define label, entry point
 
  add al,al      ; Get X flip (now in MSB)
  mov eax,[Mosaic_Size]
- js near %%xflip
+ js %%xflip
 
 %%flip_none_same_tile:
  push esi

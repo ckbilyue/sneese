@@ -163,7 +163,7 @@ EXPORT Plot_Sprites
  mov ebx,[PS_Current_Line]
  mov edi,[PS_BaseDestPtr]
  mov edx,[PS_Priority]
- jmp short .first_line
+ jmp .first_line
 
 ALIGNC
 .next_line:
@@ -189,12 +189,12 @@ ALIGNC
  shl edx,4
 
  test cl,cl
- jz near .check_line_count
+ jz .check_line_count
 
  mov cl,[C_LABEL(OAM_Count)+ebx*2+1]
  mov al,[C_LABEL(OAM_Low_Before_High)+ebx]
  test al,al
- jnz near C_LABEL(Plot_Sprites_Low_Before_High).first_line
+ jnz C_LABEL(Plot_Sprites_Low_Before_High).first_line
 
  xor eax,eax
  mov al,cl
@@ -220,7 +220,7 @@ ALIGNC
  and dh,ah
  sub ebx,byte 4
  cmp dh,dl      ; Check priority
- jne near .check_tile_count
+ jne .check_tile_count
 
  mov esi,eax
  mov edi,[PS_BaseDestPtr]
@@ -238,13 +238,13 @@ ALIGNC
  add esi,C_LABEL(TileCache4)
 
  add ah,ah
- js near .flip_x
+ js .flip_x
 
  Plot_8_Paletted_Lines_noflip 0,esi,0
 
  mov dl,[PS_Priority]
  dec cl
- jnz near .next_tile
+ jnz .next_tile
  jmp .check_count
 
 ALIGNC
@@ -255,17 +255,17 @@ ALIGNC
 
 .check_tile_count:
  dec cl
- jnz near .next_tile
+ jnz .next_tile
 
 .check_count:
  add ebx,34*4
  add cl,ch
  mov ch,0
- jnz near .next_tile
+ jnz .next_tile
 
 .check_line_count:
  dec dword [PS_Lines]
- jnz near .next_line
+ jnz .next_line
 
 .done:
  add esp,byte PS_Local_Bytes
@@ -299,7 +299,7 @@ EXPORT_C Plot_Sprites_Low_Before_High
  mov esi,eax
 
  cmp dh,dl      ; Check priority
- jnz near .bad_priority_plot
+ jnz .bad_priority_plot
 
  mov dh,ah
  shr esi,15
@@ -312,7 +312,7 @@ EXPORT_C Plot_Sprites_Low_Before_High
 
  add ah,ah
  mov ah,[Pixel_Allocation_Tag]
- js near .flip_x
+ js .flip_x
 
  mov al,[esi]
  and al,dh
@@ -421,7 +421,7 @@ EXPORT_C Plot_Sprites_Low_Before_High
  pop ecx
  pop ebx
  dec cl
- jnz near .next_tile
+ jnz .next_tile
  jmp .check_tag
 
 ALIGNC
@@ -534,13 +534,13 @@ ALIGNC
  pop ecx
  pop ebx
  dec cl
- jnz near .next_tile
+ jnz .next_tile
 
 .check_tag:
  sub ebx,34*4
  add cl,ch
  mov ch,0
- jnz near .next_tile
+ jnz .next_tile
 
  rol byte [Pixel_Allocation_Tag],1
  jnc .check_line_count
@@ -553,7 +553,7 @@ ALIGNC
 
 .check_line_count:
  dec dword [PS_Lines]
- jnz near Plot_Sprites.next_line
+ jnz Plot_Sprites.next_line
 
 .done:
  add esp,byte PS_Local_Bytes
@@ -572,7 +572,7 @@ ALIGNC
 
  add ah,ah
  mov ah,[Pixel_Allocation_Tag]
- js near .bad_priority_flip_x
+ js .bad_priority_flip_x
 
  mov al,[esi]
  and al,dh
@@ -649,7 +649,7 @@ ALIGNC
  pop ecx
  pop ebx
  dec cl
- jnz near .next_tile
+ jnz .next_tile
  jmp .check_tag
 
 ALIGNC
@@ -729,7 +729,7 @@ ALIGNC
  pop ecx
  pop ebx
  dec cl
- jnz near .next_tile
+ jnz .next_tile
  jmp .check_tag
 
 ; In the precalculator...
@@ -794,7 +794,7 @@ EXPORT_C Add_Sprite_X_Positive
  ; If tile is X-flipped, set to last tile # instead of first
  mov dl,dh
  dec ebp
- jmp short .adjust_x_done
+ jmp .adjust_x_done
 
 .flip_x:
  ; Set to first tile #
@@ -814,7 +814,7 @@ EXPORT_C Add_Sprite_X_Positive
 .next_line:
  ;If line never displayed, ignore line
  cmp bl,239
- jnb near .check_count
+ jnb .check_count
 
  ; Check OBJ count for line (if 32, set range over and ignore OBJ)
  mov al,[C_LABEL(OAM_Count)+ebx*2]
@@ -840,7 +840,7 @@ EXPORT_C Add_Sprite_X_Positive
  ; line in sprite = line size - lines left
  sub dl,[ASXP_Lines_Left+4]
  jnz .adjust_y
- jmp short .adjust_y_done
+ jmp .adjust_y_done
 
 .flip_y:
  ; line in sprite = lines left - 1
@@ -886,7 +886,7 @@ EXPORT_C Add_Sprite_X_Positive
 .time_first_over:
  mov byte [C_LABEL(OAM_Count)+ebx*2+1],34
  sub al,34
- jmp short .list_wrap
+ jmp .list_wrap
 
 .time_over:
  mov al,[OAM_Tail+ebx]
@@ -919,7 +919,7 @@ EXPORT_C Add_Sprite_X_Positive
  cmp ah,al
  jb .low_before_high
  mov [C_LABEL(OAM_Lowest_Priority)+ebx],al
- jmp short .priority_done
+ jmp .priority_done
 
 .low_before_high:
  mov byte [C_LABEL(OAM_Low_Before_High)+ebx],0xFF
@@ -947,7 +947,7 @@ EXPORT_C Add_Sprite_X_Positive
  call C_LABEL(Add_Sprite_X_Positive_Flip_X)
  pop ebx
  pop ebp
- jmp short .check_count
+ jmp .check_count
 
 .Flip_None:
  call C_LABEL(Add_Sprite_X_Positive_Flip_None)
@@ -958,7 +958,7 @@ EXPORT_C Add_Sprite_X_Positive
 .check_count:
  inc bl
  dec byte [ASXP_Lines_Left]
- jnz near .next_line
+ jnz .next_line
 
  pop eax
  pop edx
@@ -1006,7 +1006,7 @@ EXPORT_C Add_Sprite_X_Negative
 .next_line:
  ;If line never displayed, ignore line
  cmp bl,239
- jnb near .check_count
+ jnb .check_count
 
  ; Check OBJ count for line (if 32, set range over and ignore OBJ)
  mov al,[C_LABEL(OAM_Count)+ebx*2]
@@ -1032,7 +1032,7 @@ EXPORT_C Add_Sprite_X_Negative
  ; line in sprite = line size - lines left
  sub dl,[ASXP_Lines_Left+4]
  jnz .adjust_y
- jmp short .adjust_y_done
+ jmp .adjust_y_done
 
 .flip_y:
  ; line in sprite = lines left - 1
@@ -1073,12 +1073,12 @@ EXPORT_C Add_Sprite_X_Negative
  ja .time_first_over
 
  mov [C_LABEL(OAM_Count)+ebx*2+1],al
- jmp short .time_okay
+ jmp .time_okay
 
 .time_first_over:
  mov byte [C_LABEL(OAM_Count)+ebx*2+1],34
  sub al,34
- jmp short .list_wrap
+ jmp .list_wrap
 
 .time_over:
  mov al,[OAM_Tail+ebx]
@@ -1111,7 +1111,7 @@ EXPORT_C Add_Sprite_X_Negative
  cmp ah,al
  jb .low_before_high
  mov [C_LABEL(OAM_Lowest_Priority)+ebx],al
- jmp short .priority_done
+ jmp .priority_done
 
 .low_before_high:
  mov byte [C_LABEL(OAM_Low_Before_High)+ebx],0xFF
@@ -1147,7 +1147,7 @@ EXPORT_C Add_Sprite_X_Negative
  call C_LABEL(Add_Sprite_X_Negative_Flip_X)
  pop ebx
  pop ebp
- jmp short .check_count
+ jmp .check_count
 
 .Flip_None:
  call C_LABEL(Add_Sprite_X_Negative_Flip_None)
@@ -1158,7 +1158,7 @@ EXPORT_C Add_Sprite_X_Negative
 .check_count:
  inc bl
  dec byte [ASXP_Lines_Left]
- jnz near .next_line
+ jnz .next_line
 
  pop eax
  pop edx
@@ -1435,7 +1435,7 @@ EXPORT_C Recache_OAM
 
 ;mov al,[C_LABEL(OBSEL)]
 ;cmp al,0xC0    ; If invalid size selected, no sprites to plot
-;jnb near .done
+;jnb .done
 
  mov ecx,[C_LABEL(HiSpriteCnt1)]    ; Size of first set and bit offset
  mov eax,[C_LABEL(HiSpriteCnt2)]
@@ -1446,7 +1446,7 @@ EXPORT_C Recache_OAM
  push byte 0
 .is_zero:
  push eax
- jmp short .next_sprite
+ jmp .next_sprite
 
 ; Tile attribute word: YXPP CCCT TTTT TTTT
 ;  Where:
@@ -1515,7 +1515,7 @@ ALIGNC
 ;edi = OAM 32 byte subtable address
 ;ecx, esi, edi must be preserved!
  call C_LABEL(Add_Sprite_X_Negative)
- jmp short .off_screen
+ jmp .off_screen
 
 .do_positive:
 ;# tiles <= 32 - (X & 0xFF) / 8 for +X
@@ -1537,7 +1537,7 @@ ALIGNC
 ;edi = OAM 32 byte subtable address
 ;ecx, esi, edi must be preserved!
  call C_LABEL(Add_Sprite_X_Positive)
- jmp short .off_screen
+ jmp .off_screen
 
 .rect_obj:
  mov al,dl
@@ -1554,13 +1554,13 @@ ALIGNC
 .bits_left:
  add esi,byte 4 ; Goto next sprite XYAA dword
  dec ch         ; Check sprite list count
- jnz near .next_sprite
+ jnz .next_sprite
  mov ch,[1+esp] ; Get next list count
  sub esi,0x200  ; Adjust pointers to sprite 127 (if we're at end)
  sub edi,byte 0x20
  add esp,byte 4
  test ch,ch     ; Continue if valid list
- jnz near .next_sprite
+ jnz .next_sprite
 
 .done:
  mov byte [Redo_OAM],0
@@ -1634,7 +1634,7 @@ ALIGNC
 ALIGNC
 EXPORT SNES_W2101 ; OBSEL
  cmp [C_LABEL(OBSEL)],al
- je near .no_change
+ je .no_change
 
  UpdateDisplay  ;*
  push ebx
@@ -1705,7 +1705,7 @@ EXPORT SNES_W2104 ; OAMDATA
  js .in_vblank
 
  cmp byte [C_LABEL(INIDISP)], 0
- jns near .no_increment  ;.no_change
+ jns .no_increment  ;.no_change
 
 .in_vblank:
  xor ebx,ebx

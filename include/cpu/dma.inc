@@ -247,7 +247,7 @@ EXTERN_MAP_WRITE_DMA 7
  mov al,[C_LABEL(HDMAEN)]
  mov [HDMAON],al
  test al,al
- jz near %%no_hdma
+ jz %%no_hdma
  RELATCH_HDMA_CHANNEL 0
  RELATCH_HDMA_CHANNEL 1
  RELATCH_HDMA_CHANNEL 2

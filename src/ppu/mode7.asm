@@ -331,7 +331,7 @@ EXTERN_C Layer_Disable_Mask
 
  call Recalc_Mode7
 
- jmp short .first_line
+ jmp .first_line
 
 .next_line:
  inc dword [SM7_Current_Line]
@@ -474,7 +474,7 @@ EXTERN_C Layer_Disable_Mask
  add edi,GfxBufferLinePitch
  dec dword [SM7_Lines]
  mov [SM7_BaseDestPtr],edi  ; Point screen to next line
- jnz near C_LABEL(SCREEN_MODE_7).next_line
+ jnz C_LABEL(SCREEN_MODE_7).next_line
 
  add esp,byte SM7_Local_Bytes
  ret
@@ -525,7 +525,7 @@ Recalc_Mode7:
 .end_recalc_ac:
  mov dl,[Redo_M7]
  and dl,0xF5    ; Need to do any recalculating?
- jz near .end_recalc
+ jz .end_recalc
 
  test dl,0xA0   ; Recalculate V or Y?
  jz .end_recalc_vy
@@ -599,7 +599,7 @@ ALIGNC
  mov cl,[MosaicBG1]
  add edi,edx
  test cl,cl
- jnz near %3_Mosaic
+ jnz %3_Mosaic
 
  mov ecx,[C_LABEL(M7A_X)]
  imul ecx,edx
@@ -778,7 +778,7 @@ ALIGNC
  inc edi
  dec ebp
 %endif
- jnz near .pixel_loop
+ jnz .pixel_loop
 
 %if %2
  add esp,byte 4
@@ -809,9 +809,9 @@ ALIGNC
 %endif
 
  cmp eax,0x3FFFF    ; If outside screen range we use tile 0
- ja near .use_tile_0
+ ja .use_tile_0
  cmp ebx,0x3FFFF
- ja near .use_tile_0
+ ja .use_tile_0
 
 ; Convert Screen X,Y location to SNES Pic location
 
@@ -878,7 +878,7 @@ ALIGNC
  pop ebp
 
  test ebp,ebp
- jnz near .pixel_loop
+ jnz .pixel_loop
 %else
  mov ecx,[C_LABEL(M7A_X)]
 
@@ -912,7 +912,7 @@ ALIGNC
  inc edi
  dec ebp
 %endif
- jnz near .pixel_loop
+ jnz .pixel_loop
 
 %if %2
  add esp,byte 4
@@ -979,7 +979,7 @@ ALIGNC
  dec ebp
 %endif
 
- jnz near .pixel_loop
+ jnz .pixel_loop
 
 %if %2
  add esp,byte 4
@@ -1009,9 +1009,9 @@ ALIGNC
 %endif
 
  cmp eax,0x3FFFF    ; If outside screen range we simply skip the pixel
- ja near .pixel_covered
+ ja .pixel_covered
  cmp ebx,0x3FFFF
- ja near .pixel_covered
+ ja .pixel_covered
 
 ; Convert Screen X,Y location to SNES Pic location
 
@@ -1088,7 +1088,7 @@ ALIGNC
  pop ebp
 
  test ebp,ebp
- jnz near .pixel_loop
+ jnz .pixel_loop
 %else
  inc edi
 
@@ -1127,7 +1127,7 @@ ALIGNC
 
  dec ebp
 %endif
- jnz near .pixel_loop
+ jnz .pixel_loop
 
 %if %2
  add esp,byte 4

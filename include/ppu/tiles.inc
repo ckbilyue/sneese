@@ -153,22 +153,22 @@ EXTERN Invalidate_Tile_Caches
  test dh,dh
  jz %%put123_skip4
  mov [edi + (%1)],eax
- jmp short %%skip4
+ jmp %%skip4
 
 %%put12_skip3:
  mov [edi + (%1)],ax
  test dh,dh
  jnz %%skip3
- jmp short %%skip4
+ jmp %%skip4
 
 %%put123_skip4:
  mov [edi + (%1)],ax
  mov [edi + (%1) + 2],dl
- jmp short %%skip4
+ jmp %%skip4
 
 %%skip1:
  mov [edi + (%1) + 1],ah
- jmp short %%skip2
+ jmp %%skip2
 
 %%put1:
  mov [edi + (%1)],al
@@ -182,11 +182,11 @@ EXTERN Invalidate_Tile_Caches
  test dh,dh
  jz %%put3_skip4
  mov [edi + (%1) + 2],dx
- jmp short %%skip4
+ jmp %%skip4
 
 %%put3_skip4:
  mov [edi + (%1) + 2],dl
- jmp short %%skip4
+ jmp %%skip4
 
 %%skip3:
  mov [edi + (%1) + 3],dh
@@ -367,7 +367,7 @@ EXTERN Invalidate_Tile_Caches
  add esi,ecx
  add edi,GfxBufferLinePitch
  dec ebx
- jnz near %%loop
+ jnz %%loop
  pop edi
 %endif
 %endmacro
@@ -383,7 +383,7 @@ EXTERN Invalidate_Tile_Caches
  add esi,ecx
  add edi,GfxBufferLinePitch
  dec ebx
- jnz near %%loop
+ jnz %%loop
  pop edi
 %endif
 %endmacro
@@ -400,7 +400,7 @@ EXTERN Invalidate_Tile_Caches
  add esi,ecx
  add edi,GfxBufferLinePitch
  dec ebx
- jnz near %%loop
+ jnz %%loop
  pop edi
 %endif
 %endmacro
@@ -417,7 +417,7 @@ EXTERN Invalidate_Tile_Caches
  add esi,ecx
  add edi,GfxBufferLinePitch
  dec ebx
- jnz near %%loop
+ jnz %%loop
  pop edi
 %endif
 %endmacro
@@ -434,7 +434,7 @@ EXTERN Invalidate_Tile_Caches
  add esi,ecx
  add edi,GfxBufferLinePitch
  dec ebx
- jnz near %%loop
+ jnz %%loop
  pop edi
 %endif
 %endmacro
@@ -451,7 +451,7 @@ EXTERN Invalidate_Tile_Caches
  add esi,ecx
  add edi,GfxBufferLinePitch
  dec ebx
- jnz near %%loop
+ jnz %%loop
  pop edi
 %endif
 %endmacro
@@ -468,7 +468,7 @@ EXTERN Invalidate_Tile_Caches
  add esi,ecx
  add edi,GfxBufferLinePitch
  dec ebx
- jnz near %%loop
+ jnz %%loop
  pop edi
 %endif
 %endmacro
@@ -485,7 +485,7 @@ EXTERN Invalidate_Tile_Caches
  add esi,ecx
  add edi,GfxBufferLinePitch
  dec ebx
- jnz near %%loop
+ jnz %%loop
  pop edi
 %endif
 %endmacro
@@ -502,7 +502,7 @@ EXTERN Invalidate_Tile_Caches
  add esi,ecx
  add edi,GfxBufferLinePitch
  dec ebx
- jnz near %%loop
+ jnz %%loop
  pop edi
 %endif
 %endmacro
@@ -519,7 +519,7 @@ EXTERN Invalidate_Tile_Caches
  add esi,ecx
  add edi,GfxBufferLinePitch
  dec ebx
- jnz near %%loop
+ jnz %%loop
  pop edi
 %endif
 %endmacro

@@ -254,7 +254,7 @@ EXPORT_C Render_16x16M_C%1
  mov eax,[M0_Color+edx]
  mov [Palette_Base],eax
 %endif
- jmp short Render_16x16M_Base
+ jmp Render_16x16M_Base
 %endmacro
 
 Render_16x16M 2
@@ -391,7 +391,7 @@ Render_16x16M_Base:
 
 %ifndef LAYERS_PER_LINE
 ;cmp dword [R16x16M_Lines],0
- jnz near .next_line
+ jnz .next_line
 %endif
 
  mov edx,[R16x16M_BG_Table]
@@ -467,7 +467,7 @@ EXPORT_C %1     ; Define label, entry point
 
  add al,al      ; Get X flip (now in MSB)
  mov eax,[Mosaic_Size]
- js near %%xflip
+ js %%xflip
 
 %%flip_none_same_tile:
  push esi
@@ -526,7 +526,7 @@ ALIGNC
  jz %%flip_none_return
 
  cmp ebp,byte 16
- jb near %%flip_none_same_tile
+ jb %%flip_none_same_tile
 
  pop ebx
  jmp %%next_tile
@@ -595,7 +595,7 @@ ALIGNC
  jz %%flip_x_return
 
  cmp ebp,byte ~16
- ja near %%flip_x_same_tile
+ ja %%flip_x_same_tile
 
  pop ebx
  xor ebp,byte -1
@@ -667,7 +667,7 @@ EXPORT_C %1     ; Define label, entry point
 
  add al,al      ; Get X flip (now in MSB)
  mov eax,[Mosaic_Size]
- js near %%xflip
+ js %%xflip
 
 %%flip_none_same_tile:
  push esi
@@ -725,7 +725,7 @@ EXPORT_C %1     ; Define label, entry point
  jz %%flip_none_return
 
  cmp ebp,byte 16
- jb near %%flip_none_same_tile
+ jb %%flip_none_same_tile
 
  pop ebx
  jmp %%next_tile
@@ -794,7 +794,7 @@ ALIGNC
  jz %%flip_x_return
 
  cmp ebp,byte ~16
- ja near %%flip_x_same_tile
+ ja %%flip_x_same_tile
 
  pop ebx
  xor ebp,byte -1
@@ -864,7 +864,7 @@ EXPORT_C %1     ; Define label, entry point
 
  add al,al      ; Get X flip (now in MSB)
  mov eax,[Mosaic_Size]
- js near %%xflip
+ js %%xflip
 
 %%flip_none_same_tile:
 
@@ -923,7 +923,7 @@ ALIGNC
  jz %%flip_none_return
 
  cmp ebp,byte 16
- jb near %%flip_none_same_tile
+ jb %%flip_none_same_tile
 
  jmp %%next_tile
 
@@ -990,7 +990,7 @@ ALIGNC
  jz %%flip_x_return
 
  cmp ebp,byte ~16
- ja near %%flip_x_same_tile
+ ja %%flip_x_same_tile
 
  xor ebp,byte -1
  jmp %%next_tile

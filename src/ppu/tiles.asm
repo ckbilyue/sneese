@@ -342,7 +342,7 @@ EXTERN_C BreaksLast
 
  sub edi,byte 2
  dec dh
- jnz near .4bpl_line_loop
+ jnz .4bpl_line_loop
 
  mov bl,[C_LABEL(TileCache8)+edi*2+16*2-16*4]
  mov bl,[C_LABEL(TileCache8)+edi*2+16*2-16*2]
@@ -443,11 +443,11 @@ EXTERN_C BreaksLast
  mov [C_LABEL(TileCache4)+edi*8+4],ebp
  inc edi
  dec dh
- jnz near .4bpl_line_loop
+ jnz .4bpl_line_loop
 
  add esi,byte 16
  dec dword [esp]
- jnz near .4bpl_tile_loop
+ jnz .4bpl_tile_loop
 
  pop eax
 %endif
@@ -545,11 +545,11 @@ EXTERN_C BreaksLast
  mov [C_LABEL(TileCache8)+edi*8+4],ebp
  inc edi
  dec dh
- jnz near .8bpl_line_loop
+ jnz .8bpl_line_loop
 
  add esi,byte 48
  dec dword [esp]
- jnz near .8bpl_tile_loop
+ jnz .8bpl_tile_loop
 
  pop eax
 %endif

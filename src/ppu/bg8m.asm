@@ -243,7 +243,7 @@ EXPORT_C Render_8x8M_C%1
  mov eax,[M0_Color+edx]
  mov [Palette_Base],eax
 %endif
- jmp short Render_8x8M_Base
+ jmp Render_8x8M_Base
 %endmacro
 
 Render_8x8M 2
@@ -380,7 +380,7 @@ Render_8x8M_Base:
 
 %ifndef LAYERS_PER_LINE
 ;cmp dword [R8x8M_Lines],0
- jnz near .next_line
+ jnz .next_line
 %endif
 
  mov edx,[R8x8M_BG_Table]
@@ -460,7 +460,7 @@ EXPORT_C %1     ; Define label, entry point
 
  add al,al      ; Get X flip (now in MSB)
  mov eax,[Mosaic_Size]
- js near %%xflip
+ js %%xflip
 
  lea esi,[C_LABEL(TileCache2)+esi*8]
 %%flip_none_same_tile:
@@ -642,7 +642,7 @@ EXPORT_C %1     ; Define label, entry point
 
  add al,al      ; Get X flip (now in MSB)
  mov eax,[Mosaic_Size]
- js near %%xflip
+ js %%xflip
 
  lea esi,[C_LABEL(TileCache4)+esi*8]
 %%flip_none_same_tile:
@@ -821,7 +821,7 @@ EXPORT_C %1     ; Define label, entry point
 
  add al,al      ; Get X flip (now in MSB)
  mov eax,[Mosaic_Size]
- js near %%xflip
+ js %%xflip
 
  lea esi,[C_LABEL(TileCache8)+esi*8]
 %%flip_none_same_tile:

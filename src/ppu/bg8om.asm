@@ -490,7 +490,7 @@ Render_Offset_8x8M_Base:
 
 %ifndef LAYERS_PER_LINE
 ;cmp dword [RO8x8M_Lines],0
- jnz near .next_line
+ jnz .next_line
 %endif
 
  mov edx,[RO8x8M_BG_Table]
@@ -584,7 +584,7 @@ EXPORT_C %1     ; Define label, entry point
  sub edx,eax
  lea esi,[esi+ecx*8]    ; Get screen offset
  pop ecx
- jmp short .have_v_offset
+ jmp .have_v_offset
 
 .LeftEdge:
  push esi
@@ -612,7 +612,7 @@ EXPORT_C %1     ; Define label, entry point
 .tile_in_screen_map_left:
 
  mov al,[esi+1]
- Check_Tile_Priority %2, near %1_check
+ Check_Tile_Priority %2, %1_check
 
  mov ebp,[RO8x8M_LineAddressOffsetY+RO8x8M_Inner+12]
  test al,al         ; Check Y flip
@@ -635,7 +635,7 @@ EXPORT_C %1     ; Define label, entry point
 
  add al,al      ; Get X flip (now in MSB)
  mov eax,[Mosaic_Size]
- js near %%xflip
+ js %%xflip
 
  lea esi,[C_LABEL(TileCache4)+esi*8]
 %%flip_none_same_tile:
@@ -841,7 +841,7 @@ EXPORT_C %1     ; Define label, entry point
  sub edx,eax
  lea esi,[esi+ecx*8]    ; Get screen offset
  pop ecx
- jmp short .have_v_offset
+ jmp .have_v_offset
 
 .LeftEdge:
  push esi
@@ -869,7 +869,7 @@ EXPORT_C %1     ; Define label, entry point
 .tile_in_screen_map_left:
 
  mov al,[esi+1]
- Check_Tile_Priority %2, near %1_check
+ Check_Tile_Priority %2, %1_check
 
  mov ebp,[RO8x8M_LineAddressOffsetY+RO8x8M_Inner+12]
  test al,al         ; Check Y flip
@@ -892,7 +892,7 @@ EXPORT_C %1     ; Define label, entry point
 
  add al,al      ; Get X flip (now in MSB)
  mov eax,[Mosaic_Size]
- js near %%xflip
+ js %%xflip
 
  lea esi,[C_LABEL(TileCache2)+esi*8]
 %%flip_none_same_tile:
@@ -1098,7 +1098,7 @@ EXPORT_C %1     ; Define label, entry point
  sub edx,eax
  lea esi,[esi+ecx*8]    ; Get screen offset
  pop ecx
- jmp short .have_v_offset
+ jmp .have_v_offset
 
 .LeftEdge:
  push esi
@@ -1126,7 +1126,7 @@ EXPORT_C %1     ; Define label, entry point
 .tile_in_screen_map_left:
 
  mov al,[esi+1]
- Check_Tile_Priority %2, near %1_check
+ Check_Tile_Priority %2, %1_check
 
  mov ebp,[RO8x8M_LineAddressOffsetY+RO8x8M_Inner+12]
  test al,al         ; Check Y flip
@@ -1146,7 +1146,7 @@ EXPORT_C %1     ; Define label, entry point
 
  add al,al      ; Get X flip (now in MSB)
  mov eax,[Mosaic_Size]
- js near %%xflip
+ js %%xflip
 
  lea esi,[C_LABEL(TileCache8)+esi*8]
 %%flip_none_same_tile:
