@@ -409,6 +409,8 @@ EXPORT_C BG34NBA,skipb  ; aaaabbbb  aaaa=base address 4, bbbb=base address 3
 
 EXPORT_C VMAIN,skipb    ; i000abcd  i=inc type,ab=full graphic,cd=SC increment
 
+EXPORT PPU2_Latch_External,skipb
+
 ALIGNB
 EXPORT_C COLDATA,skipl  ; Actual data from COLDATA
 CGAddress:  skipl   ; Palette position for writes to CGRAM
@@ -543,6 +545,9 @@ EXPORT Reset_Ports
 
  ; Set eax to 0, as we're setting most everything to 0...
  xor eax,eax
+
+ ;Reset PPU2 Latch state
+ mov byte [PPU2_Latch_External],0
 
  mov dword [Render_Select],C_LABEL(Render_Layering_Option_0)
  mov byte [C_LABEL(Layering_Mode)],0
@@ -821,6 +826,7 @@ SNES_R213E: ; STAT77
  mov al,1   ; This is not supported yet!
  ret
 
+EXTERN_C RDIO,WRIO
 ALIGNC
 SNES_R213F: ; STAT78
  mov al,0
@@ -828,6 +834,18 @@ SNES_R213F: ; STAT78
  mov [OPVCT],al
  mov al,[STAT78]
  or al,[C_LABEL(SNES_COUNTRY)]  ; 0x10 means PAL, not NTSC
+
+
+ mov dl,[C_LABEL(WRIO)]
+ and dl,[C_LABEL(RDIO)]
+ jns .latch
+
+ cmp byte [PPU2_Latch_External],0
+ jz .no_latch
+.no_latch:
+ and byte [STAT78],~(1 << 6)    ; Clear latch flag
+.latch:
+
  ret
 
 ; SNES_R2140_SKIP: ; APUI00 in APUskip.asm
