@@ -21,7 +21,7 @@ You must read and accept the license prior to use.
 */
 
 //#define NO_GUI
-/* DOS platform-specific code */
+/* Allegro-based port platform-specific code */
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>

@@ -48,6 +48,8 @@ ALLEG  := -lalleg
 SUFFIX :=
 AFLAGS := -f coff
 GXX    := gxx
+PLATFORMOBJS := $(addprefix allegro/, platform.o)
+PLATFORMRULES = rulesalg.inc
 
 ZLIB   := 1 # comment this line to disable ZLIB support
 ifdef ZLIB

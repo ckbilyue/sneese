@@ -34,10 +34,6 @@ ifndef SAVE_ASM_OUTPUT
 SAVE_ASM_OUTPUT := 1
 endif
 
-ifndef NO_SELF_MODIFY
-NO_SELF_MODIFY := 0
-endif
-
 
 # Base paths for source and object trees
 BASE   := .
@@ -90,10 +86,6 @@ endif
 DFLAGS = -DDEBUG
 
 
-ifneq ($(NO_SELF_MODIFY),0)
-endif
-
-
 CFLAGS = $(OFLAGS) -ggdb3 -I$(INCLUDE)
 ifdef ZLIB
 CFLAGS += -DZLIB
@@ -107,6 +99,8 @@ OBJBASE := o
 endif
 
 
+include $(PLATFORMRULES)
+
 ASMOBJS := $(addsuffix .$(ASM_OBJ_EXT), \
             $(addprefix cpu/, 65c816 memmap dma) \
             $(addprefix apu/, spc700 apuskip) \
@@ -116,9 +110,9 @@ ASMOBJS := $(addsuffix .$(ASM_OBJ_EXT), \
            clear scrmode font)
 JMAOBJS := $(addprefix jma/, 7zlzma.o crc32.o iiostrm.o inbyte.o jma.o \
             lzma.o lzmadec.o winout.o)
-OBJS   := $(ASMOBJS) $(JMAOBJS) main.o romload.o snes.o timers.o debug.o \
-           input.o helper.o apu/sound.o dos.o guicore.o emugui.o map.o \
-           multiio.o
+OBJS   := $(ASMOBJS) $(PLATFORMOBJS) $(JMAOBJS) main.o romload.o snes.o \
+           timers.o debug.o input.o helper.o apu/sound.o guicore.o \
+           emugui.o map.o multiio.o
 ifdef ZLIB
 OBJS += unzip.o
 endif
@@ -132,24 +126,8 @@ $(sort $(OBJDIRS)):
 	@-$(MD) $@
 
 clean:
-	@echo Removing C/C++ output files
-	@-$(RM) $(OBJ)/*.o
-	@-$(RM) $(OBJ)/apu/*.o
-	@-$(RM) $(OBJ)/cpu/*.o
-	@-$(RM) $(OBJ)/ppu/*.o
-	@-$(RM) $(OBJ)/jma/*.o
-ifneq ($(SAVE_ASM_OUTPUT),0)
-	@-$(RM) $(OBJ)/*.s
-	@-$(RM) $(OBJ)/apu/*.s
-	@-$(RM) $(OBJ)/cpu/*.s
-	@-$(RM) $(OBJ)/ppu/*.s
-	@-$(RM) $(OBJ)/jma/*.s
-endif
-	@echo Removing ASM output files
-	@-$(RM) $(OBJ)/*.$(ASM_OBJ_EXT)
-	@-$(RM) $(OBJ)/apu/*.$(ASM_OBJ_EXT)
-	@-$(RM) $(OBJ)/cpu/*.$(ASM_OBJ_EXT)
-	@-$(RM) $(OBJ)/ppu/*.$(ASM_OBJ_EXT)
+	@echo Removing output files
+	@-$(RM) -rf $(OBJ_BASE)/$(PLATFORM)
 
 $(OBJ)/%.$(ASM_OBJ_EXT): $(SRC)/%.asm $(OBJFIX)
 	$(NASM) $(AFLAGS) $(DFLAGS) -o $@ $<
@@ -274,9 +252,6 @@ $(OBJ)/timers.$(OBJBASE): $(SRC)/timers.c $(INCLUDE)/wrapaleg.h
 $(OBJ)/debug.$(OBJBASE): $(SRC)/debug.c \
  $(addprefix $(INCLUDE)/, debug.h misc.h cpu/cpu.h apu/sound.h apu/spc.h \
  helper.h snes.h wrapaleg.h)
-$(OBJ)/dos.$(OBJBASE): $(SRC)/dos.c \
- $(addprefix $(INCLUDE)/, platform.h misc.h helper.h input.h romload.h \
- apu/sound.h cpu/cpu.h apu/spc.h guicore.h wrapaleg.h version.h)
 $(OBJ)/helper.$(OBJBASE): $(SRC)/helper.c \
  $(addprefix $(INCLUDE)/, helper.h apu/sound.h apu/spc.h misc.h cpu/cpu.h \
  wrapaleg.h)

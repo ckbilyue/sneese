@@ -5,6 +5,7 @@ makefile.win
 objfix.win
 makefile.unix
 makefile.beos
+rulesalg.inc
 LICENSE
 CHANGES
 SOURCE
@@ -94,10 +95,10 @@ include/apu/sounddef.h
 include/version.h
 src/romload.cpp
 include/cpu/mem.h
+src/allegro/platform.c
 src/snes.c
 src/timers.c
 src/debug.c
-src/dos.c
 src/helper.c
 src/apu/sound.c
 src/input.c

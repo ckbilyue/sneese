@@ -48,7 +48,8 @@ ALLEG  := -lalleg
 SUFFIX := w
 AFLAGS := -f win32
 GXX    := g++
-NO_SELF_MODIFY := 1
+PLATFORMOBJS := $(addprefix allegro/, platform.o)
+PLATFORMRULES = rulesalg.inc
 
 ZLIB   := 1 # comment this line to disable ZLIB support
 ifdef ZLIB
@@ -58,7 +59,7 @@ endif
 
 # Extra step needed for MinGW32
 OBJFIX_INCLUDE = objfix.win
-PLATFORM_OBJDIRS = win
+PLATFORM_OBJDIRS += win
 
 
 include makefile.all

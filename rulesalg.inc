@@ -21,40 +21,10 @@
 #
 
 
-PLATFORM := dos
+# Set up rules for platform-specific dependencies.
+$(OBJ)/allegro/platform.$(OBJBASE): $(SRC)/allegro/platform.c \
+ $(addprefix $(INCLUDE)/, platform.h misc.h helper.h input.h romload.h \
+ apu/sound.h cpu/cpu.h apu/spc.h guicore.h wrapaleg.h version.h)
 
-# DOS (DJGPP, GCC)
+PLATFORM_OBJDIRS += allegro
 
-
-# How to call the tools we need to use
-
-NASM   := nasm -w+orphan-labels -w+macro-params -O20 -DC_LABELS_PREFIX=_
-GCC    := gcc -Werror -Wall
-RM     := rm -f
-MD     := mkdir
-
-
-# Default filename extension for executables
-EXE_EXT := .exe
-
-
-# How to inform the linker of libraries we're using
-
-ALLEG  := -lalleg
-
-
-# Set up build for this platform.
-
-SUFFIX :=
-AFLAGS := -f coff
-GXX    := gxx
-PLATFORMOBJS := $(addprefix allegro/, platform.o)
-PLATFORMRULES = rulesalg.inc
-
-ZLIB   := 1 # comment this line to disable ZLIB support
-ifdef ZLIB
-MIOFLAGS := -lz
-endif
-
-
-include makefile.all
