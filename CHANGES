@@ -22,6 +22,8 @@ Changes
 
 
  0.832
+  Documentation: Updated grossly insufficient copyright attributations
+   [TRAC]
   5A22: Corrected decimal fixup in ADC/SBC instructions to not
    allow multiple carries/borrows [TRAC]
   Input: Prevented input code from reading sticks that were not

@@ -4,6 +4,7 @@
 #
 #
 # Copyright (c) 1998-2005, Charles Bilyue'.
+# Portions copyright (c) 1998-2003, Brad Martin.
 # Portions copyright (c) 2003-2004, Daniel Horchner.
 # Portions copyright (c) 2004-2005, Nach. ( http://nsrt.edgeemu.com/ )
 # Unzip Technology, copyright (c) 1998 Gilles Vollant.
