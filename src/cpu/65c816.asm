@@ -2113,9 +2113,9 @@ EXPORT E1_RESET
  add R_Cycles,_5A22_FAST_CYCLE * 2
  mov ebx,B_S
  GET_BYTE       ;dummy stack access
- inc bl
+ dec bl
  GET_BYTE       ;dummy stack access
- inc bl
+ dec bl
  GET_BYTE       ;dummy stack access
  mov B_S,ebx
 
