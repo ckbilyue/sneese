@@ -606,19 +606,18 @@ EXPORT Reset_Ports
 
  mov [C_LABEL(WBGLOG)],al
  mov [C_LABEL(WOBJLOG)],al
- mov [C_LABEL(WLOGBG1)],al
- mov [C_LABEL(WLOGBG2)],al
- mov [C_LABEL(WLOGBG3)],al
- mov [C_LABEL(WLOGBG4)],al
-
  mov [C_LABEL(W12SEL)],al
  mov [C_LABEL(W34SEL)],al
  mov [C_LABEL(WOBJSEL)],al
 
- mov [C_LABEL(WSELBG1)],al
- mov [C_LABEL(WSELBG2)],al
- mov [C_LABEL(WSELBG3)],al
- mov [C_LABEL(WSELBG4)],al
+ mov [WLOGBG1],al
+ mov [WLOGBG2],al
+ mov [WLOGBG3],al
+ mov [WLOGBG4],al
+ mov [WSELBG1],al
+ mov [WSELBG2],al
+ mov [WSELBG3],al
+ mov [WSELBG4],al
 
  mov [C_LABEL(TM)],al
  mov [C_LABEL(TS)],al
