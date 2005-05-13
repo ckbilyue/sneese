@@ -839,10 +839,8 @@ EXPORT_C SPC_ADDW_YA_dp
  STORE_FLAGS_V 1
 .no_overflow:
  sbb cl,cl
- STORE_FLAGS_N bh
- or bl,bh
+ STORE_FLAGS_NZ bh
  STORE_FLAGS_C cl
- STORE_FLAGS_Z bl
  STORE_FLAGS_H ah
  OPCODE_EPILOG
 
@@ -983,10 +981,8 @@ EXPORT_C SPC_SUBW_YA_dp
  STORE_FLAGS_V 1
 .no_overflow:
  sbb cl,cl
- STORE_FLAGS_N bh
- or bl,bh
+ STORE_FLAGS_NZ bh
  xor cl,0xFF
- STORE_FLAGS_Z bl
  STORE_FLAGS_C cl
  STORE_FLAGS_H ah
  OPCODE_EPILOG
