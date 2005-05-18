@@ -51,6 +51,8 @@ Changes
   Sound: Fixed a bug in decoding of BRR blocks with invalid range values;
    thanks to anomie for pointing this out [TRAC]
   Source: Improved some aspects of makefiles and source layout [TRAC]
+  5A22: Added emulation of the capability of HDMA to be used for reading
+   the B-bus, thanks to anomie for alerting me to its presence [TRAC]
  0.832
   Documentation: Updated grossly insufficient copyright attributations
    [TRAC]

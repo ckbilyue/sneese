@@ -142,10 +142,16 @@ section .text
  ACCESS_B_BUS SET_BYTE,%2,%1
 %endmacro
 
-;macro for HDMA transfers
+;macro for HDMA transfers in PPU write mode
 %macro HDMA_TRANSFER_A_TO_B 1
  GET_BYTE 0
  SET_BYTE_B_BUS %1,0
+%endmacro
+
+;macro for HDMA transfers in PPU read mode
+%macro HDMA_TRANSFER_B_TO_A 1
+ GET_BYTE_B_BUS %1,0
+ SET_BYTE 0
 %endmacro
 
 
@@ -301,19 +307,19 @@ section .text
  jmp .ppu_write_done
 
 
-ALIGNC
-EXPORT_C Do_HDMA_Channel
- ; Overhead, also used for loading next NTRLx ($43xA)
- add R_65c816_Cycles,byte _5A22_SLOW_CYCLE
+%macro Generate_Do_HDMA_Channel 1
+%ifidni %1,Read
+%define _DHC_Transfer HDMA_TRANSFER_B_TO_A
+%elifidni %1,Write
+%define _DHC_Transfer HDMA_TRANSFER_A_TO_B
+%else
+%error Invalid argument to Generate_Do_HDMA_Channel
+%endif
 
- mov ebx,[edi+A2T]      ; Get table address
- and ebx,(1 << 24) - 1
- mov al,[edi+DMAP]      ; Get HDMA control byte
  test al,0x40           ; Check for indirect addressing
- mov ecx,[edi+HDMA_Siz] ; Get HDMA transfer size
- jnz Do_HDMA_Indirect
+ jnz Do_HDMA_Indirect_%1
 
-Do_HDMA_Absolute:
+Do_HDMA_Absolute_%1:
  mov ah,[edi+NTRL]      ; Get number of lines to transfer
  test ah,0x7F           ; Need new set?
  jz .Next_Set
@@ -330,26 +336,26 @@ Do_HDMA_Absolute:
  mov [edi+A2T],ebx      ; Save new table address
 
 .Next_Transfer:
- HDMA_TRANSFER_A_TO_B [edi+DMA_B0]
+ _DHC_Transfer [edi+DMA_B0]
 
  add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
  cmp cl,2
  inc bx                 ; Adjust temporary table pointer
  jb .End_Transfer
 
- HDMA_TRANSFER_A_TO_B [edi+DMA_B1]
+ _DHC_Transfer [edi+DMA_B1]
 
  add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
  cmp cl,4
  inc bx                 ; Adjust temporary table pointer
  jb .End_Transfer
 
- HDMA_TRANSFER_A_TO_B [edi+DMA_B2]
+ _DHC_Transfer [edi+DMA_B2]
 
  add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
  inc bx
 
- HDMA_TRANSFER_A_TO_B [edi+DMA_B3]
+ _DHC_Transfer [edi+DMA_B3]
 
  add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
 
@@ -360,12 +366,7 @@ Do_HDMA_Absolute:
  stc
  ret
 
-HDMA_End_Channel:
- mov [edi+A2T],ebx
- clc
- ret
-
-Do_HDMA_Indirect:
+Do_HDMA_Indirect_%1:
  mov ah,[edi+NTRL]      ; Get number of lines to transfer
  test ah,0x7F
  jz  .Next_Set
@@ -392,26 +393,26 @@ Do_HDMA_Indirect:
  mov ebx,[edi+DAS]
  and ebx,(1 << 24) - 1
 
- HDMA_TRANSFER_A_TO_B [edi+DMA_B0]
+ _DHC_Transfer [edi+DMA_B0]
 
  add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
  cmp cl,2
  inc bx                 ; Adjust temporary table pointer
  jb .End_Transfer
 
- HDMA_TRANSFER_A_TO_B [edi+DMA_B1]
+ _DHC_Transfer [edi+DMA_B1]
 
  add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
  cmp cl,4
  inc bx                 ; Adjust temporary table pointer
  jb .End_Transfer
 
- HDMA_TRANSFER_A_TO_B [edi+DMA_B2]
+ _DHC_Transfer [edi+DMA_B2]
 
  add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
  inc bx
 
- HDMA_TRANSFER_A_TO_B [edi+DMA_B3]
+ _DHC_Transfer [edi+DMA_B3]
 
  add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
 
@@ -421,6 +422,34 @@ Do_HDMA_Indirect:
  dec byte [edi+NTRL]
  stc
  ret
+
+%undef _DHC_Transfer
+%endmacro
+
+ALIGNC
+EXPORT_C Do_HDMA_Channel
+ ; Overhead, also used for loading next NTRLx ($43xA)
+ add R_65c816_Cycles,byte _5A22_SLOW_CYCLE
+
+ mov ebx,[edi+A2T]      ; Get table address
+ and ebx,(1 << 24) - 1
+
+ mov ecx,[edi+HDMA_Siz] ; Get HDMA transfer size
+
+ mov al,[edi+DMAP]      ; Get HDMA control byte
+ test al,0x80
+ jnz Do_HDMA_Channel_Read
+
+Do_HDMA_Channel_Write:
+ Generate_Do_HDMA_Channel Write
+
+HDMA_End_Channel:
+ mov [edi+A2T],ebx
+ clc
+ ret
+
+Do_HDMA_Channel_Read:
+ Generate_Do_HDMA_Channel Read
 
 ALIGNC
 EXPORT SNES_W420C ; HDMAEN      ; Actually handled within screen core!
