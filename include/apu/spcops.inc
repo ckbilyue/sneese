@@ -312,7 +312,6 @@ You must read and accept the license prior to use.
 ; 00
 ALIGNC
 EXPORT_C SPC_NOP
- inc R_NativePC
  OPCODE_EPILOG
 
 ; 01
@@ -354,7 +353,6 @@ SPC_ASL abs
 ; 0D
 ALIGNC
 EXPORT_C SPC_PUSH_PSW
- inc R_NativePC
  SETUPFLAGS_SPC
  PUSH_B
  OPCODE_EPILOG
@@ -362,8 +360,8 @@ EXPORT_C SPC_PUSH_PSW
 ; 0E
 ALIGNC
 EXPORT_C SPC_TSET1  ; I have done this as TSB (65816) including the flag setting based on AND
- mov cl,B_A
  ADDR_abs
+ mov cl,B_A
  mov ah,cl
  GET_BYTE_SPC   ; Get byte
  and cl,al      ; NZ set for: mem & A
@@ -414,7 +412,6 @@ SPC_ASL Odp_XO
 ALIGNC
 EXPORT_C SPC_ASL_A
  mov al,B_A
- inc R_NativePC
  add al,al
  sbb cl,cl
  STORE_FLAGS_NZC al,cl
@@ -431,20 +428,12 @@ ALIGNC
 EXPORT_C SPC_JMP_Oabs_XO
  ADDR_Oabs_XO
  GET_WORD_SPC
- cmp eax,0xFFC0
- mov R_NativePC,eax
- mov eax,[SPC_FFC0_Address]
- jnb .possible_rom
- mov eax,C_LABEL(SPCRAM)
-.possible_rom:
- add R_NativePC,eax
- mov B_SPC_Code_Base,eax
+ mov R_PC,ax
  OPCODE_EPILOG
 
 ; 20
 ALIGNC
 EXPORT_C SPC_CLRP
- inc R_NativePC
  STORE_FLAGS_P ah
  mov B_SPC_PAGE_H,ah
  OPCODE_EPILOG
@@ -491,22 +480,31 @@ SPC_PUSH_reg A,B_A
 ; 2E
 ALIGNC
 EXPORT_C SPC_CBNE_dp
- mov ebx,B_SPC_PAGE
- mov bl,[1+R_NativePC]  ; get dp
- add R_NativePC,byte 3
+ GET_PC ebx
+ mov eax,B_SPC_PAGE
+ GET_BYTE_SPC           ; get dp
+ inc bx
+ mov ecx,eax
+ GET_BYTE_SPC           ; get branch offset
+ mov ebx,ecx
+ add R_PC,2
+ mov cl,al
+
  GET_BYTE_SPC           ; get (dp)
  cmp B_A,al
  je SPC_RETURN
 
- movsx eax,byte [R_NativePC-1]  ; sign extend for addition
+ movsx ax,cl            ; sign extend for addition
  short_branch
  OPCODE_EPILOG
 
 ; 2F
 ALIGNC
 EXPORT_C SPC_BRA
- movsx eax,byte [1+R_NativePC]  ; sign extend for addition
- add R_NativePC,byte 2
+ GET_PC ebx
+ GET_BYTE_SPC
+ inc R_PC
+ cbw                            ; sign extend for addition
  short_branch
  OPCODE_EPILOG
 
@@ -550,7 +548,6 @@ SPC_ROL Odp_XO
 ALIGNC
 EXPORT_C SPC_ROL_A
  mov cl,B_C_flag
- inc R_NativePC
  add cl,255 ;MAKE_CARRY
  mov al,B_A
  adc al,al
@@ -567,27 +564,19 @@ SPC_CMP_X dp
 
 ALIGNC
 EXPORT_C SPC_CALL
- GET_PC eax
- add eax,byte 3
+ GET_PC ebx
+ GET_WORD_SPC
+ inc bx
+ mov ecx,eax
+ mov eax,ebx
  PUSH_W
- xor eax,eax
- mov al,[1+R_NativePC]
- mov ah,[2+R_NativePC]
- cmp eax,0xFFC0
- mov R_NativePC,eax
- mov eax,[SPC_FFC0_Address]
- jnb .possible_rom
- mov eax,C_LABEL(SPCRAM)
-.possible_rom:
- add R_NativePC,eax
- mov B_SPC_Code_Base,eax
+ mov R_PC,cx
  OPCODE_EPILOG
 
 ; 40
 ALIGNC
 EXPORT_C SPC_SETP
  mov al,1
- inc R_NativePC
  STORE_FLAGS_P al
  mov B_SPC_PAGE_H,al
  OPCODE_EPILOG
@@ -632,8 +621,8 @@ SPC_PUSH_reg X,B_X
 ; 4E
 ALIGNC
 EXPORT_C SPC_TCLR1  ; I have done this as TRB (65816) including the flag setting based on AND
- mov cl,B_A
  ADDR_abs
+ mov cl,B_A
  mov ah,cl
  xor cl,0xFF
  GET_BYTE_SPC   ; Get byte
@@ -646,19 +635,14 @@ EXPORT_C SPC_TCLR1  ; I have done this as TRB (65816) including the flag setting
 ; 4F
 ALIGNC
 EXPORT_C SPC_PCALL  ; u-page is the last page on the SPC RAM (uppermost-page!)
- GET_PC eax
- add eax,byte 2
- PUSH_W
+ GET_PC ebx
  mov eax,0xFF00
- mov al,[1+R_NativePC]  ; upage offset
- cmp al,0xC0
- mov R_NativePC,eax
- mov eax,[SPC_FFC0_Address]
- jnb .possible_rom
- mov eax,C_LABEL(SPCRAM)
-.possible_rom:
- add R_NativePC,eax
- mov B_SPC_Code_Base,eax
+ GET_BYTE_SPC               ; upage offset
+ inc bx
+ mov ecx,eax
+ mov eax,ebx
+ PUSH_W
+ mov R_PC,cx
  OPCODE_EPILOG
 
 ; 50
@@ -704,7 +688,6 @@ SPC_LSR Odp_XO
 ALIGNC
 EXPORT_C SPC_LSR_A
  mov al,B_A
- inc R_NativePC
  shr al,byte 1
  sbb cl,cl
  mov B_A,al
@@ -719,22 +702,14 @@ SPC_CMP_Y abs
 
 ALIGNC
 EXPORT_C SPC_JMP_abs
- mov al,[1+R_NativePC]
- mov ah,[2+R_NativePC]
- cmp eax,0xFFC0
- mov R_NativePC,eax
- mov eax,[SPC_FFC0_Address]
- jnb .possible_rom
- mov eax,C_LABEL(SPCRAM)
-.possible_rom:
- add R_NativePC,eax
- mov B_SPC_Code_Base,eax
+ GET_PC ebx
+ GET_WORD_SPC
+ mov R_PC,ax
  OPCODE_EPILOG
 
 ; 60
 ALIGNC
 EXPORT_C SPC_CLRC
- inc R_NativePC
  STORE_FLAGS_C ah
  OPCODE_EPILOG
 
@@ -778,16 +753,23 @@ SPC_PUSH_reg Y,B_Y
 ; 6E
 ALIGNC
 EXPORT_C SPC_DBNZ_dp
- mov ebx,B_SPC_PAGE
- mov bl,[1+R_NativePC]  ; get dp
- add R_NativePC,byte 3
+ GET_PC ebx
+ mov eax,B_SPC_PAGE
+ GET_BYTE_SPC           ; get dp
+ inc bx
+ mov ecx,eax
+ GET_BYTE_SPC           ; get branch offset
+ mov ebx,ecx
+ add R_PC,2
+ mov cl,al
+
  GET_BYTE_SPC           ; get (dp)
  dec al
  SET_BYTE_SPC
  test al,al
  jz SPC_RETURN
 
- movsx eax,byte [R_NativePC-1]  ; sign extend for addition
+ movsx ax,cl            ; sign extend for addition
  short_branch
  OPCODE_EPILOG
 
@@ -795,14 +777,7 @@ EXPORT_C SPC_DBNZ_dp
 ALIGNC
 EXPORT_C SPC_RET
  POP_W
- cmp eax,0xFFC0
- mov R_NativePC,eax
- mov eax,[SPC_FFC0_Address]
- jnb .possible_rom
- mov eax,C_LABEL(SPCRAM)
-.possible_rom:
- add R_NativePC,eax
- mov B_SPC_Code_Base,eax
+ mov R_PC,ax
  OPCODE_EPILOG
 
 ; 70
@@ -851,7 +826,6 @@ SPC_ROR Odp_XO
 ALIGNC
 EXPORT_C SPC_ROR_A
  mov cl,B_C_flag
- inc R_NativePC
  add cl,255 ;MAKE_CARRY
  mov al,B_A
  rcr al,1
@@ -870,7 +844,6 @@ SPC_CMP_Y dp
 ALIGNC
 EXPORT_C SPC_SETC
  mov al,1
- inc R_NativePC
  STORE_FLAGS_C al
  OPCODE_EPILOG
 
@@ -887,25 +860,7 @@ SPC_ADC_A OXO
 ; 87
 SPC_ADC_A OOdp_XOO
 ; 88
-ALIGNC
-EXPORT_C SPC_ADC_A_IM
- STORE_FLAGS_V ah
- mov al,[1+R_NativePC]
- mov cl,B_C_flag
- add R_NativePC,byte 2
- add cl,255 ;MAKE_CARRY
- mov cl,B_A
- adc cl,al
- lahf
- mov B_A,cl
- jno .no_overflow
- STORE_FLAGS_V 1
-.no_overflow:
- sbb al,al
- STORE_FLAGS_NZ cl
- STORE_FLAGS_C al
- STORE_FLAGS_H ah
- OPCODE_EPILOG
+SPC_ADC_A imm8,IM
 
 ; 89
 SPC_ADC_mem dp_dp
@@ -935,7 +890,6 @@ EXPORT_C SPC_MOV_Y_IM
 ; 8E
 ALIGNC
 EXPORT_C SPC_POP_PSW
- inc R_NativePC
  POP_B
  RESTOREFLAGS_SPC
  OPCODE_EPILOG
@@ -997,7 +951,6 @@ SPC_MOV_reg_reg X__SP,B_X,B_SP
 
 ALIGNC
 EXPORT_C SPC_DIV    ; This may not be 100% due to overflow checking!
- inc R_NativePC
  xor ebx,ebx
  mov bl,B_X
  test bl,bl         ; If zero skip divide!
@@ -1030,7 +983,6 @@ ALIGNC
 EXPORT_C SPC_XCN
  mov al,B_A
  rol al,4
- inc R_NativePC
  mov B_A,al
  STORE_FLAGS_NZ al
  OPCODE_EPILOG
@@ -1039,7 +991,6 @@ EXPORT_C SPC_XCN
 ALIGNC
 EXPORT_C SPC_EI
  mov al,1
- inc R_NativePC
  STORE_FLAGS_I al
  OPCODE_EPILOG
 
@@ -1055,28 +1006,8 @@ SPC_SBC_A abs
 SPC_SBC_A OXO
 ; A7
 SPC_SBC_A OOdp_XOO
-; A8 
-ALIGNC
-EXPORT_C SPC_SBC_A_IM
- STORE_FLAGS_V ah
- mov al,[1+R_NativePC]
- mov cl,B_C_flag
- add R_NativePC,byte 2
- cmp cl,1 ;MAKE_NOT_CARRY
- mov cl,B_A
- sbb cl,al
- lahf
- mov B_A,cl
- jno .no_overflow
- STORE_FLAGS_V 1
-.no_overflow:
- sbb al,al
- STORE_FLAGS_N cl
- xor al,0xFF
- STORE_FLAGS_Z cl
- STORE_FLAGS_C al
- STORE_FLAGS_H ah
- OPCODE_EPILOG
+; A8
+SPC_SBC_A imm8,IM
 
 ; A9
 SPC_SBC_mem dp_dp
@@ -1150,7 +1081,6 @@ SPC_INC_reg A,B_A
 ALIGNC
 EXPORT_C SPC_MOV_SP_X
  mov al,B_X
- inc R_NativePC
  mov B_SP,al
  OPCODE_EPILOG
 
@@ -1168,7 +1098,6 @@ EXPORT_C SPC_MOV_A_OXOInc
 ; C0
 ALIGNC
 EXPORT_C SPC_DI
- inc R_NativePC
  STORE_FLAGS_I ah
  OPCODE_EPILOG
 
@@ -1227,7 +1156,6 @@ SPC_POP_reg X,B_X
 ; CF
 ALIGNC
 EXPORT_C SPC_MUL
- inc R_NativePC
  mov al,B_Y
  mul byte B_A
  mov cl,al
@@ -1273,16 +1201,22 @@ SPC_MOV_reg_reg A__Y,B_A,B_Y
 
 ALIGNC
 EXPORT_C SPC_CBNE_Odp_XO
- mov ebx,B_SPC_PAGE
- mov al,B_X
- mov bl,[1+R_NativePC]  ; get dp
- add R_NativePC,byte 3
- add bl,al
- GET_BYTE_SPC           ; Get (dp)
+ GET_PC ebx
+ mov ecx,B_SPC_PAGE
+ mov cl,B_X
+ GET_BYTE_SPC           ; get dp
+ inc bx
+ add cl,al
+ GET_BYTE_SPC           ; get branch offset
+ mov ebx,ecx
+ add R_PC,2
+ mov cl,al
+
+ GET_BYTE_SPC           ; get (dp+x)
  cmp B_A,al
  je SPC_RETURN
 
- movsx eax,byte [R_NativePC-1]  ; sign extend for addition
+ movsx ax,cl            ; sign extend for addition
  short_branch
  OPCODE_EPILOG
 
@@ -1291,7 +1225,6 @@ EXPORT_C SPC_CBNE_Odp_XO
 ; E0
 ALIGNC
 EXPORT_C SPC_CLRV
- inc R_NativePC
  STORE_FLAGS_H ah
  STORE_FLAGS_V ah
  OPCODE_EPILOG
@@ -1333,7 +1266,6 @@ SPC_MOV_Y_mem abs
 ALIGNC
 EXPORT_C SPC_NOTC
  mov al,B_C_flag
- inc R_NativePC
  cmp al,1
  sbb al,al
  STORE_FLAGS_C al
@@ -1382,13 +1314,16 @@ SPC_MOV_reg_reg Y__A,B_Y,B_A
 
 ALIGNC
 EXPORT_C SPC_DBNZ_Y
- mov al,B_Y
- add R_NativePC,byte 2
- dec al
- mov B_Y,al
+ GET_PC ebx
+ GET_BYTE_SPC           ; get branch offset
+ inc R_PC
+
+ mov cl,B_Y
+ dec cl
+ mov B_Y,cl
  jz SPC_RETURN
 
- movsx eax,byte [R_NativePC-1]  ; sign extend for addition
+ cbw                            ; sign extend for addition
  short_branch
  OPCODE_EPILOG
 

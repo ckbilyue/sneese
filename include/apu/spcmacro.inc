@@ -30,18 +30,10 @@ You must read and accept the license prior to use.
 ALIGNC
 EXPORT_C SPC_TCALL_%1
  GET_PC eax
- inc eax
  PUSH_W
- xor eax,eax
- mov ax,[C_LABEL(SPCRAM)+0xFFC0+((15 - (%1)) << 1)]
- cmp eax,0xFFC0
- mov R_NativePC,eax
- mov eax,[SPC_FFC0_Address]
- jnb .possible_rom
- mov eax,C_LABEL(SPCRAM)
-.possible_rom:
- add R_NativePC,eax
- mov [SPC_Code_Base],eax
+ mov ebx,0xFFC0+((15 - (%1)) << 1)
+ GET_WORD_SPC
+ mov R_PC,ax
  OPCODE_EPILOG
 %endmacro
 
@@ -59,7 +51,7 @@ EXPORT_C SPC_TCALL_%1
  and edx,1      ;address page wrap?
  add R_Cycles,edx
 %else
- add R_NativePC,eax
+ add R_PC,ax
  add R_Cycles,2 ; branch taken
 %endif
 %endmacro
@@ -68,9 +60,11 @@ EXPORT_C SPC_TCALL_%1
 %macro SPC_BFC 2
 ALIGNC
 EXPORT_C SPC_%1
- add R_NativePC,byte 2
- JUMP_FLAG_SPC %2,SPC_RETURN            ; flag set
- movsx eax,byte [-1+R_NativePC]     ; sign extend for addition
+ GET_PC ebx
+ GET_BYTE_SPC
+ inc R_PC
+ JUMP_FLAG_SPC %2,SPC_RETURN        ; flag set
+ cbw                                ; sign extend for addition
  short_branch
  OPCODE_EPILOG
 %endmacro
@@ -79,18 +73,21 @@ EXPORT_C SPC_%1
 %macro SPC_BFS 2
 ALIGNC
 EXPORT_C SPC_%1
- add R_NativePC,byte 2
- JUMP_NOT_FLAG_SPC %2,SPC_RETURN        ; flag set
- movsx eax,byte [-1+R_NativePC]     ; sign extend for addition
+ GET_PC ebx
+ GET_BYTE_SPC
+ inc R_PC
+ JUMP_NOT_FLAG_SPC %2,SPC_RETURN    ; flag clear
+ cbw                                ; sign extend for addition
  short_branch
  OPCODE_EPILOG
 %endmacro
 
 ;%1 = op
 %macro SPC_OP_A_IM_NZ 1
- mov al,[1+R_NativePC]
+ GET_PC ebx
+ GET_BYTE_SPC
  mov cl,B_A
- add R_NativePC,byte 2
+ inc R_PC
  SPC_BASE_%1 cl,al
  mov B_A,cl
  STORE_FLAGS_NZ cl
@@ -99,8 +96,9 @@ EXPORT_C SPC_%1
 
 ;%1 = reg
 %macro SPC_MOV_reg_IM 1
- mov al,[1+R_NativePC]
- add R_NativePC,byte 2
+ GET_PC ebx
+ GET_BYTE_SPC
+ inc R_PC
  mov %1,al
  STORE_FLAGS_NZ al
  OPCODE_EPILOG
@@ -108,9 +106,10 @@ EXPORT_C SPC_%1
 
 ;%1 = reg
 %macro SPC_CMP_reg_IM 1
- mov al,[1+R_NativePC]
+ GET_PC ebx
+ GET_BYTE_SPC
+ inc R_PC
  mov cl,%1
- add R_NativePC,byte 2
  sub cl,al
  sbb al,al
  STORE_FLAGS_N cl
@@ -253,10 +252,14 @@ EXPORT_C SPC_CMP_%1
  OPCODE_EPILOG
 %endmacro
 
-;%1 = addr
-%macro SPC_ADC_A 1
+;%1 = addr, %2 = name
+%macro SPC_ADC_A 1-2
 ALIGNC
+%if %0 == 1
 EXPORT_C SPC_ADC_A_%1
+%else
+EXPORT_C SPC_ADC_A_%2
+%endif
 ;STORE_FLAGS_V ah
  ADDR_%1
  mov cl,B_C_flag
@@ -300,10 +303,14 @@ EXPORT_C SPC_ADC_%1
  OPCODE_EPILOG
 %endmacro
 
-;%1 = addr
-%macro SPC_SBC_A 1
+;%1 = addr, %2 = name
+%macro SPC_SBC_A 1-2
 ALIGNC
+%if %0 == 1
 EXPORT_C SPC_SBC_A_%1
+%else
+EXPORT_C SPC_SBC_A_%2
+%endif
 ;STORE_FLAGS_V ah
  ADDR_%1
  mov cl,B_C_flag
@@ -356,7 +363,6 @@ EXPORT_C SPC_SBC_%1
 ALIGNC
 EXPORT_C SPC_DEC_%1
  mov al,%2
- inc R_NativePC
  dec al
  mov %2,al
  STORE_FLAGS_NZ al
@@ -380,7 +386,6 @@ EXPORT_C SPC_DEC_%1
 ALIGNC
 EXPORT_C SPC_INC_%1
  mov al,%2
- inc R_NativePC
  inc al
  mov %2,al
  STORE_FLAGS_NZ al
@@ -460,7 +465,6 @@ EXPORT_C SPC_ROR_%1
 ALIGNC
 EXPORT_C SPC_MOV_%1
  mov al,%3
- inc R_NativePC
  mov %2,al
  STORE_FLAGS_NZ al
  OPCODE_EPILOG
@@ -529,7 +533,6 @@ EXPORT_C SPC_MOV_Y_%1
 %macro SPC_PUSH_reg 2
 ALIGNC
 EXPORT_C SPC_PUSH_%1
- inc R_NativePC
  mov al,%2
  PUSH_B
  OPCODE_EPILOG
@@ -539,7 +542,6 @@ EXPORT_C SPC_PUSH_%1
 %macro SPC_POP_reg 2
 ALIGNC
 EXPORT_C SPC_POP_%1
- inc R_NativePC
  POP_B
  mov %2,al
  OPCODE_EPILOG

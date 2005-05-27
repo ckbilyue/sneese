@@ -53,6 +53,7 @@ Changes
   Source: Improved some aspects of makefiles and source layout [TRAC]
   5A22: Added emulation of the capability of HDMA to be used for reading
    the B-bus, thanks to anomie for alerting me to its presence [TRAC]
+  SPC700: Removed 'dirty' opcode fetching [TRAC]
  0.832
   Documentation: Updated grossly insufficient copyright attributations
    [TRAC]

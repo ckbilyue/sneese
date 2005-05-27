@@ -35,7 +35,14 @@ You must read and accept the license prior to use.
 ;    OR  A-08  AND A-28  EOR A-48  CMP A-68  ADC A-88  MOV Y-8D
 ;    SBC A-A8  CMP Y-AD  CMP X-C8  MOV X-CD  MOV A-E8
 ;
-%macro ADDR_imm 0
+%macro ADDR_imm8 0
+ GET_PC ebx
+ inc R_PC
+%endmacro
+
+%macro ADDR_imm16 0
+ GET_PC ebx
+ add R_PC,2
 %endmacro
 
 ; Direct Page
@@ -54,9 +61,11 @@ You must read and accept the license prior to use.
 ;    MOV YA-DA
 ;
 %macro ADDR_dp 0
+ GET_PC ebx
+ GET_BYTE_SPC
+ inc R_PC
  mov ebx,B_SPC_PAGE
- mov bl,[1+R_NativePC]  ; get dp
- add R_NativePC,byte 2
+ add ebx,eax
 %endmacro
 
 ; Direct Page index X
@@ -69,11 +78,13 @@ You must read and accept the license prior to use.
 ;    MOV A-D4  MOV Y-DB
 ;
 %macro ADDR_Odp_XO 0
- mov ebx,B_SPC_PAGE
+ GET_PC ebx
+ GET_BYTE_SPC
  mov cl,B_X
- mov bl,[1+R_NativePC]  ; get dp
- add R_NativePC,byte 2
- add bl,cl
+ inc R_PC
+ add al,cl
+ mov ebx,B_SPC_PAGE
+ add ebx,eax
 %endmacro
 
 ; Direct Page index Y
@@ -83,11 +94,13 @@ You must read and accept the license prior to use.
 ;    MOV X-D9
 ;
 %macro ADDR_Odp_YO 0
- mov ebx,B_SPC_PAGE
+ GET_PC ebx
+ GET_BYTE_SPC
  mov cl,B_Y
- mov bl,[1+R_NativePC]  ; get dp
- add R_NativePC,byte 2
- add bl,cl
+ inc R_PC
+ add al,cl
+ mov ebx,B_SPC_PAGE
+ add ebx,eax
 %endmacro
 
 ; Indexed Indirect
@@ -124,7 +137,6 @@ You must read and accept the license prior to use.
 ;
 %macro ADDR_OXO 0
  mov ebx,B_SPC_PAGE
- inc R_NativePC
  mov bl,B_X
 %endmacro
 
@@ -135,14 +147,20 @@ You must read and accept the license prior to use.
 ;%1 = reg
 %macro ADDR2_dp_dp 0-1 al   ; al or reg contains src byte
                             ; bx dest address
+ GET_PC ebx
+ GET_BYTE_SPC           ; get src dp
+ inc bx
+ mov cl,al
+ GET_BYTE_SPC           ; get dest dp
+ add R_PC,2
  mov ebx,B_SPC_PAGE
- mov bl,[1+R_NativePC]  ; get src dp
+ mov bl,cl
+ mov cl,al
  GET_BYTE_SPC
- mov bl,[2+R_NativePC]  ; get dest dp
+ mov bl,cl
 %ifnidni %1,al
  mov %1,al
 %endif
- add R_NativePC,byte 3
 %endmacro
 
 ; Immediate to Direct Page
@@ -150,14 +168,20 @@ You must read and accept the license prior to use.
 ;    OR -18  AND-38  EOR-58  CMP-78  MOV-8F  ADC-98  SBC-B8
 ;
 ;%1 = reg
-%macro ADDR2_dp_IM 0-1 0    ; -2(R_NativePC) or reg contains src byte
+%macro ADDR2_dp_IM 0-1 al   ; al or reg contains src byte
                             ; bx dest address
-%ifnidni %1,0
- mov %1,[1+R_NativePC]
-%endif
+ GET_PC ebx
+ GET_BYTE_SPC           ; get src byte
+ inc bx
+ mov cl,al
+ GET_BYTE_SPC           ; get dest dp
+ add R_PC,2
  mov ebx,B_SPC_PAGE
- mov bl,[2+R_NativePC]  ; get dp
- add R_NativePC,byte 3
+ mov bl,al
+
+%ifnidni %1,cl
+ mov %1,cl
+%endif
 %endmacro
 
 ; Direct Page Y to Direct Page X
@@ -168,13 +192,13 @@ You must read and accept the license prior to use.
 %macro ADDR2_OXO_OYO 0-1 al ; al or reg contains src byte (Y)
                             ; bx dest address
  mov ebx,B_SPC_PAGE
- inc R_NativePC
  mov bl,B_Y
- GET_BYTE_SPC
+ GET_BYTE_SPC           ; get src byte
+ mov bl,B_X
+
 %ifnidni %1,al
  mov %1,al
 %endif
- mov bl,B_X
 %endmacro
 
 ; Direct Page X autoincrement
@@ -184,11 +208,10 @@ You must read and accept the license prior to use.
 ;    MOV A-AF
 ;
 %macro ADDR_OXOInc 0
- mov ebx,B_SPC_PAGE     ; Get Page Variable!
+ mov ebx,B_SPC_PAGE
  mov al,B_X
  mov bl,al
  inc al
- inc R_NativePC
  mov B_X,al
 %endmacro
 
@@ -205,9 +228,10 @@ You must read and accept the license prior to use.
 ;    MOV A-C5  MOV X-C9  MOV Y-CC
 ;
 %macro ADDR_abs 0
- mov bl,[1+R_NativePC]
- mov bh,[2+R_NativePC]
- add R_NativePC,byte 3
+ GET_PC ebx
+ GET_WORD_SPC
+ mov ebx,eax
+ add R_PC,2
 %endmacro
 
 ; Absolute index X
@@ -217,10 +241,11 @@ You must read and accept the license prior to use.
 ;    MOV A-D5
 ;
 %macro ADDR_Oabs_XO 0
- mov bl,[1+R_NativePC]
- mov al,B_X
- mov bh,[2+R_NativePC]
- add R_NativePC,byte 3
+ GET_PC ebx
+ GET_WORD_SPC
+ xor ebx,ebx
+ mov bl,B_X
+ add R_PC,2
  add ebx,eax
  and ebx,0xFFFF
 %endmacro
@@ -232,10 +257,11 @@ You must read and accept the license prior to use.
 ;    MOV A-D6
 ;
 %macro ADDR_Oabs_YO 0
- mov bl,[1+R_NativePC]
- mov al,B_Y
- mov bh,[2+R_NativePC]
- add R_NativePC,byte 3
+ GET_PC ebx
+ GET_WORD_SPC
+ xor ebx,ebx
+ mov bl,B_Y
+ add R_PC,2
  add ebx,eax
  and ebx,0xFFFF
 %endmacro
@@ -250,11 +276,12 @@ You must read and accept the license prior to use.
 ;    NOT1   -EA
 ;
 %macro ADDR_membit 0    ; This is a weird addressing mode!
- mov bl,[1+R_NativePC]
+ GET_PC ebx
+ GET_WORD_SPC
  xor ecx,ecx
- mov cl,[2+R_NativePC]
- add R_NativePC,byte 3
- mov bh,cl
+ add R_PC,2
+ mov cl,ah
+ mov ebx,0x1FFF
  shr ecx,5      ; Get bit number
- and ebx,0x1FFF ; Get address
+ and ebx,eax    ; Get address
 %endmacro

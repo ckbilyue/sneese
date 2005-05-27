@@ -30,7 +30,8 @@ You must read and accept the license prior to use.
 %define R_SPC700_PSW_B              R_SPC700_PSW
 %define R_SPC700_Base               edi
 %define R_SPC700_Cycles             ebp
-%define R_SPC700_NativePC           esi
+%define R_SPC700_PCx                esi
+%define R_SPC700_PC                 si
 %define R_SPC700_MemMap_Trash       edx
 
 %endif ; !defined(SNEeSe_apu_regs_inc)

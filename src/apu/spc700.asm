@@ -141,7 +141,8 @@ REAL_SPC_FLAG_N equ 0x80    ; Negative result
 
 %define R_Base       R_SPC700_Base
 %define R_Cycles     R_SPC700_Cycles
-%define R_NativePC   R_SPC700_NativePC
+%define R_PC         R_SPC700_PC
+%define R_PCx        R_SPC700_PCx
 
 
 %define B_SPC_Code_Base     [R_Base-SPC_Register_Base+SPC_Code_Base]
@@ -201,26 +202,22 @@ REAL_SPC_FLAG_N equ 0x80    ; Negative result
  mov dword R_Base,SPC_Register_Base
 %endmacro
 
-; Load register R_NativePC with pointer to code at PC
+; Load register R_PCx with value of PC register
 %macro LOAD_PC 0
- mov dword R_NativePC,[SPC_Code_Base]
- add dword R_NativePC,[_PC]
+ mov dword R_PCx,[_PC]
 %endmacro
 
-; Get PC from register R_NativePC
+; Get PC from register R_PCx
 ;%1 = with
 %macro GET_PC 1
-%ifnidn %1,R_NativePC
- mov dword %1,R_NativePC
+%ifnidn %1,R_PCx
+ mov dword %1,R_PCx
 %endif
- sub dword %1,[SPC_Code_Base]
 %endmacro
 
-; Save PC from register R_NativePC
-;%1 = with
-%macro SAVE_PC 1
- GET_PC %1
- mov dword [_PC],%1
+; Save PC from register R_PCx
+%macro SAVE_PC 0
+ mov dword [_PC],R_PCx
 %endmacro
 
 ; Set up the flags from PC flag format to SPC flag format
@@ -1231,16 +1228,18 @@ EXTERN_C exit
 ;mov [SPC_TEMP_ADD],ebx
 %endif
 
+ GET_PC ebx
  xor eax,eax
- mov al,[R_NativePC]    ; Fetch opcode
+ GET_BYTE_SPC           ; Fetch opcode
  xor ebx,ebx
+ inc R_PC
  mov bl,[SPCCycleTable+eax]
  add R_Cycles,ebx               ; Update cycle counter
  jmp dword [SPCOpTable+eax*4]   ; jmp to opcode handler
 
 ALIGNC
 SPC_OUT:
- SAVE_PC R_NativePC
+ SAVE_PC
  SAVE_CYCLES    ; Set cycle counter
 
 %ifdef INDEPENDENT_SPC
@@ -1263,7 +1262,7 @@ ALIGNC
 EXPORT_C SPC_INVALID
  mov [C_LABEL(Map_Byte)],al ; al contains opcode!
 
- SAVE_PC R_NativePC
+ SAVE_PC
  SAVE_CYCLES    ; Set cycle counter
 
  mov eax,[_PC]          ; Adjust address to correct for pre-increment
@@ -1275,10 +1274,12 @@ EXTERN_C InvalidSPCOpcode
 ALIGNC
 EXPORT_C SPC_SET1
  shr eax,5
- mov ebx,B_SPC_PAGE
- mov bl,[1+R_NativePC]
- add R_NativePC,byte 2
  mov ah,[offset_to_bit+eax]
+ GET_PC ebx
+ GET_BYTE_SPC
+ inc R_PC
+ mov ebx,B_SPC_PAGE
+ mov bl,al
  GET_BYTE_SPC     
  or al,ah
  SET_BYTE_SPC
@@ -1287,10 +1288,12 @@ EXPORT_C SPC_SET1
 ALIGNC
 EXPORT_C SPC_CLR1
  shr eax,5
- mov ebx,B_SPC_PAGE
- mov bl,[1+R_NativePC]
- add R_NativePC,byte 2
  mov ah,[offset_to_not+eax]
+ GET_PC ebx
+ GET_BYTE_SPC
+ inc R_PC
+ mov ebx,B_SPC_PAGE
+ mov bl,al
  GET_BYTE_SPC     
  and al,ah
  SET_BYTE_SPC
@@ -1299,28 +1302,38 @@ EXPORT_C SPC_CLR1
 ALIGNC
 EXPORT_C SPC_BBS
  shr eax,5
- mov ebx,B_SPC_PAGE
- mov bl,[1+R_NativePC]
- add R_NativePC,byte 3
  mov ah,[offset_to_bit+eax]
+ GET_PC ebx
+ GET_BYTE_SPC
+ add R_PC,2
+ mov ebx,B_SPC_PAGE
+ mov bl,al
  GET_BYTE_SPC
  test al,ah
  jz SPC_RETURN
- movsx eax,byte [-1+R_NativePC]
+ GET_PC ebx
+ dec bx
+ GET_BYTE_SPC
+ cbw                            ; sign extend for addition
  short_branch
  OPCODE_EPILOG
 
 ALIGNC
 EXPORT_C SPC_BBC
  shr eax,5
- mov ebx,B_SPC_PAGE
- mov bl,[1+R_NativePC]
- add R_NativePC,byte 3
  mov ah,[offset_to_bit+eax]
- GET_BYTE_SPC         
+ GET_PC ebx
+ GET_BYTE_SPC
+ add R_PC,2
+ mov ebx,B_SPC_PAGE
+ mov bl,al
+ GET_BYTE_SPC
  test al,ah
  jnz SPC_RETURN
- movsx eax,byte [-1+R_NativePC]
+ GET_PC ebx
+ dec bx
+ GET_BYTE_SPC
+ cbw                            ; sign extend for addition
  short_branch
  OPCODE_EPILOG
 
