@@ -10,7 +10,7 @@ The SNES emulator with the extra e's...
         SSSSS   NN    NN  EEEEEE   eeee    SSSSS    eeee
 
                                             v0.833 (Public BETA)
-                                            xx xxx 2005
+                                            29 May 2005
 
   Please read the license (LICENSE file) before using or distributing
    SNEeSe in any way!
@@ -22,9 +22,6 @@ The SNES emulator with the extra e's...
 
 
 NOTE:
- This release has SPC emulation, it may get some ROMs to work that would
-  not with APU skipper.
- This release also has sound, but the sound may be unstable.
   Send critical bug reports (this is, report only the ROMs that crash the
   emulator) to: esaelon* *at* *users.sf.net
  Please list the ROM, ROM filename, the settings you were using in the
