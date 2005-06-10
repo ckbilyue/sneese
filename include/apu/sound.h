@@ -57,6 +57,8 @@ EXTERN signed char block_written;
 EXTERN unsigned char SPC_DSP[256];
 EXTERN unsigned char SNDkeys;
 
+EXTERN void Wrap_SDSP_Cyclecounter();
+
 EXTERN void Remove_Sound();
 EXTERN int Install_Sound(int stereo);
 EXTERN void Reset_Sound_DSP();

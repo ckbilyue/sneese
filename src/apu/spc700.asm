@@ -91,7 +91,6 @@ EXTERN_C SPC_DSP
 EXTERN_C SPC_DSP_DATA
 EXTERN_C SPC_READ_DSP,SPC_WRITE_DSP
 EXTERN_C Update_SPC_Timer_0,Update_SPC_Timer_1,Update_SPC_Timer_2
-EXTERN_C Wrap_SPC_Cyclecounter
 EXTERN_C Map_Byte,Map_Address
 
 EXTERN_C SNES_Cycles,EventTrip
@@ -308,7 +307,7 @@ section .text
 %macro OPCODE_EPILOG 0
 %if 0
  test R_Cycles,R_Cycles
- jle SPC_START_NEXT
+ jl SPC_START_NEXT
  jmp SPC_OUT
 %else
  jmp SPC_RETURN
@@ -939,118 +938,6 @@ SPC_TEMP_ADD:   skipl
 
 section .text
 ALIGNC
-SNES_R2140_SPC: ; APUI00
- Execute_SPC SaveCycles
- mov al,[C_LABEL(SPC_PORT0W)]
- ret
-
-ALIGNC
-SNES_R2141_SPC: ; APUI01
- Execute_SPC SaveCycles
- mov al,[C_LABEL(SPC_PORT1W)]
- ret
-
-ALIGNC
-SNES_R2142_SPC: ; APUI02
- Execute_SPC SaveCycles
- mov al,[C_LABEL(SPC_PORT2W)]
- ret
-
-ALIGNC
-SNES_R2143_SPC: ; APUI03
- Execute_SPC SaveCycles
- mov al,[C_LABEL(SPC_PORT3W)]
- ret
-
-ALIGNC
-SNES_W2140_SPC: ; APUI00
- cmp [C_LABEL(SPC_PORT0R)],al
- jne .change
- test al,al
- jz .no_change
-.change:
- Execute_SPC SaveCycles
- mov [C_LABEL(SPC_PORT0R)],al
-.no_change:
- ret
-
-ALIGNC
-SNES_W2141_SPC: ; APUI01
- cmp [C_LABEL(SPC_PORT1R)],al
- jne .change
- test al,al
- jz .no_change
-.change:
- Execute_SPC SaveCycles
- mov [C_LABEL(SPC_PORT1R)],al
-.no_change:
- ret
-
-ALIGNC
-SNES_W2142_SPC: ; APUI02
- cmp [C_LABEL(SPC_PORT2R)],al
- jne .change
- test al,al
- jz .no_change
-.change:
- Execute_SPC SaveCycles
- mov [C_LABEL(SPC_PORT2R)],al
-.no_change:
- ret
-
-ALIGNC
-SNES_W2143_SPC: ; APUI03
- cmp [C_LABEL(SPC_PORT3R)],al
- jne .change
- test al,al
- jz .no_change
-.change:
- Execute_SPC SaveCycles
- mov [C_LABEL(SPC_PORT3R)],al
-.no_change:
- ret
-
-ALIGNC
-EXPORT_C Make_SPC
- pusha
- mov eax,SNES_R2140_SPC
- mov edx,SNES_R2141_SPC
- mov esi,SNES_R2142_SPC
- mov edi,SNES_R2143_SPC
-
- mov ebx,Read_21_Address(0x40)
- mov cl,0x40 / 4
-
-.set_read_loop:
- mov [ebx],eax
- mov [ebx+1*4],edx
- mov [ebx+2*4],esi
- mov [ebx+3*4],edi
- add ebx,byte 4*4
- dec cl
- jnz .set_read_loop
-
- mov eax,SNES_W2140_SPC
- mov edx,SNES_W2141_SPC
- mov esi,SNES_W2142_SPC
- mov edi,SNES_W2143_SPC
-
- mov ebx,Write_21_Address(0x40)
- mov cl,0x40 / 4
-
-.set_write_loop:
- mov [ebx],eax
- mov [ebx+1*4],edx
- mov [ebx+2*4],esi
- mov [ebx+3*4],edi
- add ebx,byte 4*4
- dec cl
- jnz .set_write_loop
-
- popa
- ret
-
-ALIGNC
 EXPORT_C Reset_SPC
  pusha
 
@@ -1169,7 +1056,7 @@ SPC_RETURN:
 ;mov [_OLD_SPC_ADDRESS],ebx
 %endif
  test R_Cycles,R_Cycles
- jg SPC_OUT             ; Do another instruction if cycles left
+ jge SPC_OUT            ; Do another instruction if cycles left
 
 SPC_START_NEXT:
 
@@ -1356,6 +1243,45 @@ EXPORT_C SPC_READ_DSP_DATA
  pop ecx
  ret
 
+
+EXPORT_C SPC_READ_PORT_W
+ mov ecx,[esp+4]
+ and ecx,3
+ mov al,[C_LABEL(SPC_PORT0W)+ecx]
+ ret
+EXPORT_C SPC_WRITE_PORT_R
+ mov ecx,[esp+4]
+ and ecx,3
+ mov eax,[esp+8]
+ mov [C_LABEL(SPC_PORT0R)+ecx],al
+ ret
+
+EXPORT_C SPC_READ_PORT_R
+ mov ecx,[esp+4]
+ and ecx,3
+ mov al,[C_LABEL(SPC_PORT0R)+ecx]
+ ret
+EXPORT_C SPC_WRITE_PORT_W
+ mov ecx,[esp+4]
+ and ecx,3
+ mov eax,[esp+8]
+ mov [C_LABEL(SPC_PORT0W)+ecx],al
+ ret
+
+
+EXPORT_C Wrap_SPC_Cyclecounter
+ mov eax,0xF0000000
+ sub [C_LABEL(TotalCycles)],eax
+ sub [C_LABEL(SPC_Cycles)],eax
+ sub [C_LABEL(SPC_T0_cycle_latch)],eax
+ sub [C_LABEL(SPC_T1_cycle_latch)],eax
+ sub [C_LABEL(SPC_T2_cycle_latch)],eax
+
+EXTERN_C Wrap_SDSP_Cyclecounter
+ call C_LABEL(Wrap_SDSP_Cyclecounter);
+ ret
+
+
 EXPORT_C SPC_READ_PORT0R
  mov al,[C_LABEL(SPC_PORT0R)]
  ret
@@ -1467,13 +1393,13 @@ EXPORT_C SPC_WRITE_CTRL
  jnz .no_enable_timer_2
  test al,4
  jz  .no_enable_timer_2
- and edx,byte ~127
+ and edx,byte ~15
  mov byte [C_LABEL(SPC_T2_counter)],0
  mov dword [C_LABEL(SPC_T2_position)],0
  mov [C_LABEL(SPC_T2_cycle_latch)],edx
 
 .no_enable_timer_2:
- and edx,byte ~15
+ and edx,byte ~127
  test byte [C_LABEL(SPCRAM)+ebx],2
  jnz .no_enable_timer_1
  test al,2

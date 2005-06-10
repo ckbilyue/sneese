@@ -2003,3 +2003,100 @@ EXTERN_C set_upper_rom_speed
  pop ecx
  pop eax
  ret
+
+
+; bits for the SPC700
+ALIGNC
+SNES_R2140_SPC: ; APUIO0
+SNES_R2141_SPC: ; APUIO1
+SNES_R2142_SPC: ; APUIO2
+SNES_R2143_SPC: ; APUIO3
+ Execute_SPC SaveCycles
+ push eax
+ push ecx
+
+ push ebx
+ call C_LABEL(SPC_READ_PORT_W)
+ add esp,4
+ pop ecx
+ pop edx
+ and eax,0xFF
+ and edx,0xFFFFFF00
+ add eax,edx
+ ret
+
+ALIGNC
+SNES_W2140_SPC: ; APUIO0
+SNES_W2141_SPC: ; APUIO1
+SNES_W2142_SPC: ; APUIO2
+SNES_W2143_SPC: ; APUIO3
+ push eax
+ push ecx
+ push eax
+
+ push ebx
+ call C_LABEL(SPC_READ_PORT_R)
+ add esp,4
+
+ cmp al,[esp]
+ jne .change
+ test al,al
+ jz .no_change
+
+.change:
+ Execute_SPC SaveCycles
+
+ push ebx
+ call C_LABEL(SPC_WRITE_PORT_R)
+ add esp,8
+ pop ecx
+ pop eax
+ ret
+
+.no_change:
+ pop edx
+ pop ecx
+ pop eax
+ ret
+
+
+ALIGNC
+EXPORT_C Make_SPC
+ pusha
+ mov eax,SNES_R2140_SPC
+ mov edx,SNES_R2141_SPC
+ mov esi,SNES_R2142_SPC
+ mov edi,SNES_R2143_SPC
+
+ mov ebx,Read_21_Address(0x40)
+ mov cl,0x40 / 4
+
+.set_read_loop:
+ mov [ebx],eax
+ mov [ebx+1*4],edx
+ mov [ebx+2*4],esi
+ mov [ebx+3*4],edi
+ add ebx,byte 4*4
+ dec cl
+ jnz .set_read_loop
+
+ mov eax,SNES_W2140_SPC
+ mov edx,SNES_W2141_SPC
+ mov esi,SNES_W2142_SPC
+ mov edi,SNES_W2143_SPC
+
+ mov ebx,Write_21_Address(0x40)
+ mov cl,0x40 / 4
+
+.set_write_loop:
+ mov [ebx],eax
+ mov [ebx+1*4],edx
+ mov [ebx+2*4],esi
+ mov [ebx+3*4],edi
+ add ebx,byte 4*4
+ dec cl
+ jnz .set_write_loop
+
+ popa
+ ret
+

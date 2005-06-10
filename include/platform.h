@@ -104,7 +104,7 @@ typedef struct {
 #define NULL_AUDIO_VOICE { 0, 0, 0, 0, 0 }
 
 
-signed char platform_sound_available;
+EXTERN signed char platform_sound_available;
 
 EXTERN void *platform_get_audio_voice(
  int samples, int bits, int stereo, int freq,

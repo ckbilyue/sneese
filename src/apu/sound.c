@@ -215,49 +215,8 @@ int noise_vol;
 int noise_countdown;
 unsigned noise_update_count;
 
-// OLD STUFF
-
-/* Timers 0/1 must be updated once every 10M, 2 every 1.28M SPC cycles */
-void Update_SPC_Timer_0()
+void Wrap_SDSP_Cyclecounter()
 {
- if (!(SPC_CTRL & 1)) return;
- SPC_T0_position += (TotalCycles - SPC_T0_cycle_latch) / TIMER_0_CYCLES_PER_TICK;
- SPC_T0_cycle_latch += (TotalCycles - SPC_T0_cycle_latch) & ~(TIMER_0_CYCLES_PER_TICK - 1);
-
- if (SPC_T0_position < SPC_T0_target) return;
- SPC_T0_counter = (SPC_T0_counter + (SPC_T0_position / SPC_T0_target)) & 0xF;
- SPC_T0_position %= SPC_T0_target;
-}
-
-void Update_SPC_Timer_1()
-{
- if (!(SPC_CTRL & 2)) return;
- SPC_T1_position += (TotalCycles - SPC_T1_cycle_latch) / TIMER_1_CYCLES_PER_TICK;
- SPC_T1_cycle_latch += (TotalCycles - SPC_T1_cycle_latch) & ~(TIMER_1_CYCLES_PER_TICK - 1);
-
- if (SPC_T1_position < SPC_T1_target) return;
- SPC_T1_counter = (SPC_T1_counter + (SPC_T1_position / SPC_T1_target)) & 0xF;
- SPC_T1_position %= SPC_T1_target;
-}
-
-void Update_SPC_Timer_2()
-{
- if (!(SPC_CTRL & 4)) return;
- SPC_T2_position += (TotalCycles - SPC_T2_cycle_latch) / TIMER_2_CYCLES_PER_TICK;
- SPC_T2_cycle_latch += (TotalCycles - SPC_T2_cycle_latch) & ~(TIMER_2_CYCLES_PER_TICK - 1);
-
- if (SPC_T2_position < SPC_T2_target) return;
- SPC_T2_counter = (SPC_T2_counter + (SPC_T2_position / SPC_T2_target)) & 0xF;
- SPC_T2_position %= SPC_T2_target;
-}
-
-void Wrap_SPC_Cyclecounter()
-{
- TotalCycles -= 0xF0000000;
- SPC_Cycles -= 0xF0000000;
- SPC_T0_cycle_latch -= 0xF0000000;
- SPC_T1_cycle_latch -= 0xF0000000;
- SPC_T2_cycle_latch -= 0xF0000000;
  sound_cycle_latch -= 0xF0000000;
 }
 

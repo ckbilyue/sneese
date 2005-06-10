@@ -23,8 +23,8 @@ You must read and accept the license prior to use.
 #ifndef SNEeSe_version_h
 #define SNEeSe_version_h
 
-#define SNEESE_VERSION_STR "0.833"
-#define SNEESE_VERSION 0.833
+#define SNEESE_VERSION_STR "0.84"
+#define SNEESE_VERSION 0.84
 
 #define RELEASE_DATE __DATE__
 

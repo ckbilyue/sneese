@@ -28,6 +28,9 @@ You must read and accept the license prior to use.
 
 %ifndef SNEeSe_SPC700_asm
 
+EXTERN_C SPC_READ_PORT_W, SPC_WRITE_PORT_R
+EXTERN_C SPC_READ_PORT_R, SPC_WRITE_PORT_W
+
 %define SPC_CTRL 0xF1
 EXTERN_C SPCRAM
 EXTERN_C TotalCycles

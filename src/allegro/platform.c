@@ -65,6 +65,8 @@ char dat_name[MAXPATH];
 
 char start_dir[MAXPATH] = "";
 
+signed char platform_sound_available;
+
 static float cfg_version;
 static int cfg_changed;
 

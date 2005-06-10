@@ -21,6 +21,10 @@ Changes
   DBJH          Daniel Horchner
 
 
+ 0.84 [TRAC]
+  Source: Fixed a flaw that caused problems during linking
+  SPC700: Fixed a bug in the timing of timer 2
+  SPC700: Fixed a bug in the timing of SPC700 opcode execution
  0.833
   SPC700: Fixed timing of MOVW da,YA opcode, thanks to anomie for research
    [TRAC]
