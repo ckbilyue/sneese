@@ -1544,6 +1544,7 @@ int open_rom(const char *Filename)
   BRK_Nvector, IRQ_Evector,
   COP_Nvector, COP_Evector);
 
+#ifndef RELEASE_BUILD
  FILE *memmap_dmp = fopen("memmap.dmp", "wb");
  if (memmap_dmp)
  {
@@ -1554,6 +1555,7 @@ int open_rom(const char *Filename)
   fwrite(&SRAM, sizeof(SRAM), 1, memmap_dmp);
   fclose(memmap_dmp);
  }
+#endif
 
  return TRUE;
 }
