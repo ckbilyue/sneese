@@ -39,6 +39,9 @@ EXTERN void InvalidSPCHWRead(void);
 EXTERN void InvalidSPCHWWrite(void);
 EXTERN void InvalidSPCROMWrite(void);
 
+EXTERN const char *SPC_OpID[256];
+
+
 EXTERN unsigned OLD_PC;     /* Pre-NMI PB:PC */
 EXTERN unsigned char OLD_PB;
 EXTERN unsigned OLD_SPC_ADDRESS;

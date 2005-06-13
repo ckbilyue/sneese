@@ -29,6 +29,11 @@ Changes
    delay needed for cases where the timer target is set previous to the
    current position to only be applied in all cases where it was not
    needed
+  SPC700: Rewrote entire core, replacing it with a cycle-based core
+   written in C; helps Tales of Phantasia and games by Enix
+  SPC700: Corrected timer counter registers to not be reset on write,
+   and corrected most write opcodes to read first, thanks to anomie for
+   research confirming this theory
  0.833
   SPC700: Fixed timing of MOVW da,YA opcode, thanks to anomie for research
    [TRAC]

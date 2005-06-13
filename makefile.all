@@ -103,7 +103,7 @@ include $(PLATFORMRULES)
 
 ASMOBJS := $(addsuffix .$(ASM_OBJ_EXT), \
             $(addprefix cpu/, 65c816 memmap dma) \
-            $(addprefix apu/, spc700 apuskip) \
+            $(addprefix apu/, apuskip) \
             $(addprefix ppu/, screen windows mode7 tiles sprites ppu \
              bg8 bg8m bg8o bg8om bg16 bg16m bg16o bg16om bg16e bg16me \
              bg16oe bg16ome) \
@@ -111,8 +111,8 @@ ASMOBJS := $(addsuffix .$(ASM_OBJ_EXT), \
 JMAOBJS := $(addprefix jma/, 7zlzma.o crc32.o iiostrm.o inbyte.o jma.o \
             lzma.o lzmadec.o winout.o)
 OBJS   := $(ASMOBJS) $(PLATFORMOBJS) $(JMAOBJS) main.o romload.o snes.o \
-           timers.o debug.o input.o helper.o apu/sound.o guicore.o \
-           emugui.o map.o multiio.o
+           timers.o debug.o input.o helper.o apu/spc700.o apu/sound.o \
+           guicore.o emugui.o map.o multiio.o
 ifdef ZLIB
 OBJS += unzip.o
 endif
@@ -161,10 +161,6 @@ $(OBJ)/cpu/65c816.$(ASM_OBJ_EXT): $(SRC)/cpu/65c816.asm $(OBJFIX) \
  cpu/ops_x.inc cpu/ops_mx.inc cpu/timing.inc cpu/regs.inc cpu/cpumem.inc \
  cpu/dma.inc apu/spc.inc cycles.inc misc.inc ppu/ppu.inc ppu/screen.inc \
  ppu/sprites.inc)
-$(OBJ)/apu/spc700.$(ASM_OBJ_EXT): $(SRC)/apu/spc700.asm $(OBJFIX) \
- $(addprefix $(INCLUDE)/, apu/spc.inc apu/regs.inc apu/spcaddr.inc \
- apu/spcmacro.inc apu/spcops.inc cpu/regs.inc cycles.inc misc.inc \
- ppu/ppu.inc)
 $(OBJ)/cpu/memmap.$(ASM_OBJ_EXT): $(SRC)/cpu/memmap.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, misc.inc cpu/memmap.inc cpu/cpumem.inc \
  cpu/regs.inc ppu/ppu.inc cpu/dma.inc cycles.inc)
@@ -258,6 +254,9 @@ $(OBJ)/helper.$(OBJBASE): $(SRC)/helper.c \
 $(OBJ)/input.$(OBJBASE): $(SRC)/input.c \
  $(addprefix $(INCLUDE)/, input.h helper.h cpu/cpu.h apu/sound.h misc.h \
  wrapaleg.h)
+$(OBJ)/apu/spc700.$(OBJBASE): $(SRC)/apu/spc700.c $(OBJFIX) \
+ $(addprefix $(INCLUDE)/, helper.h wrapaleg.h platform.h misc.h \
+ apu/sound.h apu/spc.h apu/sounddef.h debug.h cpu/cpu.h snes.h)
 $(OBJ)/apu/sound.$(OBJBASE): $(SRC)/apu/sound.c \
  $(addprefix $(INCLUDE)/, helper.h apu/sound.h apu/sounddef.h apu/spc.h \
  misc.h wrapaleg.h)

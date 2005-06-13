@@ -47,9 +47,14 @@ EXTERN unsigned cpu_65c816_PB_Shifted;
 #define cpu_65c816_DB ((unsigned char) (cpu_65c816_DB_Shifted >> 16))
 #define cpu_65c816_PB ((unsigned char) (cpu_65c816_PB_Shifted >> 16))
 
+EXTERN unsigned char In_CPU;
+
 EXTERN signed char FPS_ENABLED;
 EXTERN unsigned char BREAKS_ENABLED;
 EXTERN unsigned LastRenderLine;
 EXTERN unsigned LastVBLLine;
+
+EXTERN unsigned SPC_CPU_cycles;
+EXTERN unsigned SPC_CPU_cycles_mul;
 
 #endif /* !defined(SNEeSe_cpu_cpu_h) */

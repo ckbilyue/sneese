@@ -26,9 +26,7 @@ You must read and accept the license prior to use.
 #include "../misc.h"
 #include "spc.h"
 
-#define SPC_CTRL SPCRAM[0xF1]
-#define SPC_DSP_ADDR SPCRAM[0xF2]
-
+/*
 EXTERN unsigned TotalCycles,CycleLatch0,CycleLatch1,CycleLatch2;
 
 EXTERN unsigned SPC_T0_cycle_latch;
@@ -41,6 +39,7 @@ EXTERN unsigned SPC_T2_cycle_latch;
 EXTERN unsigned SPC_T2_position, SPC_T2_target;
 
 EXTERN unsigned char SPC_T0_counter, SPC_T1_counter, SPC_T2_counter;
+*/
 
 EXTERN unsigned char SPC_MASK;
 EXTERN unsigned SPC_DSP_DATA;
@@ -62,6 +61,8 @@ EXTERN void Wrap_SDSP_Cyclecounter();
 EXTERN void Remove_Sound();
 EXTERN int Install_Sound(int stereo);
 EXTERN void Reset_Sound_DSP();
+
+EXTERN void update_sound(void);
 
 EXTERN void SPC_READ_DSP();
 EXTERN void SPC_WRITE_DSP();

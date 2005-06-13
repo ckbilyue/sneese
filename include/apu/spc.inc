@@ -33,65 +33,17 @@ EXTERN_C SPC_READ_PORT_R, SPC_WRITE_PORT_W
 
 %define SPC_CTRL 0xF1
 EXTERN_C SPCRAM
-EXTERN_C TotalCycles
-EXTERN_C SPC_T0_cycle_latch,SPC_T0_target,SPC_T0_position
-EXTERN_C SPC_T0_cycle_latch,SPC_T0_counter
-EXTERN_C SPC_T1_cycle_latch,SPC_T1_target,SPC_T1_position
-EXTERN_C SPC_T1_cycle_latch,SPC_T1_counter
-EXTERN_C SPC_T2_cycle_latch,SPC_T2_target,SPC_T2_position
-EXTERN_C SPC_T2_cycle_latch,SPC_T2_counter
 
 %endif
 
 ;%define NO_TIMER_COUNTER_WRAP
 
+EXTERN_C Update_SPC_Timer
 ;%1 = timer
 %macro Update_SPC_Timer 1
- mov edx,[C_LABEL(SPC_T%1_cycle_latch)]
- mov ecx,[C_LABEL(TotalCycles)]
- sub ecx,edx
- mov eax,ecx
-
-%if %1 != 2
- and ecx,byte ~127
- shr eax,7
-%else
- and ecx,byte ~15
- shr eax,4
-%endif
- add edx,ecx
- add eax,[C_LABEL(SPC_T%1_position)]
- mov [C_LABEL(SPC_T%1_cycle_latch)],edx
-
- test byte [C_LABEL(SPCRAM) + SPC_CTRL],1 << %1
- je %%done
-
- mov ecx,[C_LABEL(SPC_T%1_target)]
- mov [C_LABEL(SPC_T%1_position)],eax
- cmp eax,ecx
- jl %%done
-
- mov edx,eax
- shr edx,16
- div cx
- movzx ecx,byte [C_LABEL(SPC_T%1_counter)]
- movzx edx,dx
- movzx eax,ax
- mov [C_LABEL(SPC_T%1_position)],edx
- add eax,ecx
-
-%ifdef NO_TIMER_COUNTER_WRAP
- mov edx,15
- sub edx,eax
- sbb ecx,ecx
- and ecx,edx
- add eax,ecx
-%else
- and al,15
-%endif
- mov [C_LABEL(SPC_T%1_counter)],al
-
-%%done:
+ push dword %1
+ call C_LABEL(Update_SPC_Timer)
+ add esp,4
 %endmacro
 
 
@@ -133,35 +85,9 @@ EXTERN_C SPC_T2_cycle_latch,SPC_T2_counter
  Frame rate: 49.86075967~Hz.
 %endif
 
-%ifdef SPC_CYCLES_DIV_BEFORE_MUL
- xor edx,edx
- div dword [C_LABEL(SPC_CPU_cycle_divisor)]
- mov [SPC_CPU_cycles],edx   ; Save remainder
- mul dword [C_LABEL(SPC_CPU_cycle_multiplicand)]
-%else
- mul dword [C_LABEL(SPC_CPU_cycle_multiplicand)]
- add eax,[SPC_CPU_cycles_mul]
-;mov ecx,[C_LABEL(SPC_CPU_cycle_divisor)]
- adc edx,byte 0
- div dword [C_LABEL(SPC_CPU_cycle_divisor)]
- xor edi,edi
- mov [SPC_CPU_cycles_mul],edx   ; Save remainder
- mov [SPC_CPU_cycles],edi
-%endif
-
- add eax,[C_LABEL(SPC_Cycles)]  ; Add new balance of SPC cycles
- mov [C_LABEL(SPC_Cycles)],eax
- cmp [C_LABEL(TotalCycles)],eax
- jb %%need_execute
- ; Check for and handle 35-minute wrap
- test eax,eax
- js %%no_cycles
- cmp dword [C_LABEL(TotalCycles)],byte 0
- jns %%no_cycles
- call C_LABEL(Wrap_SPC_Cyclecounter)
-%%need_execute:
+ push eax
  call C_LABEL(SPC_START)
-%%no_cycles:
+ add esp,4
  popa
 %endmacro
 

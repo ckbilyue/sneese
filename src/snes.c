@@ -123,8 +123,6 @@ void snes_reset(void)
 
  Reset_CPU();
 
- /* Copy the SPC ROM into the top of the SPC RAM */
- memcpy(SPCRAM + 0xFFC0, SPC_ROM_CODE, 64);
  Reset_SPC();
  Reset_APU_Skipper();
  Reset_Sound_DSP();

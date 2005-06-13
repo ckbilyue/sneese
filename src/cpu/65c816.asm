@@ -319,8 +319,10 @@ OpTable:skipl
 EXPORT FixedTrip    ,skipl  ; Cycle of next fixed event on this scanline
 
 EXPORT SPC_last_cycles      ,skipl
+EXPORT_C SPC_CPU_cycles
 EXPORT SPC_CPU_cycles       ,skipl
 EXPORT SPC_cycles_left      ,skipl
+EXPORT_C SPC_CPU_cycles_mul
 EXPORT SPC_CPU_cycles_mul   ,skipl
 
 ; For when I make the back color +/- hacks really do +/-
@@ -357,6 +359,7 @@ EXPORT CPU_Execution_Mode,skipb
 EXPORT IRQ_pin      ,skipb
 _E_flag:skipb
 _Z_flag:skipb
+EXPORT_C In_CPU
 EXPORT In_CPU,skipb         ; nonzero if CPU is executing
 
 ;NMI not raised

@@ -2030,6 +2030,18 @@ SNES_W2140_SPC: ; APUIO0
 SNES_W2141_SPC: ; APUIO1
 SNES_W2142_SPC: ; APUIO2
 SNES_W2143_SPC: ; APUIO3
+ Execute_SPC SaveCycles
+ push eax
+ push ecx
+
+ push eax
+ push ebx
+ call C_LABEL(SPC_WRITE_PORT_R)
+ add esp,8
+ pop ecx
+ pop eax
+ ret
+%if 0
  push eax
  push ecx
  push eax
@@ -2049,6 +2061,7 @@ SNES_W2143_SPC: ; APUIO3
  push ebx
  call C_LABEL(SPC_WRITE_PORT_R)
  add esp,8
+
  pop ecx
  pop eax
  ret
@@ -2058,7 +2071,7 @@ SNES_W2143_SPC: ; APUIO3
  pop ecx
  pop eax
  ret
-
+%endif
 
 ALIGNC
 EXPORT_C Make_SPC
