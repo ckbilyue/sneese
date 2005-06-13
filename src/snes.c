@@ -235,7 +235,7 @@ extern unsigned char TileCache4[2 * 64 << 10];
 extern unsigned char TileCache8[1 * 64 << 10];
 void save_debug_dumps(void)
 {
-#ifndef RELEASE
+#ifndef RELEASE_BUILD
  if (snes_rom_loaded)
  {
   FILE *fp;
