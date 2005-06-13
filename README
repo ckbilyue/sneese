@@ -10,7 +10,7 @@ The SNES emulator with the extra e's...
         SSSSS   NN    NN  EEEEEE   eeee    SSSSS    eeee
 
                                             v0.84 (Public BETA)
-                                            xx June 2005
+                                            12 June 2005
 
   Please read the license (LICENSE file) before using or distributing
    SNEeSe in any way!
@@ -458,7 +458,7 @@ Emulation details:
     Partial HDMA timing,  HDMA may have some bugs.
 
  - SPC700 sound CPU with 250/256 opcodes implemented, running with
-    on-demand execution.
+    on-demand execution and cycle-based emulation.
     BRK/RETI, BCD (DAS/DAA), SLEEP/STOP remain unimplemented.
  - Partial sound DSP support and sound generation, including accurate
     emulation of the 4-point pitch-regulated gaussian interpolation of

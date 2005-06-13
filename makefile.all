@@ -83,7 +83,14 @@ OFLAGS = -march=i486 -mcpu=pentium -O3 -ffast-math $(PFLAGS)
 
 endif
 
+RELEASE ?= 0
+
+
 DFLAGS = -DDEBUG
+
+ifneq ($(RELEASE),0)
+DFLAGS += -DRELEASE
+endif
 
 
 CFLAGS = $(OFLAGS) -ggdb3 -I$(INCLUDE)

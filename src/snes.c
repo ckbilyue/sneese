@@ -239,6 +239,7 @@ void save_debug_dumps(void)
  {
   FILE *fp;
 
+#ifndef RELEASE
 #ifdef DEBUG
 #ifdef SPCTRACKER
   /* This saves the SPC-tracker dump! */
@@ -320,6 +321,7 @@ void save_debug_dumps(void)
    fclose(fp);
   }
 
+#endif
 #endif
 
  }
