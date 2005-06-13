@@ -235,11 +235,11 @@ extern unsigned char TileCache4[2 * 64 << 10];
 extern unsigned char TileCache8[1 * 64 << 10];
 void save_debug_dumps(void)
 {
+#ifndef RELEASE
  if (snes_rom_loaded)
  {
   FILE *fp;
 
-#ifndef RELEASE
 #ifdef DEBUG
 #ifdef SPCTRACKER
   /* This saves the SPC-tracker dump! */
@@ -322,7 +322,7 @@ void save_debug_dumps(void)
   }
 
 #endif
-#endif
 
  }
+#endif
 }
