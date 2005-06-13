@@ -1468,7 +1468,7 @@ EXPORT_C SPC_WRITE_TIMER_0
 
  cmp edx,[C_LABEL(SPC_T0_position)]
  ;does setting target for current position raise counter? assuming not
- jb .no_fixup ;jbe?
+ ja .no_fixup ;jae?
  ;handle 'delay' where new target is set below position
  sub dword [C_LABEL(SPC_T0_position)],256
 .no_fixup:

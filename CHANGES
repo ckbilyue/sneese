@@ -25,6 +25,10 @@ Changes
   Source: Fixed a flaw that caused problems during linking
   SPC700: Fixed a bug in the timing of timer 2
   SPC700: Fixed a bug in the timing of SPC700 opcode execution
+  SPC700: Fixed a bug affecting all of the SPC700 timers, causing the
+   delay needed for cases where the timer target is set previous to the
+   current position to only be applied in all cases where it was not
+   needed
  0.833
   SPC700: Fixed timing of MOVW da,YA opcode, thanks to anomie for research
    [TRAC]
