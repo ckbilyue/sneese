@@ -127,6 +127,7 @@ $(sort $(OBJDIRS)):
 
 clean:
 	@echo Removing output files
+	@-$(RM) -f $(EXE)
 	@-$(RM) -rf $(OBJ_BASE)/$(PLATFORM)
 
 $(OBJ)/%.$(ASM_OBJ_EXT): $(SRC)/%.asm $(OBJFIX)

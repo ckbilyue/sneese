@@ -34,6 +34,8 @@ Changes
   SPC700: Corrected timer counter registers to not be reset on write,
    and corrected most write opcodes to read first, thanks to anomie for
    research confirming this theory
+  Source: Fixed a bug in the makefile that caused 'make clean' to not
+   remove the binary
  0.833
   SPC700: Fixed timing of MOVW da,YA opcode, thanks to anomie for research
    [TRAC]
