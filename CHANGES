@@ -30,6 +30,8 @@ Changes
    address to not be updated [TRAC]
   Render: Corrected handling of writes to BG offset registers and mode 7
    matrix registers, thanks to anomie for research [TRAC]
+  Sound: Improved timing accuracy of direct envelope height setting mode
+   [TRAC]
  0.84 [TRAC]
   Source: Fixed a flaw that caused problems during linking
   SPC700: Fixed a bug in the timing of timer 2

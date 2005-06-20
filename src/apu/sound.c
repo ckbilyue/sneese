@@ -511,8 +511,16 @@ INLINE static unsigned UpdateEnvelopeHeight(int voice)
     }
     continue;
 
+   case DIRECT:
+    {
+     int gain = SPC_DSP[(voice << 4) + DSP_VOICE_GAIN];
+
+     pvs->envx = (gain & 0x7F) << ENVX_DOWNSHIFT_BITS;
+     pvs->env_sample_latch = pvs->voice_sample_latch;
+     break;
+    }
+
    //case VOICE_OFF:
-   //case DIRECT:
    //break;
    }
   }
@@ -629,8 +637,6 @@ INLINE static void SPC_KeyOn(int voices)
    }
    else
    {
-    SPC_DSP[(voice << 4) + DSP_VOICE_ENVX] = (gain & 0x7F);
-    pvs->envx = (gain & 0x7F) << ENVX_DOWNSHIFT_BITS;
     pvs->env_state = DIRECT;
    }
   }
@@ -1679,8 +1685,6 @@ void SPC_WRITE_DSP()
    else
    {
     SNDvoices[addr_hi].env_state = DIRECT;
-    SPC_DSP[(addr_hi << 4) + DSP_VOICE_ENVX] = (i & 0x7F);
-    SNDvoices[addr_hi].envx = (i & 0x7F) << ENVX_DOWNSHIFT_BITS;
    }
   }
   break;
@@ -1748,8 +1752,6 @@ void SPC_WRITE_DSP()
    else
    {
     SNDvoices[addr_hi].env_state = DIRECT;
-    SPC_DSP[(addr_hi << 4) + DSP_VOICE_ENVX] = (SPC_DSP_DATA & 0x7F);
-    SNDvoices[addr_hi].envx = (SPC_DSP_DATA & 0x7F) << ENVX_DOWNSHIFT_BITS;
    }
   }
 
