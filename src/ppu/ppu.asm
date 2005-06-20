@@ -1364,7 +1364,11 @@ SNES_W210D: ; BG1HOFS
 %endif
 
  push ebx
+ mov dl,[C_LABEL(BG1HOFS)+1]
  mov bl,[BGOFS_Last_Write]
+ and dl,7
+ and bl,~7
+ add bl,dl
  mov bh,al
  mov [BGOFS_Last_Write],al
 
@@ -1376,7 +1380,6 @@ SNES_W210D: ; BG1HOFS
  mov bl,0x40    ; Recalculate H
  or [Redo_M7],bl
 
- mov bl,1
 .no_change:
 
  pop ebx
@@ -1397,7 +1400,11 @@ SNES_W210E: ; BG1VOFS
 %endif
 
  push ebx
+ mov dl,[C_LABEL(BG1VOFS)+1]
  mov bl,[BGOFS_Last_Write]
+ and dl,7
+ and bl,~7
+ add bl,dl
  mov bh,al
  mov [BGOFS_Last_Write],al
 
@@ -1428,7 +1435,11 @@ SNES_W210F: ; BG2HOFS
 %endif
 
  push ebx
+ mov dl,[C_LABEL(BG2HOFS)+1]
  mov bl,[BGOFS_Last_Write]
+ and dl,7
+ and bl,~7
+ add bl,dl
  mov bh,al
  mov [BGOFS_Last_Write],al
 
@@ -1437,7 +1448,6 @@ SNES_W210F: ; BG2HOFS
  UpdateDisplay  ;*scroll
  mov [C_LABEL(BG2HOFS)],ebx
 
- mov bl,2
 .no_change:
 
  pop ebx
@@ -1458,7 +1468,11 @@ SNES_W2110: ; BG2VOFS
 %endif
 
  push ebx
+ mov dl,[C_LABEL(BG2VOFS)+1]
  mov bl,[BGOFS_Last_Write]
+ and dl,7
+ and bl,~7
+ add bl,dl
  mov bh,al
  mov [BGOFS_Last_Write],al
 
@@ -1486,7 +1500,11 @@ SNES_W2111: ; BG3HOFS
 %endif
 
  push ebx
+ mov dl,[C_LABEL(BG3HOFS)+1]
  mov bl,[BGOFS_Last_Write]
+ and dl,7
+ and bl,~7
+ add bl,dl
  mov bh,al
  mov [BGOFS_Last_Write],al
 
@@ -1517,7 +1535,11 @@ SNES_W2112: ; BG3VOFS
 %endif
 
  push ebx
+ mov dl,[C_LABEL(BG3VOFS)+1]
  mov bl,[BGOFS_Last_Write]
+ and dl,7
+ and bl,~7
+ add bl,dl
  mov bh,al
  mov [BGOFS_Last_Write],al
 
@@ -1548,7 +1570,11 @@ SNES_W2113: ; BG4HOFS
 %endif
 
  push ebx
+ mov dl,[C_LABEL(BG4HOFS)+1]
  mov bl,[BGOFS_Last_Write]
+ and dl,7
+ and bl,~7
+ add bl,dl
  mov bh,al
  mov [BGOFS_Last_Write],al
 
@@ -1557,7 +1583,6 @@ SNES_W2113: ; BG4HOFS
  UpdateDisplay  ;*scroll
  mov [C_LABEL(BG4HOFS)],ebx
 
- mov bl,8
 .no_change:
 
  pop ebx
@@ -1578,7 +1603,11 @@ SNES_W2114: ; BG4VOFS
 %endif
 
  push ebx
+ mov dl,[C_LABEL(BG4VOFS)+1]
  mov bl,[BGOFS_Last_Write]
+ and dl,7
+ and bl,~7
+ add bl,dl
  mov bh,al
  mov [BGOFS_Last_Write],al
 

@@ -85,6 +85,7 @@ EXPORT M7_Handler_EXTBG,skipl
 EXPORT_C EXTBG_Mask,skipb   ; mask applied to BG enable for EXTBG
 EXPORT_C M7SEL,skipb    ; ab0000yx  ab=mode 7 repetition info,y=flip vertical,x=flip horizontal
 EXPORT Redo_M7,skipb    ; vhyxdcba
+M7_Last_Write:skipb
 M7_Used:    skipb
 M7_Unused:  skipb
 Redo_16x8:  skipb
@@ -1158,6 +1159,7 @@ EXPORT_C Reset_Mode_7
 
  mov [C_LABEL(M7SEL)],al
  mov byte [Redo_M7],0xFF
+ mov byte [M7_Last_Write],al
  mov dword [M7_Handler],M7_REPEAT
  mov dword [M7_Handler_EXTBG],M7P_REPEAT
  mov byte [Redo_16x8],0
@@ -1246,84 +1248,120 @@ EXPORT SNES_W211A ; M7SEL   ; New for 0.12
 
 ALIGNC
 EXPORT SNES_W211B ; M7A
+ push ebx
+ mov bl,[M7_Last_Write]
+ mov bh,al
+ mov [M7_Last_Write],al
+
+ movsx ebx,bx
+ cmp [C_LABEL(M7A)],ebx
+ je .no_change
+
  UpdateDisplay  ;*M7
  ; Used for matrix render and 16-bit M7A * 8-bit = 24-bit multiply
- push eax
- mov ah,al
- mov al,[C_LABEL(M7A)+1]
- cwde
- mov [C_LABEL(M7A)],eax
- mov al,0x01    ; Recalculate A
- or [Redo_M7],al
+ mov [C_LABEL(M7A)],ebx
+ mov dl,0x01    ; Recalculate A
+ or [Redo_M7],dl
  mov byte [Redo_16x8],-1
- pop eax
+.no_change:
+ pop ebx
  ret
 
 ALIGNC
 EXPORT SNES_W211C ; M7B
+ push ebx
+ mov bl,[M7_Last_Write]
+ mov bh,al
+ mov [M7_Last_Write],al
+
+ movsx ebx,bx
+ cmp [C_LABEL(M7B)],ebx
+ je .no_change
+
  UpdateDisplay  ;*M7
  ; Used for matrix render and 16-bit * 8-bit M7B high byte = 24-bit multiply
- push eax
- mov ah,al
- mov al,[C_LABEL(M7B)+1]
- cwde
- mov [C_LABEL(M7B)],eax
- mov al,0x02    ; Recalculate B
- or [Redo_M7],al
+ mov [C_LABEL(M7B)],ebx
+ mov dl,0x02    ; Recalculate B
+ or [Redo_M7],dl
  mov byte [Redo_16x8],-1
- pop eax
+.no_change:
+ pop ebx
  ret
 
 ALIGNC
 EXPORT SNES_W211D ; M7C
+ push ebx
+ mov bl,[M7_Last_Write]
+ mov bh,al
+ mov [M7_Last_Write],al
+
+ movsx ebx,bx
+ cmp [C_LABEL(M7C)],ebx
+ je .no_change
+
  UpdateDisplay  ;*M7
- push eax
- mov ah,al
- mov al,[C_LABEL(M7C)+1]
- cwde
- mov [C_LABEL(M7C)],eax
- mov al,0x04    ; Recalculate C
- or [Redo_M7],al
- pop eax
+ mov [C_LABEL(M7C)],ebx
+ mov dl,0x04    ; Recalculate C
+ or [Redo_M7],dl
+.no_change:
+ pop ebx
  ret
 
 ALIGNC
 EXPORT SNES_W211E ; M7D
+ push ebx
+ mov bl,[M7_Last_Write]
+ mov bh,al
+ mov [M7_Last_Write],al
+
+ movsx ebx,bx
+ cmp [C_LABEL(M7D)],ebx
+ je .no_change
+
  UpdateDisplay  ;*M7
- push eax
- mov ah,al
- mov al,[C_LABEL(M7D)+1]
- cwde
- mov [C_LABEL(M7D)],eax
- mov al,0x08    ; Recalculate D
- or [Redo_M7],al
- pop eax
+ mov [C_LABEL(M7D)],ebx
+ mov dl,0x08    ; Recalculate D
+ or [Redo_M7],dl
+.no_change:
+ pop ebx
  ret
 
 ALIGNC
 EXPORT SNES_W211F ; M7X
- UpdateDisplay  ;*M7
- push eax
- mov ah,al
- mov al,[C_LABEL(M7X)+1]
- mov [C_LABEL(M7X)],ax
+ push ebx
+ mov bl,[M7_Last_Write]
+ mov bh,al
+ mov [M7_Last_Write],al
 
- mov al,0x10    ; Recalculate X
- or [Redo_M7],al
- pop eax
+ movsx ebx,bx
+ cmp [C_LABEL(M7X)],ebx
+ je .no_change
+
+ UpdateDisplay  ;*M7
+ mov [C_LABEL(M7X)],ebx
+ mov dl,0x10    ; Recalculate X
+ or [Redo_M7],dl
+.no_change:
+ pop ebx
  ret
 
 ALIGNC
 EXPORT SNES_W2120 ; M7Y
- UpdateDisplay  ;*M7
- push eax
- mov ah,al
- mov al,[C_LABEL(M7Y)+1]
- mov [C_LABEL(M7Y)],ax
+ push ebx
+ mov bl,[M7_Last_Write]
+ mov bh,al
+ mov [M7_Last_Write],al
 
- mov al,0x20    ; Recalculate Y
- or [Redo_M7],al
- pop eax
+ movsx ebx,bx
+ cmp [C_LABEL(M7Y)],ebx
+ je .no_change
+
+ UpdateDisplay  ;*M7
+ mov [C_LABEL(M7Y)],ebx
+ mov dl,0x20    ; Recalculate Y
+ or [Redo_M7],dl
+.no_change:
+ pop ebx
  ret
 
 section .text
