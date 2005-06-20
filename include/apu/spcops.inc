@@ -937,6 +937,7 @@ EXPORT_C SPC_SUBW_YA_dp
  sbb cl,cl
  STORE_FLAGS_NZ bh
  xor cl,0xFF
+ xor ah,0x10
  STORE_FLAGS_C cl
  STORE_FLAGS_H ah
  OPCODE_EPILOG

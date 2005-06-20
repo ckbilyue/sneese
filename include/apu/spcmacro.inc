@@ -329,6 +329,7 @@ EXPORT_C SPC_SBC_A_%2
  xor al,0xFF
  STORE_FLAGS_Z cl
  STORE_FLAGS_C al
+ xor ah,0x10
  STORE_FLAGS_H ah
  OPCODE_EPILOG
 %endmacro
@@ -351,6 +352,7 @@ EXPORT_C SPC_SBC_%1
 .no_overflow:
  sbb cl,cl
  STORE_FLAGS_Z al
+ xor ah,0x10
  xor cl,0xFF
  STORE_FLAGS_H ah
  STORE_FLAGS_C cl

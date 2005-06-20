@@ -1195,12 +1195,12 @@ INLINE static void update_voice_pitch(int voice, struct voice_state *pvs,
         else \
          GET_OUTX_##GAUSS; \
  \
-        pvs->outx &= ~1; \
- \
         update_voice_pitch(voice, pvs, pitch_modulation_enable, voice_bit); \
  \
         pvs->outx = (pvs->outx \
          * (int) SoundGetEnvelopeHeight(voice)) >> ENVX_PRECISION_BITS; \
+ \
+        pvs->outx &= ~1; \
  \
         CHANNELS##_VOICE_VOLUME_##ECHO(SAMPLE_ADD) \
  \

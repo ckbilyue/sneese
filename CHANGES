@@ -21,6 +21,13 @@ Changes
   DBJH          Daniel Horchner
 
 
+ 0.841
+  Sound: Fixed a flaw in the order of operations in sample volume
+   multiplication, causing a slight improvement in sound accuracy [TRAC]
+  SPC700: Fixed a bug in the MUL YA opcode which caused it to not update
+   flags [TRAC]
+  SPC700: Fixed a bug in the POP PSW which caused the direct page base
+   address to not be updated [TRAC]
  0.84 [TRAC]
   Source: Fixed a flaw that caused problems during linking
   SPC700: Fixed a bug in the timing of timer 2
