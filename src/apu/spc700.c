@@ -30,8 +30,6 @@ You must read and accept the license prior to use.
 #include "cpu/cpu.h"
 #include "snes.h"
 
-//#define NO_OPCODE_SUSPENSION
-
 SPC700_CONTEXT primary_context;
 
 SPC700_CONTEXT *active_context = &primary_context;
@@ -821,94 +819,6 @@ void dummy_fprintf()
 #endif
 
 
-#ifdef NO_OPCODE_SUSPENSION
-
-#ifdef OPCODE_TRACE_LOG
-/* cycle #, PC, TotalCycles */
-#define SINGLE_STEP_START() \
-  if (dump_flag) fprintf(log_file, "START_CYCLE() PC:%04X %u\n", _PC & 0xFFFF, get_cycles_spc());
-
-void single_step_end(void)
-{
-  if (!dump_flag) return;
-  fprintf(log_file, "R:%02X %02X %02X %02X W:%02X %02X %02X %02X X:%02X Y:%02X A:%02X SP:%02X dp:%02X Op:%02X\n",
-    _PORT0R & 0xFF, _PORT1R & 0xFF, _PORT2R & 0xFF, _PORT3R & 0xFF,
-    _PORT0W & 0xFF, _PORT1W & 0xFF, _PORT2W & 0xFF, _PORT3W & 0xFF,
-    _X & 0xFF, _Y & 0xFF, _A & 0xFF, _SP & 0xFF, _direct_page & 0xFF, _opcode & 0xFF);
-  fprintf(log_file, "NVPBHIZC %c%c%c%c%c%c%c%c",
-    flag_state_spc(SPC_FLAG_N) ? '1' : '0', flag_state_spc(SPC_FLAG_V) ? '1' : '0',
-    flag_state_spc(SPC_FLAG_P) ? '1' : '0', '1',
-    flag_state_spc(SPC_FLAG_H) ? '1' : '0', flag_state_spc(SPC_FLAG_I) ? '1' : '0',
-    flag_state_spc(SPC_FLAG_Z) ? '1' : '0', flag_state_spc(SPC_FLAG_C) ? '1' : '0');
- if (_cycle == 0) fprintf(log_file, " %s\n", SPC_OpID[_opcode]);
- else fprintf(log_file, "\n");
-}
-
-
-/* op, R ports, W ports, X Y A */
-/* address1 address2 offset data1 data2 data16 */
-#define SINGLE_STEP_END single_step_end();
-
-#else
-#define SINGLE_STEP_START()
-#define SINGLE_STEP_END
-#endif
-
-
-/* base opcode execution time in bus cycles */
-static unsigned char SPCCycleTable[256] =
-{
-   2,  8,  4,  5,  3,  4,  3,  6,  2,  6,  5,  4,  5,  4,  6,  8,   /* 00 */
-   2,  8,  4,  5,  4,  5,  5,  6,  5,  5,  6,  5,  2,  2,  4,  6,   /* 10 */
-   2,  8,  4,  5,  3,  4,  3,  6,  2,  6,  5,  4,  5,  4,  5,  2,   /* 20 */
-   2,  8,  4,  5,  4,  5,  5,  6,  5,  5,  6,  5,  2,  2,  3,  8,   /* 30 */
-   2,  8,  4,  5,  3,  4,  3,  6,  2,  6,  4,  4,  5,  4,  6,  6,   /* 40 */
-   2,  8,  4,  5,  4,  5,  5,  6,  5,  5,  4,  5,  2,  2,  4,  3,   /* 50 */
-   2,  8,  4,  5,  3,  4,  3,  6,  2,  6,  4,  4,  5,  4,  5,  5,   /* 60 */
-   2,  8,  4,  5,  4,  5,  5,  6,  5,  5,  5,  5,  2,  2,  3,  6,   /* 70 */
-   2,  8,  4,  5,  3,  4,  3,  6,  2,  6,  5,  4,  5,  2,  4,  5,   /* 80 */
-   2,  8,  4,  5,  4,  5,  5,  6,  5,  5,  5,  5,  2,  2, 12,  5,   /* 90 */
-   3,  8,  4,  5,  3,  4,  3,  6,  2,  6,  4,  4,  5,  2,  4,  4,   /* A0 */
-   2,  8,  4,  5,  4,  5,  5,  6,  5,  5,  5,  5,  2,  2,  3,  4,   /* B0 */
-   3,  8,  4,  5,  4,  5,  4,  7,  2,  5,  6,  4,  5,  2,  4,  9,   /* C0 */
-   2,  8,  4,  5,  5,  6,  6,  7,  4,  5,  5,  5,  2,  2,  6,  3,   /* D0 */
-   2,  8,  4,  5,  3,  4,  3,  6,  2,  4,  5,  3,  4,  3,  4,  3,   /* E0 */
-   2,  8,  4,  5,  4,  5,  5,  6,  3,  4,  5,  4,  2,  2,  4,  3    /* F0 */
-};
-
-#define START_CYCLE(c) { if ((c) == 1) { SINGLE_STEP_START() }
-
-#define END_FETCH_CYCLE() \
-  SINGLE_STEP_END \
-  _WorkCycles += SPCCycleTable[_opcode]; \
-}
-
-#define END_CYCLE(c,n) \
-}
-
-#define EXIT_OPCODE(n) { break; }
-
-#define END_OPCODE(n) EXIT_OPCODE(n) }
-
-#define END_BRANCH_OPCODE(cycle, TEST) \
-  TEST \
-  END_CYCLE((cycle), 1) \
- \
-  /* tally up cycles for taken branch */ \
-  _WorkCycles += 2; \
- \
-  /* sign extend offset and add to PC */ \
-  START_CYCLE((cycle) + 1) \
-  _address = _PC + (((int) _offset ^ 0x80) - 0x80); \
-  END_CYCLE((cycle) + 1, 1) \
- \
-  START_CYCLE((cycle) + 2) \
-  _PC = _address; \
-  END_OPCODE(1)
-
-
-#else
-
 #ifdef OPCODE_TRACE_LOG
 /* cycle #, PC, TotalCycles */
 #define SINGLE_STEP_START(c) \
@@ -971,9 +881,6 @@ void single_step_end(void)
   START_CYCLE((cycle) + 2) \
   _PC = _address; \
   END_OPCODE(1)
-
-
-#endif
 
 
 #define REL_TEST_BRA ;
@@ -1795,26 +1702,6 @@ void single_step_end(void)
   END_OPCODE(1)
 
 
-unsigned spc_opcode_usage[256] =
-{
- 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
- 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
- 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
- 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
- 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
- 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
- 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
- 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
- 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
- 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
- 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
- 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
- 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
- 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
- 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
- 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-};
-
 static void Execute_SPC(void)
 {
   unsigned char was_in_cpu = In_CPU;
@@ -1830,7 +1717,6 @@ static void Execute_SPC(void)
       /* fetch opcode */
       _opcode = get_byte_spc(_PC);
       _PC++;
-      spc_opcode_usage[_opcode]++;
     END_FETCH_CYCLE()
 
     switch (_opcode)
