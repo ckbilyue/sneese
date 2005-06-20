@@ -27,10 +27,6 @@ include/cpu/timing.inc
 include/cpu/regs.inc
 include/apu/spc.inc
 src/apu/spc700.c
-include/apu/spcaddr.inc
-include/apu/spcmacro.inc
-include/apu/spcops.inc
-include/apu/regs.inc
 include/cycles.inc
 include/cpu/cpumem.inc
 include/misc.inc
