@@ -308,6 +308,7 @@ void spc_restore_flags(void)
   if (PSW & SPC_FLAG_P) set_flag_spc(SPC_FLAG_P);
   else clr_flag_spc(SPC_FLAG_P);
 
+  _B_flag = PSW & SPC_FLAG_B;
   _H_flag = PSW & SPC_FLAG_H;
   _I_flag = PSW & SPC_FLAG_I;
   _Z_flag = ~PSW & SPC_FLAG_Z;
@@ -798,7 +799,7 @@ void SPC_SHOW_REGISTERS(void)
 
 unsigned char get_SPC_PSW(void)
 {
-  spc_setup_flags(1);
+  spc_setup_flags(_B_flag);
 
   return _PSW;
 }
@@ -1144,8 +1145,8 @@ void single_step_end(void)
   { \
     unsigned result = (dest) + (src) + (flag_state_spc(SPC_FLAG_C) ? 1 : 0); \
  \
-    store_flag_h(((dest) & 0x0F) + ((src) & 0x0F) + \
-      (flag_state_spc(SPC_FLAG_C) ? 1 : 0) > 0x0F ? 1 : 0); \
+    store_flag_h(((unsigned) (((dest) & 0x0F) + ((src) & 0x0F) + \
+      (flag_state_spc(SPC_FLAG_C) ? 1 : 0))) > 0x0F ? 1 : 0); \
     store_flag_c(result > 0xFF); \
     store_flag_v((~((dest) ^ (src))) & (((dest) ^ result) & 0x80)); \
     store_flags_nz(result); \
@@ -1156,8 +1157,8 @@ void single_step_end(void)
   { \
     unsigned result = (dest) - (src) - (flag_state_spc(SPC_FLAG_C) ? 0 : 1); \
  \
-    store_flag_h(((dest) & 0x0F) - ((src) & 0x0F) - \
-      (flag_state_spc(SPC_FLAG_C) ? 0 : 1) > 0x0F ? 0 : 1); \
+    store_flag_h(((unsigned) (((dest) & 0x0F) - ((src) & 0x0F) - \
+      (flag_state_spc(SPC_FLAG_C) ? 0 : 1))) > 0x0F ? 0 : 1); \
     store_flag_c(result <= 0xFF); \
     store_flag_v(((dest) ^ (src)) & (((dest) ^ result) & 0x80)); \
     store_flags_nz(result); \
@@ -1183,14 +1184,14 @@ void single_step_end(void)
     temp_low = ((dest) & 0xFF) + ((src) & 0xFF); \
     carry_low = temp_low > 0xFF ? 1 : 0; \
  \
-    store_flag_h((((dest) >> 8) & 0x0F) + (((src) >> 8) & 0x0F) + \
-      carry_low > 0x0F ? 1 : 0); \
+    store_flag_h(((unsigned) ((((dest) >> 8) & 0x0F) + \
+      (((src) >> 8) & 0x0F) + carry_low)) > 0x0F ? 1 : 0); \
  \
     temp_high = ((dest) >> 8) + ((src) >> 8) + carry_low; \
     store_flag_c(temp_high > 0xFF); \
-    result = (temp_low & 0xFF) + (temp_high << 8); \
+    result = ((temp_low & 0xFF) + (temp_high << 8)) & 0xFFFF; \
  \
-    store_flag_v((~((dest) ^ (src))) & (((dest) ^ result) & 0x8000) >> 8); \
+    store_flag_v(((~((dest) ^ (src))) & (((dest) ^ result) & 0x8000)) >> 8); \
     store_flag_n(result >> 8); store_flag_z(result != 0); \
     (dest) = result; \
   }
@@ -1202,14 +1203,14 @@ void single_step_end(void)
     temp_low = ((dest) & 0xFF) - ((src) & 0xFF); \
     carry_low = temp_low > 0xFF ? 1 : 0; \
  \
-    store_flag_h((((dest) >> 8) & 0x0F) - (((src) >> 8) & 0x0F) - \
-      carry_low <= 0x0F ? 1 : 0); \
+    store_flag_h(((unsigned) ((((dest) >> 8) & 0x0F) - \
+      (((src) >> 8) & 0x0F) - carry_low)) > 0x0F ? 0 : 1); \
  \
     temp_high = ((dest) >> 8) - ((src) >> 8) - carry_low; \
     store_flag_c(temp_high <= 0xFF); \
-    result = (temp_low & 0xFF) + (temp_high << 8); \
+    result = ((temp_low & 0xFF) + (temp_high << 8)) & 0xFFFF; \
  \
-    store_flag_v(((dest) ^ (src)) & (((dest) ^ result) & 0x8000) >> 8); \
+    store_flag_v((((dest) ^ (src)) & (((dest) ^ result) & 0x8000)) >> 8); \
     store_flag_n(result >> 8); store_flag_z(result != 0); \
     (dest) = result; \
   }
@@ -1259,14 +1260,14 @@ void single_step_end(void)
   { \
     (var)--; \
     store_flag_n(var >> 8); \
-    store_flag_z(var != 0); \
+    store_flag_z((var & 0xFFFF) != 0); \
   }
 
 #define OP_INCW(var) \
   { \
     (var)++; \
     store_flag_n(var >> 8); \
-    store_flag_z(var != 0); \
+    store_flag_z((var & 0xFFFF) != 0); \
   }
 
 
@@ -2378,7 +2379,7 @@ static void Execute_SPC(void)
         END_CYCLE(2, 1)
 
         START_CYCLE(3)
-        spc_setup_flags(1);
+        spc_setup_flags(_B_flag);
         set_byte_spc(_address, _PSW);
         END_CYCLE(3, 1)
 
