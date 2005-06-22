@@ -21,22 +21,24 @@ Changes
   DBJH          Daniel Horchner
 
 
- 0.841
+ 0.841 [TRAC]
   Sound: Fixed a flaw in the order of operations in sample volume
-   multiplication, causing a slight improvement in sound accuracy [TRAC]
+   multiplication, causing a slight improvement in sound accuracy
   SPC700: Fixed a bug in the MUL YA opcode which caused it to not update
-   flags [TRAC]
+   flags
   SPC700: Fixed a bug in the POP PSW which caused the direct page base
-   address to not be updated [TRAC]
+   address to not be updated
   Render: Corrected handling of writes to BG offset registers and mode 7
-   matrix registers, thanks to anomie for research [TRAC]
+   matrix registers, thanks to anomie for research
   Sound: Improved timing accuracy of direct envelope height setting mode
-   [TRAC]
   SPC700: Corrected POP PSW to allow changing of B flag, and PUSH PSW to
-   reflect its current state [TRAC]
+   reflect its current state
   SPC700: Corrected a bug in updating of H flag by SBC, and some bugs in
    updating of flags in ADDW and SUBW, and potentially in INCW and DECW;
-   thanks to Overload for some of the related research [TRAC]
+   thanks to Overload for some of the related research
+  Sound: Fixed a bug which caused attack rate 15 to be far too slow
+  Sound: Fixed bugs in sustain and release which could cause ENVX to
+   underflow
  0.84 [TRAC]
   Source: Fixed a flaw that caused problems during linking
   SPC700: Fixed a bug in the timing of timer 2

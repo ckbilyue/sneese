@@ -422,7 +422,7 @@ INLINE static unsigned UpdateEnvelopeHeight(int voice)
    switch (pvs->env_state)
    {
    case ATTACK:
-    if (env_update_count == 1)
+    if (env_update_count == attack_time(15))
     {
      envx += ENVX_MAX_BASE / 2; //add 1/2nd
     }
@@ -443,7 +443,7 @@ INLINE static unsigned UpdateEnvelopeHeight(int voice)
    case DECAY:
     envx -= (((int) envx - 1) >> 8) + 1;    //mult by 1-1/256
 
-    if (envx <= pvs->sl)
+    if ((envx <= pvs->sl) || (envx > ENVX_MAX))
     {
      pvs->env_state = pvs->adsr_state = SUSTAIN;
      pvs->env_update_count = pvs->sr;
@@ -461,7 +461,7 @@ INLINE static unsigned UpdateEnvelopeHeight(int voice)
     envx -= (ENVX_MAX_BASE >> 8);   //sub 1/256th
     if ((envx == 0) || (envx > ENVX_MAX))
     {
-     pvs->envx = envx;
+     pvs->envx = envx = 0;
      SPC_VoiceOff(voice, "release");
      break;
     }
@@ -479,7 +479,7 @@ INLINE static unsigned UpdateEnvelopeHeight(int voice)
 
    case DECREASE:
     envx -= (ENVX_MAX_BASE >> 6);   //sub 1/64th
-    if (envx == 0 || envx > ENVX_MAX)    //underflow
+    if ((envx == 0) || (envx > ENVX_MAX))   //underflow
     {
      pvs->env_sample_latch = pvs->voice_sample_latch;
      envx = 0;
@@ -490,7 +490,7 @@ INLINE static unsigned UpdateEnvelopeHeight(int voice)
    case EXP:
     envx -= (((int) envx - 1) >> 8) + 1;    //mult by 1-1/256
 
-    if (envx == 0 || envx > ENVX_MAX)   //underflow
+    if ((envx == 0) || (envx > ENVX_MAX))   //underflow
     {
      pvs->env_sample_latch = pvs->voice_sample_latch;
      envx = 0;
@@ -515,13 +515,16 @@ INLINE static unsigned UpdateEnvelopeHeight(int voice)
     {
      int gain = SPC_DSP[(voice << 4) + DSP_VOICE_GAIN];
 
-     pvs->envx = (gain & 0x7F) << ENVX_DOWNSHIFT_BITS;
+     envx = (gain & 0x7F) << ENVX_DOWNSHIFT_BITS;
      pvs->env_sample_latch = pvs->voice_sample_latch;
      break;
     }
 
-   //case VOICE_OFF:
-   //break;
+   case VOICE_OFF:
+    {
+     pvs->env_sample_latch = pvs->voice_sample_latch;
+     break;
+    }
    }
   }
   break;
@@ -594,22 +597,22 @@ INLINE static void SPC_KeyOn(int voices)
 
   pvs->adsr_state = ATTACK;
 
+#ifndef ZERO_ENVX_ON_KEY_ON
+  // Don't set envelope to zero if sound was playing
+  if (!(SNDkeys & (1 << voice)))
+#endif
+  {
+   SPC_DSP[(voice << 4) + DSP_VOICE_ENVX] = 0;
+   pvs->envx = 0;
+   SPC_DSP[(voice << 4) + DSP_VOICE_OUTX] = 0;
+   pvs->outx = 0;
+  }
+
   adsr1 = SPC_DSP[(voice << 4) + DSP_VOICE_ADSR1];
   if (adsr1 & 0x80)
   {
    //ADSR mode
    adsr2 = SPC_DSP[(voice << 4) + DSP_VOICE_ADSR2];
-
-#ifndef ZERO_ENVX_ON_KEY_ON
-   // Don't set envelope to zero if sound was playing
-   if (!(SNDkeys & (1 << voice)))
-#endif
-   {
-    SPC_DSP[(voice << 4) + DSP_VOICE_ENVX] = 0;
-    pvs->envx = 0;
-    SPC_DSP[(voice << 4) + DSP_VOICE_OUTX] = 0;
-    pvs->outx = 0;
-   }
 
    pvs->env_state = pvs->adsr_state;
    pvs->env_update_count = pvs->ar;
@@ -619,21 +622,10 @@ INLINE static void SPC_KeyOn(int voices)
    //GAIN mode
    gain = SPC_DSP[(voice << 4) + DSP_VOICE_GAIN];
    pvs->env_update_count = pvs->gain_update_count;
+
    if (gain & 0x80)
    {
-#ifndef ZERO_ENVX_ON_KEY_ON
-    // Don't set envelope to zero if sound was playing
-    if (!(SNDkeys & (1 << voice)))
-#endif
-    {
-     SPC_DSP[(voice << 4) + DSP_VOICE_ENVX] = 0;
-     pvs->envx = 0;
-     SPC_DSP[(voice << 4) + DSP_VOICE_OUTX] = 0;
-     pvs->outx = 0;
-    }
-
     pvs->env_state = gain >> 5;
-
    }
    else
    {
@@ -713,7 +705,7 @@ void Reset_Sound_DSP()
   SNDvoices[i].sl = ENVX_MAX_BASE / 8;
   SNDvoices[i].lvol = 0;
   SNDvoices[i].rvol = 0;
-  SNDvoices[i].gain_update_count = 0;
+  SNDvoices[i].gain_update_count = apu_counter_reset_value;
  }
 
  if (!sound_enable_mode) return;
@@ -1732,7 +1724,7 @@ void SPC_WRITE_DSP()
   }
   else
   {
-   SNDvoices[addr_hi].gain_update_count = 0;
+   SNDvoices[addr_hi].gain_update_count = apu_counter_reset_value;
   }
 
   /* If voice releasing or not playing, nothing else to update */
