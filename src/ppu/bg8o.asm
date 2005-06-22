@@ -363,7 +363,7 @@ Render_Offset_8x8_Run:
 
 %macro Render_Offset_8x8 1
 ALIGNC
-EXPORT_C Render_Offset_8x8_C%1
+EXPORT Render_Offset_8x8_C%1
 %ifndef NO_OFFSET_CHANGE
 %ifndef NO_OFFSET_CHANGE_DISABLE
  cmp byte [C_LABEL(Offset_Change_Disable)],0    ; Hack to disable offset change
@@ -557,7 +557,7 @@ ALIGNC
 ALIGNC
 %endif
 
-EXPORT_C %1     ; Define label, entry point
+EXPORT %1       ; Define label, entry point
 .next_tile:
  lea eax,[esi+2]
  mov dh,[1+esi]     ; Horizontal offset change map
@@ -701,7 +701,7 @@ ALIGNC
 ALIGNC
 %endif
 
-EXPORT_C %1     ; Define label, entry point
+EXPORT %1       ; Define label, entry point
 .next_tile:
  lea eax,[esi+2]
  mov dh,[1+esi]     ; Offset change map
@@ -845,7 +845,7 @@ ALIGNC
 ALIGNC
 %endif
 
-EXPORT_C %1     ; Define label, entry point
+EXPORT %1       ; Define label, entry point
 .next_tile:
  lea eax,[esi+2]
  mov dh,[1+esi]     ; Offset change map
@@ -979,9 +979,9 @@ Generate_Line_Plotters_Offset_8x8 8
 
 section .data
 %macro Generate_Line_Plotter_Table_Offset_8x8 2
-EXPORT_C Plot_Lines_%1_Offset_8x8_Table_C%2
-dd C_LABEL(Plot_Lines_%1_Offset_8x8_C%2).LeftEdge
-dd C_LABEL(Plot_Lines_%1_Offset_8x8_C%2)
+EXPORT Plot_Lines_%1_Offset_8x8_Table_C%2
+dd Plot_Lines_%1_Offset_8x8_C%2.LeftEdge
+dd Plot_Lines_%1_Offset_8x8_C%2
 %endmacro
 
 %ifndef NO_NP_RENDER

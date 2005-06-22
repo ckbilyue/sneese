@@ -190,9 +190,9 @@ EXTERN_WIN_DATA 1
 EXTERN_WIN_DATA 2
 
 %macro MERGED_WIN_DATA 2
-EXPORT_C TableWin%1
-EXPORT_C Win%1_Count,skipb
-EXPORT_C Win%1_Bands,skipb 2*%2
+EXPORT TableWin%1
+EXPORT Win%1_Count,skipb
+EXPORT Win%1_Bands,skipb 2*%2
 %endmacro
 
 %macro EXTERN_MERGED_WIN_DATA 2

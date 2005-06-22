@@ -59,11 +59,11 @@ You must read and accept the license prior to use.
 %include "ppu/ppu.inc"
 
 section .text
-EXPORT_C sprites_text_start
+EXPORT sprites_text_start
 section .data
-EXPORT_C sprites_data_start
+EXPORT sprites_data_start
 section .bss
-EXPORT_C sprites_bss_start
+EXPORT sprites_bss_start
 
 EXTERN Ready_Line_Render,BaseDestPtr
 EXTERN_C SNES_Screen8
@@ -91,22 +91,22 @@ db  2,-15,  4,-31,  4,-31,  4,-31   ; 16x32, 32x32
 section .bss
 ALIGNB
 ;Line counts when last OBJ of specified priority was added
-EXPORT_C OAM_Count_Priority,skipl 240
+EXPORT OAM_Count_Priority,skipl 240
 
 ;OBJ counts (low byte) and OBJ line counts (high byte)
-EXPORT_C OAM_Count,skipw 240
+EXPORT OAM_Count,skipw 240
 
 ;Time/range overflow flags
-EXPORT_C OAM_TimeRange,skipb 240
+EXPORT OAM_TimeRange,skipb 240
 ;'Complex' priority in-use flags
-EXPORT_C OAM_Low_Before_High,skipb 240
+EXPORT OAM_Low_Before_High,skipb 240
 ;Priorities for 'complex' priority detection
-EXPORT_C OAM_Lowest_Priority,skipb 240
+EXPORT OAM_Lowest_Priority,skipb 240
 ;Tail entry for ring buffers
 EXPORT OAM_Tail,skipb 240
 
 ;239 ring buffers of 34 OBJ line descriptors (32-bit)
-EXPORT_C OAM_Lines,skipl 34*239
+EXPORT OAM_Lines,skipl 34*239
 
 ; AAAA AAAA AAAA AAxx YXPP CCCX XXXX XXXX
 ;  A - OAM sprite line-in-tile address
@@ -114,17 +114,17 @@ EXPORT_C OAM_Lines,skipl 34*239
 ;  X - X position
 
 ALIGNB
-EXPORT_C OAM,skipb 512+32   ; Buffer for OAM
+EXPORT OAM,skipb 512+32     ; Buffer for OAM
 EXPORT SpriteCount,skipl
-EXPORT_C HiSprite ,skipl
-EXPORT_C HiSpriteCnt1,skipl ; First set size and bit offset
-EXPORT_C HiSpriteCnt2,skipl ; Second set size and bit offset
-EXPORT_C OBBASE,skipl   ; VRAM location of sprite tiles 00-FF
-EXPORT_C OBNAME,skipl   ; VRAM location of sprite tiles 100-1FF
-EXPORT_C OAMAddress,skipl
-EXPORT_C OAMAddress_VBL,skipl   ; Restore this at VBL
-EXPORT_C HiSpriteAddr,skipl     ; OAM address of sprite in 512b table
-EXPORT_C HiSpriteBits,skipl     ; OAM address of sprite in 32b table
+EXPORT HiSprite ,skipl
+EXPORT HiSpriteCnt1,skipl   ; First set size and bit offset
+EXPORT HiSpriteCnt2,skipl   ; Second set size and bit offset
+EXPORT OBBASE,skipl         ; VRAM location of sprite tiles 00-FF
+EXPORT OBNAME,skipl         ; VRAM location of sprite tiles 100-1FF
+EXPORT OAMAddress,skipl
+EXPORT OAMAddress_VBL,skipl ; Restore this at VBL
+EXPORT HiSpriteAddr,skipl   ; OAM address of sprite in 512b table
+EXPORT HiSpriteBits,skipl   ; OAM address of sprite in 32b table
 ALIGNB
 EXPORT Sprite_Size_Current_X,skipl
 EXPORT_EQU sprsize_small_x,Sprite_Size_Current_X
@@ -141,7 +141,7 @@ OBJ_vflip_fixup:skipb   ; value to XOR with OBJ current line for v-flip
                         ; used for rectangular (undocumented) OBJ
 EXPORT Redo_OAM,skipb
 EXPORT SPRLatch   ,skipb    ; Sprite Priority Rotation latch flag
-EXPORT_C OBSEL    ,skipb    ; sssnnxbb  sss=sprite size,nn=upper 4k address,bb=offset
+EXPORT OBSEL    ,skipb      ; sssnnxbb  sss=sprite size,nn=upper 4k address,bb=offset
 EXPORT OAMHigh    ,skipb
 EXPORT OAM_Write_Low,skipb
 EXPORT Pixel_Allocation_Tag,skipb
@@ -203,7 +203,7 @@ ALIGNC
  mov cl,[C_LABEL(OAM_Count)+ebx*2+1]
  mov al,[C_LABEL(OAM_Low_Before_High)+ebx]
  test al,al
- jnz C_LABEL(Plot_Sprites_Low_Before_High).first_line
+ jnz Plot_Sprites_Low_Before_High.first_line
 
  xor eax,eax
  mov al,cl
@@ -281,7 +281,7 @@ ALIGNC
  ret
 
 ALIGNC
-EXPORT_C Plot_Sprites_Low_Before_High
+EXPORT Plot_Sprites_Low_Before_High
 .first_line:
  xor eax,eax
  mov al,[OAM_Tail+ebx]
@@ -779,7 +779,7 @@ ALIGNC
 
 ;starts with first+max-count or last (first+count-1) tile
 ALIGNC
-EXPORT_C Add_Sprite_X_Positive
+EXPORT Add_Sprite_X_Positive
 ;visible width count in dh, total count in dl
 ;esi = OAM 512 byte subtable address
 ;edi = OAM 32 byte subtable address
@@ -977,7 +977,7 @@ EXPORT_C Add_Sprite_X_Positive
 
 ;starts with first or last (first+max-1) tile
 ALIGNC
-EXPORT_C Add_Sprite_X_Negative
+EXPORT Add_Sprite_X_Negative
 ;visible width count in dh, total count in dl
 ;esi = OAM 512 byte subtable address
 ;edi = OAM 32 byte subtable address
@@ -1177,7 +1177,7 @@ EXPORT_C Add_Sprite_X_Negative
 
 ALIGNC
 ;ebp += (count - 1) * 8; al += (count - 1) * 8;
-EXPORT_C Add_Sprite_X_Positive_Flip_None
+EXPORT Add_Sprite_X_Positive_Flip_None
  xor ebx,ebx
  mov bl,ch
  add bl,cl
@@ -1219,7 +1219,7 @@ EXPORT_C Add_Sprite_X_Positive_Flip_None
 
 ALIGNC
 ;ebp -= (count - 1) * 8; al += (count - 1) * 8;
-EXPORT_C Add_Sprite_X_Positive_Flip_X
+EXPORT Add_Sprite_X_Positive_Flip_X
  xor ebx,ebx
  mov bl,ch
  add bl,cl
@@ -1262,7 +1262,7 @@ EXPORT_C Add_Sprite_X_Positive_Flip_X
 ALIGNC
 ;ebp += (count - 1) * 8; al += (count - 1) * 8;
 ;if al < ((count - 1) * 8) ah ^= 1;
-EXPORT_C Add_Sprite_X_Negative_Flip_None
+EXPORT Add_Sprite_X_Negative_Flip_None
 .next_tile:
  ; compute tile line #'s and store line descriptors
  push ebp
@@ -1302,7 +1302,7 @@ EXPORT_C Add_Sprite_X_Negative_Flip_None
 ALIGNC
 ;ebp -= (count - 1) * 8; al += (count - 1) * 8;
 ;if al < ((count - 1) * 8) ah ^= 1;
-EXPORT_C Add_Sprite_X_Negative_Flip_X
+EXPORT Add_Sprite_X_Negative_Flip_X
 .next_tile:
  ; compute tile line #'s and store line descriptors
  push ebp
@@ -1340,7 +1340,7 @@ EXPORT_C Add_Sprite_X_Negative_Flip_X
  ret
 
 ALIGNC
-EXPORT_C Check_OAM_Recache
+EXPORT Check_OAM_Recache
  ;if priority rotation is off, treat OAM address as 0
  xor eax,eax
  mov al,[SPRLatch]
@@ -1385,7 +1385,7 @@ EXPORT_C Check_OAM_Recache
  jmp C_LABEL(Recache_OAM)
 
 ALIGNC
-EXPORT_C Recache_OAM
+EXPORT Recache_OAM
 
 %ifdef Profile_Recache_OAM
  inc dword [C_LABEL(Calls_Recache_OAM)]
@@ -1577,7 +1577,7 @@ ALIGNC
  ret
 
 ALIGNC
-EXPORT_C Reset_Sprites
+EXPORT Reset_Sprites
  pusha
  ; Set eax to 0, as we're setting most everything to 0...
  xor eax,eax

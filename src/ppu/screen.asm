@@ -58,11 +58,11 @@ You must read and accept the license prior to use.
 EXTERN_C use_mmx,use_fpu_copies,preload_cache,preload_cache_2
 
 section .text
-EXPORT_C screen_text_start
+EXPORT screen_text_start
 section .data
-EXPORT_C screen_data_start
+EXPORT screen_data_start
 section .bss
-EXPORT_C screen_bss_start
+EXPORT screen_bss_start
 
 section .data
 ALIGND
@@ -131,8 +131,8 @@ section .bss
 ALIGNB
 EXPORT DisplayZ,skipb (8+256+8)
 ALIGNB
-EXPORT_C Current_Line_Render,skipl
-EXPORT_C Last_Frame_Line,skipl
+EXPORT Current_Line_Render,skipl
+EXPORT Last_Frame_Line,skipl
 EXPORT Ready_Line_Render,skipl
 EXPORT BaseDestPtr      ,skipl
 
@@ -179,7 +179,7 @@ EXPORT OffsetChangeDetect1,skipb
 EXPORT OffsetChangeDetect2,skipb
 EXPORT OffsetChangeDetect3,skipb
 
-EXPORT_C Offset_Change_Disable  ,skipb
+EXPORT Offset_Change_Disable,skipb
 
 section .text
 ALIGNC
@@ -314,7 +314,7 @@ Update_Offset_Change:
 %endmacro
 
 ALIGNC
-EXPORT_C Clear_Scanlines
+EXPORT Clear_Scanlines
 ;edi = dest address, ebp = line count
  mov al,[C_LABEL(use_fpu_copies)]
  test al,al
@@ -333,7 +333,7 @@ EXPORT_C Clear_Scanlines
  cld
 
  cmp byte [C_LABEL(preload_cache)],0
- jnz C_LABEL(Clear_Scanlines_Preload).clear_loop
+ jnz Clear_Scanlines_Preload.clear_loop
 
 .clear_loop:
  rep stosd
@@ -387,7 +387,7 @@ ALIGNC
  ret
 
 ALIGNC
-EXPORT_C Clear_Scanlines_Preload
+EXPORT Clear_Scanlines_Preload
 ;edi = dest address, ebp = line count
  cmp byte [C_LABEL(preload_cache_2)],0
  jz C_LABEL(Clear_Scanlines)
@@ -500,7 +500,7 @@ ALIGNC
  ret
 
 ALIGNC
-EXPORT_C Update_Display
+EXPORT Update_Display
  ; edx = number of lines to recache
  mov edx,[Ready_Line_Render]
  push eax
@@ -1221,8 +1221,8 @@ ALIGNC
 %endmacro
 
 ALIGNC
-EXPORT_C SCREEN_MODE_0
-EXPORT_C SCREEN_MODE_1
+EXPORT SCREEN_MODE_0
+EXPORT SCREEN_MODE_1
  push eax
  push ebx
  push edi
@@ -1410,11 +1410,11 @@ EXPORT_C SCREEN_MODE_1
 
 %endmacro
 
-EXPORT_C SCREEN_MODE_2
-EXPORT_C SCREEN_MODE_3
-EXPORT_C SCREEN_MODE_4
-EXPORT_C SCREEN_MODE_5
-EXPORT_C SCREEN_MODE_6
+EXPORT SCREEN_MODE_2
+EXPORT SCREEN_MODE_3
+EXPORT SCREEN_MODE_4
+EXPORT SCREEN_MODE_5
+EXPORT SCREEN_MODE_6
 
  push eax
  push ebx

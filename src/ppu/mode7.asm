@@ -30,7 +30,7 @@ You must read and accept the license prior to use.
 %include "ppu/ppu.inc"
 
 section .text
-EXPORT_C mode7_start
+EXPORT mode7_start
 
 ;%define old_sprites
 EXTERN Ready_Line_Render,BaseDestPtr
@@ -55,24 +55,24 @@ EXPORT Mode7_Line_X,skipl
 EXPORT Mode7_Line_Y,skipl
 
 
-EXPORT_C M7A    ,skipl
-EXPORT_C M7B    ,skipl
-EXPORT_C M7C    ,skipl
-EXPORT_C M7D    ,skipl
-EXPORT_C M7X_13 ,skipl
-EXPORT_C M7Y_13 ,skipl
-EXPORT_C M7H_13 ,skipl
-EXPORT_C M7V_13 ,skipl
-EXPORT_C M7X    ,skipl
-EXPORT_C M7Y    ,skipl
+EXPORT M7A      ,skipl
+EXPORT M7B      ,skipl
+EXPORT M7C      ,skipl
+EXPORT M7D      ,skipl
+EXPORT M7X_13   ,skipl
+EXPORT M7Y_13   ,skipl
+EXPORT M7H_13   ,skipl
+EXPORT M7V_13   ,skipl
+EXPORT M7X      ,skipl
+EXPORT M7Y      ,skipl
 
 ;M7A, M7C are taken from here to help handle X-flip
-EXPORT_C M7A_X  ,skipl
-EXPORT_C M7C_X  ,skipl
+EXPORT M7A_X    ,skipl
+EXPORT M7C_X    ,skipl
 
 ;M7A, M7C are taken from here to help handle X-flip and mosaic
-EXPORT_C M7A_XM ,skipl
-EXPORT_C M7C_XM ,skipl
+EXPORT M7A_XM   ,skipl
+EXPORT M7C_XM   ,skipl
 
 
 MPY:    skipl   ; Mode 7 multiplication result
@@ -82,8 +82,8 @@ MPYH equ MPY+2  ; Mode 7 multiplication result: high byte
 
 EXPORT M7_Handler,skipl
 EXPORT M7_Handler_EXTBG,skipl
-EXPORT_C EXTBG_Mask,skipb   ; mask applied to BG enable for EXTBG
-EXPORT_C M7SEL,skipb    ; ab0000yx  ab=mode 7 repetition info,y=flip vertical,x=flip horizontal
+EXPORT EXTBG_Mask,skipb ; mask applied to BG enable for EXTBG
+EXPORT M7SEL,skipb      ; ab0000yx  ab=mode 7 repetition info,y=flip vertical,x=flip horizontal
 EXPORT Redo_M7,skipb    ; vhyxdcba
 M7_Last_Write:skipb
 M7_Used:    skipb
@@ -141,7 +141,7 @@ MERGED_WIN_DATA Mode7_Sub_EXTBG_Off,3
 
 section .text
 ALIGNC
-EXPORT_C SCREEN_MODE_7
+EXPORT SCREEN_MODE_7
 
  push ebx
  push edi
@@ -484,7 +484,7 @@ EXTERN_C Layer_Disable_Mask
  add edi,GfxBufferLinePitch
  dec dword [SM7_Lines]
  mov [SM7_BaseDestPtr],edi  ; Point screen to next line
- jnz C_LABEL(SCREEN_MODE_7).next_line
+ jnz SCREEN_MODE_7.next_line
 
  add esp,byte SM7_Local_Bytes
  ret
@@ -1153,7 +1153,7 @@ M7_Generate_Handlers CHAR0
 M7_Generate_Handlers CLIP
 
 ALIGNC
-EXPORT_C Reset_Mode_7
+EXPORT Reset_Mode_7
  ; Set eax to 0, as we're setting most everything to 0...
  xor eax,eax
 

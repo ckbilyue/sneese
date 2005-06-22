@@ -39,6 +39,8 @@ Changes
   Sound: Fixed a bug which caused attack rate 15 to be far too slow
   Sound: Fixed bugs in sustain and release which could cause ENVX to
    underflow
+  Source: Fixed some issues in the source which caused problems building
+   on Linux, thanks to Jonathan Gevaryahu for pointing this out
  0.84 [TRAC]
   Source: Fixed a flaw that caused problems during linking
   SPC700: Fixed a bug in the timing of timer 2

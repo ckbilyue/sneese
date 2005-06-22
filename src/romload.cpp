@@ -625,10 +625,6 @@ int Allocate_SRAM()
  return 0;
 }
 
-// Hack for FF6 world map glitch
-// To be removed when timing improved
-extern unsigned char FastROM_offset;
-
 void Set_SNES_Map()
 {
 

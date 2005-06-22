@@ -69,11 +69,11 @@ You must read and accept the license prior to use.
 EXTERN_C SNES_Screen8
 
 section .text
-EXPORT_C tiles_text_start
+EXPORT tiles_text_start
 section .data
-EXPORT_C tiles_data_start
+EXPORT tiles_data_start
 section .bss
-EXPORT_C tiles_bss_start
+EXPORT tiles_bss_start
 
 section .data
 ALIGND
@@ -188,9 +188,9 @@ EXPORT Tile_Line_16_8
 section .bss
 ALIGNB
 
-EXPORT_C TileCache2,skipk 256
-EXPORT_C TileCache4,skipk 128
-EXPORT_C TileCache8,skipk 64
+EXPORT TileCache2,skipk 256
+EXPORT TileCache4,skipk 128
+EXPORT TileCache8,skipk 64
 
 EXPORT TilesetAddress,skipl
 EXPORT ColourBase,skipb
@@ -725,7 +725,7 @@ EXTERN_C BreaksLast
 %endif
 %endmacro
 
-EXPORT_C tile_plotters_text_start
+EXPORT tile_plotters_text_start
 ALIGNC
 PLOT8_8BplTile:
  P8_Plot_8 noflip

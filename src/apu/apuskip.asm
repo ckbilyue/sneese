@@ -32,17 +32,17 @@ You must read and accept the license prior to use.
 EXTERN_C cpu_65c816_A,cpu_65c816_X,cpu_65c816_Y
 
 section .text
-EXPORT_C APUskip_text_start
+EXPORT APUskip_text_start
 section .data
-EXPORT_C APUskip_data_start
+EXPORT APUskip_data_start
 section .bss
-EXPORT_C APUskip_bss_start
+EXPORT APUskip_bss_start
 
 section .bss
 ALIGNB
-EXPORT_C APUI00a,skipb  ; This is the APU value when APUI00b=0
-EXPORT_C APUI00b,skipb  ; This is a count type of variable for flipping APUI00a
-EXPORT_C APUI00c,skipb  ; Binary counter used in conjuction with APUI01c
+EXPORT APUI00a,skipb    ; This is the APU value when APUI00b=0
+EXPORT APUI00b,skipb    ; This is a count type of variable for flipping APUI00a
+EXPORT APUI00c,skipb    ; Binary counter used in conjuction with APUI01c
 C_LABEL(APUI01a):skipb  ; This is the APU value when APUI01b=0
 C_LABEL(APUI01b):skipb  ; This is a count type of variable for flipping APUI01a
 C_LABEL(APUI01c):skipb  ; Binary counter upper byte of APUI00c
@@ -55,7 +55,7 @@ C_LABEL(APUI03c):skipb  ; Binary counter upper byte of APUI02c
 
 section .text
 ALIGNC
-EXPORT_C Reset_APU_Skipper
+EXPORT Reset_APU_Skipper
  pusha
  ; Set eax to 0, as we're setting most everything to 0...
  xor eax,eax
@@ -442,7 +442,7 @@ SNES_W2143_SKIP:    ; APUI03
  ret
 
 ALIGNC
-EXPORT_C Make_APU_Skipper
+EXPORT Make_APU_Skipper
  pusha
  mov eax,SNES_R2140_SKIP
  mov edx,SNES_R2141_SKIP

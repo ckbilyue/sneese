@@ -238,7 +238,7 @@ Render_8x8M_Run:
 
 %macro Render_8x8M 1
 ALIGNC
-EXPORT_C Render_8x8M_C%1
+EXPORT Render_8x8M_C%1
 %ifndef NO_NP_RENDER
  mov ecx,C_LABEL(Plot_Lines_NP_8x8M_Table_C%1)
  test al,al
@@ -438,7 +438,7 @@ ALIGNC
  add eax,eax
  add ebx,eax        ; Update screen pointer
 
-EXPORT_C %1     ; Define label, entry point
+EXPORT %1       ; Define label, entry point
  mov al,[ebx+1]
 
  Check_Tile_Priority %2, %1_check
@@ -623,7 +623,7 @@ ALIGNC
  add eax,eax
  add ebx,eax        ; Update screen pointer
 
-EXPORT_C %1     ; Define label, entry point
+EXPORT %1       ; Define label, entry point
  mov al,[ebx+1]
 
  Check_Tile_Priority %2, %1_check
@@ -806,7 +806,7 @@ ALIGNC
  add eax,eax
  add ebx,eax        ; Update screen pointer
 
-EXPORT_C %1     ; Define label, entry point
+EXPORT %1       ; Define label, entry point
  mov al,[ebx+1]
 
  Check_Tile_Priority %2, %1_check
@@ -969,7 +969,7 @@ section .data
 ;%1 = type, %2 = depth
 %macro Generate_Line_Plotter_Table_8x8M 2
 ALIGND
-EXPORT_C Plot_Lines_%1_8x8M_Table_C%2
+EXPORT Plot_Lines_%1_8x8M_Table_C%2
 dd C_LABEL(Plot_Lines_1_%1_8x8M_C%2)
 dd C_LABEL(Plot_Lines_2_%1_8x8M_C%2)
 dd C_LABEL(Plot_Lines_3_%1_8x8M_C%2)

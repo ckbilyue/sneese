@@ -23,7 +23,7 @@ You must read and accept the license prior to use.
 %include "misc.inc"
 
 section .data
-EXPORT_C Xlat_ZSNES_6x6
+EXPORT Xlat_ZSNES_6x6
          db 00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h
          db 00h,00h,00h,00h,00h,00h,00h,00h,00h,30h,00h,00h,00h,00h,00h,00h
          db 00h,3Eh,33h,31h,3Fh,37h,2Fh,3Dh,3Ah,3Bh,35h,38h,39h,25h,28h,29h
@@ -41,7 +41,7 @@ EXPORT_C Xlat_ZSNES_6x6
          db 00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h
          db 00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h,00h
 
-EXPORT_C Font_ZSNES_6x6
+EXPORT Font_ZSNES_6x6
          db 0,0,0,0,0
          db 01110b
          db 10011b
@@ -384,7 +384,7 @@ EXPORT_C Font_ZSNES_6x6
          db 00010b
          db 01100b; }
 
-EXPORT_C Font_Modified_6x6
+EXPORT Font_Modified_6x6
          db 0,0,0,0,0
          db 01110b
          db 10011b
@@ -727,7 +727,7 @@ EXPORT_C Font_Modified_6x6
          db 00010b
          db 01100b; }
 
-EXPORT_C Xlat_6x8
+EXPORT Xlat_6x8
          db 00h
          db 0C0h,0C1h,0C2h,0C3h,0C4h,0C5h,0C6h,0C7h
          db 00h,00h,00h,00h,00h,00h,00h
@@ -749,7 +749,7 @@ EXPORT_C Xlat_6x8
          db 0B0h,0B1h,0B2h,0B3h,0B4h,0B5h,0B6h,0B7h
          db 0B8h,0B9h,0BAh,0BBh,0BCh,0BDh,0BEh,0BFh
 
-EXPORT_C Font_6x8
+EXPORT Font_6x8
          db 0,0,0,0,0,0,0,0
 
          db 001000b; !

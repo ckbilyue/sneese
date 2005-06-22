@@ -151,11 +151,11 @@ EXTERN_C Frames
 %endif
 
 section .text
-EXPORT_C CPU_text_start
+EXPORT CPU_text_start
 section .data
-EXPORT_C CPU_data_start
+EXPORT CPU_data_start
 section .bss
-EXPORT_C CPU_bss_start
+EXPORT CPU_bss_start
 
 %define CPU_LABEL(x) C_LABEL(cpu_65c816_ %+ x)
 
@@ -259,22 +259,22 @@ ALIGNB
 %define B_C_flag [_C_flag]
 %endif
 
-EXPORT_C IRQ_Nvector,skipl
-EXPORT_C IRQ_Noffset,skipl
-EXPORT_C NMI_Nvector,skipl
-EXPORT_C NMI_Noffset,skipl
-EXPORT_C BRK_Nvector,skipl
-EXPORT_C BRK_Noffset,skipl
-EXPORT_C COP_Nvector,skipl
-EXPORT_C COP_Noffset,skipl
-EXPORT_C IRQ_Evector,skipl
-EXPORT_C IRQ_Eoffset,skipl
-EXPORT_C NMI_Evector,skipl
-EXPORT_C NMI_Eoffset,skipl
-EXPORT_C COP_Evector,skipl
-EXPORT_C COP_Eoffset,skipl
-EXPORT_C RES_Evector,skipl
-EXPORT_C RES_Eoffset,skipl
+EXPORT IRQ_Nvector,skipl
+EXPORT IRQ_Noffset,skipl
+EXPORT NMI_Nvector,skipl
+EXPORT NMI_Noffset,skipl
+EXPORT BRK_Nvector,skipl
+EXPORT BRK_Noffset,skipl
+EXPORT COP_Nvector,skipl
+EXPORT COP_Noffset,skipl
+EXPORT IRQ_Evector,skipl
+EXPORT IRQ_Eoffset,skipl
+EXPORT NMI_Evector,skipl
+EXPORT NMI_Eoffset,skipl
+EXPORT COP_Evector,skipl
+EXPORT COP_Eoffset,skipl
+EXPORT RES_Evector,skipl
+EXPORT RES_Eoffset,skipl
 
 ; v0.25 - New system for CPU timings... there are now ten paired tables,
 ; not five single tables. Each pair of tables has a 256-byte SlowROM
@@ -291,8 +291,8 @@ EXPORT_EQU CPU_LABEL(PB),CPU_LABEL(PB_Shifted) + 2
 
 EXPORT CPU_LABEL(PC),skipl  ; Program Counter
 EXPORT CPU_LABEL(P) ,skipl  ; Processor status (flags)
-EXPORT_C SNES_Cycles,skipl  ; Scanline cycle count for CPU (0-EventTrip)
-EXPORT_C EventTrip  ,skipl  ; Cycle of next event on this scanline
+EXPORT SNES_Cycles  ,skipl  ; Scanline cycle count for CPU (0-EventTrip)
+EXPORT EventTrip    ,skipl  ; Cycle of next event on this scanline
 
 EXPORT CPU_LABEL(A) ,skipl  ; Accumulator
 EXPORT_EQU CPU_LABEL(B),CPU_LABEL(A)+1
@@ -319,10 +319,8 @@ OpTable:skipl
 EXPORT FixedTrip    ,skipl  ; Cycle of next fixed event on this scanline
 
 EXPORT SPC_last_cycles      ,skipl
-EXPORT_C SPC_CPU_cycles
 EXPORT SPC_CPU_cycles       ,skipl
 EXPORT SPC_cycles_left      ,skipl
-EXPORT_C SPC_CPU_cycles_mul
 EXPORT SPC_CPU_cycles_mul   ,skipl
 
 ; For when I make the back color +/- hacks really do +/-
@@ -359,7 +357,6 @@ EXPORT CPU_Execution_Mode,skipb
 EXPORT IRQ_pin      ,skipb
 _E_flag:skipb
 _Z_flag:skipb
-EXPORT_C In_CPU
 EXPORT In_CPU,skipb         ; nonzero if CPU is executing
 
 ;NMI not raised
@@ -370,9 +367,9 @@ EXPORT In_CPU,skipb         ; nonzero if CPU is executing
 %define NMI_Raised 2
 
 EXPORT NMI_pin      ,skipb
-EXPORT_C FPS_ENABLED            ,skipb
+EXPORT FPS_ENABLED      ,skipb
 _V_flag:skipb
-EXPORT_C BREAKS_ENABLED         ,skipb
+EXPORT BREAKS_ENABLED   ,skipb
 
 section .data
 
@@ -1758,7 +1755,7 @@ section .text
 
 
 ALIGNC
-EXPORT_C Reset_CPU
+EXPORT Reset_CPU
  pusha
 
  call Reset_DMA
@@ -1945,7 +1942,7 @@ EXPORT do_DMA
 
 
 ALIGNC
-EXPORT_C Do_CPU
+EXPORT Do_CPU
  pusha
  mov byte [C_LABEL(PaletteChanged)],1   ; Make sure we get our palette
  mov dword [C_LABEL(Last_Frame_Line)],239
@@ -2010,7 +2007,7 @@ ALIGNC
  jmp C_LABEL(CPU_START_NEXT)
 
 ALIGNC
-EXPORT_C CPU_RETURN
+EXPORT CPU_RETURN
 %ifdef Abort_at_op_num
  dec dword [MaxOps]
  jz Op_0xDB     ;STP
@@ -2021,7 +2018,7 @@ EXPORT_C CPU_RETURN
 
  jge HANDLE_EVENT
 
-EXPORT_C CPU_START_NEXT
+EXPORT CPU_START_NEXT
 ; This code is for a CPU-tracker dump... #define TRACKERS to make a dump
 ; of the CPU state before each instruction - uncomment the ret to
 ; force emulation core to break when buffer fills. TRACKERS must be
@@ -2196,10 +2193,10 @@ IRQ_completion:
 %include "cpu/cpuaddr.inc"  ; Addressing modes ([d], a,x, etc.)
 %include "cpu/cpumacro.inc" ; Instructions (LDA,ADC,SBC,etc.)
 
-EXPORT_C cpu_ops_start
+EXPORT cpu_ops_start
 
 ALIGNC
-EXPORT_C ALL_INVALID
+EXPORT ALL_INVALID
  GET_PC ebx
  mov [C_LABEL(Map_Address)],ebx
  mov bl,[CPU_LABEL(PB)]
@@ -2213,10 +2210,10 @@ EXPORT_C ALL_INVALID
 
 section .text
 ALIGNC
-EXPORT_C CPU_text_end
+EXPORT CPU_text_end
 section .data
 ALIGND
-EXPORT_C CPU_data_end
+EXPORT CPU_data_end
 section .bss
 ALIGNB
-EXPORT_C CPU_bss_end
+EXPORT CPU_bss_end

@@ -36,11 +36,11 @@ extern In_CPU,HVBJOY
 EXTERN_C SNES_Cycles
 
 section .text
-EXPORT_C DMA_text_start
+EXPORT DMA_text_start
 section .data
-EXPORT_C DMA_data_start
+EXPORT DMA_data_start
 section .bss
-EXPORT_C DMA_bss_start
+EXPORT DMA_bss_start
 
 section .data
 ALIGND
@@ -67,25 +67,25 @@ section .bss
 ALIGNB
 EXPORT TableDMA%1
 ; dh0bcttt d=CPU->PPU,h=addr,b=inc/dec,c=inc/fixed,t=type
-EXPORT_C DMAP_%1    ,skipb
-EXPORT_C BBAD_%1    ; Low byte of 0x21??
+EXPORT DMAP_%1,skipb
+EXPORT BBAD_%1          ; Low byte of 0x21??
 EXPORT DMA_Vid_%1   ,skipb
 EXPORT NTRL_%1,skipb
 DMA_Inc_%1: skipb
 EXPORT A1T_%1       ; Source Address L/H/B
-EXPORT_C A1TL_%1,skipb  ; Source Address L
-EXPORT_C A1TH_%1,skipb  ; Source Address H
-EXPORT_C A1B_%1 ,skipb  ; Source Bank Address
+EXPORT A1TL_%1,skipb    ; Source Address L
+EXPORT A1TH_%1,skipb    ; Source Address H
+EXPORT A1B_%1 ,skipb    ; Source Bank Address
                  skipb
 EXPORT DAS_%1       ; Data Size L/H
-EXPORT_C DASL_%1,skipb  ; Data Size L
-EXPORT_C DASH_%1,skipb  ; Data Size H
-EXPORT_C DASB_%1,skipb  ; Data address bank
+EXPORT DASL_%1,skipb    ; Data Size L
+EXPORT DASH_%1,skipb    ; Data Size H
+EXPORT DASB_%1,skipb    ; Data address bank
                  skipb
 EXPORT A2T_%1
-EXPORT_C A2L_%1 ,skipb  ; HDMA table address L
-EXPORT_C A2H_%1 ,skipb  ; HDMA table address H
-EXPORT_C A2B_%1 ,skipb  ; HDMA table bank address
+EXPORT A2L_%1 ,skipb    ; HDMA table address L
+EXPORT A2H_%1 ,skipb    ; HDMA table address H
+EXPORT A2B_%1 ,skipb    ; HDMA table bank address
                  skipb
 
 ; HDMA_Siz_x - These hold the register size for HDMA
@@ -109,8 +109,8 @@ DMA_DATA 7
 
 DMA_Transfer_Size:skipl ;Size for active DMA transfer
 
-EXPORT_C MDMAEN,skipb   ; DMA enable
-EXPORT_C HDMAEN,skipb   ; HDMA enable
+EXPORT MDMAEN,skipb     ; DMA enable
+EXPORT HDMAEN,skipb     ; HDMA enable
 EXPORT HDMAON,skipb     ; HDMA enabled this refresh
                         ; 0000dccc | d = in DMA/HDMA, if 0 all should be 0
 EXPORT In_DMA,skipb     ; c = channel # 0-7
@@ -207,7 +207,7 @@ ALIGNC
   [DMA_Transfer_Size] = DAS (byte count)
   esi = Address adjustment
 %endif
-EXPORT_C Do_DMA_Channel
+EXPORT Do_DMA_Channel
  mov ebx,[edi+A1T]      ; CPU address in ebx
  and ebx,(1 << 24) - 1
 
@@ -427,7 +427,7 @@ Do_HDMA_Indirect_%1:
 %endmacro
 
 ALIGNC
-EXPORT_C Do_HDMA_Channel
+EXPORT Do_HDMA_Channel
  ; Overhead, also used for loading next NTRLx ($43xA)
  add R_65c816_Cycles,byte _5A22_SLOW_CYCLE
 

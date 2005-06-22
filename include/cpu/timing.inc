@@ -92,21 +92,21 @@ EXPORT ScreenLineHoles  ,skipb (256+128)/8
 %endif
 
 JOYC1:      skipb   ; This holds the controller read control byte
-EXPORT_C Controller1_Pos,skipb  ; Shift count for controller 1 read
-EXPORT_C Controller23_Pos,skipb ; Shift count for controller 2/3 read
-EXPORT_C Controller45_Pos,skipb ; Shift count for controller 4/5 read
+EXPORT Controller1_Pos  ,skipb  ; Shift count for controller 1 read
+EXPORT Controller23_Pos ,skipb  ; Shift count for controller 2/3 read
+EXPORT Controller45_Pos ,skipb  ; Shift count for controller 4/5 read
 
 ALIGNB
 ; These are updated per VBL rather than per read!
-EXPORT_C JOY1L,skipb
-EXPORT_C JOY1H,skipb 3
-EXPORT_C JOY2L,skipb
-EXPORT_C JOY2H,skipb 3
+EXPORT JOY1L,skipb
+EXPORT JOY1H,skipb 3
+EXPORT JOY2L,skipb
+EXPORT JOY2H,skipb 3
 ; These are not updated yet
-EXPORT_C JOY3L,skipb
-EXPORT_C JOY3H,skipb 3
-EXPORT_C JOY4L,skipb
-EXPORT_C JOY4H,skipb 3
+EXPORT JOY3L,skipb
+EXPORT JOY3H,skipb 3
+EXPORT JOY4L,skipb
+EXPORT JOY4H,skipb 3
 
 RDDIV:
 RDDIVL:     skipb   ; Quotient of divide
@@ -121,8 +121,8 @@ WRDIV:
 WRDIVL:     skipb   ; Dividend C
 WRDIVH:     skipb
 
-EXPORT_C LastRenderLine ,skipl
-EXPORT_C LastVBLLine    ,skipl
+EXPORT LastRenderLine   ,skipl
+EXPORT LastVBLLine      ,skipl
 
 EXPORT FrameCount       ,skipl  ; Used for frameskipping
 EXPORT Event_Handler    ,skipl  ; Used for render/HDMA timing/NMI/IRQ
@@ -145,26 +145,24 @@ Vblank_Start:       skipl   ; Scanline of last Vblank start
 EXPORT HTimer           ,skipl  ; IRQ position on scanline
 EXPORT HTimer_Set       ,skipl  ; H-IRQ position set in $4207-8
 
-EXPORT_C HTIMEL ,skipb  ; H IRQ position low
-EXPORT_C HTIMEH ,skipb  ; H IRQ position high
+EXPORT HTIMEL   ,skipb  ; H IRQ position low
+EXPORT HTIMEH   ,skipb  ; H IRQ position high
                  skipb
                  skipb
-EXPORT_C VTIMEL ,skipb  ; V IRQ position low
-EXPORT_C VTIMEH ,skipb  ; V IRQ position high
+EXPORT VTIMEL   ,skipb  ; V IRQ position low
+EXPORT VTIMEH   ,skipb  ; V IRQ position high
                  skipb
                  skipb
 
 FPSCount:       skipl   ; Count of frames executed this second
-EXPORT_C FPSMaxTicks,skipl  ; Number of timer ticks after which FPS is calc'd
-EXPORT_C FPSLast    ,skipl  ; Calculated FPS for last second
-EXPORT_C BreaksLast ,skipl  ; Render breaks for last frame
+EXPORT FPSMaxTicks  ,skipl  ; Number of timer ticks after which FPS is calc'd
+EXPORT FPSLast      ,skipl  ; Calculated FPS for last second
+EXPORT BreaksLast   ,skipl  ; Render breaks for last frame
 
 Latched_H:  skipl   ; These two are latched values!
 Latched_V:  skipl
 
 MEMSEL:     skipb   ; FastROM switch
-; Hack for FF6 glitch, to be removed when timing improved
-EXPORT_C FastROM_offset,skipb
 EXPORT OPHCT,skipb  ; Whether reading lo or high byte
 EXPORT OPVCT,skipb  ; Whether reading lo or high byte
 RDNMI:      skipb   ; x000vvvv  x=disable/enable NMI,vvvv=version
@@ -173,12 +171,12 @@ RDNMI:      skipb   ; x000vvvv  x=disable/enable NMI,vvvv=version
 ; during this frame
 RDNMI_mask:skipb
 
-EXPORT_C NMITIMEN,skipb ; a0yx000b  a=NMI on/off,y=vert count,x=horiz count,b=joy read
+EXPORT NMITIMEN,skipb   ; a0yx000b  a=NMI on/off,y=vert count,x=horiz count,b=joy read
 ; I/O port register - bit 7 affects H/V counter, all bits used for output
-EXPORT_C WRIO,skipb     ; lxxxxxxx  l=counter latched when set
+EXPORT WRIO,skipb       ; lxxxxxxx  l=counter latched when set
 ; I/O port register - value CPU is receiving
 ; RDIO register reads return this value ANDed with value in WRIO
-EXPORT_C RDIO,skipb
+EXPORT RDIO,skipb
 EXPORT HVBJOY,skipb
 ; Nonzero if an IRQ set for current line has not been reached yet
 ;IRQ_set_this_line:skipb
@@ -677,7 +675,7 @@ EXTERN_C Profiler_Start
  jmp CPU_START_IRQ      ; Return to CPU
 
 ALIGNC
-EXPORT_C IRQFirstRender ; Check HDMA, IRQ, Render
+EXPORT IRQFirstRender   ; Check HDMA, IRQ, Render
 section .data
 .str:db " irqfirstrender ",0
 section .text
@@ -704,7 +702,7 @@ section .text
  jmp CPU_START_IRQ      ; Return to CPU
 
 ALIGNC
-EXPORT_C IRQRender  ; Check HDMA, IRQ, Render
+EXPORT IRQRender    ; Check HDMA, IRQ, Render
 section .data
 .str:db " irqrender ",0
 section .text
@@ -784,7 +782,7 @@ section .text
  jmp CPU_START_IRQ      ; Return to CPU
 
 ALIGNC
-EXPORT_C IRQFirst   ; Check HDMA, IRQ, Render
+EXPORT IRQFirst     ; Check HDMA, IRQ, Render
 section .data
 .str:db " irqfirst ",0
 section .text
@@ -838,7 +836,7 @@ ALIGNC
  jmp CPU_START_IRQ      ; Return to CPU
 
 ALIGNC
-EXPORT_C NMI
+EXPORT NMI
  UpdateDisplay  ;*
  mov ax,[C_LABEL(Real_SNES_Palette)]
  push eax
@@ -916,7 +914,7 @@ EXPORT_C NMI
 
  pop eax
  mov [C_LABEL(Real_SNES_Palette)],ax
-EXPORT_C NMI_NoRender
+EXPORT NMI_NoRender
 section .data
 .str:db " nmi_norender ",0
 section .text
@@ -2074,7 +2072,7 @@ SNES_W2143_SPC: ; APUIO3
 %endif
 
 ALIGNC
-EXPORT_C Make_SPC
+EXPORT Make_SPC
  pusha
  mov eax,SNES_R2140_SPC
  mov edx,SNES_R2141_SPC

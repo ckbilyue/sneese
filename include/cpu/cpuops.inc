@@ -351,7 +351,7 @@ You must read and accept the license prior to use.
 
 %macro OPCODE_LABEL 1
 ALIGNC
-EXPORT_C %1
+EXPORT %1
 %endmacro
 
 

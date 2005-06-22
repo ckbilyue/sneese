@@ -327,7 +327,7 @@ Render_16x16_Run:
 
 %macro Render_16x16 1
 ALIGNC
-EXPORT_C Render_16x16_C%1
+EXPORT Render_16x16_C%1
  cmp byte [Mosaic+edx],0
  jnz C_LABEL(Render_16x16M_C%1)
 
@@ -497,7 +497,7 @@ ALIGNC
 ALIGNC
 %endif
 
-EXPORT_C %1     ; Define label, entry point
+EXPORT %1       ; Define label, entry point
 %%next_tile:
  mov al,[ebx+1]
 
@@ -680,7 +680,7 @@ ALIGNC
 ALIGNC
 %endif
 
-EXPORT_C %1     ; Define label, entry point
+EXPORT %1       ; Define label, entry point
 %%next_tile:
  mov al,[ebx+1]
 
@@ -859,7 +859,7 @@ ALIGNC
 ALIGNC
 %endif
 
-EXPORT_C %1     ; Define label, entry point
+EXPORT %1       ; Define label, entry point
 %%next_tile:
  mov al,[ebx+1]
 
@@ -1034,11 +1034,11 @@ ALIGND
 
 ;%1 = type, %2 = depth
 %macro Generate_Line_Plotter_Table_16x16 2
-EXPORT_C Plot_Lines_%1_16x16_Table_C%2
-dd C_LABEL(Plot_Lines_0_%1_16x16_C%2)
-dd C_LABEL(Plot_Lines_1_%1_16x16_C%2)
-dd C_LABEL(Plot_Lines_0_%1_16x16_C%2).LeftEdge
-dd C_LABEL(Plot_Lines_1_%1_16x16_C%2).LeftEdge
+EXPORT Plot_Lines_%1_16x16_Table_C%2
+dd Plot_Lines_0_%1_16x16_C%2
+dd Plot_Lines_1_%1_16x16_C%2
+dd Plot_Lines_0_%1_16x16_C%2.LeftEdge
+dd Plot_Lines_1_%1_16x16_C%2.LeftEdge
 %endmacro
 
 %ifndef NO_NP_RENDER

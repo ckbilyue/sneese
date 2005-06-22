@@ -364,7 +364,7 @@ Render_Offset_16_Even_Run:
 ;depth, tile height
 %macro Render_Offset_16_Even 2
 ALIGNC
-EXPORT_C Render_Offset_16x%2_Even_C%1
+EXPORT Render_Offset_16x%2_Even_C%1
 %ifndef NO_OFFSET_CHANGE
 %ifndef NO_OFFSET_CHANGE_DISABLE
  cmp byte [C_LABEL(Offset_Change_Disable)],0    ; Hack to disable offset change
@@ -547,7 +547,7 @@ ALIGNC
 ALIGNC
 %endif
 
-EXPORT_C %1     ; Define label, entry point
+EXPORT %1       ; Define label, entry point
 .next_tile:
  lea eax,[esi+2]
  mov dh,[1+esi]     ; Horizontal offset change map
@@ -715,9 +715,9 @@ Generate_Line_Plotters_Offset_16_Even 4,16
 
 section .data
 %macro Generate_Line_Plotter_Table_Offset_16_Even 3
-EXPORT_C Plot_Lines_%1_Offset_16x%3_Even_Table_C%2
-dd C_LABEL(Plot_Lines_%1_Offset_16x%3_Even_C%2).LeftEdge
-dd C_LABEL(Plot_Lines_%1_Offset_16x%3_Even_C%2)
+EXPORT Plot_Lines_%1_Offset_16x%3_Even_Table_C%2
+dd Plot_Lines_%1_Offset_16x%3_Even_C%2.LeftEdge
+dd Plot_Lines_%1_Offset_16x%3_Even_C%2
 %endmacro
 
 %ifndef NO_NP_RENDER

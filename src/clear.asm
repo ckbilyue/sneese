@@ -25,11 +25,11 @@ You must read and accept the license prior to use.
 %include "misc.inc"
 
 section .text
-EXPORT_C clear_text_start
+EXPORT clear_text_start
 section .data
-EXPORT_C clear_data_start
+EXPORT clear_data_start
 section .bss
-EXPORT_C clear_bss_start
+EXPORT clear_bss_start
 
 section .text
 ALIGNC

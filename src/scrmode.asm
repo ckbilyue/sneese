@@ -32,11 +32,11 @@ You must read and accept the license prior to use.
 %include "ppu/screen.inc"
 
 section .text
-EXPORT_C scrmode_start
+EXPORT scrmode_start
 
 section .text
 ALIGNC
-EXPORT_C Set256x239     ; This sets up a 256x239 linear VGA mode
+EXPORT Set256x239   ; This sets up a 256x239 linear VGA mode
  pusha
 
  ; 0 -> Display -> Overscan -> Blank -> Retrace -> End Blank -> Overscan
@@ -200,7 +200,7 @@ EXPORT_C Set256x239     ; This sets up a 256x239 linear VGA mode
  ret
 
 ALIGNC
-EXPORT_C Set256x224     ; This sets up a 256x224 linear VGA mode
+EXPORT Set256x224   ; This sets up a 256x224 linear VGA mode
  pusha
 
  ; 0 -> Display -> Overscan -> Blank -> Retrace -> End Blank -> Overscan

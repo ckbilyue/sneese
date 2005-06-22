@@ -286,7 +286,7 @@ Render_16_Even_Run:
 ;depth, tile height
 %macro Render_16_Even 2
 ALIGNC
-EXPORT_C Render_16x%2_Even_C%1
+EXPORT Render_16x%2_Even_C%1
  cmp byte [Mosaic+edx],0
  jnz C_LABEL(Render_16x%2M_Even_C%1)
 
@@ -459,7 +459,7 @@ ALIGNC
 ALIGNC
 %endif
 
-EXPORT_C %1     ; Define label, entry point
+EXPORT %1       ; Define label, entry point
 %%next_tile:
  mov al,[ebx+1]
 
@@ -575,7 +575,7 @@ ALIGNC
 ALIGNC
 %endif
 
-EXPORT_C %1     ; Define label, entry point
+EXPORT %1       ; Define label, entry point
 %%next_tile:
  mov al,[ebx+1]
 
@@ -693,7 +693,7 @@ ALIGND
 
 ;%1 = type, %2 = depth
 %macro Generate_Line_Plotter_Table_16_Even 2
-EXPORT_C Plot_Lines_%1_16_Even_Table_C%2
+EXPORT Plot_Lines_%1_16_Even_Table_C%2
 dd C_LABEL(Plot_Lines_0_%1_16_Even_C%2)
 dd C_LABEL(Plot_Lines_1_%1_16_Even_C%2)
 %endmacro

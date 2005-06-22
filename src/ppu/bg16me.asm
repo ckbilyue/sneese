@@ -238,7 +238,7 @@ Render_16M_Even_Run:
 
 %macro Render_16M_Even 2
 ALIGNC
-EXPORT_C Render_16x%2M_Even_C%1
+EXPORT Render_16x%2M_Even_C%1
 %ifndef NO_NP_RENDER
  mov ecx,C_LABEL(Plot_Lines_NP_16M_Even_Table_C%1)
  test al,al
@@ -441,7 +441,7 @@ ALIGNC
  add eax,eax
  add ebx,eax        ; Update screen pointer
 
-EXPORT_C %1     ; Define label, entry point
+EXPORT %1       ; Define label, entry point
  mov al,[ebx+1]
 
  Check_Tile_Priority %2, %1_check
@@ -646,7 +646,7 @@ ALIGNC
  add eax,eax
  add ebx,eax        ; Update screen pointer
 
-EXPORT_C %1     ; Define label, entry point
+EXPORT %1       ; Define label, entry point
  mov al,[ebx+1]
 
  Check_Tile_Priority %2, %1_check
@@ -838,7 +838,7 @@ section .data
 ;%1 = type, %2 = depth
 %macro Generate_Line_Plotter_Table_16M_Even 2
 ALIGND
-EXPORT_C Plot_Lines_%1_16M_Even_Table_C%2
+EXPORT Plot_Lines_%1_16M_Even_Table_C%2
 dd C_LABEL(Plot_Lines_1_%1_16M_Even_C%2)
 dd C_LABEL(Plot_Lines_2_%1_16M_Even_C%2)
 dd C_LABEL(Plot_Lines_3_%1_16M_Even_C%2)

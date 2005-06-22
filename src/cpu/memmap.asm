@@ -53,11 +53,11 @@ You must read and accept the license prior to use.
 %include "cycles.inc"
 
 section .text
-EXPORT_C memmap_text_start
+EXPORT memmap_text_start
 section .data
-EXPORT_C memmap_data_start
+EXPORT memmap_data_start
 section .bss
-EXPORT_C memmap_bss_start
+EXPORT memmap_bss_start
 
 EXTERN_C SRAM_Mask
 EXTERN_C Map_Address
@@ -65,33 +65,33 @@ EXTERN_C Map_Byte
 
 section .bss
 ALIGNB
-EXPORT_C Read_Bank8Mapping  ,skipl 256*8
-EXPORT_C Write_Bank8Mapping ,skipl 256*8
-EXPORT_C Read_Bank8Offset   ,skipl 256*8
-EXPORT_C Write_Bank8Offset  ,skipl 256*8
-EXPORT_C Dummy              ,skipk 64
+EXPORT Read_Bank8Mapping    ,skipl 256*8
+EXPORT Write_Bank8Mapping   ,skipl 256*8
+EXPORT Read_Bank8Offset     ,skipl 256*8
+EXPORT Write_Bank8Offset    ,skipl 256*8
+EXPORT Dummy                ,skipk 64
 
-EXPORT_C Access_Speed_Mask  ,skipl
-EXPORT_C Last_Bus_Value_A   ,skipb
+EXPORT Access_Speed_Mask    ,skipl
+EXPORT Last_Bus_Value_A     ,skipb
 
 section .text
 ALIGNC
-EXPORT_C SNES_GET_BYTE
+EXPORT SNES_GET_BYTE
  GET_BYTE_CODE
  ret
 
 ALIGNC
-EXPORT_C SNES_GET_BYTE_FIXED
+EXPORT SNES_GET_BYTE_FIXED
  GET_BYTE_CODE 1
  ret
 
 ALIGNC
-EXPORT_C SNES_GET_WORD_FAST
+EXPORT SNES_GET_WORD_FAST
  GET_WORD_CODE
  ret
 
 ALIGNC
-EXPORT_C SNES_GET_WORD
+EXPORT SNES_GET_WORD
  GET_BYTE
  mov ah,al
  inc ebx
@@ -101,12 +101,12 @@ EXPORT_C SNES_GET_WORD
  ret
 
 ALIGNC
-EXPORT_C SNES_GET_LONG_FAST
+EXPORT SNES_GET_LONG_FAST
  GET_LONG_CODE
  ret
 
 ALIGNC
-EXPORT_C SNES_GET_LONG
+EXPORT SNES_GET_LONG
  xor eax,eax
  GET_BYTE
  inc ebx
@@ -121,12 +121,12 @@ EXPORT_C SNES_GET_LONG
  ret
 
 ALIGNC
-EXPORT_C SNES_GET_WORD_FAST_WRAP
+EXPORT SNES_GET_WORD_FAST_WRAP
  GET_WORD_CODE wrap
  ret
 
 ALIGNC
-EXPORT_C SNES_GET_WORD_WRAP
+EXPORT SNES_GET_WORD_WRAP
  GET_BYTE
  mov ah,al
  inc bx
@@ -135,12 +135,12 @@ EXPORT_C SNES_GET_WORD_WRAP
  ret
 
 ALIGNC
-EXPORT_C SNES_GET_LONG_FAST_WRAP
+EXPORT SNES_GET_LONG_FAST_WRAP
  GET_LONG_CODE wrap
  ret
 
 ALIGNC
-EXPORT_C SNES_GET_LONG_WRAP
+EXPORT SNES_GET_LONG_WRAP
  xor eax,eax
  GET_BYTE
  inc bx
@@ -154,12 +154,12 @@ EXPORT_C SNES_GET_LONG_WRAP
 
 
 ALIGNC
-EXPORT_C CPU_OPEN_BUS_READ
+EXPORT CPU_OPEN_BUS_READ
     mov al,[C_LABEL(Last_Bus_Value_A)]
     ret
 
 ALIGNC
-EXPORT_C CPU_OPEN_BUS_READ_LEGACY
+EXPORT CPU_OPEN_BUS_READ_LEGACY
     mov al,[C_LABEL(Last_Bus_Value_A)]
     mov edx,[C_LABEL(Access_Speed_Mask)]
     and edx,_5A22_LEGACY_CYCLE - _5A22_FAST_CYCLE
@@ -168,7 +168,7 @@ EXPORT_C CPU_OPEN_BUS_READ_LEGACY
 
 
 ALIGNC
-EXPORT_C IGNORE_WRITE
+EXPORT IGNORE_WRITE
 %ifdef DEBUG
 %ifdef TRAP_IGNORED_WRITES
 extern _InvalidHWWrite
@@ -184,7 +184,7 @@ extern _InvalidHWWrite
 
 
 ALIGNC
-EXPORT_C UNSUPPORTED_READ
+EXPORT UNSUPPORTED_READ
     mov al,0
 %ifdef DEBUG
 %ifdef TRAP_BAD_READS
@@ -200,7 +200,7 @@ extern _InvalidHWRead
     ret
 
 ALIGNC
-EXPORT_C UNSUPPORTED_WRITE
+EXPORT UNSUPPORTED_WRITE
 %ifdef DEBUG
 %ifdef TRAP_BAD_WRITES
 extern _InvalidHWWrite
@@ -216,7 +216,7 @@ extern _InvalidHWWrite
 
 
 ALIGNC
-EXPORT_C Read_Direct_Safeguard
+EXPORT Read_Direct_Safeguard
  mov edx,ebx
  shr edx,13
  mov edx,[C_LABEL(Read_Bank8Offset)+edx*4]
@@ -225,7 +225,7 @@ EXPORT_C Read_Direct_Safeguard
  ret
 
 ALIGNC
-EXPORT_C Write_Direct_Safeguard
+EXPORT Write_Direct_Safeguard
  mov edx,ebx
  shr edx,13
  mov edx,[C_LABEL(Write_Bank8Offset)+edx*4]
@@ -235,7 +235,7 @@ EXPORT_C Write_Direct_Safeguard
 
 ALIGNC
 ; Read hardware - 2000-5FFF in 00-3F/80-BF
-EXPORT_C PPU_READ
+EXPORT PPU_READ
     mov edx,(1 << 16) - 1
     and edx,ebx
 
@@ -258,7 +258,7 @@ EXPORT_C PPU_READ
 
 ALIGNC
 ; Write hardware - 2000-5FFF in 00-3F/80-BF
-EXPORT_C PPU_WRITE
+EXPORT PPU_WRITE
     mov edx,(1 << 16) - 1
     and edx,ebx
 
@@ -277,7 +277,7 @@ EXPORT_C PPU_WRITE
     jmp [(C_LABEL(Write_Map_20_5F)-0x2000*4)+edx*4]
 
 ALIGNC
-EXPORT_C SRAM_READ
+EXPORT SRAM_READ
     mov edx,[C_LABEL(SRAM_Mask)]
     and edx,ebx
     add edx,[C_LABEL(SRAM)]
@@ -286,7 +286,7 @@ EXPORT_C SRAM_READ
     ret
 
 ALIGNC
-EXPORT_C SRAM_WRITE
+EXPORT SRAM_WRITE
     mov edx,[C_LABEL(SRAM_Mask)]
     and edx,ebx
     add edx,[C_LABEL(SRAM)]
@@ -295,7 +295,7 @@ EXPORT_C SRAM_WRITE
     ret
 
 ALIGNC
-EXPORT_C SRAM_WRITE_ALT
+EXPORT SRAM_WRITE_ALT
     push ecx
     mov ecx,ebx
     push edi
@@ -314,7 +314,7 @@ EXPORT_C SRAM_WRITE_ALT
     ret
 
 ALIGNC
-EXPORT_C SRAM_WRITE_HIROM
+EXPORT SRAM_WRITE_HIROM
     push ecx
     mov ecx,0x0F0000
     mov edx,((8 << 10) - 1)
@@ -331,7 +331,7 @@ EXPORT_C SRAM_WRITE_HIROM
     ret
 
 ALIGNC
-EXPORT_C SRAM_WRITE_2k
+EXPORT SRAM_WRITE_2k
     mov edx,(2 << 10) - 1
     and edx,ebx
     add edx,[C_LABEL(SRAM)]
@@ -343,7 +343,7 @@ EXPORT_C SRAM_WRITE_2k
     ret
 
 ALIGNC
-EXPORT_C SRAM_WRITE_4k
+EXPORT SRAM_WRITE_4k
     mov edx,(4 << 10) - 1
     and edx,ebx
     add edx,[C_LABEL(SRAM)]

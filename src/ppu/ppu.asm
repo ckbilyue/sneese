@@ -77,18 +77,18 @@ EXTERN_C Map_Address,Map_Byte
 EXTERN_C InvalidHWWrite
 
 section .text
-EXPORT_C PPU_text_start
+EXPORT PPU_text_start
 section .data
-EXPORT_C PPU_data_start
+EXPORT PPU_data_start
 section .bss
-EXPORT_C PPU_bss_start
+EXPORT PPU_bss_start
 
 section .data
 ALIGND
-EXPORT_C Read_Map_20_5F
+EXPORT Read_Map_20_5F
     ; 2000-20FF: Open Bus A
     DUPLICATE dd,0x100,C_LABEL(CPU_OPEN_BUS_READ)
-EXPORT_C Read_Map_21
+EXPORT Read_Map_21
     ; 2100-2103: Open Bus A
     DUPLICATE dd,4,C_LABEL(CPU_OPEN_BUS_READ)
     ; 2104-2106: Open Bus B (PPU1)
@@ -137,7 +137,7 @@ EXPORT_C Read_Map_21
     ; 2200-3FFF: Open Bus A
     DUPLICATE dd,0x1E00,C_LABEL(CPU_OPEN_BUS_READ)
 
-EXPORT_C Read_Map_40
+EXPORT Read_Map_40
     ; 4000-4015: Open Bus A - 12 master cycles
     DUPLICATE dd,0x16,C_LABEL(CPU_OPEN_BUS_READ_LEGACY)
     dd   SNES_R4016  ; JOYC1
@@ -147,7 +147,7 @@ EXPORT_C Read_Map_40
     ; 4100-41FF: Open Bus A - 12 master cycles
     DUPLICATE dd,0x100,C_LABEL(CPU_OPEN_BUS_READ_LEGACY)
 
-EXPORT_C Read_Map_42
+EXPORT Read_Map_42
     ; 4200-420F: Open Bus A
     DUPLICATE dd,0x10,C_LABEL(CPU_OPEN_BUS_READ)
 
@@ -171,7 +171,7 @@ EXPORT_C Read_Map_42
     ; 4220-42FF: Open Bus A
     DUPLICATE dd,0xE0,C_LABEL(CPU_OPEN_BUS_READ)
 
-EXPORT_C Read_Map_43
+EXPORT Read_Map_43
     MAP_READ_DMA_LIST 0
     MAP_READ_DMA_LIST 1
     MAP_READ_DMA_LIST 2
@@ -186,10 +186,10 @@ EXPORT_C Read_Map_43
     DUPLICATE dd,0x1C00,C_LABEL(CPU_OPEN_BUS_READ)
 
 ALIGND
-EXPORT_C Write_Map_20_5F
+EXPORT Write_Map_20_5F
     ; 2000-20FF: Unmapped
     DUPLICATE dd,0x100,C_LABEL(UNSUPPORTED_WRITE)
-EXPORT_C Write_Map_21
+EXPORT Write_Map_21
     dd   SNES_W2100  ; INIDISP
     dd   SNES_W2101  ; OBSEL
     dd   SNES_W2102  ; OAMADDL
@@ -251,14 +251,14 @@ EXPORT_C Write_Map_21
     DUPLICATE dd,0x7C,C_LABEL(UNSUPPORTED_WRITE)
     ; 2200-3FFF: Unmapped
     DUPLICATE dd,0x1E00,C_LABEL(UNSUPPORTED_WRITE)
-EXPORT_C Write_Map_40
+EXPORT Write_Map_40
     DUPLICATE dd,0x16,C_LABEL(UNSUPPORTED_WRITE)
     dd   SNES_W4016  ; JOYC1
     dd   SNES_W4017  ; JOYC2
     DUPLICATE dd,0xE8,C_LABEL(UNSUPPORTED_WRITE)
     ; 4100-41FF: Unmapped
     DUPLICATE dd,0x100,C_LABEL(UNSUPPORTED_WRITE)
-EXPORT_C Write_Map_42
+EXPORT Write_Map_42
     dd   SNES_W4200  ; NMITIMEN
     dd   SNES_W4201  ; WRIO
     dd   SNES_W4202  ; WRMPYA
@@ -296,7 +296,7 @@ EXPORT_C Write_Map_42
     dd   C_LABEL(IGNORE_WRITE)  ; JOY4H
     DUPLICATE dd,0xE0,C_LABEL(UNSUPPORTED_WRITE)
 
-EXPORT_C Write_Map_43
+EXPORT Write_Map_43
 %ifdef NO_DMA_WRITE
     DUPLICATE dd,0x80,C_LABEL(UNSUPPORTED_WRITE)
 %else
@@ -385,10 +385,10 @@ dd 0,BGNBA_Table_2,BGNBA_Table_4,BGNBA_Table_8
 
 section .bss
 ALIGNB
-EXPORT_C WRAM   ,skipk 128  ; Buffer for Work RAM
-EXPORT_C VRAM   ,skipk 64   ; Buffer for Video RAM
-EXPORT_C SPCRAM ,skipk 64   ; Buffer for SPC RAM/ROM
-EXPORT_C Blank  ,skipk 64   ; Blank ROM buffer
+EXPORT WRAM   ,skipk 128    ; Buffer for Work RAM
+EXPORT VRAM   ,skipk 64     ; Buffer for Video RAM
+EXPORT SPCRAM ,skipk 64     ; Buffer for SPC RAM/ROM
+EXPORT Blank  ,skipk 64     ; Blank ROM buffer
 _PortRAM:skipk 24           ; Ports 0x2000-0x5FFF
 
 VRAMAddress:    skipl   ; VRAM address in PPU
@@ -400,19 +400,19 @@ EXPORT Tile_Recache_Set_End  ,skipl
 EXPORT Mosaic_Size,skipl    ; 000xxxxx  xxxxx=2-16 pixel size
 EXPORT Mosaic_Size_Select,skipl ;Table selector
 EXPORT MOSAIC     ,skipb    ; xxxxabcd  xxxx=0-F pixel size,a-d = affect BG4-1
-EXPORT_C INIDISP  ,skipb    ; x000bbbb x=screen on/off,bbbb=Brightness
-EXPORT_C BGMODE   ,skipb    ; abcdefff a-d=tile size bg4-1 (8/16),e=priority bg3,fff=mode
-EXPORT_C Base_BGMODE,skipb  ; 00000fff fff=mode
+EXPORT INIDISP  ,skipb      ; x000bbbb x=screen on/off,bbbb=Brightness
+EXPORT BGMODE   ,skipb      ; abcdefff a-d=tile size bg4-1 (8/16),e=priority bg3,fff=mode
+EXPORT Base_BGMODE,skipb    ; 00000fff fff=mode
 
-EXPORT_C BG12NBA,skipb  ; aaaabbbb  aaaa=base address 2, bbbb=base address 1
-EXPORT_C BG34NBA,skipb  ; aaaabbbb  aaaa=base address 4, bbbb=base address 3
+EXPORT BG12NBA,skipb    ; aaaabbbb  aaaa=base address 2, bbbb=base address 1
+EXPORT BG34NBA,skipb    ; aaaabbbb  aaaa=base address 4, bbbb=base address 3
 
-EXPORT_C VMAIN,skipb    ; i000abcd  i=inc type,ab=full graphic,cd=SC increment
+EXPORT VMAIN,skipb      ; i000abcd  i=inc type,ab=full graphic,cd=SC increment
 
 EXPORT PPU2_Latch_External,skipb
 
 ALIGNB
-EXPORT_C COLDATA,skipl  ; Actual data from COLDATA
+EXPORT COLDATA,skipl    ; Actual data from COLDATA
 CGAddress:  skipl   ; Palette position for writes to CGRAM
 
 WMADDL:     skipb   ; Work RAM Address Lo Byte
@@ -426,9 +426,9 @@ CGReadHigh: skipb   ; Whether reading lo or high byte
 
 BGOFS_Last_Write:skipb
 
-EXPORT_C Current_Line_Timing,skipl
+EXPORT Current_Line_Timing,skipl
 
-EXPORT_C SETINI,skipb
+EXPORT SETINI,skipb
 EXPORT STAT78,skipb     ; Enable support for field register
 
 EXPORT Redo_Offset_Change,skipb
@@ -439,9 +439,9 @@ EXPORT BGMODE_Tile_Layer_Mask,skipb
 EXPORT BGMODE_Allowed_Offset_Change,skipb
 
 %macro BG_WIN_DATA 2
-EXPORT_C TableWin%2BG%1
-EXPORT_C WinBG%1_%2_Count,skipb
-EXPORT_C WinBG%1_%2_Bands,skipb 2*3
+EXPORT TableWin%2BG%1
+EXPORT WinBG%1_%2_Count,skipb
+EXPORT WinBG%1_%2_Bands,skipb 2*3
 %endmacro
 
 ; MapAddress - base address of tilemap
@@ -454,10 +454,10 @@ EXPORT_C WinBG%1_%2_Bands,skipb 2*3
 
 %macro BG_DATA 1
 ALIGNB
-EXPORT_C TableBG%1
+EXPORT TableBG%1
 EXPORT WSELBG%1,skipb
 EXPORT WLOGBG%1,skipb
-EXPORT_C BGSC%1,skipb   ; xxxxxxab  xxxxxx=base address, ab=SC Size
+EXPORT BGSC%1,skipb     ; xxxxxxab  xxxxxx=base address, ab=SC Size
 EXPORT DepthBG%1,skipb
 TileHeightBG%1: skipb
 TileWidthBG%1:  skipb
@@ -508,19 +508,19 @@ BG_DATA 2
 BG_DATA 3
 BG_DATA 4
 
-EXPORT_EQU_C BG1SC,C_LABEL(BGSC1)
-EXPORT_EQU_C BG2SC,C_LABEL(BGSC2)
-EXPORT_EQU_C BG3SC,C_LABEL(BGSC3)
-EXPORT_EQU_C BG4SC,C_LABEL(BGSC4)
+EXPORT_EQU BG1SC,C_LABEL(BGSC1)
+EXPORT_EQU BG2SC,C_LABEL(BGSC2)
+EXPORT_EQU BG3SC,C_LABEL(BGSC3)
+EXPORT_EQU BG4SC,C_LABEL(BGSC4)
 
-EXPORT_EQU_C BG1HOFS,HScroll_1
-EXPORT_EQU_C BG1VOFS,VScroll_1
-EXPORT_EQU_C BG2HOFS,HScroll_2
-EXPORT_EQU_C BG2VOFS,VScroll_2
-EXPORT_EQU_C BG3HOFS,HScroll_3
-EXPORT_EQU_C BG3VOFS,VScroll_3
-EXPORT_EQU_C BG4HOFS,HScroll_4
-EXPORT_EQU_C BG4VOFS,VScroll_4
+EXPORT_EQU BG1HOFS,HScroll_1
+EXPORT_EQU BG1VOFS,VScroll_1
+EXPORT_EQU BG2HOFS,HScroll_2
+EXPORT_EQU BG2VOFS,VScroll_2
+EXPORT_EQU BG3HOFS,HScroll_3
+EXPORT_EQU BG3VOFS,VScroll_3
+EXPORT_EQU BG4HOFS,HScroll_4
+EXPORT_EQU BG4VOFS,VScroll_4
 
 PaletteData:    skipw
 
@@ -923,7 +923,7 @@ SNES_W2100: ; INIDISP
 ; SNES_W2104: ; OAMDATA in sprites.asm
 
 ALIGNC
-EXPORT_C Toggle_Offset_Change
+EXPORT Toggle_Offset_Change
  xor byte [C_LABEL(Offset_Change_Disable)],0xFF
  ret
 
@@ -2105,7 +2105,7 @@ SNES_W212B: ; WOBJLOG
  ret
 
 ALIGNC
-EXPORT_C Update_Layering
+EXPORT Update_Layering
  pusha
 
  mov byte [Redo_Layering],0

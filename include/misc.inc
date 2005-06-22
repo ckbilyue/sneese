@@ -81,32 +81,30 @@ resb %1*1024
 %endif
 
 
-;Define a global label
+;Define a global label with optional directives/values
 %macro EXPORT 1-2+      ;label
-global %1
-%1:
-%2
-%endmacro
-
-;Define a global label using C label conventions
-%macro EXPORT_C 1-2+    ;label
+%ifnidn C_LABEL(%1),%1
 global C_LABEL(%1)
 C_LABEL(%1):
+%endif
+
+global %1
+%1:
 %2
 %endmacro
 
 
 ;Define a global equate
 %macro EXPORT_EQU 2     ;label
+%ifnidn C_LABEL(%1),%1
+global C_LABEL(%1)
+C_LABEL(%1) equ (%2)
+%endif
+
 global %1
 %1 equ (%2)
 %endmacro
 
-;Define a global equate using C label conventions
-%macro EXPORT_EQU_C 2   ;label
-global C_LABEL(%1)
-C_LABEL(%1) equ (%2)
-%endmacro
 
 ;Declare a list of labels to be external
 %macro EXTERN 1-*       ;label

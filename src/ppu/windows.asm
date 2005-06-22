@@ -31,11 +31,11 @@ You must read and accept the license prior to use.
 %include "ppu/screen.inc"
 
 section .text
-EXPORT_C windows_text_start
+EXPORT windows_text_start
 section .data
-EXPORT_C windows_data_start
+EXPORT windows_data_start
 section .bss
-EXPORT_C windows_bss_start
+EXPORT windows_bss_start
 
 section .data
 ALIGND
@@ -57,32 +57,32 @@ ALIGNB
 EXPORT Window_Offset_First,skipl
 EXPORT Window_Offset_Second,skipl
 
-EXPORT_C WH0,skipb      ; Holds window 1 left position
-EXPORT_C TM ,skipb      ; 000odcba  o=OBJ enable,a-d=BG1-4 enable
-EXPORT_C WBGLOG,skipb   ; BG Window mask logic
-EXPORT_C W12SEL ,skipb  ; Holds plane 1/2 window mask settings
-EXPORT_C WH1,skipb      ; Holds window 1 right position
-EXPORT_C TMW,skipb
-EXPORT_C WOBJLOG,skipb  ; OBJ/Colour Window mask logic
-EXPORT_C W34SEL ,skipb  ; Holds plane 3/4 window mask settings
-EXPORT_C WH2,skipb      ; Holds window 2 left position
-EXPORT_C TS ,skipb      ; 000odcba  o=OBJ enable,a-d=BG1-4 enable
-EXPORT_C CGWSEL,skipb
-EXPORT_C WOBJSEL,skipb  ; Holds colour/object window mask settings
-EXPORT_C WH3,skipb      ; Holds window 2 right position
-EXPORT_C TSW,skipb
-EXPORT_C CGADSUB,skipb
+EXPORT WH0,skipb        ; Holds window 1 left position
+EXPORT TM ,skipb        ; 000odcba  o=OBJ enable,a-d=BG1-4 enable
+EXPORT WBGLOG,skipb     ; BG Window mask logic
+EXPORT W12SEL ,skipb    ; Holds plane 1/2 window mask settings
+EXPORT WH1,skipb        ; Holds window 1 right position
+EXPORT TMW,skipb
+EXPORT WOBJLOG,skipb    ; OBJ/Colour Window mask logic
+EXPORT W34SEL ,skipb    ; Holds plane 3/4 window mask settings
+EXPORT WH2,skipb        ; Holds window 2 left position
+EXPORT TS ,skipb        ; 000odcba  o=OBJ enable,a-d=BG1-4 enable
+EXPORT CGWSEL,skipb
+EXPORT WOBJSEL,skipb    ; Holds colour/object window mask settings
+EXPORT WH3,skipb        ; Holds window 2 right position
+EXPORT TSW,skipb
+EXPORT CGADSUB,skipb
 
 ;Layering vars
 EXPORT Layers_Low       ; one of allowed TM, TS, or TM || TS
 EXPORT Layers_High      ; one of allowed TS, TM, or 0
 
-EXPORT_C Layering_Mode,skipb
+EXPORT Layering_Mode,skipb
 EXPORT SCR_TM,skipb     ; TM taken from here
 EXPORT SCR_TS,skipb     ; TS taken from here
 EXPORT SCR_TMW,skipb    ; TMW taken from here
 EXPORT SCR_TSW,skipb    ; TSW taken from here
-EXPORT_C Layer_Disable_Mask,skipb   ; This is used to force planes to disable!
+EXPORT Layer_Disable_Mask,skipb ; This is used to force planes to disable!
 
 EXPORT TM_Allowed,skipb ; allowed layer mask & layer disable mask & TM
 EXPORT TS_Allowed,skipb ; allowed layer mask & layer disable mask & TS
@@ -90,11 +90,11 @@ EXPORT Layers_In_Use,skipb  ; TM_Allowed | TS_Allowed
 
 %macro WIN_DATA 1
 ALIGNB
-EXPORT_C TableWin%1
-EXPORT_C Win%1_Count_Out,skipb
-EXPORT_C Win%1_Bands_Out,skipb 2*2
-EXPORT_C Win%1_Count_In,skipb
-EXPORT_C Win%1_Bands_In,skipb 2
+EXPORT TableWin%1
+EXPORT Win%1_Count_Out,skipb
+EXPORT Win%1_Bands_Out,skipb 2*2
+EXPORT Win%1_Count_In,skipb
+EXPORT Win%1_Bands_In,skipb 2
 %endmacro
 
 WIN_DATA 1
@@ -121,26 +121,26 @@ EXPORT Redo_Windowing,skipb
 section .text
 ;ebx = first line, edi = destination base ptr, ebp = # lines
 ALIGNC
-EXPORT_C Render_Layering_Option_0   ; main-on-sub
+EXPORT Render_Layering_Option_0 ; main-on-sub
  mov al,[SCR_TS]    ; Get BG status for sub screens
  mov ah,[SCR_TM]    ; Get BG status for main screens
  jmp dword [Render_Mode]
 
 ALIGNC
-EXPORT_C Render_Layering_Option_1   ; sub-on-main
+EXPORT Render_Layering_Option_1 ; sub-on-main
  mov al,[SCR_TM]    ; Get BG status for main screens
  mov ah,[SCR_TS]    ; Get BG status for sub screens
  jmp dword [Render_Mode]
 
 ALIGNC
-EXPORT_C Render_Layering_Option_2   ; main-with-sub
+EXPORT Render_Layering_Option_2 ; main-with-sub
  mov al,[SCR_TM]    ; Get BG status for main/sub screens
  mov ah,0
  jmp dword [Render_Mode]
 
 ;al = left edge, cl = right edge + 1
 ALIGNC
-EXPORT_C Recalc_Window_Bands
+EXPORT Recalc_Window_Bands
  test cl,cl         ; 0 = 255 (right edge)
  jz .one_inside
  cmp cl,al
@@ -218,7 +218,7 @@ EXPORT_C Recalc_Window_Bands
 %endmacro
 
 ALIGNC
-EXPORT_C Recalc_Window_Area_BG
+EXPORT Recalc_Window_Area_BG
 
  test al,[BG_Flag+edi]
  jz .no_clip
@@ -564,12 +564,12 @@ EXTERN_C xor_bands
  mov [edi+Win_Count],al
  ret
 
-EXPORT_EQU_C Intersect_Window_Area_AND,C_LABEL(Recalc_Window_Area_BG).intersect_and_entry
-EXPORT_EQU_C Intersect_Window_Area_OR,C_LABEL(Recalc_Window_Area_BG).intersect_or_entry
-EXPORT_EQU_C Intersect_Window_Area_XOR,C_LABEL(Recalc_Window_Area_BG).intersect_xor_entry
+EXPORT_EQU Intersect_Window_Area_AND,Recalc_Window_Area_BG.intersect_and_entry
+EXPORT_EQU Intersect_Window_Area_OR,Recalc_Window_Area_BG.intersect_or_entry
+EXPORT_EQU Intersect_Window_Area_XOR,Recalc_Window_Area_BG.intersect_xor_entry
 
 ALIGNC
-EXPORT_C Recalc_Window_Effects
+EXPORT Recalc_Window_Effects
  push eax
  push ecx
  push edx
@@ -650,7 +650,7 @@ EXPORT_C Recalc_Window_Effects
 
 ; max output bands is 1 more than max input bands; only in case where
 ;neither outermost band edges are at screen edge
-EXPORT_C Invert_Window_Bands
+EXPORT Invert_Window_Bands
 ;esi = base address for input bands; first byte is count
 ;edi = base address for output bands; first byte is count
 ;edx = count of bands output (count up)

@@ -315,7 +315,7 @@ Render_Offset_16x16M_Run:
 
 %macro Render_Offset_16x16M 1
 ALIGNC
-EXPORT_C Render_Offset_16x16M_C%1
+EXPORT Render_Offset_16x16M_C%1
 %ifndef NO_NP_RENDER
  mov ecx,C_LABEL(Plot_Lines_NP_Offset_16x16M_Table_C%1)
  test al,al
@@ -551,7 +551,7 @@ ALIGNC
  add ebx,eax        ; Update screen pointer
  lea esi,[esi+eax*2-2]
 
-EXPORT_C %1     ; Define label, entry point
+EXPORT %1       ; Define label, entry point
  lea eax,[esi+2]
  mov dh,[1+esi]     ; Offset change map
  push eax
@@ -819,7 +819,7 @@ ALIGNC
  add ebx,eax        ; Update screen pointer
  lea esi,[esi+eax*2-2]
 
-EXPORT_C %1     ; Define label, entry point
+EXPORT %1       ; Define label, entry point
  lea eax,[esi+2]
  mov dh,[1+esi]     ; Offset change map
  push eax
@@ -1087,7 +1087,7 @@ ALIGNC
  add ebx,eax        ; Update screen pointer
  lea esi,[esi+eax*2-2]
 
-EXPORT_C %1     ; Define label, entry point
+EXPORT %1       ; Define label, entry point
  lea eax,[esi+2]
  mov dh,[1+esi]     ; Offset change map
  push eax
@@ -1339,14 +1339,14 @@ Generate_Line_Plotters_Offset_16x16M_Depth 8
 
 section .data
 %macro Generate_Line_Plotter_Offsets_16x16M 3
-dd C_LABEL(Plot_Lines_%3_%1_Offset_16x16M_C%2).LeftEdge
-dd C_LABEL(Plot_Lines_%3_%1_Offset_16x16M_C%2)
+dd Plot_Lines_%3_%1_Offset_16x16M_C%2.LeftEdge
+dd Plot_Lines_%3_%1_Offset_16x16M_C%2
 %endmacro
 
 ;%1 = type, %2 = depth
 %macro Generate_Line_Plotter_Table_Offset_16x16M 2
 ALIGND
-EXPORT_C Plot_Lines_%1_Offset_16x16M_Table_C%2
+EXPORT Plot_Lines_%1_Offset_16x16M_Table_C%2
 %assign GLPTO_16x16M_Count 1
 %rep RO16x16M_MAX_LINE_COUNT
 Generate_Line_Plotter_Offsets_16x16M %1,%2,GLPTO_16x16M_Count

@@ -316,7 +316,7 @@ Render_Offset_16M_Even_Run:
 ;depth, tile height
 %macro Render_Offset_16M_Even 2
 ALIGNC
-EXPORT_C Render_Offset_16x%2M_Even_C%1
+EXPORT Render_Offset_16x%2M_Even_C%1
 %ifndef NO_NP_RENDER
  mov ecx,C_LABEL(Plot_Lines_NP_Offset_16x%2M_Even_Table_C%1)
  test al,al
@@ -550,7 +550,7 @@ ALIGNC
  add ebx,eax        ; Update screen pointer
  lea esi,[esi+eax-2]
 
-EXPORT_C %1     ; Define label, entry point
+EXPORT %1       ; Define label, entry point
  lea eax,[esi+2]
  mov dh,[1+esi]     ; Offset change map
  push eax
@@ -818,14 +818,14 @@ Generate_Line_Plotters_Offset_16M_Even_Depth 4,16
 
 section .data
 %macro Generate_Line_Plotter_Offsets_16M_Even 4
-dd C_LABEL(Plot_Lines_%3_%1_Offset_16x%4M_Even_C%2).LeftEdge
-dd C_LABEL(Plot_Lines_%3_%1_Offset_16x%4M_Even_C%2)
+dd Plot_Lines_%3_%1_Offset_16x%4M_Even_C%2.LeftEdge
+dd Plot_Lines_%3_%1_Offset_16x%4M_Even_C%2
 %endmacro
 
 ;%1 = type, %2 = depth, %3 = tile height
 %macro Generate_Line_Plotter_Table_Offset_16M_Even 3
 ALIGND
-EXPORT_C Plot_Lines_%1_Offset_16x%3M_Even_Table_C%2
+EXPORT Plot_Lines_%1_Offset_16x%3M_Even_Table_C%2
 %assign GLPTO_16ME_Count 1
 %rep RO16ME_MAX_LINE_COUNT
 Generate_Line_Plotter_Offsets_16M_Even %1,%2,GLPTO_16ME_Count,%3

@@ -363,7 +363,7 @@ Render_Offset_16x16_Run:
 
 %macro Render_Offset_16x16 1
 ALIGNC
-EXPORT_C Render_Offset_16x16_C%1
+EXPORT Render_Offset_16x16_C%1
 %ifndef NO_OFFSET_CHANGE
 %ifndef NO_OFFSET_CHANGE_DISABLE
  cmp byte [C_LABEL(Offset_Change_Disable)],0    ; Hack to disable offset change
@@ -559,7 +559,7 @@ ALIGNC
 ALIGNC
 %endif
 
-EXPORT_C %1     ; Define label, entry point
+EXPORT %1       ; Define label, entry point
 .next_tile:
  lea eax,[esi+2]
  push ecx
@@ -714,7 +714,7 @@ ALIGNC
 ALIGNC
 %endif
 
-EXPORT_C %1     ; Define label, entry point
+EXPORT %1       ; Define label, entry point
 .next_tile:
  mov eax,esi
  push ecx
@@ -870,7 +870,7 @@ ALIGNC
 ALIGNC
 %endif
 
-EXPORT_C %1     ; Define label, entry point
+EXPORT %1       ; Define label, entry point
 .next_tile:
  mov eax,esi
  push ecx
@@ -1015,9 +1015,9 @@ Generate_Line_Plotters_Offset_16x16 8
 
 section .data
 %macro Generate_Line_Plotter_Table_Offset_16x16 2
-EXPORT_C Plot_Lines_%1_Offset_16x16_Table_C%2
-dd C_LABEL(Plot_Lines_%1_Offset_16x16_C%2).LeftEdge
-dd C_LABEL(Plot_Lines_%1_Offset_16x16_C%2)
+EXPORT Plot_Lines_%1_Offset_16x16_Table_C%2
+dd Plot_Lines_%1_Offset_16x16_C%2.LeftEdge
+dd Plot_Lines_%1_Offset_16x16_C%2
 %endmacro
 
 %ifndef NO_NP_RENDER
