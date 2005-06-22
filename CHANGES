@@ -35,8 +35,8 @@ Changes
   SPC700: Corrected POP PSW to allow changing of B flag, and PUSH PSW to
    reflect its current state [TRAC]
   SPC700: Corrected a bug in updating of H flag by SBC, and some bugs in
-   updating of flags in ADDW and SUBW, and potentially in INCW and DECW
-   [TRAC]
+   updating of flags in ADDW and SUBW, and potentially in INCW and DECW;
+   thanks to Overload for some of the related research [TRAC]
  0.84 [TRAC]
   Source: Fixed a flaw that caused problems during linking
   SPC700: Fixed a bug in the timing of timer 2
