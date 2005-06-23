@@ -21,6 +21,8 @@ Changes
   DBJH          Daniel Horchner
 
 
+ 0.842 [TRAC]
+  SPC700: Added support for BCD fixup opcodes DAA and DAS
  0.841 [TRAC]
   Sound: Fixed a flaw in the order of operations in sample volume
    multiplication, causing a slight improvement in sound accuracy

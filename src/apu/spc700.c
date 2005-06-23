@@ -3227,6 +3227,26 @@ static void Execute_SPC(void)
         END_OPCODE(11)
       }
 
+    case 0xBE:  /* DAS */
+      {
+        /*  3 cycles - opcode, 2(op) */
+        START_CYCLE(2)
+        if ((_A & 0x0F) > 9 || !flag_state_spc(SPC_FLAG_H))
+        {
+         _A -= 6;
+        }
+        END_CYCLE(2, 1)
+
+        START_CYCLE(3)
+        if (_A > 0x9F || !flag_state_spc(SPC_FLAG_C))
+        {
+         _A -= 0x60;
+         clr_flag_spc(SPC_FLAG_C);
+        }
+        store_flags_nz(_A);
+        END_OPCODE(1)
+      }
+
     case 0xDE:  /* CBNE dp+X,rel */
       {
         /*  6 cycles - opcode, address, branch offset, address index */
@@ -3393,12 +3413,30 @@ static void Execute_SPC(void)
         END_OPCODE(1)
       }
 
+    case 0xDF:  /* DAA */
+      {
+        /*  3 cycles - opcode, 2(op) */
+        START_CYCLE(2)
+        if ((_A & 0x0F) > 9 || flag_state_spc(SPC_FLAG_H))
+        {
+         _A += 6;
+        }
+        END_CYCLE(2, 1)
+
+        START_CYCLE(3)
+        if (_A > 0x9F || flag_state_spc(SPC_FLAG_C))
+        {
+         _A += 0x60;
+         set_flag_spc(SPC_FLAG_C);
+        }
+        store_flags_nz(_A);
+        END_OPCODE(1)
+      }
+
 
     /* handle unhandled or invalid opcodes */
     case 0x0F:  /* BRK */
     case 0x7F:  /* RETI */
-    case 0xBE:  /* DAS */
-    case 0xDF:  /* DAA */
     case 0xEF:  /* SLEEP */
     case 0xFF:  /* STOP */
     default:

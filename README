@@ -9,8 +9,8 @@ The SNES emulator with the extra e's...
        SS   SS  NN   NNN  EE      ee      SS   SS  ee
         SSSSS   NN    NN  EEEEEE   eeee    SSSSS    eeee
 
-                                            v0.841 (Public BETA)
-                                            22 June 2005
+                                            v0.842 (Public BETA)
+                                            xx June 2005
 
   Please read the license (LICENSE file) before using or distributing
    SNEeSe in any way!
@@ -459,7 +459,7 @@ Emulation details:
 
  - SPC700 sound CPU with 250/256 opcodes implemented, running with
     on-demand execution and cycle-based emulation.
-    BRK/RETI, BCD (DAS/DAA), SLEEP/STOP remain unimplemented.
+    BRK/RETI, SLEEP/STOP remain unimplemented.
  - Partial sound DSP support and sound generation, including accurate
     emulation of the 4-point pitch-regulated gaussian interpolation of
     sample data, OUTX/ENVX registers, pitch modulation, and the echo
