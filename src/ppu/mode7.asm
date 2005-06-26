@@ -65,6 +65,8 @@ EXPORT M7H_13   ,skipl
 EXPORT M7V_13   ,skipl
 EXPORT M7X      ,skipl
 EXPORT M7Y      ,skipl
+EXPORT M7H      ,skipl
+EXPORT M7V      ,skipl
 
 ;M7A, M7C are taken from here to help handle X-flip
 EXPORT M7A_X    ,skipl
@@ -1174,6 +1176,8 @@ EXPORT Reset_Mode_7
 ;mov [C_LABEL(M7V_13)],eax
  mov [C_LABEL(M7X)],eax
  mov [C_LABEL(M7Y)],eax
+ mov [C_LABEL(M7H)],eax
+ mov [C_LABEL(M7V)],eax
 
  ret
 
@@ -1209,6 +1213,44 @@ EXPORT SNES_R2136 ; MPYH
  cmp byte [Redo_16x8],0
  jnz Do_16x8_Multiply
  mov al,[edx]
+ ret
+
+ALIGNC
+EXPORT SNES_W_M7H ; 210D - handle mode 7 register update
+ push ebx
+ mov bl,[M7_Last_Write]
+ mov bh,al
+ mov [M7_Last_Write],al
+
+ movsx ebx,bx
+ cmp [C_LABEL(M7H)],ebx
+ je .no_change
+
+ UpdateDisplay  ;*M7
+ mov [C_LABEL(M7H)],ebx
+ mov dl,0x40    ; Recalculate H
+ or [Redo_M7],dl
+.no_change:
+ pop ebx
+ ret
+
+ALIGNC
+EXPORT SNES_W_M7V ; 210E - handle mode 7 register update
+ push ebx
+ mov bl,[M7_Last_Write]
+ mov bh,al
+ mov [M7_Last_Write],al
+
+ movsx ebx,bx
+ cmp [C_LABEL(M7V)],ebx
+ je .no_change
+
+ UpdateDisplay  ;*M7
+ mov [C_LABEL(M7V)],ebx
+ mov dl,0x80    ; Recalculate V
+ or [Redo_M7],dl
+.no_change:
+ pop ebx
  ret
 
 ALIGNC

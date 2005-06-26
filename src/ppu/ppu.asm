@@ -1363,6 +1363,9 @@ SNES_W210D: ; BG1HOFS
  popa   ;*
 %endif
 
+EXTERN SNES_W_M7H
+ call SNES_W_M7H
+
  push ebx
  mov dl,[C_LABEL(BG1HOFS)+1]
  mov bl,[BGOFS_Last_Write]
@@ -1376,9 +1379,6 @@ SNES_W210D: ; BG1HOFS
  je .no_change
  UpdateDisplay  ;*scroll
  mov [C_LABEL(BG1HOFS)],ebx
-
- mov bl,0x40    ; Recalculate H
- or [Redo_M7],bl
 
 .no_change:
 
@@ -1399,6 +1399,9 @@ SNES_W210E: ; BG1VOFS
  popa   ;*
 %endif
 
+EXTERN SNES_W_M7V
+ call SNES_W_M7V
+
  push ebx
  mov dl,[C_LABEL(BG1VOFS)+1]
  mov bl,[BGOFS_Last_Write]
@@ -1413,8 +1416,6 @@ SNES_W210E: ; BG1VOFS
  UpdateDisplay  ;*scroll
  mov [C_LABEL(BG1VOFS)],ebx
 
- mov bl,0x80    ; Recalculate V
- or [Redo_M7],bl
 .no_change:
 
  pop ebx
