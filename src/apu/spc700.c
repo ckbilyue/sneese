@@ -3247,27 +3247,28 @@ static void Execute_SPC(void)
 
     case 0x9E:  /* DIV YA,X */
       {
-        unsigned temp = _YA;
-        int overflow = 0;
-
         /*  12 cycles - opcode, 11(op) */
-        /* timing and logic of operations completely wrong here */
+        /* timing of operations completely wrong here, at least */
         START_CYCLE(2)
-        if (_X == 0) overflow = 1;
-        else overflow = (temp / _X) > 0xFF;
-        if (overflow)
-        {
-          set_flag_spc(SPC_FLAG_N | SPC_FLAG_V);
-          clr_flag_spc(SPC_FLAG_Z);
-          _YA = 0xFFFF;
-        }
-        else
-        {
-          _Y = temp % _X;
-          _A = temp / _X;
-          clr_flag_spc(SPC_FLAG_V);
-          store_flags_nz(_A);
-        }
+          unsigned yva, work_x, i;
+          yva = _YA;
+          work_x = (unsigned) _X << 9;
+
+          if ((_X & 0xF) <= (_Y & 0xF)) set_flag_spc(SPC_FLAG_H);
+          else clr_flag_spc(SPC_FLAG_H);
+
+          for (i = 0; i < 9; i++)
+          {
+           yva <<= 1; if (yva & 0x20000) yva = (yva & 0x1FFFF) | 1;  /* 17-bit ROL */
+           if (yva >= work_x) yva ^= 1;  /* Why XOR i don't know, but it's what works */
+           if (yva & 1) yva -= work_x;   /* and I guess this was easier than a compound if */
+          }
+
+          if (yva & 0x100) set_flag_spc(SPC_FLAG_V);
+          else clr_flag_spc(SPC_FLAG_V);
+
+          _YA = (((yva >> 9) & 0xFF) << 8) + (yva & 0xFF);
+          store_flags_nz(_YA);
         END_OPCODE(11)
       }
 

@@ -22,8 +22,12 @@ Changes
 
 
  0.842 [TRAC]
-  SPC700: Added support for BCD fixup opcodes DAA and DAS
-  SPC700: Added support for opcodes BRK and RETI
+  SPC700: Added support for BCD fixup opcodes DAA and DAS, thanks to
+   anomie and Overload for information and resources for research and
+   testing
+  SPC700: Added support for opcodes BRK and RETI, thanks to anomie for
+   information
+  SPC700: Corrected DIV behavior, thanks to anomie for research
   PPU: Added support for separate internal H-offset and V-offset registers
    for matrix rendering
  0.841 [TRAC]
