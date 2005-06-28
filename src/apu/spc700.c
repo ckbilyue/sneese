@@ -719,7 +719,7 @@ void set_byte_spc(unsigned short address, unsigned char data)
   }
 }
 
-//#define OPCODE_TRACE_LOG
+/* #define OPCODE_TRACE_LOG */
 #ifdef OPCODE_TRACE_LOG
 FILE *log_file = 0;
 #endif
@@ -2528,6 +2528,50 @@ static void Execute_SPC(void)
 
 
     /* xxx01111 */
+    case 0x0F:  /* BRK */
+      {
+        /*  8 cycles - opcode, new PCL, new PCH, stack address load, */
+        /* PSW write, PCH write, PCL write, SP decrement */
+        /* fetch address for PC */
+        START_CYCLE(2)
+        /* same vector as TCALL 0 */
+        _address = 0xFFC0 + ((15 - (0)) * 2);
+        _address2 = get_byte_spc(_address);
+        END_CYCLE(2, 1)
+
+        START_CYCLE(3)
+        _address2 += (get_byte_spc(_address + 1) << 8);
+        END_CYCLE(3, 1)
+
+        START_CYCLE(4)
+        _address = 0x0100 + _SP;
+        END_CYCLE(4, 1)
+
+        START_CYCLE(5)
+        set_flag_spc(SPC_FLAG_B);
+        clr_flag_spc(SPC_FLAG_I);
+        spc_setup_flags(_B_flag);
+        set_byte_spc(_address, _PSW);
+        _SP--;
+        _address = 0x0100 + _SP;
+        END_CYCLE(5, 1)
+
+        START_CYCLE(6)
+        set_byte_spc(_address, _PC >> 8);
+        _SP--;
+        _address = 0x0100 + _SP;
+        END_CYCLE(6, 1)
+
+        START_CYCLE(7)
+        set_byte_spc(_address, _PC);
+        END_CYCLE(7, 1)
+
+        START_CYCLE(8)
+        _PC = _address2;
+        _SP--;
+        END_OPCODE(1)
+      }
+
     case 0x2F:  /* BRA rel */
       {
         COND_REL(REL_TEST_BRA)
@@ -2565,7 +2609,7 @@ static void Execute_SPC(void)
 
     case 0x6F:  /* RET */
       {
-        /*  4 cycles - opcode, SP increment, address load, new PCL, new PCH */
+        /*  5 cycles - opcode, SP increment, address load, new PCL, new PCH */
         /* pop address to PC */
         START_CYCLE(2)
         _SP++;
@@ -3231,19 +3275,22 @@ static void Execute_SPC(void)
       {
         /*  3 cycles - opcode, 2(op) */
         START_CYCLE(2)
-        if ((_A & 0x0F) > 9 || !flag_state_spc(SPC_FLAG_H))
+//      printf("i: A:%02X PSW:%02X\n", _A, get_SPC_PSW());
+        _data = _A;
+        if ((_data & 0x0F) > 9 || !flag_state_spc(SPC_FLAG_H))
         {
          _A -= 6;
         }
         END_CYCLE(2, 1)
 
         START_CYCLE(3)
-        if (_A > 0x9F || !flag_state_spc(SPC_FLAG_C))
+        if (_data > 0x99 || !flag_state_spc(SPC_FLAG_C))
         {
          _A -= 0x60;
          clr_flag_spc(SPC_FLAG_C);
         }
         store_flags_nz(_A);
+//      printf("o: A:%02X PSW:%02X\n", _A, get_SPC_PSW());
         END_OPCODE(1)
       }
 
@@ -3375,6 +3422,36 @@ static void Execute_SPC(void)
         END_OPCODE(1)
       }
 
+    case 0x7F:  /* RETI */
+      {
+        /*  6 cycles - opcode, SP increment, address load, new PSW, new PCL, */
+        /* new PCH, pop address to PC */
+        START_CYCLE(2)
+        _SP++;
+        END_CYCLE(2, 1)
+
+        START_CYCLE(3) \
+        _address = 0x0100 + _SP; \
+        END_CYCLE(3, 1) \
+
+        START_CYCLE(4) \
+        _PSW = get_byte_spc(_address);
+        spc_restore_flags();
+        _SP++;
+        _address = 0x0100 + _SP;
+        END_CYCLE(4, 1)
+
+        START_CYCLE(5) \
+        _address2 = get_byte_spc(_address);
+        _SP++;
+        _address = 0x0100 + _SP;
+        END_CYCLE(5, 1)
+
+        START_CYCLE(6)
+        _PC = (get_byte_spc(_address) << 8) + _address2;
+        END_OPCODE(1)
+      }
+
     case 0x9F:  /* XCN A */
       {
         /*  5 cycles - opcode, 4(op) */
@@ -3417,14 +3494,16 @@ static void Execute_SPC(void)
       {
         /*  3 cycles - opcode, 2(op) */
         START_CYCLE(2)
-        if ((_A & 0x0F) > 9 || flag_state_spc(SPC_FLAG_H))
+        _data = _A;
+        if ((_data & 0x0F) > 9 || flag_state_spc(SPC_FLAG_H))
         {
          _A += 6;
+         if (_A < 6) set_flag_spc(SPC_FLAG_C);
         }
         END_CYCLE(2, 1)
 
         START_CYCLE(3)
-        if (_A > 0x9F || flag_state_spc(SPC_FLAG_C))
+        if (_data > 0x99 || flag_state_spc(SPC_FLAG_C))
         {
          _A += 0x60;
          set_flag_spc(SPC_FLAG_C);
@@ -3435,8 +3514,6 @@ static void Execute_SPC(void)
 
 
     /* handle unhandled or invalid opcodes */
-    case 0x0F:  /* BRK */
-    case 0x7F:  /* RETI */
     case 0xEF:  /* SLEEP */
     case 0xFF:  /* STOP */
     default:

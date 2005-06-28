@@ -459,7 +459,7 @@ Emulation details:
 
  - SPC700 sound CPU with 250/256 opcodes implemented, running with
     on-demand execution and cycle-based emulation.
-    BRK/RETI, SLEEP/STOP remain unimplemented.
+    SLEEP/STOP remain unimplemented.
  - Partial sound DSP support and sound generation, including accurate
     emulation of the 4-point pitch-regulated gaussian interpolation of
     sample data, OUTX/ENVX registers, pitch modulation, and the echo
