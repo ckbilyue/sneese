@@ -665,10 +665,10 @@ EXPORT Reset_Ports
  mov dword [M0_Color_BG3],0x43434343
  mov dword [M0_Color_BG4],0x63636363
 
- mov byte [BG_Flag_BG1],(1 << 0)
- mov byte [BG_Flag_BG2],(1 << 1)
- mov byte [BG_Flag_BG3],(1 << 2)
- mov byte [BG_Flag_BG4],(1 << 3)
+ mov byte [BG_Flag_BG1],BIT(0)
+ mov byte [BG_Flag_BG2],BIT(1)
+ mov byte [BG_Flag_BG3],BIT(2)
+ mov byte [BG_Flag_BG4],BIT(3)
 
  mov byte [OC_Flag_BG1],0x20
  mov byte [OC_Flag_BG2],0x40
@@ -769,7 +769,7 @@ VMDATAREAD_update_NORM: ; normal increment
  mov [VRAMAddress],edx
  ret
 
-;bitshift (%1), bitmask (1 << (%1)) - 1, topmask 0x7FFF & ~((1 << ((%1) + 3)) - 1)
+;bitshift (%1), bitmask BITMASK(0,(%1) - 1), topmask BITMASK(0,14) & ~BITMASK(0,(%1) + 3 - 1)
 %macro GEN_SNES_R2139_213A_FULL 2
 VMDATAREAD_update_FULL_%2:  ; full graphic increment
  mov edx,[VRAMAddress]
@@ -778,10 +778,10 @@ VMDATAREAD_update_FULL_%2:  ; full graphic increment
  mov edi,edx
  mov eax,edx
  shr edi,(%1)   ;Bitshift
- and eax,byte (1 << (%1)) - 1   ;Bitmask
+ and eax,byte BITMASK(0,(%1) - 1)   ;Bitmask
  and edi,byte 7
  shl eax,3
- and edx,0x7FFF & ~((1 << ((%1) + 3)) - 1)  ;Topmask
+ and edx,BITMASK(0,14) & ~BITMASK(0,(%1) + 3 - 1)   ;Topmask
  or edx,edi
  or edx,eax
  pop edi
@@ -843,7 +843,7 @@ SNES_R213F: ; STAT78
  cmp byte [PPU2_Latch_External],0
  jz .no_latch
 .no_latch:
- and byte [STAT78],~(1 << 6)    ; Clear latch flag
+ and byte [STAT78],~BIT(6)    ; Clear latch flag
 .latch:
 
  ret
@@ -1755,7 +1755,7 @@ SNES_W2117: ; VMADDH
 %endmacro
 
 
-;bitshift (%1), bitmask (1 << (%1)) - 1, topmask 0x7FFF & ~((1 << ((%1) + 3)) - 1)
+;bitshift (%1), bitmask BITMASK(0,(%1) - 1), topmask BITMASK(0,14) & ~BITMASK(0,(%1) + 3 - 1)
 %macro GEN_SNES_W2118_2119_FULL 2 0
 ALIGNC
 ; VMDATAL, full graphic increment
@@ -1770,10 +1770,10 @@ SNES_W2118_FULL_%2:
  mov edi,edx
  mov eax,edx
  shr edi,(%1)   ;Bitshift
- and eax,byte (1 << (%1)) - 1   ;Bitmask
+ and eax,byte BITMASK(0,(%1) - 1)   ;Bitmask
  and edi,byte 7
  shl eax,3
- and edx,0x7FFF & ~((1 << ((%1) + 3)) - 1)  ;Topmask
+ and edx,BITMASK(0,14) & ~BITMASK(0,(%1) + 3 - 1)   ;Topmask
  or edx,eax
  pop eax
  or edx,edi
@@ -1814,10 +1814,10 @@ SNES_W2119_FULL_%2:
  mov edi,edx
  mov eax,edx
  shr edi,(%1)   ;Bitshift
- and eax,byte (1 << (%1)) - 1   ;Bitmask
+ and eax,byte BITMASK(0,(%1) - 1)   ;Bitmask
  and edi,byte 7
  shl eax,3
- and edx,0x7FFF & ~((1 << ((%1) + 3)) - 1)  ;Topmask
+ and edx,BITMASK(0,14) & ~BITMASK(0,(%1) + 3 - 1)   ;Topmask
  or edx,eax
  pop eax
  or edx,edi

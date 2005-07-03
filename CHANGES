@@ -30,6 +30,8 @@ Changes
   SPC700: Corrected DIV behavior, thanks to anomie for research
   PPU: Added support for separate internal H-offset and V-offset registers
    for matrix rendering
+  SPC700: Fixed a flaw in DIV algorithm, thanks to Heretic for pointing
+   this out
  0.841 [TRAC]
   Sound: Fixed a flaw in the order of operations in sample volume
    multiplication, causing a slight improvement in sound accuracy

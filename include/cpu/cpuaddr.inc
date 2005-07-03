@@ -207,12 +207,12 @@ You must read and accept the license prior to use.
 %endif
 
 %if %%wrapcheck         ;time always taken
- mov ebx,(1 << 24) - 1  ;clip for indexing
+ mov ebx,BITMASK(0,23)  ;clip for indexing
  add eax,%1
  and ebx,eax
  add R_Cycles,%2
 %else                   ;penalty for address wrap
- mov ebx,(1 << 24) - 1  ;clip for indexing
+ mov ebx,BITMASK(0,23)  ;clip for indexing
  mov edx,eax
  add eax,%1
  sub dh,ah
@@ -273,7 +273,7 @@ You must read and accept the license prior to use.
 %macro ADDR_Absolute_Long 0-1 0
  READ24_Immediate
 %ifnidni %1,0
- mov ebx,(1 << 24) - 1
+ mov ebx,BITMASK(0,23)
  add eax,%1             ;helper: index
  and ebx,eax            ;clip for indexing
 %else
@@ -320,7 +320,7 @@ You must read and accept the license prior to use.
  add eax,%1             ;helper: index
 %endif
  mov edx,B_D
- mov ebx,(1 << 16) - 1
+ mov ebx,BITMASK(0,15)
  add eax,edx            ;(D + byte (+ index, if present))
  and ebx,eax            ;bank 00
  Check_DL_Not_Zero
@@ -401,12 +401,12 @@ You must read and accept the license prior to use.
 %endif
 
 %if %%wrapcheck         ;time always taken
- mov ebx,(1 << 24) - 1  ;clip for indexing
+ mov ebx,BITMASK(0,23)  ;clip for indexing
  add eax,%1
  and ebx,eax
  add R_Cycles,%2
 %else                   ;penalty for address wrap
- mov ebx,(1 << 24) - 1  ;clip for indexing
+ mov ebx,BITMASK(0,23)  ;clip for indexing
  mov edx,eax
  add eax,%1
  sub dh,ah
@@ -538,7 +538,7 @@ You must read and accept the license prior to use.
 %macro ADDR_Direct_Indirect_Long 0-1 0
  READ24_Direct
 %ifnidni %1,0           ;helper: index
- mov ebx,(1 << 24) - 1  ;clip for indexing
+ mov ebx,BITMASK(0,23)  ;clip for indexing
  add eax,%1
  and ebx,eax
 %else
@@ -920,7 +920,7 @@ You must read and accept the license prior to use.
  mov ebx,B_S    ; Add stack pointer to make address
  add R_Cycles,_5A22_FAST_CYCLE
  add ebx,eax
- and ebx,(1 << 16) - 1
+ and ebx,BITMASK(0,15)
 %endmacro
 
 %macro READ8_Stack_Relative 0
@@ -969,7 +969,7 @@ You must read and accept the license prior to use.
  mov ebx,B_Y
  add R_Cycles,_5A22_FAST_CYCLE
  add ebx,eax
- and ebx,(1 << 24) - 1  ; Ensure 24-bit address
+ and ebx,BITMASK(0,23)  ; Ensure 24-bit address
 %endmacro
 
 %macro READ8_Stack_Relative_Indirect_Indexed 0

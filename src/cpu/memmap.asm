@@ -95,7 +95,7 @@ EXPORT SNES_GET_WORD
  GET_BYTE
  mov ah,al
  inc ebx
- and ebx,(1 << 24) - 1
+ and ebx,BITMASK(0,23)
  GET_BYTE
  ror ax,8
  ret
@@ -111,11 +111,11 @@ EXPORT SNES_GET_LONG
  GET_BYTE
  inc ebx
  mov ah,al
- and ebx,(1 << 24) - 1
+ and ebx,BITMASK(0,23)
  GET_BYTE
  inc ebx
  bswap eax
- and ebx,(1 << 24) - 1
+ and ebx,BITMASK(0,23)
  GET_BYTE
  ror eax,16
  ret
@@ -236,7 +236,7 @@ EXPORT Write_Direct_Safeguard
 ALIGNC
 ; Read hardware - 2000-5FFF in 00-3F/80-BF
 EXPORT PPU_READ
-    mov edx,(1 << 16) - 1
+    mov edx,BITMASK(0,15)
     and edx,ebx
 
     cmp dh,0x21
@@ -259,7 +259,7 @@ EXPORT PPU_READ
 ALIGNC
 ; Write hardware - 2000-5FFF in 00-3F/80-BF
 EXPORT PPU_WRITE
-    mov edx,(1 << 16) - 1
+    mov edx,BITMASK(0,15)
     and edx,ebx
 
     cmp dh,0x21

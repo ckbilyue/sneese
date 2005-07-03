@@ -185,7 +185,7 @@ section .text
 ;macro for processing a channel during HDMA transfer
 %macro HDMAOPERATION 1
   mov al,[HDMAON]
-  test al,(1<<%1)
+  test al,BIT(%1)
   jz %%no_hdma
 
   add dword R_65c816_Cycles,byte 8  ; HDMA processing
@@ -195,7 +195,7 @@ section .text
   call C_LABEL(Do_HDMA_Channel) ; CF clear if channel disabled
 
   jc %%no_hdma
-  and byte [HDMAON],~(1<<%1)    ; Disable this channel
+  and byte [HDMAON],~BIT(%1)    ; Disable this channel
 %%no_hdma:
 %endmacro
 
@@ -209,11 +209,11 @@ ALIGNC
 %endif
 EXPORT Do_DMA_Channel
  mov ebx,[edi+A1T]      ; CPU address in ebx
- and ebx,(1 << 24) - 1
+ and ebx,BITMASK(0,23)
 
  movzx ecx,word [edi+DAS]
  dec ecx
- and ecx,(1 << 16) - 1
+ and ecx,BITMASK(0,15)
  inc ecx
  mov [DMA_Transfer_Size],ecx
 
@@ -391,7 +391,7 @@ Do_HDMA_Indirect_%1:
  mov [edi+A2T],ebx
 .Next_Transfer:
  mov ebx,[edi+DAS]
- and ebx,(1 << 24) - 1
+ and ebx,BITMASK(0,23)
 
  _DHC_Transfer [edi+DMA_B0]
 
@@ -432,7 +432,7 @@ EXPORT Do_HDMA_Channel
  add R_65c816_Cycles,byte _5A22_SLOW_CYCLE
 
  mov ebx,[edi+A2T]      ; Get table address
- and ebx,(1 << 24) - 1
+ and ebx,BITMASK(0,23)
 
  mov ecx,[edi+HDMA_Siz] ; Get HDMA transfer size
 
@@ -464,7 +464,7 @@ EXPORT SNES_W420C ; HDMAEN      ; Actually handled within screen core!
 
 ;macro for processing a channel during HDMA init
 %macro RELATCH_HDMA_CHANNEL 1
- test byte [C_LABEL(HDMAEN)],(1<<%1)
+ test byte [C_LABEL(HDMAEN)],BIT(%1)
  jz %%no_relatch
 
  mov eax,[A1T_%1]        ; Src Address in ebx
@@ -567,7 +567,7 @@ DMA_Fix_B_Addresses:
  pop eax
  ret
 
-; Requires %eax to be (1 << 24) - 1!
+; Requires %eax to be BITMASK(0,23)!
 ;%1 = num
 %macro Reset_DMA_Channel 1
  mov [C_LABEL(DMAP_%1)],al
@@ -593,8 +593,8 @@ EXPORT Reset_DMA
  mov [In_DMA],al
  mov byte [DMA_Pending_B_Address],-1
 
- ; Now (1 << 24) - 1...
- mov eax,(1 << 24) - 1
+ ; Now BITMASK(0,23)...
+ mov eax,BITMASK(0,23)
  Reset_DMA_Channel 0
  Reset_DMA_Channel 1
  Reset_DMA_Channel 2

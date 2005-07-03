@@ -771,8 +771,8 @@ ALIGNC
 %define ASXP_Visible_Width esp+5
 %define ASXP_Total_Lines   esp+6
 
-%define OAM_TIME_OVER (1 << 7)
-%define OAM_RANGE_OVER (1 << 6)
+%define OAM_TIME_OVER BIT(7)
+%define OAM_RANGE_OVER BIT(6)
 
 ;tiles are added to ring buffers in right-to-left order
 ;ring buffers handle time-overflow by spilling excess tiles

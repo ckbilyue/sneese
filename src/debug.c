@@ -224,7 +224,7 @@ void DisplayStatus()
  else printf("    ENVMXDIZC\n");
  printf("A:%04X  X:%04X  Y:%04X", cpu_65c816_A, cpu_65c816_X, cpu_65c816_Y);
 
- for (c = 0; c < 9; c++) Message[8 - c] = (cpu_65c816_P & (1 << c)) ? '1' : '0';
+ for (c = 0; c < 9; c++) Message[8 - c] = (cpu_65c816_P & BIT(c)) ? '1' : '0';
  Message[9] = 0;
  printf("  Opcode:%08X %s\n", (unsigned) Map_Byte, Message);
  printf("%s\n", CPU_OpID[Map_Byte & 0xFF]);
@@ -349,7 +349,7 @@ void Dump_DMA(int b)
   printf("HDMAEN:%02X\n", (unsigned) HDMAEN);
  }
 
- if (!(b & ~0xFF) || b & (1 << 0))
+ if (!(b & ~0xFF) || b & BIT(0))
  {
   printf("%02X %02X %02X %02X%02X%02X %02X%02X%02X %02X%02X%02X\n",
    (unsigned) DMAP_0,(unsigned) BBAD_0,(unsigned) NTRL_0,
@@ -358,7 +358,7 @@ void Dump_DMA(int b)
    (unsigned) DASB_0,(unsigned) DASH_0,(unsigned) DASL_0);
  }
 
- if (!(b & ~0xFF) || b & (1 << 1))
+ if (!(b & ~0xFF) || b & BIT(1))
  {
   printf("%02X %02X %02X %02X%02X%02X %02X%02X%02X %02X%02X%02X\n",
    (unsigned) DMAP_1,(unsigned) BBAD_1,(unsigned) NTRL_1,
@@ -367,7 +367,7 @@ void Dump_DMA(int b)
    (unsigned) DASB_1,(unsigned) DASH_1,(unsigned) DASL_1);
  }
 
- if (!(b & ~0xFF) || b & (1 << 2))
+ if (!(b & ~0xFF) || b & BIT(2))
  {
   printf("%02X %02X %02X %02X%02X%02X %02X%02X%02X %02X%02X%02X\n",
    (unsigned) DMAP_2,(unsigned) BBAD_2,(unsigned) NTRL_2,
@@ -376,7 +376,7 @@ void Dump_DMA(int b)
    (unsigned) DASB_2,(unsigned) DASH_2,(unsigned) DASL_2);
  }
 
- if (!(b & ~0xFF) || b & (1 << 3))
+ if (!(b & ~0xFF) || b & BIT(3))
  {
   printf("%02X %02X %02X %02X%02X%02X %02X%02X%02X %02X%02X%02X\n",
    (unsigned) DMAP_3,(unsigned) BBAD_3,(unsigned) NTRL_3,
@@ -385,7 +385,7 @@ void Dump_DMA(int b)
    (unsigned) DASB_3,(unsigned) DASH_3,(unsigned) DASL_3);
  }
 
- if (!(b & ~0xFF) || b & (1 << 4))
+ if (!(b & ~0xFF) || b & BIT(4))
  {
   printf("%02X %02X %02X %02X%02X%02X %02X%02X%02X %02X%02X%02X\n",
    (unsigned) DMAP_4,(unsigned) BBAD_4,(unsigned) NTRL_4,
@@ -394,7 +394,7 @@ void Dump_DMA(int b)
    (unsigned) DASB_4,(unsigned) DASH_4,(unsigned) DASL_4);
  }
 
- if (!(b & ~0xFF) || b & (1 << 5))
+ if (!(b & ~0xFF) || b & BIT(5))
  {
   printf("%02X %02X %02X %02X%02X%02X %02X%02X%02X %02X%02X%02X\n",
    (unsigned) DMAP_5,(unsigned) BBAD_5,(unsigned) NTRL_5,
@@ -403,7 +403,7 @@ void Dump_DMA(int b)
    (unsigned) DASB_5,(unsigned) DASH_5,(unsigned) DASL_5);
  }
 
- if (!(b & ~0xFF) || b & (1 << 6))
+ if (!(b & ~0xFF) || b & BIT(6))
  {
   printf("%02X %02X %02X %02X%02X%02X %02X%02X%02X %02X%02X%02X\n",
    (unsigned) DMAP_6,(unsigned) BBAD_6,(unsigned) NTRL_6,
@@ -412,7 +412,7 @@ void Dump_DMA(int b)
    (unsigned) DASB_6,(unsigned) DASH_6,(unsigned) DASL_6);
  }
 
- if (!(b & ~0xFF) || b & (1 << 7))
+ if (!(b & ~0xFF) || b & BIT(7))
  {
   printf("%02X %02X %02X %02X%02X%02X %02X%02X%02X %02X%02X%02X\n",
    (unsigned) DMAP_7,(unsigned) BBAD_7,(unsigned) NTRL_7,
@@ -570,7 +570,7 @@ void DisplaySPC()
  printf("PC:%04X  SP:%04X  NVPBHIZC\n", _SPC_PC, _SPC_SP);
 
  _SPC_PSW = get_SPC_PSW();
- for (c = 0; c < 8; c++) Message[7 - c] = (_SPC_PSW & (1 << c)) ? '1' : '0';
+ for (c = 0; c < 8; c++) Message[7 - c] = (_SPC_PSW & BIT(c)) ? '1' : '0';
  Message[8] = 0;
 
  printf("A:%02X  X:%02X  Y:%02X  %s\n",

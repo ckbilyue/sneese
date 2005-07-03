@@ -137,4 +137,11 @@ alignb 16,db 0
 alignb 16
 %endmacro
 
+
+; macros to clarify generation of literal bit masks
+%define BIT(bit) (1 << (bit))
+; lowest bit in mask, highest bit in mask
+%define BITMASK(lsb,msb) ((BIT((msb) - (lsb) + 1) - 1) << (lsb))
+
+
 %endif ; !defined(SNEeSe_misc_inc)

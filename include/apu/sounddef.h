@@ -69,8 +69,8 @@ typedef unsigned short output_sample_16;
 typedef short output_sample_16;
 #endif
 
-#define BRR_PACKET_END  (1 << 0)    /* BRR end block flag */
-#define BRR_PACKET_LOOP (1 << 1)    /* BRR sample loop flag */
+#define BRR_PACKET_END  BIT(0)      /* BRR end block flag */
+#define BRR_PACKET_LOOP BIT(1)    /* BRR sample loop flag */
 
 #define DSP_MAIN_LVOL   0x0C    /* Master volume, left channel */
 #define DSP_MAIN_RVOL   0x1C    /* Master volume, right channel */
@@ -100,9 +100,9 @@ typedef short output_sample_16;
 #define DSP_VOICE_ENVX      8   /* ADSR/GAIN envelope height */
 #define DSP_VOICE_OUTX      9   /* Envelope-applied sample output */
 
-#define DSP_FLG_RESET (1 << 7)
-#define DSP_FLG_MUTE  (1 << 6)
-#define DSP_FLG_NECEN (1 << 5)
+#define DSP_FLG_RESET BIT(7)
+#define DSP_FLG_MUTE  BIT(6)
+#define DSP_FLG_NECEN BIT(5)
 
 #define SPC_CLOCK_HZ (1024000)
 #define TIMER_0_CYCLES_TO_TICKS_SHIFT 7

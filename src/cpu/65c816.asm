@@ -1792,10 +1792,10 @@ EXPORT Reset_CPU
  mov byte [C_LABEL(Controller1_Pos)],16
  mov byte [C_LABEL(Controller23_Pos)],16
  mov byte [C_LABEL(Controller45_Pos)],16
- mov dword [C_LABEL(JOY1L)],(1<<31)
- mov dword [C_LABEL(JOY2L)],(1<<31)
- mov dword [C_LABEL(JOY3L)],(1<<31)
- mov dword [C_LABEL(JOY4L)],(1<<31)
+ mov dword [C_LABEL(JOY1L)],BIT(31)
+ mov dword [C_LABEL(JOY2L)],BIT(31)
+ mov dword [C_LABEL(JOY3L)],BIT(31)
+ mov dword [C_LABEL(JOY4L)],BIT(31)
 
  ; Reset hardware ports
  call Reset_Ports

@@ -203,14 +203,14 @@ EXTERN_C Win%1_Bands
 
 %endif
 
-%define GfxBufferLineSlack (1 << GfxBufferLineSlackShift)
+%define GfxBufferLineSlack BIT(GfxBufferLineSlackShift)
 %define GfxBufferLineSlackShift 3
 %define GfxBufferLinePitch (256+GfxBufferLineSlack)
 
-%define Redo_Win_BG(x) (1 << ((x) - 1))
-%define Redo_Win_OBJ (1 << 4)
-%define Redo_Win_Color (1 << 5)
-%define Redo_Win(x) (1 << (6 + (x) - 1))
+%define Redo_Win_BG(x) BIT((x) - 1)
+%define Redo_Win_OBJ BIT(4)
+%define Redo_Win_Color BIT(5)
+%define Redo_Win(x) BIT(6 + (x) - 1)
 
 %macro Render_Start_Frame 0
  mov dword [BaseDestPtr],0

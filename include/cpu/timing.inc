@@ -41,18 +41,18 @@ You must read and accept the license prior to use.
 %define ZERO_TRIP_CYCLE_COUNTER
 
 
-%define JOYC1_OPEN_BUS_BITS (((1 << 6) - 1) << 2)
-%define JOYC2_OPEN_BUS_BITS (((1 << 3) - 1) << 5)
-%define JOYC2_ALWAYS_HIGH_BITS (((1 << 3) - 1) << 2)
+%define JOYC1_OPEN_BUS_BITS BITMASK(2,7)
+%define JOYC2_OPEN_BUS_BITS BITMASK(5,7)
+%define JOYC2_ALWAYS_HIGH_BITS BITMASK(2,4)
 
-%define RDNMI_OPEN_BUS_BITS (((1 << 3) - 1) << 4)
-%define TIMEUP_OPEN_BUS_BITS ((1 << 7) - 1)
-%define HVBJOY_OPEN_BUS_BITS (((1 << 5) - 1) << 1)
+%define RDNMI_OPEN_BUS_BITS BITMASK(4,6)
+%define TIMEUP_OPEN_BUS_BITS BITMASK(6,0)
+%define HVBJOY_OPEN_BUS_BITS BITMASK(1,5)
 
-%define RDNMI_VBLANK_START (1 << 7)
-%define HVBJOY_IN_VBLANK (1 << 7)
-%define HVBJOY_IN_HBLANK (1 << 6)
-%define HVBJOY_CONTROLLERS_BUSY (1 << 0)
+%define RDNMI_VBLANK_START BIT(7)
+%define HVBJOY_IN_VBLANK BIT(7)
+%define HVBJOY_IN_HBLANK BIT(6)
+%define HVBJOY_CONTROLLERS_BUSY BIT(0)
 
 %include "misc.inc"
 %include "ppu/screen.inc"
@@ -852,21 +852,21 @@ EXPORT NMI
  mov bx,[C_LABEL(Real_SNES_Palette)]
  push ecx
  push edx
- mov ecx,((1<<5)+(1<<10)+(1<<15))
+ mov ecx,(BIT(5) + BIT(10) + BIT(15))
  mov edx,ebx
 
  ; get LSBs
  and edx,ecx
- and ebx,~((1<<5)+(1<<10)+(1<<15))
+ and ebx,~(BIT(5) + BIT(10) + BIT(15))
  and ecx,eax
- and eax,~((1<<5)+(1<<10)+(1<<15))
+ and eax,~(BIT(5) + BIT(10) + BIT(15))
  ; add LSBs
  add ecx,edx
- mov edx,((2<<5)+(2<<10)+(2<<15))
+ mov edx,(BIT(5) + BIT(10) + BIT(15)) * 2
  ; add colors
  add eax,ebx
  and edx,ecx
- mov ebx,((1<<5)+(1<<10)+(1<<15))
+ mov ebx,(BIT(5) + BIT(10) + BIT(15))
  add eax,edx
  and ecx,ebx
  and ebx,eax
@@ -1305,7 +1305,7 @@ EXPORT SNES_R2137 ; SLHV  ; This latches the counter for horizontal/vertical dat
  cmp byte [PPU2_Latch_External],0
  jnz .no_change
 .latch:
- or byte [STAT78],(1 << 6)  ; Raise latch flag
+ or byte [STAT78],BIT(6)    ; Raise latch flag
 
  push ebx
  GET_CYCLES ebx
@@ -1639,7 +1639,7 @@ EXPORT SNES_R4213 ; RDIO
 
  cmp byte [PPU2_Latch_External],0
  jz .no_latch
- and al,~(1 << 7)
+ and al,~BIT(7)
 .no_latch:
 
  ret

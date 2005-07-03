@@ -456,13 +456,13 @@ void Update_SPC_Timer(int timer)
   {
     shift = 4;
   }
-  mask = -(1 << shift);
+  mask = -BIT(shift);
 
   cycles = _TotalCycles - _timers[timer].cycle_latch;
   _timers[timer].cycle_latch += cycles & mask;
 
   /* nothing to do if timer turned off */
-  if (!(SPC_CTRL & (1 << timer))) return;
+  if (!(SPC_CTRL & BIT(timer))) return;
 
   position = _timers[timer].position + (cycles >> shift);
   _timers[timer].position = position;
@@ -515,7 +515,7 @@ void spc_start_timer(int timer)
   {
     shift = 4;
   }
-  mask = -(1 << shift);
+  mask = -BIT(shift);
 
   _timers[timer].cycle_latch = _TotalCycles & mask;
   _timers[timer].position = 0;
@@ -3261,7 +3261,8 @@ static void Execute_SPC(void)
           {
            yva <<= 1; if (yva & 0x20000) yva = (yva & 0x1FFFF) | 1;  /* 17-bit ROL */
            if (yva >= work_x) yva ^= 1;  /* Why XOR i don't know, but it's what works */
-           if (yva & 1) yva -= work_x;   /* and I guess this was easier than a compound if */
+           /* and I guess this was easier than a compound if */
+           if (yva & 1) yva = (yva - work_x) & 0x1FFFF; /* enforce 17-bit register limit! */
           }
 
           if (yva & 0x100) set_flag_spc(SPC_FLAG_V);

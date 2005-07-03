@@ -492,18 +492,18 @@ EXTERN_C Layer_Disable_Mask
  ret
 
 %macro SIGN_EXTEND 2 ;reg,bits
- and (%1),(1 << (%2)) - 1
- xor (%1),1 << ((%2) - 1)
- sub (%1),1 << ((%2) - 1)
+ and (%1),BITMASK(0,(%2) - 1)
+ xor (%1),BIT((%2) - 1)
+ sub (%1),BIT((%2) - 1)
 %endmacro
 
 %macro SIGN_EXTEND_ALT 4 ;reg,reg2,bits,bit
  mov %2,%1
- and %1,1 << (%4)
- and %2,(1 << (%3)) - 1
- xor %1,1 << (%4)
+ and %1,BIT(%4)
+ and %2,BITMASK(0,(%3) - 1)
+ xor %1,BIT(%4)
  sar %1,(%4) - (%3)
- sub %2,1 << (%3)
+ sub %2,BIT(%3)
  add %1,%2
 %endmacro
 

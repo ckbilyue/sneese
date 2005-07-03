@@ -967,7 +967,7 @@ ALIGNC
 %define SM01_Layers esp
 
 %macro Check_Present_Layer 2
- test byte %2,1 << ((%1)-1)
+ test byte %2,BIT((%1)-1)
 %endmacro
 
 %macro Jump_Present_Layer 3

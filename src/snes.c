@@ -200,9 +200,9 @@ void Reset_Memory(void)
  memset(Blank,0xFF,(64 << 10));
 
  /* Reset SPC address space to the value of pin A5 */
- for (i = 0; i < (64 << 10); i += (1 << 5))
+ for (i = 0; i < (64 << 10); i += BIT(5))
  {
-  memset(SPCRAM, i & (1 << 5) ? (0 - 1) : 0, (1 << 5));
+  memset(SPCRAM, i & BIT(5) ? (0 - 1) : 0, BIT(5));
  }
 
  /* Reset WRAM to 0x55 */

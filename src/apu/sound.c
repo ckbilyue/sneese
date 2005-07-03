@@ -246,13 +246,13 @@ void Wrap_SPC_Samplecounter()
 
 static void SPC_VoiceOff(int voice, const char *reason)
 {
- if (SNDkeys & (1 << voice))
+ if (SNDkeys & BIT(voice))
  {
 #ifdef LOG_SOUND_VOICE_OFF
  printf("Voice off: %d (%s)\n", voice, reason);
 #endif
 
- SNDkeys &= ~(1 << voice);
+ SNDkeys &= ~BIT(voice);
 
  SNDvoices[voice].env_state = VOICE_OFF;
  SNDvoices[voice].env_update_count = 0;
@@ -279,7 +279,7 @@ static void SPC_VoicesOff(int voices, const char *reason)
 
  for (voice = 0; voice < 8; voice++)
  {
-  if (voices & (1 << voice))
+  if (voices & BIT(voice))
   {
    SPC_VoiceOff(voice, reason);
   }
@@ -289,7 +289,7 @@ static void SPC_VoicesOff(int voices, const char *reason)
 static INLINE int validate_brr_address(int voice)
 {
  // BRR fetch wraps past end of address space!
- SNDvoices[voice].brrptr &= (1 << 16) - 1;
+ SNDvoices[voice].brrptr &= BITMASK(0,15);
 
  return 0;
 }
@@ -328,7 +328,7 @@ static int get_brr_block(int voice, struct voice_state *pvs)
    pvs->brr_header = SPCRAM[pvs->brrptr++];
    if (pvs->brr_header & BRR_PACKET_END)
    {
-    SPC_DSP[DSP_ENDX] |= 1 << voice;
+    SPC_DSP[DSP_ENDX] |= BIT(voice);
    }
    pvs->brr_samples_left = 16;
   }
@@ -558,7 +558,7 @@ INLINE static void SPC_KeyOn(int voices)
 
   for (voice = 0; voice < 8; voice++)
   {
-   if (!(voices & (1 << voice))) continue;
+   if (!(voices & BIT(voice))) continue;
 
    SNDvoices[voice].key_wait = 8;
   }
@@ -570,16 +570,16 @@ INLINE static void SPC_KeyOn(int voices)
  {
   struct voice_state *pvs;
 
-  if (!(keying_on & (1 << voice))) continue;
+  if (!(keying_on & BIT(voice))) continue;
 
   pvs = &SNDvoices[voice];
 
   if (pvs->key_wait--) continue;
 
-  keying_on &= ~(1 << voice);
+  keying_on &= ~BIT(voice);
 
   /* Clear sample-end-block-decoded flag for voices being keyed on */
-  SPC_DSP[DSP_ENDX] &= ~(1 << voice);
+  SPC_DSP[DSP_ENDX] &= ~BIT(voice);
 
   cursamp = SPC_DSP[(voice << 4) + DSP_VOICE_SRCN];
   pvs->brrptr = pvs->sample_start_address = samp_dir[cursamp * 2];
@@ -599,7 +599,7 @@ INLINE static void SPC_KeyOn(int voices)
 
 #ifndef ZERO_ENVX_ON_KEY_ON
   // Don't set envelope to zero if sound was playing
-  if (!(SNDkeys & (1 << voice)))
+  if (!(SNDkeys & BIT(voice)))
 #endif
   {
    SPC_DSP[(voice << 4) + DSP_VOICE_ENVX] = 0;
@@ -633,7 +633,7 @@ INLINE static void SPC_KeyOn(int voices)
    }
   }
 
-  SNDkeys |= (1 << voice);
+  SNDkeys |= BIT(voice);
  }
 }
 
@@ -647,7 +647,7 @@ INLINE static void SPC_KeyOff(int voices)
 
  for (voice = 0; voice < 8; voice++)
  {
-  if (voices & (1 << voice))
+  if (voices & BIT(voice))
   {
    SNDvoices[voice].env_state = RELEASE;
    SNDvoices[voice].env_update_count = apu_counter_reset_value;
@@ -1513,7 +1513,7 @@ void SPC_READ_DSP()
      /* if we're reading envx or outx but voice is off */
      if (addr_lo == DSP_VOICE_ENVX || addr_lo == DSP_VOICE_OUTX)
      {
-      if (!(SNDkeys & (1 << addr_hi)))
+      if (!(SNDkeys & BIT(addr_hi)))
       {
 #ifdef LOG_SOUND_DSP_READ
        printf(" %02X", SPC_DSP[SPC_DSP_ADDR]);
@@ -1541,7 +1541,7 @@ void SPC_READ_DSP()
                 if (!sound_enabled) SNDvoices[addr_hi].voice_sample_latch =
                  sound_sample_latch;
 #if defined(ZERO_ENVX_ON_VOICE_OFF) && !defined(DSP_SPEED_HACK)
-                if (ENVX_ENABLED && (SNDkeys & (1 << addr_hi)))
+                if (ENVX_ENABLED && (SNDkeys & BIT(addr_hi)))
 #else
                 if (ENVX_ENABLED)
 #endif
@@ -1581,7 +1581,7 @@ void SPC_WRITE_DSP()
 
  /* if it's not a voice register for a voice that's not on */
  if (addr_lo > 9 ||
-  ((SNDkeys | (SPC_DSP[DSP_KON] & ~SPC_DSP[DSP_KOF])) & (1 << addr_hi)))
+  ((SNDkeys | (SPC_DSP[DSP_KON] & ~SPC_DSP[DSP_KOF])) & BIT(addr_hi)))
  {
 #endif
 
@@ -1627,13 +1627,13 @@ void SPC_WRITE_DSP()
  case DSP_VOICE_ADSR1:
   if (!sound_enabled) SNDvoices[addr_hi].voice_sample_latch =
    sound_sample_latch;
-  if (SNDkeys & (1 << addr_hi)) UpdateEnvelopeHeight(addr_hi);
+  if (SNDkeys & BIT(addr_hi)) UpdateEnvelopeHeight(addr_hi);
 
   SNDvoices[addr_hi].ar = attack_time(SPC_DSP_DATA & 0xF);
   SNDvoices[addr_hi].dr = decay_time((SPC_DSP_DATA >> 4) & 7);
 
   /* If voice releasing or not playing, nothing else to update */
-  if (!(SNDkeys & (1 << addr_hi)) ||
+  if (!(SNDkeys & BIT(addr_hi)) ||
    SNDvoices[addr_hi].env_state == RELEASE) break;
 
   if (SNDvoices[addr_hi].env_state == ATTACK)
@@ -1685,7 +1685,7 @@ void SPC_WRITE_DSP()
  case DSP_VOICE_ADSR2:
   if (!sound_enabled) SNDvoices[addr_hi].voice_sample_latch =
    sound_sample_latch;
-  if (SNDkeys & (1 << addr_hi)) UpdateEnvelopeHeight(addr_hi);
+  if (SNDkeys & BIT(addr_hi)) UpdateEnvelopeHeight(addr_hi);
 
   SNDvoices[addr_hi].sr = exp_time(SPC_DSP_DATA & 0x1F);
   SNDvoices[addr_hi].sl = ((SPC_DSP_DATA >> 5) == 7) ? ENVX_MAX :
@@ -1700,7 +1700,7 @@ void SPC_WRITE_DSP()
  case DSP_VOICE_GAIN:
   if (!sound_enabled) SNDvoices[addr_hi].voice_sample_latch =
    sound_sample_latch;
-  if (SNDkeys & (1 << addr_hi)) UpdateEnvelopeHeight(addr_hi);
+  if (SNDkeys & BIT(addr_hi)) UpdateEnvelopeHeight(addr_hi);
 
   if (SPC_DSP_DATA & 0x80)
   {
@@ -1728,7 +1728,7 @@ void SPC_WRITE_DSP()
   }
 
   /* If voice releasing or not playing, nothing else to update */
-  if (!(SNDkeys & (1 << addr_hi)) ||
+  if (!(SNDkeys & BIT(addr_hi)) ||
    SNDvoices[addr_hi].env_state == RELEASE) break;
 
   /* is gain enabled? */

@@ -125,8 +125,8 @@ EXTERN_MAP_WRITE_DMA 7
 
                          ; 0000dccc | d = in DMA/HDMA, if 0 all should be 0
 ;EXPORT In_DMA           ; c = channel # 0-7
-%define DMA_IN_PROGRESS (1 << 3)
-%define DMA_CHANNEL_MASK ((1 << 3) - 1)
+%define DMA_IN_PROGRESS BIT(3)
+%define DMA_CHANNEL_MASK BITMASK(0,2)
 
 
 ; Offsets from TableDMA#
@@ -194,7 +194,7 @@ EXTERN_MAP_WRITE_DMA 7
 ;%1 = num, 2 = branch target for early-exit
 %macro DMAOPERATION 2
  mov al,[C_LABEL(MDMAEN)]
- test al,1 << (%1)
+ test al,BIT(%1)
  jz %%no_dma
 
  mov byte [In_DMA],(%1) | DMA_IN_PROGRESS
@@ -205,7 +205,7 @@ EXTERN_MAP_WRITE_DMA 7
  cmp byte [In_DMA],0
  jnz %2
 
- and byte [C_LABEL(MDMAEN)],~(1 << (%1))
+ and byte [C_LABEL(MDMAEN)],~BIT(%1)
 
 %%no_dma:
 %endmacro

@@ -297,7 +297,7 @@ byte accessed.
  mov al,ah
 %ifnidni %1,wrap
  inc ebx
- and ebx,(1 << 24) - 1
+ and ebx,BITMASK(0,23)
 %else
  inc bx
 %endif
@@ -313,7 +313,7 @@ byte accessed.
  pop eax
 %ifnidni %1,wrap
  dec ebx
- and ebx,(1 << 24) - 1
+ and ebx,BITMASK(0,23)
 %else
  inc bx
 %endif
