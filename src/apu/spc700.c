@@ -895,8 +895,8 @@ void single_step_end(void)
 #define REL_TEST_BEQ if (!flag_state_spc(SPC_FLAG_Z)) EXIT_OPCODE(1)
 
 #define OP_TCALL(vector) \
-  /*  8 cycles - opcode, new PCL, new PCH, stack address load, dummy */ \
-  /* cycle (PSW write in BRK?), PCH write, PCL write, */ \
+  /*  8 cycles - opcode, new PCL, new PCH, stack address load, PCH */ \
+  /* write, PCL write, dummy cycle (PSW write in BRK?) */ \
   /* SP decrement */ \
   /* fetch address for PC */ \
   START_CYCLE(2) \
@@ -913,22 +913,23 @@ void single_step_end(void)
   END_CYCLE(4, 1) \
  \
   START_CYCLE(5) \
-  /* should we write PSW to stack here? */ \
+  set_byte_spc(_address, _PC >> 8); \
+  _SP--; \
+  _address = 0x0100 + _SP; \
   END_CYCLE(5, 1) \
  \
   START_CYCLE(6) \
-  set_byte_spc(_address, _PC >> 8); \
+  set_byte_spc(_address, _PC); \
   _SP--; \
   _address = 0x0100 + _SP; \
   END_CYCLE(6, 1) \
  \
   START_CYCLE(7) \
-  set_byte_spc(_address, _PC); \
+  /* should we write PSW to stack here? */ \
   END_CYCLE(7, 1) \
  \
   START_CYCLE(8) \
   _PC = _address2; \
-  _SP--; \
   END_OPCODE(1)
 
 
@@ -2548,22 +2549,22 @@ static void Execute_SPC(void)
         END_CYCLE(4, 1)
 
         START_CYCLE(5)
-        set_flag_spc(SPC_FLAG_B);
-        clr_flag_spc(SPC_FLAG_I);
-        spc_setup_flags(_B_flag);
-        set_byte_spc(_address, _PSW);
+        set_byte_spc(_address, _PC >> 8);
         _SP--;
         _address = 0x0100 + _SP;
         END_CYCLE(5, 1)
 
         START_CYCLE(6)
-        set_byte_spc(_address, _PC >> 8);
+        set_byte_spc(_address, _PC);
         _SP--;
         _address = 0x0100 + _SP;
         END_CYCLE(6, 1)
 
         START_CYCLE(7)
-        set_byte_spc(_address, _PC);
+        set_flag_spc(SPC_FLAG_B);
+        clr_flag_spc(SPC_FLAG_I);
+        spc_setup_flags(_B_flag);
+        set_byte_spc(_address, _PSW);
         END_CYCLE(7, 1)
 
         START_CYCLE(8)
@@ -3372,8 +3373,8 @@ static void Execute_SPC(void)
 
     case 0x3F:  /* CALL abs */
       {
-        /*  8 cycles - opcode, new PCL, new PCH, stack address load, dummy */
-        /* cycle (PSW write in BRK?), PCH write, PCL write, */
+        /*  8 cycles - opcode, new PCL, new PCH, stack address load, PCH */
+        /* write, PCL write, dummy cycle (PSW write in BRK?) */
         /* SP decrement */
         /* fetch address for PC */
         START_CYCLE(2)
@@ -3391,24 +3392,25 @@ static void Execute_SPC(void)
         END_CYCLE(4, 1)
 
         START_CYCLE(5)
-        /* should we write PSW to stack here? */
+        set_byte_spc(_address, _PC >> 8);
+        _SP--;
+        _address = 0x0100 + _SP;
         END_CYCLE(5, 1)
 
         START_CYCLE(6)
-        set_byte_spc(_address, _PC >> 8);
+        set_byte_spc(_address, _PC);
         _SP--;
         _address = 0x0100 + _SP;
         END_CYCLE(6, 1)
 
         START_CYCLE(7)
-        set_byte_spc(_address, _PC);
+        /* should we write PSW to stack here? */
         END_CYCLE(7, 1)
 
         START_CYCLE(8)
         _PC = _address2;
-        _SP--;
         END_OPCODE(1)
-      }
+
 
     case 0x5F:  /* JMP abs */
       {
