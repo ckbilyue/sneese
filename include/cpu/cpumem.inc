@@ -315,7 +315,7 @@ byte accessed.
  dec ebx
  and ebx,BITMASK(0,23)
 %else
- inc bx
+ dec bx
 %endif
  SET_BYTE
 %endmacro
