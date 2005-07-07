@@ -3278,7 +3278,6 @@ static void Execute_SPC(void)
       {
         /*  3 cycles - opcode, 2(op) */
         START_CYCLE(2)
-//      printf("i: A:%02X PSW:%02X\n", _A, get_SPC_PSW());
         _data = _A;
         if ((_data & 0x0F) > 9 || !flag_state_spc(SPC_FLAG_H))
         {
@@ -3293,7 +3292,6 @@ static void Execute_SPC(void)
          clr_flag_spc(SPC_FLAG_C);
         }
         store_flags_nz(_A);
-//      printf("o: A:%02X PSW:%02X\n", _A, get_SPC_PSW());
         END_OPCODE(1)
       }
 
@@ -3410,6 +3408,7 @@ static void Execute_SPC(void)
         START_CYCLE(8)
         _PC = _address2;
         END_OPCODE(1)
+      }
 
 
     case 0x5F:  /* JMP abs */
