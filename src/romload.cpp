@@ -70,6 +70,8 @@ using namespace std;
 #include "platform.h"
 #include "multiio.h"
 
+#include "patch.h"
+
 
 char *rom_romfile = 0;
 char *rom_romhilo = 0;
@@ -90,7 +92,6 @@ unsigned char *RomAddress;      // Address of SNES ROM
 //  to non-existant SRAM
 unsigned SaveRamLength = 0;
 
-int Allocate_ROM();
 int ROM_format;
 
 typedef struct {
@@ -158,7 +159,8 @@ int LoadSRAM(char *SRAM_filename)
  if (!snes_rom_loaded || !SaveRamLength) return 0;   // No SRAM
 
  // Return if we can't get SRAM filename
- if (CreateSRAMFilename(ROM_filename)) return 0;
+ if (CreateSaveFilename(SRAM_filename, ROM_filename, save_extension))
+  return 0;
 
  FILE *Infile = fopen(SRAM_filename, "rb");
  if (!Infile) return 0;         // Can't open file
@@ -183,7 +185,8 @@ int SaveSRAM(char *SRAM_filename)
  if (!snes_rom_loaded || !SaveRamLength) return 0;   // No SRAM
 
  // Return if we can't get SRAM filename
- if (CreateSRAMFilename(ROM_filename)) return 0;
+ if (CreateSaveFilename(SRAM_filename, ROM_filename, save_extension))
+  return 0;
 
  FILE *Outfile = fopen(SRAM_filename, "wb");
  if (!Outfile) return 0;        // Can't open file
@@ -230,11 +233,12 @@ ROMFileType GetROMFileType(const char *ROM_filename)
  return ROMFileType_normal;
 }
 
-bool CreateSRAMFilename(char *ROM_filename)
+bool CreateSaveFilename(char *save_filename, const char *ROM_filename,
+ const char *save_extension)
 {
  int length, slength;
 
- SRAM_filename[0] = 0;
+ save_filename[0] = 0;
 
  length = 1;    // 1 for the null
  fnsplit(ROM_filename, fn_drive, fn_dir, fn_file, fn_ext);
@@ -272,30 +276,30 @@ bool CreateSRAMFilename(char *ROM_filename)
 
  if (strlen(save_dir))
  {
-  strcat(SRAM_filename, save_dir);
+  strcat(save_filename, save_dir);
   if (save_dir[slength - 1] != '/' && save_dir[slength - 1] != '\\')
-   strcat(SRAM_filename, "/");  // Add missing trailing slash
+   strcat(save_filename, "/");  // Add missing trailing slash
  } else {
   if (strlen(fn_drive))
   {
-   strcat(SRAM_filename, fn_drive);
+   strcat(save_filename, fn_drive);
   }
 
   if (strlen(fn_dir))
   {
-   strcat(SRAM_filename, fn_dir);
+   strcat(save_filename, fn_dir);
    if (fn_dir[slength - 1] != '/' && fn_dir[slength - 1] != '\\')
-    strcat(SRAM_filename, "/");  // Add missing trailing slash
+    strcat(save_filename, "/");  // Add missing trailing slash
   }
  }
 
- strcat(SRAM_filename, fn_file);
+ strcat(save_filename, fn_file);
 
  if (strlen(save_extension))
  {
   if (save_extension[0] != '.')
-   strcat(SRAM_filename, ".");  // Add missing leading period
-  strcat(SRAM_filename, save_extension);
+   strcat(save_filename, ".");  // Add missing leading period
+  strcat(save_filename, save_extension);
  }
 
  return FALSE;
@@ -306,26 +310,62 @@ void DisplayRomStats(SNESRomInfoStruct *RomInfo);
 // ROM is now dynamically allocated. This is to add large ROM support
 // without raising RAM requirements when using smaller ROMs.
 static unsigned char *AllocROMAddress = 0;
+unsigned rom_allocated_size = 0;
 
 void Free_ROM()
 {
  if (AllocROMAddress) free(AllocROMAddress);
- AllocROMAddress = (unsigned char *)0;
+ RomAddress = AllocROMAddress = (unsigned char *)0;
+ rom_allocated_size = 0;
 }
 
-int Allocate_ROM()
+int Allocate_ROM(bool resize)
 {
- // De-allocate any previous memory
- Free_ROM();
+ const unsigned new_size = rmd_64k.bank_count * (64 << 10) + (8 << 10);
+ unsigned clear_size = rmd_64k.bank_count * (64 << 10);
+ unsigned old_size = 0;
+ unsigned old_alignment_padding = RomAddress - AllocROMAddress;
 
- AllocROMAddress =
-  (unsigned char *) malloc (rmd_64k.bank_count * (64 << 10) + (12 << 10));
- if (!AllocROMAddress) return rmd_64k.bank_count * (64 << 10) + (12 << 10);
+ if (resize)
+ {
+  clear_size -= rom_allocated_size;
+  old_size = rom_allocated_size;
+ }
 
- RomAddress =   // Force 4k alignment/8k misalignment
-  (unsigned char *)(((unsigned)
-   ((AllocROMAddress + ((8 << 10) - 1))) & ~((8 << 10) - 1)) + (4 << 10));
- memset(RomAddress, 0xFF, rmd_64k.bank_count * (64 << 10));
+ if (rom_allocated_size != new_size)
+ {
+  // De-allocate any previous memory if not resizing
+  if (!resize) Free_ROM();
+
+  void *ReallocROMAddress = realloc(AllocROMAddress, new_size);
+
+  if (ReallocROMAddress)
+  {
+   AllocROMAddress = (unsigned char *) ReallocROMAddress;
+   rom_allocated_size = new_size;
+  }
+  else
+  {
+   return new_size;
+  }
+ }
+
+ unsigned rom_address_temp;
+
+ // Force 4k alignment/8k misalignment
+ rom_address_temp = ((unsigned)
+   (AllocROMAddress + ((4 << 10) - 1)) & ~((4 << 10) - 1));
+ if (!(rom_address_temp & (4 << 10))) rom_address_temp += (4 << 10);
+
+ RomAddress = (unsigned char *) rom_address_temp;
+
+ unsigned new_alignment_padding = RomAddress - AllocROMAddress;
+ if (resize && (old_alignment_padding != new_alignment_padding))
+ {
+   memmove(RomAddress, AllocROMAddress + old_alignment_padding, old_size);
+ }
+    
+ memset(RomAddress + old_size, 0xFF, clear_size);
 
  return 0;
 }
@@ -599,28 +639,57 @@ extern "C" void reset_bus_timings(void)
 
 }
 
+static unsigned char *AllocSRAMAddress = 0;
+unsigned sram_allocated_size = 0;
+
 // SRAM is now dynamically allocated. This is to add large SRAM support
 // without raising RAM requirements when using smaller SRAMs.
 unsigned char *SRAM = 0;
 
 void Free_SRAM()
 {
- if (SRAM) free(SRAM);
- SRAM = (unsigned char *)0;
+ if (AllocSRAMAddress) free(AllocSRAMAddress);
+ SRAM = AllocSRAMAddress = (unsigned char *)0;
+ sram_allocated_size = 0;
 }
 
 // SaveRamLength is bytes
 int Allocate_SRAM()
 {
- // De-allocate any previous memory
- Free_SRAM();
-
- if (!SaveRamLength) return 0;
-
  // We need at least 8k to use direct read
- SRAM=(unsigned char *)malloc(SaveRamLength > (8 << 10) ?
-  SaveRamLength : (8 << 10));
- if (!SRAM) return SaveRamLength;
+ const unsigned new_size =
+  (SaveRamLength > (8 << 10) ? SaveRamLength : (8 << 10)) + (8 << 10);
+
+
+ if (sram_allocated_size != new_size || !SaveRamLength)
+ {
+  // De-allocate any previous memory if we can't reuse it
+  Free_SRAM();
+
+  // Don't allocate if we are won't use it
+  if (!SaveRamLength) return 0;
+
+  void *ReallocSRAMAddress = realloc(AllocSRAMAddress, new_size);
+
+  if (ReallocSRAMAddress)
+  {
+   AllocSRAMAddress = (unsigned char *) ReallocSRAMAddress;
+   sram_allocated_size = new_size;
+  }
+  else
+  {
+   return new_size;
+  }
+ }
+
+ unsigned sram_address_temp;
+
+ // Force 4k alignment/8k misalignment
+ sram_address_temp = ((unsigned)
+   (AllocSRAMAddress + ((4 << 10) - 1)) & ~((4 << 10) - 1));
+ if (!(sram_address_temp & (4 << 10))) sram_address_temp += (4 << 10);
+
+ SRAM = (unsigned char *) sram_address_temp;
 
  return 0;
 }
@@ -794,27 +863,32 @@ bool Set_HiROM_Map()
  return TRUE;
 }
 
+// to do - combine these into a struct of some form
+/* Off = LoROM, On = HiROM, Undetected = autodetect (only for override) */
+int ROM_force_header = Undetected;
 int ROM_has_header = Undetected;
-/* Off = LoROM, On = HiROM, Undetected = autodetect */
+int ROM_force_memory_map = Undetected;
 int ROM_memory_map = Undetected;
+int ROM_force_interleaved = Undetected;
 int ROM_interleaved = Undetected;
+int ROM_force_video_standard = Undetected;
 int ROM_video_standard = Undetected;
 
 void Load_32k(FILE *infile)
 {
  // Read in as 32k blocks and (de)interleave
  for (int cnt = 0; cnt < rmd_64k.bank_count; cnt++) // Read first half
-  fread2(RomAddress + cnt * 65536 + 32768, 1, 32768, infile);
+  fread2(RomAddress + cnt * (64 << 10) + (32 << 10), 1, (32 << 10), infile);
 
  for (int cnt = 0; cnt < rmd_64k.bank_count; cnt++) // Read second half
-  fread2(RomAddress + cnt * 65536, 1, 32768, infile);
+  fread2(RomAddress + cnt * (64 << 10), 1, (32 << 10), infile);
 }
 
 void Load_64k(FILE *infile)
 {
  for (int cnt = 0; cnt < rmd_64k.bank_count; cnt++) // Read in ROM
  {
-  fread2(RomAddress + cnt * 65536, 1, 65536, infile);
+  fread2(RomAddress + cnt * (64 << 10), 1, (64 << 10), infile);
  }
 }
 
@@ -823,15 +897,15 @@ void Copy_32k(const unsigned char *buffer, size_t len)
   const unsigned char *end = buffer + len;
   for (int cnt = 0; cnt < rmd_64k.bank_count; cnt++) // Read first half
   { 
-    memcpy(RomAddress + cnt * 65536 + 32768, buffer, 32768);
-    buffer += 32768;
+    memcpy(RomAddress + cnt * (64 << 10) + (32 << 10), buffer, (32 << 10));
+    buffer += (32 << 10);
     if (buffer > end) break;
   }
  
   for (int cnt = 0; cnt < rmd_64k.bank_count; cnt++) // Read second half
   { 
-    memcpy(RomAddress + cnt * 65536, buffer, 32768);
-    buffer += 32768;
+    memcpy(RomAddress + cnt * (64 << 10), buffer, (32 << 10));
+    buffer += (32 << 10);
     if (buffer > end) break;
   } 
 }
@@ -841,9 +915,22 @@ void Copy_64k(const unsigned char *buffer, size_t len)
   const unsigned char *end = buffer + len;
   for (int cnt = 0; cnt < rmd_64k.bank_count; cnt++) // Read in ROM
   {
-    memcpy(RomAddress + cnt * 65536, buffer, 65536);
-    buffer += 65536;    
+    memcpy(RomAddress + cnt * (64 << 10), buffer, (64 << 10));
+    buffer += (64 << 10);    
     if (buffer > end) break;
+  }
+}
+
+void Setup_bank_count(const unsigned int size)
+{
+  rmd_64k.bank_count = ((size + (64 << 10) - 1) / (64 << 10));
+  rmd_32k.bank_count = ((size + (32 << 10) - 1) / (32 << 10));
+    
+  // Maximum 64Mbit ROM size for LoROM
+  if (rmd_64k.bank_count > ROM_SIZE_MAX / (64 << 10))
+  {
+    rmd_64k.bank_count = ROM_SIZE_MAX / (64 << 10);
+    rmd_32k.bank_count = ROM_SIZE_MAX / (32 << 10);
   }
 }
 
@@ -856,10 +943,17 @@ unsigned check_for_header(FILE *fp, int filesize)
   // check against even multiple of 1k instead of 32k
  // If ROM filesize is even multiple of 1k, assume no header
  // If ROM filesize is even multiple of 1k, +512, assume header
- if ((((filesize % 1024) == 0) || (ROM_has_header == Off)) &&
-  (ROM_has_header != On)) ROM_start = 0;
- else if (((filesize % 1024) == ROM_Header_Size) || (ROM_has_header == On))
+ if ((((filesize % 1024) == 0) || (ROM_force_header == Off)) &&
+  (ROM_force_header != On))
+ { 
+  ROM_start = 0;
+  ROM_has_header = Off;
+ } 
+ else if (((filesize % 1024) == ROM_Header_Size) || (ROM_force_header == On))
+ {
   ROM_start = ROM_Header_Size;
+  ROM_has_header = On;
+ } 
  else { // Basic header detection failure
 /* Gridle 04/03/1998 (dmy)
 
@@ -888,7 +982,11 @@ HiROM checksums at FFDC/FFDE, 101DC/101DE with header
   ROM_start=ROM_Header_Size;
 
   for (unsigned cnt = 0x110 - 11; cnt < 0x1FA - 11; cnt++)
+  {
    if (Header.RestOfHeader[cnt] != 0){ ROM_start = 0; break; }
+  }
+
+  ROM_has_header = ROM_start ? On : Off;
  }
 /*
  if (ROM_start == ROM_Header_Size)
@@ -906,18 +1004,26 @@ void HiLo_Detect()
   if ((RomInfoLo.ROM_makeup & 0x0F) == 1)
   {
    strcpy(rom_romhilo, "Interleaved HiROM detected");
+   ROM_memory_map = On;
+   ROM_interleaved = On;
    ROM_format = HiROM_Interleaved;
   } else {
    strcpy(rom_romhilo, "LoROM detected");
+   ROM_memory_map = Off;
+   ROM_interleaved = Off;
    ROM_format = LoROM;
   }
  } else {
   if (((RomInfoHi.Checksum ^ RomInfoHi.Complement) == 0xFFFF))
   {
    strcpy(rom_romhilo, "HiROM detected");
+   ROM_memory_map = On;
+   ROM_interleaved = Off;
    ROM_format = HiROM;
   } else {
    strcpy(rom_romhilo, "Detection failed, using LoROM");
+   ROM_memory_map = Off;
+   ROM_interleaved = Off;
    ROM_format = LoROM;
   }
  }
@@ -926,26 +1032,111 @@ void HiLo_Detect()
  /* SNES ROM header is at 01:FFC0 */
  if (!strcmp(rom_name, "BATMAN--REVENGE JOKER"))
  {
+  ROM_memory_map = Off;
+  ROM_interleaved = Off;
   ROM_format = LoROM;
  }
 
- switch (ROM_memory_map)
+ switch (ROM_force_memory_map)
  {
   case HiROM:
    if (ROM_format & HiROM) break;
+   ROM_memory_map = On;
+   ROM_interleaved = Off;
    ROM_format = HiROM;
-   strcpy(rom_romhilo, "HiROM forced"); break;
+    strcpy(rom_romhilo, "HiROM forced"); break;
   case LoROM:
    if (!(ROM_format & HiROM)) break;
+   ROM_memory_map = Off;
+   ROM_interleaved = Off;
    ROM_format = LoROM;
    strcpy(rom_romhilo, "LoROM forced"); break;
  }
 
- switch (ROM_interleaved)
+ switch (ROM_force_interleaved)
  {
-  case On: ROM_format |= Interleaved; break;
-  case Off: ROM_format &= ~Interleaved; break;
+  case On: ROM_interleaved = On; ROM_format |= Interleaved; break;
+  case Off: ROM_interleaved = Off; ROM_format &= ~Interleaved; break;
  }
+}
+
+void patch_rom(const char *Filename)
+{
+  if (AutoPatch)
+  {
+    if (!strcasecmp(fn_ext, ".zip")) { findZipIPS(Filename); }
+    if (!IPSPatched)
+    {
+      char ips_file[MAXFILE];
+      strcpy(ips_file, Filename);
+      char *ext_loc = strrchr(ips_file, '.');
+      if (ext_loc) { *ext_loc = 0; }
+      strcat(ips_file, ".ips");
+      patchfile = ips_file;
+      PatchUsingIPS();
+
+#ifdef FILE_CASE_SENSITIVE
+      if (!IPSPatched)
+      {
+        *(strrchr(ips_file, '.')) = 0;
+        strcat(ips_file, ".IPS");
+        patchfile = ips_file;
+        PatchUsingIPS();       
+      }
+#endif
+    }
+
+    /* check save path */
+    if (!IPSPatched)
+    {
+      char ips_filename[MAXPATH];
+
+      if (CreateSaveFilename(ips_filename, ROM_filename, ".ips")) return;
+      patchfile = ips_filename;
+      PatchUsingIPS();       
+
+#ifdef FILE_CASE_SENSITIVE
+      if (!IPSPatched)
+      {
+        if (CreateSaveFilename(ips_filename, ROM_filename, ".IPS")) return;
+        patchfile = ips_filename;
+        PatchUsingIPS();       
+      }
+#endif
+    }
+
+  } 
+}
+
+bool PatchROMAddress(const unsigned address, const unsigned char byte)
+{
+  if (address > ROM_SIZE_MAX) return false;
+  if (address > (unsigned) (rmd_64k.bank_count * (64 << 10)))
+  {
+    Setup_bank_count(address + 1);
+    if (Allocate_ROM(true))
+    {
+      return false;
+    }
+
+    setup_rom_mirroring(&rmd_32k);
+    setup_rom_mirroring(&rmd_64k);
+    
+    HiLo_Detect();  
+    switch (ROM_format)
+    {
+      case HiROM: case HiROM_Interleaved:
+        if (!Set_HiROM_Map()) { return false; }
+        break;
+      case LoROM: case LoROM_Interleaved:
+        if (!Set_LoROM_Map()) { return false; }
+        break;
+    }    
+  }
+  
+  RomAddress[address] = byte;
+
+  return true;
 }
 
 static bool open_rom_jma(const char *filename)
@@ -962,14 +1153,14 @@ static bool open_rom_jma(const char *filename)
     for (vector<JMA::jma_public_file_info>::iterator i = file_info.begin(); i != file_info.end(); i++)
     {
       //Check for valid ROM based on size
-      if ((i->size <= 0x600200) && (i->size > our_file_size))
+      if ((i->size <= ROM_SIZE_MAX + ROM_Header_Size) && (i->size > our_file_size))
       {
         our_file_name = i->name;
         our_file_size = i->size;
       }
     }
 
-    if (!our_file_size || our_file_size < 0x10000)
+    if (!our_file_size || our_file_size < (64 << 10))
     {
       return FALSE;
     }
@@ -980,15 +1171,20 @@ static bool open_rom_jma(const char *filename)
 
     JMAFile.extract_file(our_file_name, buffer);
     
-    if ((((our_file_size % 1024) == 0) || (ROM_has_header == Off)) &&
-     (ROM_has_header != On))
-      /* do nothing */ ;
+    if ((((our_file_size % 1024) == 0) || (ROM_force_header == Off)) &&
+     (ROM_force_header != On))
+    {
+     ROM_has_header = Off;
+    }
     else if (((our_file_size % 1024) == ROM_Header_Size) ||
-     (ROM_has_header == On))
-      ROM_buffer += ROM_Header_Size;
+     (ROM_force_header == On))
+    {
+     ROM_buffer += ROM_Header_Size;
+     ROM_has_header = On;
+    }
 
     our_file_size -= ROM_buffer - buffer;
-    if (ROM_buffer > buffer)
+    if (ROM_has_header == On)
     {
       printf("Header detected and ignored.\n");
     }
@@ -1002,15 +1198,7 @@ static bool open_rom_jma(const char *filename)
   
     HiLo_Detect();
   
-    rmd_64k.bank_count = ((our_file_size + (64 << 10) - 1) / (64 << 10));
-    rmd_32k.bank_count = ((our_file_size + (32 << 10) - 1) / (32 << 10));
-
-    // Maximum 64Mbit ROM size for LoROM
-    if (rmd_64k.bank_count > 128)
-    {
-      rmd_64k.bank_count = 128;
-      rmd_32k.bank_count = 256;
-    }
+    Setup_bank_count(our_file_size);
 
     if (Allocate_ROM())   // Dynamic allocation of ROM
     {
@@ -1021,7 +1209,7 @@ static bool open_rom_jma(const char *filename)
     setup_rom_mirroring(&rmd_32k);
     setup_rom_mirroring(&rmd_64k);
 
-    switch(ROM_format)
+    switch (ROM_format)
     {
       case HiROM:
         DisplayRomStats(&RomInfoHi);
@@ -1088,7 +1276,7 @@ static bool open_rom_normal(const char *Filename)
  int infilesize = ftell2(infile);
  ROM_start = check_for_header(infile, infilesize);
 
- if (ROM_start == ROM_Header_Size)
+ if (ROM_has_header)
   printf("Header detected and ignored.\n");
  else
   printf("No header detected.\n");
@@ -1102,17 +1290,7 @@ static bool open_rom_normal(const char *Filename)
 
  HiLo_Detect();
  
- rmd_64k.bank_count = (((infilesize - ROM_start) + (64 << 10) - 1)
-  / (64 << 10));
- rmd_32k.bank_count = (((infilesize - ROM_start) + (32 << 10) - 1)
-  / (32 << 10));
-
- // Maximum 64Mbit ROM size for LoROM
- if (rmd_64k.bank_count > 128)
- {
-  rmd_64k.bank_count = 128;
-  rmd_32k.bank_count = 256;
- }
+ Setup_bank_count(infilesize - ROM_start);
 
  if (Allocate_ROM())   // Dynamic allocation of ROM
  {
@@ -1125,7 +1303,7 @@ static bool open_rom_normal(const char *Filename)
 
  fseek2(infile, ROM_start, SEEK_SET);
 
- switch(ROM_format)
+ switch (ROM_format)
  {
   case HiROM:
    DisplayRomStats(&RomInfoHi);
@@ -1194,10 +1372,11 @@ bool Load_32k_split(FILE *infile, const char *Filename, int parts, long total_si
  for (int cnt = 0;
       cnt < rmd_64k.bank_count && part <= parts; cnt++) // Read first half
  {
-  infilesize = fread2(RomAddress + cnt * 65536 + 32768, 1, 32768, infile);
+  infilesize = fread2(RomAddress + cnt * (64 << 10) + (32 << 10), 1,
+   (32 << 10), infile);
   if (infilesize != EOF) bytes_read += infilesize;
 
-  while ((bytes_read % 32768) || (infilesize < 1))
+  while ((bytes_read % (32 << 10)) || (infilesize < 1))
   {
   // partial bank read, must complete (or nothing read, go to next file)
 
@@ -1222,8 +1401,9 @@ bool Load_32k_split(FILE *infile, const char *Filename, int parts, long total_si
    fseek2(infile,ROM_start,SEEK_SET);
 
    infilesize =
-    fread2(RomAddress + cnt * 65536 + 32768 + (bytes_read % 32768), 1,
-    32768 - (bytes_read % 32768), infile);
+    fread2(RomAddress + cnt * (64 << 10) + (32 << 10) +
+     (bytes_read % (32 << 10)), 1,
+     (32 << 10) - (bytes_read % (32 << 10)), infile);
 
    if (infilesize != EOF) bytes_read += infilesize;
   }
@@ -1232,10 +1412,10 @@ bool Load_32k_split(FILE *infile, const char *Filename, int parts, long total_si
  for (int cnt = 0;
       cnt < rmd_64k.bank_count && part <= parts; cnt++) // Read second half
  {
-  infilesize = fread2(RomAddress + cnt * 65536, 1, 32768, infile);
+  infilesize = fread2(RomAddress + cnt * (64 << 10), 1, (32 << 10), infile);
   if (infilesize != EOF) bytes_read += infilesize;
 
-  while ((bytes_read % 32768) || (infilesize < 1))
+  while ((bytes_read % (32 << 10)) || (infilesize < 1))
   {
   // partial bank read, must complete (or nothing read, go to next file)
 
@@ -1260,8 +1440,8 @@ bool Load_32k_split(FILE *infile, const char *Filename, int parts, long total_si
    fseek2(infile,ROM_start,SEEK_SET);
 
    infilesize =
-    fread2(RomAddress + cnt * 65536 + (bytes_read % 32768), 1,
-    32768 - (bytes_read % 32768), infile);
+    fread2(RomAddress + cnt * (64 << 10) + (bytes_read % (32 << 10)), 1,
+    (32 << 10) - (bytes_read % (32 << 10)), infile);
 
    if (infilesize != EOF) bytes_read += infilesize;
   }
@@ -1321,54 +1501,57 @@ static bool open_rom_split(const char *Filename)
   if ((RomInfoLo.ROM_makeup&0x0F)==1)
   {
    strcpy(rom_romhilo,"Interleaved HiROM detected");
+   ROM_memory_map = On;
+   ROM_interleaved = On;
    ROM_format = HiROM_Interleaved;
   } else {
    strcpy(rom_romhilo,"LoROM detected");
+   ROM_memory_map = Off;
+   ROM_interleaved = Off;
    ROM_format = LoROM;
   }
  } else {
   if (((RomInfoHi.Checksum^RomInfoHi.Complement) == 0xFFFF))
   {
    strcpy(rom_romhilo,"HiROM detected");
+   ROM_memory_map = On;
+   ROM_interleaved = Off;
    ROM_format = HiROM;
   } else {
    strcpy(rom_romhilo,"Detection failed, using LoROM");
+   ROM_memory_map = Off;
+   ROM_interleaved = Off;
    ROM_format = LoROM;
   }
  }
 
  if (!strcmp(rom_name, "BATMAN--REVENGE JOKER"))
  {
+  ROM_memory_map = Off;
   ROM_format = LoROM;
  }
 
- switch (ROM_memory_map)
+ switch (ROM_force_memory_map)
  {
   case HiROM:
    if (ROM_format & HiROM) break;
+   ROM_memory_map = On;
    ROM_format = HiROM;
    strcpy(rom_romhilo, "HiROM forced"); break;
   case LoROM:
    if (!(ROM_format & HiROM)) break;
+   ROM_memory_map = Off;
    ROM_format = LoROM;
    strcpy(rom_romhilo, "LoROM forced"); break;
  }
 
- switch (ROM_interleaved)
+ switch (ROM_force_interleaved)
  {
-  case On: ROM_format |= Interleaved; break;
-  case Off: ROM_format &= ~Interleaved; break;
+  case On: ROM_interleaved = On; ROM_format |= Interleaved; break;
+  case Off: ROM_interleaved = Off; ROM_format &= ~Interleaved; break;
  }
 
- rmd_64k.bank_count = ((total_size + (64 << 10) - 1) / (64 << 10));
- rmd_32k.bank_count = ((total_size + (32 << 10) - 1) / (32 << 10));
-
- // Maximum 64Mbit ROM size for LoROM
- if (rmd_64k.bank_count > 128)
- {
-  rmd_64k.bank_count = 128;
-  rmd_32k.bank_count = 256;
- }
+ Setup_bank_count(total_size);
 
  if (Allocate_ROM())   // Dynamic allocation of ROM
  {
@@ -1381,7 +1564,7 @@ static bool open_rom_split(const char *Filename)
 
  fseek2(infile,ROM_start,SEEK_SET);
 
- switch(ROM_format)
+ switch (ROM_format)
  {
   long bytes_read;
 
@@ -1523,6 +1706,8 @@ int open_rom(const char *Filename)
 
  if (snes_rom_loaded == FALSE) return FALSE;
 
+ patch_rom(Filename);
+ 
  Reset_Memory();
  Reset_SRAM();
  snes_reset();
@@ -1678,38 +1863,49 @@ void DisplayRomStats(SNESRomInfoStruct *RomInfo)
   strcpy(rom_country, CountryTable[ RomInfo->Country_code ]);
   /* Japan, USA, Korea == NTSC */
   if ((((RomInfo->Country_code < 2) || (RomInfo->Country_code == 13)
-  ) && (ROM_video_standard != PAL_video))
-   || (ROM_video_standard == NTSC_video))
+  ) && (ROM_force_video_standard != PAL_video))
+   || (ROM_force_video_standard == NTSC_video))
   {
+   ROM_video_standard = NTSC_video;
+
    strcat(rom_country,
-    (ROM_video_standard != NTSC_video) ? " (NTSC)" : " (NTSC forced)");
+    (ROM_force_video_standard != NTSC_video) ? " (NTSC)" : " (NTSC forced)");
 
    set_snes_ntsc();
   }
-  else if (((RomInfo->Country_code < 14) && (ROM_video_standard != NTSC_video))
-   || (ROM_video_standard == PAL_video))
+  else if (((RomInfo->Country_code < 14) &&
+   (ROM_force_video_standard != NTSC_video)) ||
+   (ROM_force_video_standard == PAL_video))
   {
+   ROM_video_standard = PAL_video;
+
    strcat(rom_country,
-    (ROM_video_standard != PAL_video) ? " (PAL)" : " (PAL forced)");
+    (ROM_force_video_standard != PAL_video) ? " (PAL)" : " (PAL forced)");
 
    set_snes_pal();
   }
  } else {
-  switch (ROM_video_standard)
+  switch (ROM_force_video_standard)
   {
    case PAL_video:
+    ROM_video_standard = PAL_video;
+
     strcpy(rom_country, "Unknown (PAL forced)");
 
     set_snes_pal();
     break;
 
    case NTSC_video:
+    ROM_video_standard = NTSC_video;
+
     strcpy(rom_country, "Unknown (NTSC forced)");
 
     set_snes_ntsc();
     break;
 
    default:
+    ROM_video_standard = NTSC_video;
+
     strcpy(rom_country, "Unknown (Using NTSC)");
 
     set_snes_ntsc();

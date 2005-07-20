@@ -613,13 +613,13 @@ int parse_args(int argc, char **argv, char **names, int maxnames)
        switch(*(tv + 2))
        {
         case 'l': case 'L':  /* Force LoROM */
-         ROM_memory_map = LoROM; break;
+         ROM_force_memory_map = LoROM; break;
         case 'h': case 'H':  /* Force HiROM */
-         ROM_memory_map = HiROM; break;
+         ROM_force_memory_map = HiROM; break;
         case 'n': case 'N':  /* Force non-interleaved */
-         ROM_interleaved = Off; break;
+         ROM_force_interleaved = Off; break;
         case 'i': case 'I':  /* Force interleaved */
-         ROM_interleaved = On; break;
+         ROM_force_interleaved = On; break;
         default: printf("Invalid switch: %s\n", tv); cmdhelp(); return 1;
        }
        break;
@@ -630,9 +630,9 @@ int parse_args(int argc, char **argv, char **names, int maxnames)
          switch(*(tv + 3))
          {
           case 'n': case 'N':    /* Force NTSC video standard */
-           ROM_video_standard = NTSC_video; break;
+           ROM_force_video_standard = NTSC_video; break;
           case 'p': case 'P':    /* Force PAL video standard */
-           ROM_video_standard = PAL_video; break;
+           ROM_force_video_standard = PAL_video; break;
           default: printf("Invalid switch: %s\n", tv); cmdhelp(); return 1;
          }
          break;
@@ -655,13 +655,13 @@ int parse_args(int argc, char **argv, char **names, int maxnames)
      {
       printf("Invalid switch: %s\n", tv); cmdhelp(); return 1;
      }
-     ROM_has_header = Off; break;
+     ROM_force_header = Off; break;
     case 'h': case 'H': /* Force header */
      if (strlen(tv + 1) != 1)
      {
       printf("Invalid switch: %s\n", tv); cmdhelp(); return 1;
      }
-     ROM_has_header = On; break;
+     ROM_force_header = On; break;
     case '?':
      if (strlen(tv + 1) != 1)
      {

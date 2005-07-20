@@ -54,6 +54,8 @@ Unix/Linux/BeOS Port Developer/Maintainer
 Assistant Developer (Sound system emulation)
  Brad Martin                    bmartin* *at* *umr.edu
                                 http://home.gvi.net/~martin
+Improvements to ROM Loading Code and IPS Patching Support
+   Nach                         http://nsrt.edgeemu.com/
 
 JMA ROM Format Credits
  LZMA Technology
@@ -117,7 +119,7 @@ Here is a rough guide to the things you need to run this emulator:
     computationally intensive, involving at least two CPUs, a
     complex audio DSP and complex video hardware.
 
- - Roughly 4-8 MB of memory free, dependant on ROM size.
+ - Roughly 6-10 MB of memory free, dependant on ROM size.
 
  - Some SNES ROM images to try out. I will NOT give images due to ethics
     and copyright laws. Don't waste our time asking.
@@ -457,7 +459,7 @@ Emulation details:
     incorrect).  General DMA timing (possibly not 100% correct).
     Partial HDMA timing,  HDMA may have some bugs.
 
- - SPC700 sound CPU with 250/256 opcodes implemented, running with
+ - SPC700 sound CPU with 254/256 opcodes implemented, running with
     on-demand execution and cycle-based emulation.
     SLEEP/STOP remain unimplemented.
  - Partial sound DSP support and sound generation, including accurate
@@ -471,6 +473,8 @@ Emulation details:
     HiROM, and interleaved HiROM, with or without 512-byte copier
     header(s) - note, memory map autodetection of ROMs > 32Mbit is very
     poor.
+ - IPS auto-patching of ROMs on load; IPS Patch must be in same path as ROM
+    image, in ROM image ZIP file, or in save path.
 
  - Most hardware registers emulated.
 

@@ -58,6 +58,7 @@ You must read and accept the license prior to use.
 #define MAXFILE     FILENAME_MAX
 #define MAXEXT      FILENAME_MAX
 #define FILE_SEPARATOR "/"
+#define FILE_CASE_SENSITIVE
 
 EXTERN void fnmerge(char *out, const char *drive, const char *dir,
                     const char *file, const char *ext);

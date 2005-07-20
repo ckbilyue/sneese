@@ -104,27 +104,38 @@ extern char SRAM_filename[MAXPATH];
 extern char save_dir[MAXPATH];
 extern char save_extension[MAXEXT];
 
+
+// to do - combine these into a struct of some form
+/* Off = LoROM, On = HiROM, Undetected = autodetect (only for override) */
+extern int ROM_force_header;
 extern int ROM_has_header;
-/* Off = LoROM, On = HiROM, Undetected = autodetect */
+extern int ROM_force_memory_map;
 extern int ROM_memory_map;
+extern int ROM_force_interleaved;
 extern int ROM_interleaved;
+extern int ROM_force_video_standard;
 extern int ROM_video_standard;
 
 extern char *TypeTable[];
 extern char *CountryTable[];
 
+#define ROM_SIZE_MAX ((64 << 20) >> 3)
+
 #if (defined(__cplusplus)||defined(c_plusplus))
 
-extern int Allocate_Rom(void);
+extern unsigned rom_allocated_size;
 
 int SaveSRAM(char *SRAM_filename);
 int LoadSRAM(char *SRAM_filename);
-bool CreateSRAMFilename(char *ROM_filename);
+bool CreateSaveFilename(char *save_filename, const char *ROM_filename,
+ const char *save_extension);
 
-int Allocate_ROM(void);
+int Allocate_ROM(bool resize = false);
 
 int open_rom(const char *FileName);
 void DisplayRomStats(SNESRomInfoStruct *RomInfo);
+
+bool PatchROMAddress(const unsigned address, const unsigned char byte);
 
 #endif /* defined(__cplusplus)||defined(c_plusplus) */
 

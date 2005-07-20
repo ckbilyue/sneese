@@ -119,7 +119,7 @@ JMAOBJS := $(addprefix jma/, 7zlzma.o crc32.o iiostrm.o inbyte.o jma.o \
             lzma.o lzmadec.o winout.o)
 OBJS   := $(ASMOBJS) $(PLATFORMOBJS) $(JMAOBJS) main.o romload.o snes.o \
            timers.o debug.o input.o helper.o apu/spc700.o apu/sound.o \
-           guicore.o emugui.o map.o multiio.o
+           guicore.o emugui.o map.o multiio.o patch.o
 ifdef ZLIB
 OBJS += unzip.o
 endif
@@ -248,7 +248,9 @@ $(OBJ)/emugui.$(OBJBASE): $(SRC)/emugui.cpp \
  apu/spc.h apu/sound.h romload.h debug.h snes.h wrapaleg.h)
 $(OBJ)/romload.$(OBJBASE): $(SRC)/romload.cpp \
  $(addprefix $(INCLUDE)/, romload.h helper.h misc.h cpu/cpu.h apu/spc.h \
- cpu/mem.h snes.h wrapaleg.h)
+ cpu/mem.h snes.h wrapaleg.h patch.h)
+$(OBJ)/patch.$(OBJBASE): $(SRC)/patch.cpp \
+ $(addprefix $(INCLUDE)/, romload.h patch.h)
 $(OBJ)/snes.$(OBJBASE): $(SRC)/snes.c \
  $(addprefix $(INCLUDE)/, timers.h helper.h platform.h apu/sound.h \
  cpu/cpu.h apu/spc.h apu/apuskip.h misc.h wrapaleg.h)
