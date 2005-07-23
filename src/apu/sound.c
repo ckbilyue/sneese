@@ -548,7 +548,7 @@ INLINE static void SPC_KeyOn(int voices)
   voices &= SPC_MASK;
 
   /* Clear key-on bits when acknowledged */
-  SPC_DSP[DSP_KON] = voices & SPC_DSP[DSP_KOF];
+  SPC_DSP[DSP_KON] &= SPC_DSP[DSP_KOF];
 
   /* Don't acknowledge key-on when key-off is set */
   voices &= ~SPC_DSP[DSP_KOF];

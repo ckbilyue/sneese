@@ -719,18 +719,9 @@ void set_byte_spc(unsigned short address, unsigned char data)
   }
 }
 
-/* #define OPCODE_TRACE_LOG */
-#ifdef OPCODE_TRACE_LOG
-FILE *log_file = 0;
-#endif
-
 void Reset_SPC(void)
 {
   int i;
-
-#ifdef OPCODE_TRACE_LOG
-  if (!log_file) log_file = fopen("h:\\spc.log", "wb");
-#endif
 
   /* Get ROM reset vector and setup Program Counter */
   _PC = SPC_ROM_CODE[0xFFFE - 0xFFC0] +
@@ -823,24 +814,24 @@ void dummy_fprintf()
 #ifdef OPCODE_TRACE_LOG
 /* cycle #, PC, TotalCycles */
 #define SINGLE_STEP_START(c) \
-  if (dump_flag) fprintf(log_file, "START_CYCLE(%u) PC:%04X %u\n",  c, _PC & 0xFFFF, get_cycles_spc());
+  if (dump_flag && debug_log_file) fprintf(debug_log_file, "START_CYCLE(%u) PC:%04X %u\n",  c, _PC & 0xFFFF, get_cycles_spc());
 
 void single_step_end(void)
 {
-  if (!dump_flag) return;
-  fprintf(log_file, "R:%02X %02X %02X %02X W:%02X %02X %02X %02X X:%02X Y:%02X A:%02X SP:%02X dp:%02X Op:%02X\n",
+  if (!dump_flag || !debug_log_file) return;
+  fprintf(debug_log_file, "R:%02X %02X %02X %02X W:%02X %02X %02X %02X X:%02X Y:%02X A:%02X SP:%02X dp:%02X Op:%02X\n",
     _PORT0R & 0xFF, _PORT1R & 0xFF, _PORT2R & 0xFF, _PORT3R & 0xFF,
     _PORT0W & 0xFF, _PORT1W & 0xFF, _PORT2W & 0xFF, _PORT3W & 0xFF,
     _X & 0xFF, _Y & 0xFF, _A & 0xFF, _SP & 0xFF, _direct_page & 0xFF, _opcode & 0xFF);
-  fprintf(log_file, "Ad%04X %04X Off%02X D%02X %02X D16 %04X NVPBHIZC %c%c%c%c%c%c%c%c",
+  fprintf(debug_log_file, "Ad%04X %04X Off%02X D%02X %02X D16 %04X NVPBHIZC %c%c%c%c%c%c%c%c",
     _address & 0xFFFF, _address2 & 0xFFFF, _offset & 0xFF, _data & 0xFF, _data2 & 0xFF,
     _data16 & 0xFFFF,
     flag_state_spc(SPC_FLAG_N) ? '1' : '0', flag_state_spc(SPC_FLAG_V) ? '1' : '0',
     flag_state_spc(SPC_FLAG_P) ? '1' : '0', '1',
     flag_state_spc(SPC_FLAG_H) ? '1' : '0', flag_state_spc(SPC_FLAG_I) ? '1' : '0',
     flag_state_spc(SPC_FLAG_Z) ? '1' : '0', flag_state_spc(SPC_FLAG_C) ? '1' : '0');
- if (_cycle == 0) fprintf(log_file, " %s\n", SPC_OpID[_opcode]);
- else fprintf(log_file, "\n");
+ if (_cycle == 0) fprintf(debug_log_file, " %s\n", SPC_OpID[_opcode]);
+ else fprintf(debug_log_file, "\n");
 }
 
 

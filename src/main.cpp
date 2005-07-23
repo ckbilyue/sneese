@@ -82,6 +82,8 @@ int main(int argc, char **argv)
 
  atexit(platform_exit);
 
+ debug_init();
+
  // Load saved configuration, using defaults for missing settings
  if (LoadConfig()) return 1;
 

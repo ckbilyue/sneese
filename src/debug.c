@@ -60,6 +60,18 @@ unsigned OLD_SPC_ADDRESS;
 unsigned Map_Address;
 unsigned Map_Byte;
 
+
+FILE *debug_log_file = 0;
+
+void debug_init(void)
+{
+#ifdef OPCODE_TRACE_LOG
+ if (!debug_log_file) log_file = fopen("h:\\spc.log", "wb");
+#endif
+}
+
+
+/* printf wrappers for asm code */
 void print_str(const char *s)
 {
  printf("%s", s);
@@ -74,6 +86,7 @@ void print_hexnum(unsigned u, int width)
 {
  printf("%0*X", width, u);
 }
+
 
 void InvalidDMAMode()
 {
