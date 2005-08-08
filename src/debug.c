@@ -62,11 +62,13 @@ unsigned Map_Byte;
 
 
 FILE *debug_log_file = 0;
+int dump_flag = 0;
+
 
 void debug_init(void)
 {
 #ifdef OPCODE_TRACE_LOG
- if (!debug_log_file) log_file = fopen("h:\\spc.log", "wb");
+ if (!debug_log_file) debug_log_file = fopen("h:\\spc.log", "wb");
 #endif
 }
 
@@ -648,4 +650,29 @@ void Display_Debug()
  textprintf(screen,font,50,110,255,DEBUG_STRING,(int)DEBUG_VALUE7);
  textprintf(screen,font,50,120,255,DEBUG_STRING,(int)DEBUG_VALUE8);
  */
+}
+
+void opcode_trace_5A22(unsigned char opcode)
+{
+ if (!debug_log_file) return;
+ if (!dump_flag)
+ {
+/*
+  if (cpu_65c816_PB == 0x00 && cpu_65c816_PC == 0x81F7) dump_flag = 1;
+  else
+ */
+   return;
+ }
+ fprintf(debug_log_file, "%s DB:%02X D:%04X S:%04X X:%04X Y:%04X A:%04X PB:PC %02X:%04X Op:%02X\n",
+   cpu_65c816_P & 0x100 ? "ENVB1DIZC" : "ENVMXDIZC",
+   cpu_65c816_DB & 0xFF, cpu_65c816_D & 0xFFFF, cpu_65c816_S & 0xFFFF,
+   cpu_65c816_X & 0xFFFF, cpu_65c816_Y & 0xFFFF, cpu_65c816_A & 0xFFFF,
+   cpu_65c816_PB & 0xFF, cpu_65c816_PC & 0xFFFF, opcode & 0xFF);
+ fprintf(debug_log_file, "%c%c%c%c%c%c%c%c%c %s\n",
+   cpu_65c816_P & 0x100 ? '1' : '0',
+   cpu_65c816_P & 0x80 ? '1' : '0', cpu_65c816_P & 0x40 ? '1' : '0',
+   cpu_65c816_P & 0x20 ? '1' : '0', cpu_65c816_P & 0x10 ? '1' : '0',
+   cpu_65c816_P & 0x08 ? '1' : '0', cpu_65c816_P & 0x04 ? '1' : '0',
+   cpu_65c816_P & 0x02 ? '1' : '0', cpu_65c816_P & 0x01 ? '1' : '0',
+   CPU_OpID[opcode]);
 }

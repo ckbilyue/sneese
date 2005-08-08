@@ -35,6 +35,8 @@ Changes
   ROM loader: Added IPS auto-patching support (must be in same path as ROM
    image, in ROM image ZIP file, or in save path) [Nach]
   ROM loader: Continuing clean-up of ROM loading code [Nach,TRAC]
+  SPC700: Improved opcode trace logging code [TRAC]
+  5A22: Added opcode trace logging code [TRAC]
  0.841 [TRAC]
   Sound: Fixed a flaw in the order of operations in sample volume
    multiplication, causing a slight improvement in sound accuracy

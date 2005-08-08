@@ -796,8 +796,6 @@ unsigned char get_SPC_PSW(void)
 }
 
 #ifdef OPCODE_TRACE_LOG
-static int dump_flag = 1;
-
 #define SS_WAIT_FOR_KEY /*if ((readkey() & 0xFF) == 'g') { int i = 0; while (i++ < 49) simulate_keypress(' ' + (KEY_SPACE << 8)); }*/
 
 #else
@@ -814,22 +812,22 @@ void dummy_fprintf()
 #ifdef OPCODE_TRACE_LOG
 /* cycle #, PC, TotalCycles */
 #define SINGLE_STEP_START(c) \
-  if (dump_flag && debug_log_file) fprintf(debug_log_file, "START_CYCLE(%u) PC:%04X %u\n",  c, _PC & 0xFFFF, get_cycles_spc());
+  if (dump_flag && debug_log_file){ fprintf(debug_log_file, "START_CYCLE(%u) PC:%04X %u\n", c, _PC & 0xFFFF, get_cycles_spc()); if ((c == 1) && (_PC == 0x02C4)) exit(0); }
 
 void single_step_end(void)
 {
   if (!dump_flag || !debug_log_file) return;
-  fprintf(debug_log_file, "R:%02X %02X %02X %02X W:%02X %02X %02X %02X X:%02X Y:%02X A:%02X SP:%02X dp:%02X Op:%02X\n",
+  fprintf(debug_log_file, "NVPBHIZC R:%02X %02X %02X %02X X:%02X Y:%02X A:%02X SP:%02X dp:%02X Op:%02X\n",
     _PORT0R & 0xFF, _PORT1R & 0xFF, _PORT2R & 0xFF, _PORT3R & 0xFF,
-    _PORT0W & 0xFF, _PORT1W & 0xFF, _PORT2W & 0xFF, _PORT3W & 0xFF,
     _X & 0xFF, _Y & 0xFF, _A & 0xFF, _SP & 0xFF, _direct_page & 0xFF, _opcode & 0xFF);
-  fprintf(debug_log_file, "Ad%04X %04X Off%02X D%02X %02X D16 %04X NVPBHIZC %c%c%c%c%c%c%c%c",
-    _address & 0xFFFF, _address2 & 0xFFFF, _offset & 0xFF, _data & 0xFF, _data2 & 0xFF,
-    _data16 & 0xFFFF,
+  fprintf(debug_log_file, "%c%c%c%c%c%c%c%c W:%02X %02X %02X %02X Ad%04X %04X Off%02X D%02X %02X D16 %04X",
     flag_state_spc(SPC_FLAG_N) ? '1' : '0', flag_state_spc(SPC_FLAG_V) ? '1' : '0',
-    flag_state_spc(SPC_FLAG_P) ? '1' : '0', '1',
+    flag_state_spc(SPC_FLAG_P) ? '1' : '0', flag_state_spc(SPC_FLAG_B) ? '1' : '0',
     flag_state_spc(SPC_FLAG_H) ? '1' : '0', flag_state_spc(SPC_FLAG_I) ? '1' : '0',
-    flag_state_spc(SPC_FLAG_Z) ? '1' : '0', flag_state_spc(SPC_FLAG_C) ? '1' : '0');
+    flag_state_spc(SPC_FLAG_Z) ? '1' : '0', flag_state_spc(SPC_FLAG_C) ? '1' : '0',
+    _PORT0W & 0xFF, _PORT1W & 0xFF, _PORT2W & 0xFF, _PORT3W & 0xFF,
+    _address & 0xFFFF, _address2 & 0xFFFF, _offset & 0xFF, _data & 0xFF, _data2 & 0xFF,
+    _data16 & 0xFFFF);
  if (_cycle == 0) fprintf(debug_log_file, " %s\n", SPC_OpID[_opcode]);
  else fprintf(debug_log_file, "\n");
 }
@@ -2552,10 +2550,10 @@ static void Execute_SPC(void)
         END_CYCLE(6, 1)
 
         START_CYCLE(7)
-        set_flag_spc(SPC_FLAG_B);
-        clr_flag_spc(SPC_FLAG_I);
         spc_setup_flags(_B_flag);
         set_byte_spc(_address, _PSW);
+        set_flag_spc(SPC_FLAG_B);
+        clr_flag_spc(SPC_FLAG_I);
         END_CYCLE(7, 1)
 
         START_CYCLE(8)

@@ -25,9 +25,10 @@ You must read and accept the license prior to use.
 
 #include "misc.h"
 
-/* #define OPCODE_TRACE_LOG */
+/*#define OPCODE_TRACE_LOG*/
 
 EXTERN FILE *debug_log_file;
+EXTERN int dump_flag;
 
 EXTERN void debug_init(void);
 

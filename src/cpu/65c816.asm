@@ -37,7 +37,7 @@ You must read and accept the license prior to use.
 
 %define WAI_DELAY
 
-;%define SINGLE_STEP
+;%define OPCODE_TRACE_LOG
 
 ;%define WATCH_FLAG_BREAKS
 ;%define FAST_STACK_ACCESS_NATIVE_MODE
@@ -355,8 +355,8 @@ EXPORT CPU_Execution_Mode,skipb
 %define CEM_Clock_Stopped 4
 
 EXPORT IRQ_pin      ,skipb
-_E_flag:skipb
-_Z_flag:skipb
+EXPORT _E_flag,skipb
+EXPORT _Z_flag,skipb
 EXPORT In_CPU,skipb         ; nonzero if CPU is executing
 
 ;NMI not raised
@@ -1034,10 +1034,6 @@ dd OpTableMX
 
 %ifdef Abort_at_op_num
 MaxOps:dd Abort_at_op_num
-%endif
-%ifdef SINGLE_STEP
-_waitcount:dd 256*256*1024  ;14100
-_debug:db 0
 %endif
 
 section .text
@@ -1946,16 +1942,6 @@ EXPORT Do_CPU
  pusha
  mov byte [C_LABEL(PaletteChanged)],1   ; Make sure we get our palette
  mov dword [C_LABEL(Last_Frame_Line)],239
-%ifdef SINGLE_STEP
-EXTERN_C set_gfx_mode
- push byte 0
- push byte 0
- push byte 0
- push byte 0
- push byte -1
- call _set_gfx_mode
- add esp,20
-%endif
 
  call CPU_START
  popa
@@ -2080,35 +2066,23 @@ EXPORT CPU_START_NEXT
 %endif
 %endif
 
-%ifdef SINGLE_STEP
- cmp byte [_debug],0
- jnz .on
- dec dword [_waitcount]
- setz [_debug]
- jnz .off
-.on:
- pusha
- GET_PC edx
- mov al,B_PB
- mov [C_LABEL(OLD_PC)],edx
- mov [C_LABEL(OLD_PB)],al
- mov eax,[esi]
- bswap eax
- mov [C_LABEL(Map_Byte)],eax
- E0_SETUPFLAGS
- mov [_P],al
-EXTERN_C DisplayStatus,readkey,keypressed
- call _DisplayStatus
-.wait:
- call _keypressed
- test eax,eax
- jz .wait
- call _readkey
- popa
-.off:
-%endif
  GET_PBPC ebx
  GET_BYTE               ; Get opcode
+
+%ifdef OPCODE_TRACE_LOG
+ pusha
+ movzx eax,al
+ push eax
+ SAVE_PC eax
+ E0_SETUPFLAGS
+ cmp byte B_E_flag,0
+ setnz ah
+ mov B_P,ax
+EXTERN_C opcode_trace_5A22
+ call C_LABEL(opcode_trace_5A22)
+ pop eax
+ popa
+%endif
  mov edx,B_OpTable
  xor ebx,ebx
 
