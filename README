@@ -564,7 +564,6 @@ TO DO:
  SPC      : Clean up emulation
             Correct bus timing (need info)
   Skipper  : Fails to work on MANY ROMs, need at least an alternate skipper
- Sound DSP: Correct noise, etc.
 
  GUI: interface cleanup/rewrite/ease-of-use/versatility/mouse
 

@@ -211,6 +211,7 @@ static const int counter_update_table[32] =
 #define bent_time(x)   (counter_update_table[(x)])
 
 int noise_vol;
+int noise_base;
 
 int noise_countdown;
 unsigned noise_update_count;
@@ -684,6 +685,7 @@ void Reset_Sound_DSP()
 #endif
 
  noise_vol = 0;
+ noise_base = 1;
  noise_update_count = counter_update_table[0];
  noise_countdown = apu_counter_reset_value;
 
@@ -1406,31 +1408,46 @@ void update_sound(void)
      SPC_VoicesOff(~SPC_MASK, "SPC_MASK");
     }
 
-    if (SNDkeys & SPC_DSP[DSP_NON])
     {
      unsigned i;
      int samples_left = samples;
 
      for (i = first; samples_left && noise_update_count; samples_left--)
      {
+      int feedback;
+
+
       noise_countdown -= noise_update_count;
 
-      if (noise_countdown <= 0)
+      if (noise_base & 0x4000)
       {
-       noise_countdown = apu_counter_reset_value;
-       noise_vol = rand();
+       noise_vol += (noise_base & 1) ? noise_base : -noise_base;
+      }
+      else
+      {
+       noise_vol >>= 1;
       }
 
-      noise_buffer [i] = noise_vol;
+      feedback = (noise_base << 13) ^ (noise_base << 14);
+      noise_base = (feedback & 0x4000) | (noise_base >> 1);
+
+      if (SNDkeys & SPC_DSP[DSP_NON])
+      {
+       noise_buffer [i] = noise_vol << 1;
+      }
+
       if (++i >= buffer_size)
        i = 0;
      }
 
-     for (; samples_left; samples_left--)
+     if (SNDkeys & SPC_DSP[DSP_NON])
      {
-      noise_buffer [i] = noise_vol;
-      if (++i >= buffer_size)
-       i = 0;
+      for (; samples_left; samples_left--)
+      {
+       noise_buffer [i] = noise_vol << 1;
+       if (++i >= buffer_size)
+        i = 0;
+      }
      }
     }
 

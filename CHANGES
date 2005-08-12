@@ -37,6 +37,8 @@ Changes
   ROM loader: Continuing clean-up of ROM loading code [Nach,TRAC]
   SPC700: Improved opcode trace logging code [TRAC]
   5A22: Added opcode trace logging code [TRAC]
+  Sound: Added noise source emulation, thanks to Shay Green's
+   Game_Music_Emu for information [TRAC]
  0.841 [TRAC]
   Sound: Fixed a flaw in the order of operations in sample volume
    multiplication, causing a slight improvement in sound accuracy
