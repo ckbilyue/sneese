@@ -156,29 +156,45 @@ section .text
 
 
 ;macro for DMA transfers in PPU write mode
-%macro DMA_TRANSFER_A_TO_B 3
- GET_BYTE 0
- mov [DMA_Pending_Data],al
+%macro DMA_TRANSFER_A_TO_B 4-5 0
  mov byte [DMA_Pending_B_Address],%1
-
  test R_65c816_Cycles,R_65c816_Cycles
  jge %3
 %2:
 
- SET_BYTE_B_BUS [edi+DMA_B%1],_5A22_SLOW_CYCLE
+ GET_BYTE _5A22_SLOW_CYCLE
+ mov [DMA_Pending_Data],al
+
+ SET_BYTE_B_BUS [edi+DMA_B%1],0
+
+ add bx,si
+ dec dword [DMA_Transfer_Size]
+%if %5
+ jnz %4
+%else
+ jz %4
+%endif
 %endmacro
 
 ;macro for DMA transfers in PPU read mode
-%macro DMA_TRANSFER_B_TO_A 3
- GET_BYTE_B_BUS [edi+DMA_B%1],0
- mov [DMA_Pending_Data],al
+%macro DMA_TRANSFER_B_TO_A 4-5 0
  mov byte [DMA_Pending_B_Address],%1
-
  test R_65c816_Cycles,R_65c816_Cycles
  jge %3
 %2:
 
- SET_BYTE _5A22_SLOW_CYCLE
+ GET_BYTE_B_BUS [edi+DMA_B%1],_5A22_SLOW_CYCLE
+ mov [DMA_Pending_Data],al
+
+ SET_BYTE 0
+
+ add bx,si
+ dec dword [DMA_Transfer_Size]
+%if %5
+ jnz %4
+%else
+ jz %4
+%endif
 %endmacro
 
 
@@ -236,25 +252,13 @@ dd  .lpr_access0,.lpr_access1,.lpr_access2,.lpr_access3
 
 section .text
 .loop_ppu_read:
- DMA_TRANSFER_B_TO_A 0,.lpr_access0,.early_out
- add bx,si
- dec dword [DMA_Transfer_Size]
- jz .ppu_read_done
+ DMA_TRANSFER_B_TO_A 0,.lpr_access0,.early_out,.ppu_read_done
 
- DMA_TRANSFER_B_TO_A 1,.lpr_access1,.early_out
- add bx,si
- dec dword [DMA_Transfer_Size]
- jz .ppu_read_done
+ DMA_TRANSFER_B_TO_A 1,.lpr_access1,.early_out,.ppu_read_done
 
- DMA_TRANSFER_B_TO_A 2,.lpr_access2,.early_out
- add bx,si
- dec dword [DMA_Transfer_Size]
- jz .ppu_read_done
+ DMA_TRANSFER_B_TO_A 2,.lpr_access2,.early_out,.ppu_read_done
 
- DMA_TRANSFER_B_TO_A 3,.lpr_access3,.early_out
- add bx,si
- dec dword [DMA_Transfer_Size]
- jnz .loop_ppu_read
+ DMA_TRANSFER_B_TO_A 3,.lpr_access3,.early_out,.loop_ppu_read,1
 
 .ppu_read_done:
 .ppu_write_done:
@@ -285,25 +289,13 @@ dd  .lpw_access0,.lpw_access1,.lpw_access2,.lpw_access3
 section .text
 
 .loop_ppu_write:
- DMA_TRANSFER_A_TO_B 0,.lpw_access0,.early_out
- add bx,si
- dec dword [DMA_Transfer_Size]
- jz .ppu_write_done
+ DMA_TRANSFER_A_TO_B 0,.lpw_access0,.early_out,.ppu_write_done
 
- DMA_TRANSFER_A_TO_B 1,.lpw_access1,.early_out
- add bx,si
- dec dword [DMA_Transfer_Size]
- jz .ppu_write_done
+ DMA_TRANSFER_A_TO_B 1,.lpw_access1,.early_out,.ppu_write_done
 
- DMA_TRANSFER_A_TO_B 2,.lpw_access2,.early_out
- add bx,si
- dec dword [DMA_Transfer_Size]
- jz .ppu_write_done
+ DMA_TRANSFER_A_TO_B 2,.lpw_access2,.early_out,.ppu_write_done
 
- DMA_TRANSFER_A_TO_B 3,.lpw_access3,.early_out
- add bx,si
- dec dword [DMA_Transfer_Size]
- jnz .loop_ppu_write
+ DMA_TRANSFER_A_TO_B 3,.lpw_access3,.early_out,.loop_ppu_write,1
  jmp .ppu_write_done
 
 
@@ -336,28 +328,28 @@ Do_HDMA_Absolute_%1:
  mov [edi+A2T],ebx      ; Save new table address
 
 .Next_Transfer:
+ add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
  _DHC_Transfer [edi+DMA_B0]
 
- add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
  cmp cl,2
  inc bx                 ; Adjust temporary table pointer
  jb .End_Transfer
 
+ add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
  _DHC_Transfer [edi+DMA_B1]
 
- add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
  cmp cl,4
  inc bx                 ; Adjust temporary table pointer
  jb .End_Transfer
 
+ add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
  _DHC_Transfer [edi+DMA_B2]
 
- add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
  inc bx
 
+ add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
  _DHC_Transfer [edi+DMA_B3]
 
- add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
 
 .End_Transfer:
  add [edi+A2T],cx
@@ -393,28 +385,28 @@ Do_HDMA_Indirect_%1:
  mov ebx,[edi+DAS]
  and ebx,BITMASK(0,23)
 
+ add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
  _DHC_Transfer [edi+DMA_B0]
 
- add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
  cmp cl,2
  inc bx                 ; Adjust temporary table pointer
  jb .End_Transfer
 
+ add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
  _DHC_Transfer [edi+DMA_B1]
 
- add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
  cmp cl,4
  inc bx                 ; Adjust temporary table pointer
  jb .End_Transfer
 
+ add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
  _DHC_Transfer [edi+DMA_B2]
 
- add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
  inc bx
 
+ add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
  _DHC_Transfer [edi+DMA_B3]
 
- add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
 
 .End_Transfer:
  add [edi+DAS],cx
