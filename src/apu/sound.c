@@ -1419,17 +1419,22 @@ void update_sound(void)
 
       noise_countdown -= noise_update_count;
 
-      if (noise_base & 0x4000)
+      if (noise_countdown <= 0)
       {
-       noise_vol += (noise_base & 1) ? noise_base : -noise_base;
-      }
-      else
-      {
-       noise_vol >>= 1;
-      }
+       noise_countdown = apu_counter_reset_value;
 
-      feedback = (noise_base << 13) ^ (noise_base << 14);
-      noise_base = (feedback & 0x4000) | (noise_base >> 1);
+       if (noise_base & 0x4000)
+       {
+        noise_vol += (noise_base & 1) ? noise_base : -noise_base;
+       }
+       else
+       {
+        noise_vol >>= 1;
+       }
+
+       feedback = (noise_base << 13) ^ (noise_base << 14);
+       noise_base = (feedback & 0x4000) | (noise_base >> 1);
+      }
 
       if (SNDkeys & SPC_DSP[DSP_NON])
       {
@@ -1445,6 +1450,7 @@ void update_sound(void)
       for (; samples_left; samples_left--)
       {
        noise_buffer [i] = noise_vol << 1;
+
        if (++i >= buffer_size)
         i = 0;
       }
