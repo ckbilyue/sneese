@@ -430,7 +430,8 @@ static unsigned char SPC_READ_DSP_DATA(unsigned short address)
   SPC_READ_DSP();
 
   /* read from DSP register */
-  return SPC_DSP[SPC_DSP_ADDR];
+  /* DSP address bit 7 ignored during reads only! */
+  return SPC_DSP[SPC_DSP_ADDR & 0x7F];
 }
 
 

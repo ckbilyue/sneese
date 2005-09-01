@@ -1522,8 +1522,11 @@ void update_sound(void)
 
 void SPC_READ_DSP()
 {
-    int addr_lo = SPC_DSP_ADDR & 0xF;
-    int addr_hi = SPC_DSP_ADDR >> 4;
+    /* DSP address bit 7 ignored during reads only! */
+    int DSP_READ_ADDR = SPC_DSP_ADDR & 0x7F;
+
+    int addr_lo = DSP_READ_ADDR & 0xF;
+    int addr_hi = (DSP_READ_ADDR >> 4);
 
 #ifdef LOG_SOUND_DSP_READ
     printf("\nread @ %08X,%04X: %02X", TotalCycles, (unsigned) _SPC_PC, (unsigned) SPC_DSP_ADDR);
@@ -1531,7 +1534,7 @@ void SPC_READ_DSP()
 
 #ifdef DSP_SPEED_HACK
     /* if we're not reading endx */
-    if (SPC_DSP_ADDR != DSP_ENDX)
+    if (DSP_READ_ADDR != DSP_ENDX)
     {
      /* if we're reading envx or outx but voice is off */
      if (addr_lo == DSP_VOICE_ENVX || addr_lo == DSP_VOICE_OUTX)
@@ -1539,7 +1542,7 @@ void SPC_READ_DSP()
       if (!(SNDkeys & BIT(addr_hi)))
       {
 #ifdef LOG_SOUND_DSP_READ
-       printf(" %02X", SPC_DSP[SPC_DSP_ADDR]);
+       printf(" %02X", SPC_DSP[DSP_READ_ADDR]);
 #endif
        return;
       }
@@ -1547,7 +1550,7 @@ void SPC_READ_DSP()
      else
      {
 #ifdef LOG_SOUND_DSP_READ
-      printf(" %02X", SPC_DSP[SPC_DSP_ADDR]);
+      printf(" %02X", SPC_DSP[DSP_READ_ADDR]);
 #endif
       return;
      }
@@ -1570,12 +1573,12 @@ void SPC_READ_DSP()
 #endif
                  UpdateEnvelopeHeight(addr_hi); // >> ENVX_DOWNSHIFT_BITS;
                 else
-                 SPC_DSP[SPC_DSP_ADDR] = 0;
+                 SPC_DSP[DSP_READ_ADDR] = 0;
 
                 break;
     }
 #ifdef LOG_SOUND_DSP_READ
-    printf(" %02X", SPC_DSP[SPC_DSP_ADDR]);
+    printf(" %02X", SPC_DSP[DSP_READ_ADDR]);
 #endif
 }
 
