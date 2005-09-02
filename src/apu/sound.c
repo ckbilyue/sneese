@@ -267,7 +267,7 @@ static void SPC_VoiceOff(int voice, const char *reason)
  SPC_DSP[(voice << 4) + DSP_VOICE_ENVX] = SNDvoices[voice].envx = 0;
 #else
  SPC_DSP[(voice << 4) + DSP_VOICE_ENVX] = SNDvoices[voice].envx >>
-  ENVX_DOWNSHIT_BITS;
+  ENVX_DOWNSHIFT_BITS;
 #endif
  }
 }

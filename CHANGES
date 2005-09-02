@@ -42,6 +42,9 @@ Changes
   5A22: Improved DMA timing accuracy slightly [TRAC]
   Sound: Changed DSP register reads to ignore address bit 7; thanks to
    byuu for relaying research from anomie [TRAC]
+  Source: Fixed a typo in the code which could appear and prevent
+   compilation in a currently unused conditional case, thanks to byuu
+   for pointing it out [TRAC]
  0.841 [TRAC]
   Sound: Fixed a flaw in the order of operations in sample volume
    multiplication, causing a slight improvement in sound accuracy
