@@ -45,6 +45,7 @@ Changes
   Source: Fixed a typo in the code which could appear and prevent
    compilation in a currently unused conditional case, thanks to byuu
    for pointing it out [TRAC]
+  PPU: Added support for returning open bus values from the PPUs [TRAC]
  0.841 [TRAC]
   Sound: Fixed a flaw in the order of operations in sample volume
    multiplication, causing a slight improvement in sound accuracy

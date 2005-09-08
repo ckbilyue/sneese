@@ -1197,6 +1197,7 @@ EXPORT SNES_R2134 ; MPYL
  cmp byte [Redo_16x8],0
  jnz Do_16x8_Multiply
  mov al,[edx]
+ mov [Last_Bus_Value_PPU1],al
  ret
 
 ALIGNC
@@ -1205,6 +1206,7 @@ EXPORT SNES_R2135 ; MPYM
  cmp byte [Redo_16x8],0
  jnz Do_16x8_Multiply
  mov al,[edx]
+ mov [Last_Bus_Value_PPU1],al
  ret
 
 ALIGNC
@@ -1213,6 +1215,7 @@ EXPORT SNES_R2136 ; MPYH
  cmp byte [Redo_16x8],0
  jnz Do_16x8_Multiply
  mov al,[edx]
+ mov [Last_Bus_Value_PPU1],al
  ret
 
 ALIGNC

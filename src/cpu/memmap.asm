@@ -247,7 +247,7 @@ EXPORT PPU_READ
     cmp dh,0x40
     jb .access_ok
     cmp edx,0x437F
-    jbe C_LABEL(CPU_OPEN_BUS_READ)
+    jbe CPU_OPEN_BUS_READ
 .access_ok:
     call [(C_LABEL(Read_Map_20_5F)-0x2000*4)+edx*4]
     mov [C_LABEL(Last_Bus_Value_A)],al

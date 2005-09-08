@@ -87,34 +87,34 @@ section .data
 ALIGND
 EXPORT Read_Map_20_5F
     ; 2000-20FF: Open Bus A
-    DUPLICATE dd,0x100,C_LABEL(CPU_OPEN_BUS_READ)
+    DUPLICATE dd,0x100,CPU_OPEN_BUS_READ
 EXPORT Read_Map_21
     ; 2100-2103: Open Bus A
-    DUPLICATE dd,4,C_LABEL(CPU_OPEN_BUS_READ)
+    DUPLICATE dd,4,CPU_OPEN_BUS_READ
     ; 2104-2106: Open Bus B (PPU1)
-    DUPLICATE dd,3,C_LABEL(UNSUPPORTED_READ)
+    DUPLICATE dd,3,PPU1_OPEN_BUS_READ
     ; 2107: Open Bus A
-    dd   C_LABEL(CPU_OPEN_BUS_READ)
+    dd   CPU_OPEN_BUS_READ
     ; 2108-210A: Open Bus B (PPU1)
-    DUPLICATE dd,3,C_LABEL(UNSUPPORTED_READ)
+    DUPLICATE dd,3,PPU1_OPEN_BUS_READ
     ; 210B-2113: Open Bus A
-    DUPLICATE dd,9,C_LABEL(CPU_OPEN_BUS_READ)
+    DUPLICATE dd,9,CPU_OPEN_BUS_READ
     ; 2114-2116: Open Bus B (PPU1)
-    DUPLICATE dd,3,C_LABEL(UNSUPPORTED_READ)
+    DUPLICATE dd,3,PPU1_OPEN_BUS_READ
     ; 2117: Open Bus A
-    dd   C_LABEL(CPU_OPEN_BUS_READ)
+    dd   CPU_OPEN_BUS_READ
     ; 2118-211A: Open Bus B (PPU1)
-    DUPLICATE dd,3,C_LABEL(UNSUPPORTED_READ)
+    DUPLICATE dd,3,PPU1_OPEN_BUS_READ
     ; 211B-2123: Open Bus A
-    DUPLICATE dd,9,C_LABEL(CPU_OPEN_BUS_READ)
+    DUPLICATE dd,9,CPU_OPEN_BUS_READ
     ; 2124-2126: Open Bus B (PPU1)
-    DUPLICATE dd,3,C_LABEL(UNSUPPORTED_READ)
+    DUPLICATE dd,3,PPU1_OPEN_BUS_READ
     ; 2127: Open Bus A
-    dd   C_LABEL(CPU_OPEN_BUS_READ)
+    dd   CPU_OPEN_BUS_READ
     ; 2128-212A: Open Bus B (PPU1)
-    DUPLICATE dd,3,C_LABEL(UNSUPPORTED_READ)
+    DUPLICATE dd,3,PPU1_OPEN_BUS_READ
     ; 212B-2133: Open Bus A
-    DUPLICATE dd,9,C_LABEL(CPU_OPEN_BUS_READ)
+    DUPLICATE dd,9,CPU_OPEN_BUS_READ
 
     dd   SNES_R2134  ; MPYL
     dd   SNES_R2135  ; MPYM
@@ -132,24 +132,24 @@ EXPORT Read_Map_21
     dd   SNES_R2180  ; WMDATA   ; 2180 WMDATA - read/write to Work RAM
 
     ; 2181-21FF: Open Bus A
-    DUPLICATE dd,0x7F,C_LABEL(CPU_OPEN_BUS_READ)
+    DUPLICATE dd,0x7F,CPU_OPEN_BUS_READ
 
     ; 2200-3FFF: Open Bus A
-    DUPLICATE dd,0x1E00,C_LABEL(CPU_OPEN_BUS_READ)
+    DUPLICATE dd,0x1E00,CPU_OPEN_BUS_READ
 
 EXPORT Read_Map_40
     ; 4000-4015: Open Bus A - 12 master cycles
-    DUPLICATE dd,0x16,C_LABEL(CPU_OPEN_BUS_READ_LEGACY)
+    DUPLICATE dd,0x16,CPU_OPEN_BUS_READ_LEGACY
     dd   SNES_R4016  ; JOYC1
     dd   SNES_R4017  ; JOYC2
     ; 4018-40FF: Open Bus A - 12 master cycles
-    DUPLICATE dd,0xE8,C_LABEL(CPU_OPEN_BUS_READ_LEGACY)
+    DUPLICATE dd,0xE8,CPU_OPEN_BUS_READ_LEGACY
     ; 4100-41FF: Open Bus A - 12 master cycles
-    DUPLICATE dd,0x100,C_LABEL(CPU_OPEN_BUS_READ_LEGACY)
+    DUPLICATE dd,0x100,CPU_OPEN_BUS_READ_LEGACY
 
 EXPORT Read_Map_42
     ; 4200-420F: Open Bus A
-    DUPLICATE dd,0x10,C_LABEL(CPU_OPEN_BUS_READ)
+    DUPLICATE dd,0x10,CPU_OPEN_BUS_READ
 
     dd   SNES_R4210  ; RDNMI
     dd   SNES_R4211  ; TIMEUP
@@ -169,7 +169,7 @@ EXPORT Read_Map_42
     dd   SNES_R421F  ; JOY4H
 
     ; 4220-42FF: Open Bus A
-    DUPLICATE dd,0xE0,C_LABEL(CPU_OPEN_BUS_READ)
+    DUPLICATE dd,0xE0,CPU_OPEN_BUS_READ
 
 EXPORT Read_Map_43
     MAP_READ_DMA_LIST 0
@@ -181,9 +181,9 @@ EXPORT Read_Map_43
     MAP_READ_DMA_LIST 6
     MAP_READ_DMA_LIST 7
     ; 4380-43FF: Open Bus A
-    DUPLICATE dd,0x80,C_LABEL(CPU_OPEN_BUS_READ)
+    DUPLICATE dd,0x80,CPU_OPEN_BUS_READ
     ; 4400-5FFF: Open Bus A
-    DUPLICATE dd,0x1C00,C_LABEL(CPU_OPEN_BUS_READ)
+    DUPLICATE dd,0x1C00,CPU_OPEN_BUS_READ
 
 ALIGND
 EXPORT Write_Map_20_5F
@@ -524,6 +524,9 @@ EXPORT_EQU BG4VOFS,VScroll_4
 
 PaletteData:    skipw
 
+EXPORT Last_Bus_Value_PPU1  ,skipb
+EXPORT Last_Bus_Value_PPU2  ,skipb
+
 section .text
 ALIGNC
 EXPORT Reset_Ports
@@ -731,6 +734,17 @@ EXPORT Reset_Ports
 
 ; Read from 21xx handlers
 
+ALIGNC
+EXPORT PPU1_OPEN_BUS_READ
+ mov al,[C_LABEL(Last_Bus_Value_PPU1)]
+ ret
+
+ALIGNC
+EXPORT PPU2_OPEN_BUS_READ
+ mov al,[C_LABEL(Last_Bus_Value_PPU2)]
+ ret
+
+
 ; SNES_R2134: ; MPYL in mode7.asm
 ; SNES_R2135: ; MPYM in mode7.asm
 ; SNES_R2136: ; MPYH in mode7.asm
@@ -742,6 +756,7 @@ SNES_R2139: ; VMDATALREAD
  mov al,[C_LABEL(VMAIN)]
  test al,al
  mov al,[VMDATAREAD_buffer]
+ mov [Last_Bus_Value_PPU1],al
  jns VMDATAREAD_do_update
  ret
 
@@ -750,6 +765,7 @@ SNES_R213A: ; VMDATAHREAD
  mov al,[C_LABEL(VMAIN)]
  test al,al
  mov al,[VMDATAREAD_buffer+1]
+ mov [Last_Bus_Value_PPU1],al
  js VMDATAREAD_do_update
  ret
 
@@ -808,6 +824,7 @@ SNES_R213B: ; CGDATAREAD
  mov bl,[CGReadHigh]
  mov edx,[CGAddress]
  mov al,[C_LABEL(Real_SNES_Palette)+ebx+edx*2]
+ mov [Last_Bus_Value_PPU2],al
  xor bl,1
  jnz .no_increment
  inc edx
@@ -835,6 +852,10 @@ SNES_R213F: ; STAT78
  mov al,[STAT78]
  or al,[C_LABEL(SNES_COUNTRY)]  ; 0x10 means PAL, not NTSC
 
+ mov dl,[Last_Bus_Value_PPU2]
+ and dl,BIT(5)
+ xor dl,0xFF
+ add dl,al
 
  mov dl,[C_LABEL(WRIO)]
  and dl,[C_LABEL(RDIO)]

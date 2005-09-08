@@ -1633,11 +1633,15 @@ EXPORT SNES_R2138 ; OAMDATAREAD
  inc edx
  and edx,0x1FF  ; address is 9 bits
  mov [C_LABEL(OAMAddress)],edx
+
+ mov [Last_Bus_Value_PPU1],al
  ret
 
 ALIGNC
 .read_low:
  mov al,[C_LABEL(OAM)+edx*2]
+
+ mov [Last_Bus_Value_PPU1],al
  ret
 
 ALIGNC

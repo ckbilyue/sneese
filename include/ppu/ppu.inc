@@ -107,6 +107,9 @@ EXTERN_C BG1VOFS,BG2VOFS,BG3VOFS,BG4VOFS
 EXTERN Reset_Ports
 EXTERN_C Toggle_Offset_Change
 EXTERN_C Update_Layering
+
+EXTERN Last_Bus_Value_PPU1
+EXTERN Last_Bus_Value_PPU2
 %endif
 
 %define Read_21_Address(reg) (C_LABEL(Read_Map_21)+(reg)*4)

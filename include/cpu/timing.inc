@@ -1329,23 +1329,15 @@ EXPORT SNES_R2137 ; SLHV  ; This latches the counter for horizontal/vertical dat
  add ebx,DOTS_IN_REFRESH        ; Adjust for memory refresh cycles
 .before_refresh:
 
- ; All this below ensures bits 9-15 to be same as bits 1-7
- ; (open bus kludge)
- mov al,0xFE
-
  cmp ebx,DOTS_PER_SCANLINE_REPORTED
  jb .before_next_line
  sub ebx,DOTS_PER_SCANLINE_REPORTED
  inc edx            ; Adjust if we're on the next line
 .before_next_line:
 
- and bh,1
- and al,bl
- or bh,al
  mov [Latched_H],ebx    ; H counter
 
  mov ebx,[C_LABEL(Current_Line_Timing)]
- mov al,0xFE
  add ebx,edx        ; fixup for next line
 
  mov edx,[C_LABEL(LastVBLLine)]
@@ -1355,24 +1347,26 @@ EXPORT SNES_R2137 ; SLHV  ; This latches the counter for horizontal/vertical dat
  dec ebx
 .before_next_frame:
 
- and bh,1
- and al,bl
- or bh,al
  mov [Latched_V],ebx
 
  pop ebx
 .no_change:
- mov al,0x21    ;open bus kludge
- ret
+ jmp CPU_OPEN_BUS_READ  ;return open bus value
 
 ALIGNC
 EXPORT SNES_R213C ; OPHCT
  xor byte [OPHCT],1
  jz .return_high
  mov al,[Latched_H]
+ mov [Last_Bus_Value_PPU2],al
  ret
 .return_high:
  mov al,[Latched_H+1]
+ mov dl,[Last_Bus_Value_PPU2]
+ and al,1
+ and dl,~1
+ add al,dl
+ mov [Last_Bus_Value_PPU2],al
  ret
 
 ALIGNC
@@ -1380,9 +1374,15 @@ EXPORT SNES_R213D ; OPVCT
  xor byte [OPVCT],1
  jz .return_high
  mov al,[Latched_V]
+ mov [Last_Bus_Value_PPU2],al
  ret
 .return_high:
  mov al,[Latched_V+1]
+ mov dl,[Last_Bus_Value_PPU2]
+ and al,1
+ and dl,~1
+ add al,dl
+ mov [Last_Bus_Value_PPU2],al
  ret
 
 ; Write to 40xx handlers
