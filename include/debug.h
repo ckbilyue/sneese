@@ -23,6 +23,8 @@ You must read and accept the license prior to use.
 #ifndef SNEeSe_debug_h
 #define SNEeSe_debug_h
 
+#include <stdio.h>
+
 #include "misc.h"
 
 /*#define OPCODE_TRACE_LOG*/
