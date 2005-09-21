@@ -547,7 +547,7 @@ EXTERN_C rest
  and al,~HVBJOY_IN_VBLANK   ; VBlank off
  mov [HVBJOY],al
 
- mov byte [RDNMI_mask],0xFF
+ mov byte [RDNMI_mask],~0
  mov byte [RDNMI],VERSION_NUMBER_5A22   ; Clear NMI enabled bit in 0x4210
  mov byte [NMI_pin],NMI_None            ;clear NMI input
 
@@ -1578,7 +1578,7 @@ EXPORT SNES_R4210 ; RDNMI
 .no_nmi:
 
  mov byte [RDNMI],VERSION_NUMBER_5A22   ; clear NMI source
- mov byte [RDNMI_mask],0x7F
+ mov byte [RDNMI_mask],~RDNMI_VBLANK_START
 .no_reset:
  ;merge in open bus bits
  mov dl,[C_LABEL(Last_Bus_Value_A)]
@@ -1762,6 +1762,14 @@ EXPORT SNES_W4200 ; NMITIMEN
  test bl,0x30
  jz .no_irq_change
 
+ test al,0x30
+ jnz .irq_enabled
+
+ and byte [IRQ_pin],~0x80   ; Clear Internal IRQ
+ jmp .no_irq_change
+
+.irq_enabled:
+
  mov edx,eax
  shr edx,5  ;shift out bit 4
  sbb edx,edx
@@ -1772,7 +1780,6 @@ EXPORT SNES_W4200 ; NMITIMEN
 .no_irq_change:
  pop ebx
 .no_change:
- and byte [IRQ_pin],~0x80   ; Clear Internal IRQ
  ret
 
 ALIGNC

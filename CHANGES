@@ -21,6 +21,9 @@ Changes
   DBJH          Daniel Horchner
 
 
+ 0.843
+  5A22: Improved self-generated IRQ behavior, thanks to byuu for
+   information [TRAC]
  0.842
   SPC700: Added support for BCD fixup opcodes DAA and DAS, thanks to
    anomie and Overload for information and resources for research and
