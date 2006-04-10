@@ -423,8 +423,8 @@ Render_Offset_8x8_Base:
 .next_line:
  mov edx,[RO8x8_BG_Table]
 
- mov eax,[RO8x8_Current_Line]
- call Sort_Screen_Height
+;mov eax,[RO8x8_Current_Line]
+;call Sort_Screen_Height
 
  mov eax,[RO8x8_Current_Line]
  SORT_TILES_8_TALL [RO8x8_MapAddress_Current]
@@ -713,7 +713,7 @@ EXPORT %1       ; Define label, entry point
  jz .No_VChange
 
  test dh,dh         ; vertical offset?
- jnz .calc_v_offset
+ js .calc_v_offset
 
  mov dl,[esi]
  mov ebp,edx
@@ -857,7 +857,7 @@ EXPORT %1       ; Define label, entry point
  jz .No_VChange
 
  test dh,dh         ; vertical offset?
- jnz .calc_v_offset
+ js .calc_v_offset
 
  mov dl,[esi]
  mov ebp,edx
