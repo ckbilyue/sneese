@@ -370,9 +370,24 @@ EXTERN_C Layer_Disable_Mask
 
  mov ecx,[Mode7_VY]
  mov ebx,[C_LABEL(M7B)]
- add edx,ecx
+;add edx,ecx
+;imul ebx,edx
+;imul edx,[C_LABEL(M7D)]
+;and ebx,~BITMASK(0,5)
+;and edx,~BITMASK(0,5)
+
+ imul ecx,ebx
  imul ebx,edx
- imul edx,[C_LABEL(M7D)]
+ and ecx,~BITMASK(0,5)
+ and ebx,~BITMASK(0,5)
+ add ebx,ecx
+ mov ecx,[C_LABEL(M7D)]
+ imul edx,ecx
+ imul ecx,[Mode7_VY]
+ and edx,~BITMASK(0,5)
+ and ecx,~BITMASK(0,5)
+ add edx,ecx
+
  mov ecx,[Mode7_AHX]
  mov esi,[Mode7_CHXY]
  add ebx,ecx
@@ -583,6 +598,7 @@ Recalc_Mode7:
 ;mov ebx,[C_LABEL(M7X_13)]
  mov ebx,edi
  imul eax,[C_LABEL(M7A)]
+ and eax,~BITMASK(0,5)
  shl ebx,8
  add eax,ebx
  mov [Mode7_AHX],eax    ;A * (H - X) + (X << 8)
@@ -593,6 +609,7 @@ Recalc_Mode7:
 .recalc_c:
  mov ebx,[C_LABEL(M7Y_13)]
  imul eax,[C_LABEL(M7C)]
+ and eax,~BITMASK(0,5)
  shl ebx,8
  add eax,ebx
  mov [Mode7_CHXY],eax   ;C * (H - X) + (Y << 8)
