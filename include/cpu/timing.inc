@@ -722,13 +722,12 @@ section .text
  inc eax
  mov [C_LABEL(Current_Line_Timing)],eax
  cmp [C_LABEL(LastRenderLine)],eax
- jbe .end_of_display
- jmp CPU_START_IRQ      ; Return to CPU
-ALIGNC
+ ja CPU_START_IRQ       ; Return to CPU
 .end_of_display:
  mov eax,[NMI_Event_Handler]
- mov [Render_Next_Event],eax
- mov dword [Render_Next_Trip],CYCLES_NEW_SCANLINE
+ mov [HDMA_Next_Event],eax
+;mov [Render_Next_Event],eax
+;mov dword [Render_Next_Trip],CYCLES_NEW_SCANLINE
  jmp CPU_START_IRQ      ; Return to CPU
 
 ALIGNC
@@ -818,21 +817,21 @@ section .text
 
  Update_Cycles
 
- mov eax,[C_LABEL(Current_Line_Timing)] ; Get current scanline
- inc eax
- mov [C_LABEL(Current_Line_Timing)],eax
- cmp [C_LABEL(LastRenderLine)],eax
- jbe .end_of_display
 ;mov dword [C_LABEL(EventTrip)],CYCLES_HDMA_START
  mov dword [FixedTrip],CYCLES_HDMA_START
 ;mov dword [Event_Handler],HDMA_Event
  mov dword [Fixed_Event],HDMA_Event
- jmp CPU_START_IRQ      ; Return to CPU
-ALIGNC
+
+ mov eax,[C_LABEL(Current_Line_Timing)] ; Get current scanline
+ inc eax
+ mov [C_LABEL(Current_Line_Timing)],eax
+ cmp [C_LABEL(LastRenderLine)],eax
+ ja CPU_START_IRQ       ; Return to CPU
 .end_of_display:
  mov eax,[NMI_Event_Handler]
- mov [Event_Handler],eax
- mov [Fixed_Event],eax
+ mov [HDMA_Next_Event],eax
+;mov [Event_Handler],eax
+;mov [Fixed_Event],eax
  jmp CPU_START_IRQ      ; Return to CPU
 
 ALIGNC
