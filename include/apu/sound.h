@@ -51,7 +51,6 @@ EXTERN unsigned sound_cycle_latch;
 EXTERN unsigned sound_output_position;
 
 EXTERN int voice_handle;
-EXTERN signed char block_written;
 
 EXTERN unsigned char SPC_DSP[256];
 EXTERN unsigned char SNDkeys;

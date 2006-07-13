@@ -787,7 +787,7 @@ int Install_Sound(int stereo)
  noise_buffer = (output_sample_16 *)
   malloc(sizeof(output_sample_16 [samples]));
 
- outx_buffer = (char *) malloc(sizeof(char [samples]));
+ outx_buffer = (signed char *) malloc(sizeof(char [samples]));
 
  mix_buffer = (int *) malloc(sizeof(int [(stereo ? 2 : 1) * samples]));
 
