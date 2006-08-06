@@ -3,7 +3,7 @@
 SNEeSe, an Open Source Super NES emulator.
 
 
-Copyright (c) 1998-2005, Charles Bilyue'.
+Copyright (c) 1998-2006, Charles Bilyue'.
 Portions copyright (c) 1998-2003, Brad Martin.
 Portions copyright (c) 2003-2004, Daniel Horchner.
 Portions copyright (c) 2004-2005, Nach. ( http://nsrt.edgeemu.com/ )
@@ -267,26 +267,20 @@ const char *Controls_Options[CONTROLS_NUM_OPTIONS]=
 
 WINDOW *Screen_window=0;
 #if defined(ALLEGRO_DOS)
-#define NUM_SCREEN_OPTIONS 7
+#define NUM_SCREEN_OPTIONS 3
 char *Screen_Options[NUM_SCREEN_OPTIONS]={
- "320x200x256 VGA",
- "320x240x256 VESA2",
- "320x240x256 MODE-X",
- "256x239x256 VGA",
  "320x200x16b VESA2",
  "320x240x16b VESA2",
  "640x480x16b VESA2"
 };
 #elif defined(ALLEGRO_WINDOWS) || defined(ALLEGRO_UNIX) || defined(ALLEGRO_BEOS)
-#define NUM_SCREEN_OPTIONS 8
+#define NUM_SCREEN_OPTIONS 6
 char *Screen_Options[NUM_SCREEN_OPTIONS]={
- "320x200x256 WIN",
- "320x240x256 WIN",
- "320x240x256 FS",
- "256x239x256 WIN",
  "320x200x16b WIN",
  "320x240x16b WIN",
  "640x480x16b WIN",
+ "256x239x16b WIN",
+ "320x240x16b FS",
  "640x480x16b FS"
 };
 #else
@@ -1366,11 +1360,6 @@ extern "C" unsigned char TM,TS,TMW,TSW,WBGLOG,WOBJLOG,CGWSEL,CGADSUB;
 
 WINDOW *HWStatus_window=0;
 
-EXTERN unsigned char Win1_Count_In, Win1_Count_Out;
-EXTERN unsigned char Win2_Count_In, Win2_Count_Out;
-EXTERN unsigned char Win1_Bands_In[2], Win1_Bands_Out[4];
-EXTERN unsigned char Win2_Bands_In[2], Win2_Bands_Out[4];
-
 void HWStatus(void)
 {
  char Number[5];
@@ -1447,39 +1436,39 @@ void HWStatus(void)
  PlotString(HWStatus_window,default_font,Number,default_font->get_widthspace()*29,default_font->get_heightspace()*6);
 
  PlotString(HWStatus_window,default_font,"Win1:# ## ## # ## ## ## ##",0,default_font->get_heightspace()*7);
- sprintf(Number, "%1X", (unsigned) Win1_Count_In);
+ sprintf(Number, "%1X", (unsigned) Win_Count_In(1));
  PlotString(HWStatus_window,default_font,Number,default_font->get_widthspace()*5,default_font->get_heightspace()*7);
- sprintf(Number, "%02X", (unsigned) Win1_Bands_In[0]);
+ sprintf(Number, "%02X", (unsigned) Win_Bands_In(1)[0][0]);
  PlotString(HWStatus_window,default_font,Number,default_font->get_widthspace()*7,default_font->get_heightspace()*7);
- sprintf(Number, "%02X", (unsigned) Win1_Bands_In[1]);
+ sprintf(Number, "%02X", (unsigned) Win_Bands_In(1)[0][1]);
  PlotString(HWStatus_window,default_font,Number,default_font->get_widthspace()*10,default_font->get_heightspace()*7);
- sprintf(Number, "%1X", (unsigned) Win1_Count_Out);
+ sprintf(Number, "%1X", (unsigned) Win_Count_Out(1));
  PlotString(HWStatus_window,default_font,Number,default_font->get_widthspace()*13,default_font->get_heightspace()*7);
- sprintf(Number, "%02X", (unsigned) Win1_Bands_Out[0]);
+ sprintf(Number, "%02X", (unsigned) Win_Bands_Out(1)[0][0]);
  PlotString(HWStatus_window,default_font,Number,default_font->get_widthspace()*15,default_font->get_heightspace()*7);
- sprintf(Number, "%02X", (unsigned) Win1_Bands_Out[1]);
+ sprintf(Number, "%02X", (unsigned) Win_Bands_Out(1)[0][1]);
  PlotString(HWStatus_window,default_font,Number,default_font->get_widthspace()*18,default_font->get_heightspace()*7);
- sprintf(Number, "%02X", (unsigned) Win1_Bands_Out[2]);
+ sprintf(Number, "%02X", (unsigned) Win_Bands_Out(1)[1][0]);
  PlotString(HWStatus_window,default_font,Number,default_font->get_widthspace()*21,default_font->get_heightspace()*7);
- sprintf(Number, "%02X", (unsigned) Win1_Bands_Out[3]);
+ sprintf(Number, "%02X", (unsigned) Win_Bands_Out(1)[1][1]);
  PlotString(HWStatus_window,default_font,Number,default_font->get_widthspace()*24,default_font->get_heightspace()*7);
 
  PlotString(HWStatus_window,default_font,"Win2:# ## ## # ## ## ## ##",0,default_font->get_heightspace()*8);
- sprintf(Number, "%1X", (unsigned) Win2_Count_In);
+ sprintf(Number, "%1X", (unsigned) Win_Count_In(2));
  PlotString(HWStatus_window,default_font,Number,default_font->get_widthspace()*5,default_font->get_heightspace()*8);
- sprintf(Number, "%02X", (unsigned) Win2_Bands_In[0]);
+ sprintf(Number, "%02X", (unsigned) Win_Bands_In(2)[0][0]);
  PlotString(HWStatus_window,default_font,Number,default_font->get_widthspace()*7,default_font->get_heightspace()*8);
- sprintf(Number, "%02X", (unsigned) Win2_Bands_In[1]);
+ sprintf(Number, "%02X", (unsigned) Win_Bands_In(2)[0][1]);
  PlotString(HWStatus_window,default_font,Number,default_font->get_widthspace()*10,default_font->get_heightspace()*8);
- sprintf(Number, "%1X", (unsigned) Win2_Count_Out);
+ sprintf(Number, "%1X", (unsigned) Win_Count_Out(2));
  PlotString(HWStatus_window,default_font,Number,default_font->get_widthspace()*13,default_font->get_heightspace()*8);
- sprintf(Number, "%02X", (unsigned) Win2_Bands_Out[0]);
+ sprintf(Number, "%02X", (unsigned) Win_Bands_Out(2)[0][0]);
  PlotString(HWStatus_window,default_font,Number,default_font->get_widthspace()*15,default_font->get_heightspace()*8);
- sprintf(Number, "%02X", (unsigned) Win2_Bands_Out[1]);
+ sprintf(Number, "%02X", (unsigned) Win_Bands_Out(2)[0][1]);
  PlotString(HWStatus_window,default_font,Number,default_font->get_widthspace()*18,default_font->get_heightspace()*8);
- sprintf(Number, "%02X", (unsigned) Win2_Bands_Out[2]);
+ sprintf(Number, "%02X", (unsigned) Win_Bands_Out(2)[1][0]);
  PlotString(HWStatus_window,default_font,Number,default_font->get_widthspace()*21,default_font->get_heightspace()*8);
- sprintf(Number, "%02X", (unsigned) Win2_Bands_Out[3]);
+ sprintf(Number, "%02X", (unsigned) Win_Bands_Out(2)[1][1]);
  PlotString(HWStatus_window,default_font,Number,default_font->get_widthspace()*24,default_font->get_heightspace()*8);
 
  refresh_gui();

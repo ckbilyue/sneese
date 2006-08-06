@@ -3,7 +3,7 @@
 SNEeSe, an Open Source Super NES emulator.
 
 
-Copyright (c) 1998-2005, Charles Bilyue'.
+Copyright (c) 1998-2006, Charles Bilyue'.
 Portions copyright (c) 1998-2003, Brad Martin.
 Portions copyright (c) 2003-2004, Daniel Horchner.
 Portions copyright (c) 2004-2005, Nach. ( http://nsrt.edgeemu.com/ )
@@ -499,7 +499,7 @@ void PlotCharTDirect(pGUI_FONT font,char Character,int x,int y,int color){
    if((x+h)<0) continue;
    if(!bit) bit=0x80;
    if(Pointer[(h/8)+((width+7)/8)*v] & bit)
-    putpixel((BITMAP *) gbSNES_Screen8.subbitmap, x+h, y+v, color);
+    putpixel((BITMAP *) gbSNES_Screen16.subbitmap, x+h, y+v, color);
 //  SNES_Screen8[x+h+(256+16)*(y+v)]=color;
   }
  }

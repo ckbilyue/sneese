@@ -9,8 +9,8 @@ The SNES emulator with the extra e's...
        SS   SS  NN   NNN  EE      ee      SS   SS  ee
         SSSSS   NN    NN  EEEEEE   eeee    SSSSS    eeee
 
-                                            v0.843 (Public BETA)
-                                            xx September 2005
+                                            v0.85 (Public BETA)
+                                            xx August 2006
 
   Please read the license (LICENSE file) before using or distributing
    SNEeSe in any way!
@@ -33,7 +33,7 @@ Credits
 e-mail address sniffers)
 
 
-SNEeSe is copyright (c) 1998-2005, Charles Bilyue'.
+SNEeSe is copyright (c) 1998-2006, Charles Bilyue'.
 Portions copyright (c) 1998-2003, Brad Martin.
 Portions copyright (c) 2003-2004, Daniel Horchner.
 Portions copyright (c) 2004-2005, Nach. ( http://nsrt.edgeemu.com/ )
@@ -115,9 +115,9 @@ System Requirements
 """""""""""""""""""
 Here is a rough guide to the things you need to run this emulator:
 
- - A 486 or better CPU.  Preferably better, as SNES emulation is
-    computationally intensive, involving at least two CPUs, a
-    complex audio DSP and complex video hardware.
+ - A 586-class (Pentium, K6-family) or better CPU.  Preferably better, as
+    SNES emulation is computationally intensive, involving at least two CPUs,
+    a complex audio DSP and complex video hardware.
 
  - Roughly 6-10 MB of memory free, dependant on ROM size.
 
@@ -127,22 +127,12 @@ Here is a rough guide to the things you need to run this emulator:
 -- DOS --
  - A PC running MS-DOS or Win9x (95/98/ME).
 
- - VGA-compatible graphics card capable of mode 13h for the following
-    8-bit display modes:
-     320x200
-     320x240 Mode-X - 256x239
  - SVGA graphics card (either with native VESA 2 support, or with a driver
     providing VESA 2 support, such as UniVBE or Scitech Display Doctor)
     for the following display modes:
-     8-bit using linear framebuffer
-      320x240
      16-bit using linear framebuffer
       320x200        - 320x240
       640x480
-   Note that the 16-bit modes are slower and there is currently no
-    advantage to using them!
-
- - A reasonable monitor (if you want to use the 256x239 or Mode-X modes!).
 
  - A sound card from the following list for sound output (compatible cards
     may work):
@@ -160,7 +150,7 @@ Here is a rough guide to the things you need to run this emulator:
 
 
 -- Linux/Unix --
- - A PC running X (windowing system), with Allegro 4.0 or above.
+ - A PC running X (windowing system), with Allegro 4.1.16.
  - A video adapter compatible with X; improved performance may be achieved
     by having DGA(2) support and the necessary privileges to access it.
  - A sound output device compatible with OSS, ESD, or ALSA, for sound
@@ -168,7 +158,7 @@ Here is a rough guide to the things you need to run this emulator:
 
 
 -- BeOS --
- - A PC running BeOS R5 PE, with Allegro 4.1 or above. Other versions of BeOS
+ - A PC running BeOS R5 PE, with Allegro 4.1.16. Other versions of BeOS
     might also work.
  - A video adapter supported by BeOS.
  - A sound output device supported by BeOS.
@@ -235,7 +225,7 @@ emulation as follows:
                              When you press ENTER a window will open
                              allowing you to choose a new resolution.
                              If the resolution cannot be set, it will
-                             revert to standard 320x200x256 mode.
+                             revert to 320x200x16b mode.
 
   Configure Controllers    - Brings up the CONTROLLER CONFIGURATION menu.
 
@@ -354,13 +344,10 @@ Video output:
  -m#  Set screen mode
   Available screen modes:
  DOS:
-   0:320x200x256 VGA       1:320x240x256 VESA2     2:320x240x256 MODE-X
-   3:256x239x256 VGA       4:320x200x16b VESA2     5:320x240x16b VESA2
-   6:640x480x16b VESA2
+   0:320x200x16b VESA2     1:320x240x16b VESA2     2:640x480x16b VESA2
  Win32, Unix & BeOS:
-   0:320x200x256 WIN       1:320x240x256 WIN       2:320x240x256 FS
-   3:256x239x256 WIN       4:320x200x16b WIN       5:320x240x16b WIN
-   6:640x480x16b WIN       7:640x480x16b FS
+   0:320x200x16b WIN 2     1:320x240x16b WIN       2:640x480x16b WIN
+   3:256x239x16b WIN       4:320x240x16b FS        5:640x480x16b FS
 Paths and files:
  -saveext RAM     Set extension for save RAM files
  -savedir .\saves Set save directory
@@ -425,8 +412,8 @@ other CPUs for similar mainboards, such as AMD K5s.
 Switches -pt2 (preload_cache_2=0) and -pb2 (preload_cache_2=1) control
 a limited form of the above, that should help performance on most or all
 CPUs with a write-back internal cache and no write-allocation.  Such CPUs
-include 486DX4s, write-back enhanced 486DX2s, Pentium Overdrive CPUs for
-486 systems, AMD 5x86s, and similar CPUs.
+include Pentium Overdrive CPUs for
+486 systems, and similar CPUs.
 
 'preload_cache' and 'preload_cache_2' both default to enabled if the
 detected CPU family is 5, representing Intel Pentium and similar CPUs.
@@ -456,8 +443,8 @@ Emulation details:
  - Variable speed CPU bus timing.
  - Open bus states emulated (currently on A bus only).
  - DMA and HDMA, all 8 channels, modes 0-4 (5-7 supported but possibly
-    incorrect).  General DMA timing (possibly not 100% correct).
-    Partial HDMA timing,  HDMA may have some bugs.
+    incorrect).  General DMA timing (not 100% correct).
+    Partial HDMA timing.  HDMA may have some bugs.
 
  - SPC700 sound CPU with 254/256 opcodes implemented, running with
     on-demand execution and cycle-based emulation.
@@ -478,21 +465,25 @@ Emulation details:
 
  - Most hardware registers emulated.
 
- - SNES joypads 1 and 2 and mouse are supported.
+ - SNES joypads 1 and 2 and mouse are supported.  Mouse emulation is likely
+    not 100% accurate.
 
  - BG modes 0-7, 8x8 and 16x16 tiles, X/Y flip, palette mapping,
-    scrolling, tile priorities.
+    scrolling, tile priorities.  Interlace remains unimplemented.
     - Full offset change support in modes 2, 4, and 6 (mode 6 support
      not properly tested).
     - Partial wide-tile support in modes 5 and 6 (odd pixels are skipped).
-    - Partial priority-per-pixel support in mode 7 (may still have bugs).
- - Dual window clipping with all logic modes in BG modes 0-6.
+    - Priority-per-pixel support in mode 7.
+ - Dual window clipping with all logic modes on all BG and OBJ.
+ - Color window, including fixed color and sub screen arithmetic modes
+    and most, if not all, of the various edge cases.
  - Full mosaic effect in BG modes 0-7, with correct countdown register
     support.
  - Screen sizes 32x32, 64x32, 32x64, and 64x64 supported.
- - Sprites are supported in all sizes (8x8, 16x16, 16x32, 32x32, 32x64,
+ - OBJ are supported in all sizes (8x8, 16x16, 16x32, 32x32, 32x64,
     64x64), with name and base select, priority rotation, correct
     sprite-to-sprite priorities, and correct time/range limitation.
+    Interlaced OBJ support remains unimplemented.
 
 Extras:
  - Independent optional stretching of screen in horizontal and vertical
@@ -539,16 +530,11 @@ TO DO:
 ~~~~~~
  Screen rendering
   OBJ limitations: Time/range over flag emulation, proper handling in
-   half-height mode
+   half-height (interlaced OBJ) mode
   Sprite priority rotation: Emulation of the quirky behavior when
    (OAM byte address & 3) == 3
-  Performance: Improve tile-based rendering + more
-  Window clipping: Used to cut holes in layers; not yet supported on OBJ
-   and BG mode 7; support limited in other BG modes
-  Color window: Used for color arithmetic, allows overlaying BGs like the
-   rain in Zelda
-  Direct color mode: Used in ActRaiser 2, Secret of Mana, others
-  Priority per pixel in mode 7: May have priority problems
+  Hi-res / Pseudo-hi-res and interlace emulation
+  Performance: Possible reorganization; platform-specific optimizations.
   Plenty of other missing stuff...
 
  Source   : More source cleanup/clarity/commentation

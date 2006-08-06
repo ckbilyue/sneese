@@ -3,7 +3,7 @@
 SNEeSe, an Open Source Super NES emulator.
 
 
-Copyright (c) 1998-2005, Charles Bilyue'.
+Copyright (c) 1998-2006, Charles Bilyue'.
 Portions copyright (c) 1998-2003, Brad Martin.
 Portions copyright (c) 2003-2004, Daniel Horchner.
 Portions copyright (c) 2004-2005, Nach. ( http://nsrt.edgeemu.com/ )
@@ -321,34 +321,35 @@ void Free_ROM()
 
 int Allocate_ROM(bool resize)
 {
- const unsigned new_size = rmd_64k.bank_count * (64 << 10) + (8 << 10);
- unsigned clear_size = rmd_64k.bank_count * (64 << 10);
+ const unsigned new_size = rmd_64k.bank_count * (64 << 10);
+ const unsigned new_alloc_size = new_size + (8 << 10);
+ int clear_size = new_size;
  unsigned old_size = 0;
  unsigned old_alignment_padding = RomAddress - AllocROMAddress;
 
- if (resize)
+ if (rom_allocated_size == new_size) return 0;
+
+ // De-allocate any previous memory if not resizing
+ if (!resize) Free_ROM();
+ else
  {
-  clear_size -= rom_allocated_size;
   old_size = rom_allocated_size;
+  clear_size -= old_size;
  }
 
- if (rom_allocated_size != new_size)
+
+ void *ReallocROMAddress = realloc(AllocROMAddress, new_alloc_size);
+
+ if (ReallocROMAddress)
  {
-  // De-allocate any previous memory if not resizing
-  if (!resize) Free_ROM();
-
-  void *ReallocROMAddress = realloc(AllocROMAddress, new_size);
-
-  if (ReallocROMAddress)
-  {
-   AllocROMAddress = (unsigned char *) ReallocROMAddress;
-   rom_allocated_size = new_size;
-  }
-  else
-  {
-   return new_size;
-  }
+  AllocROMAddress = (unsigned char *) ReallocROMAddress;
+  rom_allocated_size = new_size;
  }
+ else
+ {
+  return new_alloc_size;
+ }
+ 
 
  unsigned rom_address_temp;
 
@@ -362,10 +363,15 @@ int Allocate_ROM(bool resize)
  unsigned new_alignment_padding = RomAddress - AllocROMAddress;
  if (resize && (old_alignment_padding != new_alignment_padding))
  {
-   memmove(RomAddress, AllocROMAddress + old_alignment_padding, old_size);
+  unsigned move_size = old_size <= new_size ? old_size : new_size;
+
+  memmove(RomAddress, AllocROMAddress + old_alignment_padding, move_size);
  }
-    
- memset(RomAddress + old_size, 0xFF, clear_size);
+
+ if (clear_size > 0)
+ {
+  memset(RomAddress + old_size, 0xFF, clear_size);
+ }
 
  return 0;
 }
@@ -934,6 +940,8 @@ void Setup_bank_count(const unsigned int size)
   }
 }
 
+unsigned ROM_start;        // This is where the ROM code itself starts.
+
 unsigned check_for_header(FILE *fp, int filesize)
 {
  unsigned ROM_start;
@@ -1062,6 +1070,8 @@ void HiLo_Detect()
 
 void patch_rom(const char *Filename)
 {
+  IPSPatched = false;
+
   if (AutoPatch)
   {
     if (!strcasecmp(fn_ext, ".zip")) { findZipIPS(Filename); }
@@ -1111,7 +1121,7 @@ void patch_rom(const char *Filename)
 bool PatchROMAddress(const unsigned address, const unsigned char byte)
 {
   if (address > ROM_SIZE_MAX) return false;
-  if (address > (unsigned) (rmd_64k.bank_count * (64 << 10)))
+  if (address >= (unsigned) (rmd_32k.bank_count * (32 << 10)))
   {
     Setup_bank_count(address + 1);
     if (Allocate_ROM(true))
@@ -1121,8 +1131,8 @@ bool PatchROMAddress(const unsigned address, const unsigned char byte)
 
     setup_rom_mirroring(&rmd_32k);
     setup_rom_mirroring(&rmd_64k);
-    
-    HiLo_Detect();  
+
+    HiLo_Detect();
     switch (ROM_format)
     {
       case HiROM: case HiROM_Interleaved:
@@ -1131,9 +1141,9 @@ bool PatchROMAddress(const unsigned address, const unsigned char byte)
       case LoROM: case LoROM_Interleaved:
         if (!Set_LoROM_Map()) { return false; }
         break;
-    }    
+    }
   }
-  
+
   RomAddress[address] = byte;
 
   return true;
@@ -1270,8 +1280,6 @@ static bool open_rom_normal(const char *Filename)
  FILE *infile = fopen2(Filename, "rb");
  if (!infile) return FALSE; // File aint there m8
 
- unsigned ROM_start;        // This is where the ROM code itself starts.
-
  fseek2(infile, 0, SEEK_END);
  int infilesize = ftell2(infile);
  ROM_start = check_for_header(infile, infilesize);
@@ -1364,7 +1372,6 @@ bool Load_32k_split(FILE *infile, const char *Filename, int parts, long total_si
  long bytes_read = 0;
  int part = 1;
  int infilesize;
- unsigned ROM_start;
 
  fnsplit(Filename, fn_drive, fn_dir, fn_file, fn_ext);
 
@@ -1473,8 +1480,6 @@ static bool open_rom_split(const char *Filename)
 
  FILE *infile=fopen2(Filename,"rb");
  if (!infile) return FALSE;  // File aint there m8
-
- unsigned ROM_start;        // This is where the ROM code itself starts.
 
  fseek2(infile, 0, SEEK_END);
  int infilesize = ftell2(infile);
@@ -1707,7 +1712,7 @@ int open_rom(const char *Filename)
  if (snes_rom_loaded == FALSE) return FALSE;
 
  patch_rom(Filename);
- 
+
  Reset_Memory();
  Reset_SRAM();
  snes_reset();

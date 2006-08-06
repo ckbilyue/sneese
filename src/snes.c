@@ -3,7 +3,7 @@
 SNEeSe, an Open Source Super NES emulator.
 
 
-Copyright (c) 1998-2005, Charles Bilyue'.
+Copyright (c) 1998-2006, Charles Bilyue'.
 Portions copyright (c) 1998-2003, Brad Martin.
 Portions copyright (c) 2003-2004, Daniel Horchner.
 Portions copyright (c) 2004-2005, Nach. ( http://nsrt.edgeemu.com/ )
@@ -27,6 +27,7 @@ You must read and accept the license prior to use.
 
 /*#define DEINTERLEAVED_VRAM*/
 
+#include "snes.h"
 #include "timers.h"
 #include "helper.h"
 #include "platform.h"
@@ -93,12 +94,13 @@ int snes_init(void)
   return 1;
  }
 
- memset(&gbSNES_Screen8, 0, sizeof(gbSNES_Screen8));
  memset(&gbSNES_Screen16, 0, sizeof(gbSNES_Screen16));
 
- SNES_Screen8 =
-  platform_get_gfx_buffer(8, 256, 239, 8, 0, &gbSNES_Screen8);
- if (SNES_Screen8 == 0) return 1;
+ main_screen = (unsigned char (*)[2]) malloc(256 * 2 * MAX_LINES_IN_SET);
+ if (!main_screen) return 1;
+
+ sub_screen = (unsigned char (*)[2]) malloc(256 * 2 * MAX_LINES_IN_SET);
+ if (!sub_screen) return 1;
 
  SNES_Screen16 =
   platform_get_gfx_buffer(16, 256, 239, 0, 0, &gbSNES_Screen16);

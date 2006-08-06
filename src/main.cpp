@@ -3,7 +3,7 @@
 SNEeSe, an Open Source Super NES emulator.
 
 
-Copyright (c) 1998-2005, Charles Bilyue'.
+Copyright (c) 1998-2006, Charles Bilyue'.
 Portions copyright (c) 1998-2003, Brad Martin.
 Portions copyright (c) 2003-2004, Daniel Horchner.
 Portions copyright (c) 2004-2005, Nach. ( http://nsrt.edgeemu.com/ )
@@ -40,7 +40,6 @@ using namespace std;
 #include "snes.h"
 #include "timers.h"
 
-#include "scrmode.h"
 #include "types.h"
 #include "version.h"
 
@@ -48,21 +47,15 @@ void no_adjust(void){}
 
 SCREEN screenmodes[]={
 #if defined(ALLEGRO_DOS)
- { 8,320,200,320,200,GFX_VGA   ,no_adjust  },  // 320x200x256 VGA
- { 8,320,240,320,240,GFX_VESA2L,no_adjust  },  // 320x240x256 VESA2L
- { 8,320,240,320,240,GFX_MODEX ,no_adjust  },  // 320x240x256 MODE-X
- { 8,256,256,256,239,GFX_VGA   ,Set256x239 },  // 256x239x256 VGA
- {16,320,200,320,200,GFX_VESA2L,no_adjust  },  // 320x200x16b SVGA
- {16,320,240,320,240,GFX_VESA2L,no_adjust  },  // 320x240x16b SVGA
- {16,640,480,640,480,GFX_VESA2L,no_adjust  }   // 640x480x16b SVGA
+ {16,320,200,320,200,GFX_VESA2L,no_adjust  },  // 320x200x16b VESA2L
+ {16,320,240,320,240,GFX_VESA2L,no_adjust  },  // 320x240x16b VESA2L
+ {16,640,480,640,480,GFX_VESA2L,no_adjust  }   // 640x480x16b VESA2L
 #elif defined(ALLEGRO_WINDOWS) || defined(ALLEGRO_UNIX) || defined(ALLEGRO_BEOS)
- { 8,320,200,320,200,GFX_AUTODETECT_WINDOWED  ,no_adjust  },  // 320x200x256 WIN
- { 8,320,240,320,240,GFX_AUTODETECT_WINDOWED  ,no_adjust  },  // 320x240x256 WIN
- { 8,320,240,320,240,GFX_AUTODETECT_FULLSCREEN,no_adjust  },  // 320x240x256 FS
- { 8,256,256,256,239,GFX_AUTODETECT_WINDOWED  ,no_adjust  },  // 256x239x256 WIN
  {16,320,200,320,200,GFX_AUTODETECT_WINDOWED  ,no_adjust  },  // 320x200x16b WIN
  {16,320,240,320,240,GFX_AUTODETECT_WINDOWED  ,no_adjust  },  // 320x240x16b WIN
  {16,640,480,640,480,GFX_AUTODETECT_WINDOWED  ,no_adjust  },  // 640x480x16b WIN
+ {16,256,239,256,239,GFX_AUTODETECT_WINDOWED  ,no_adjust  },  // 256x239x16b WIN
+ {16,320,240,320,240,GFX_AUTODETECT_FULLSCREEN,no_adjust  },  // 320x240x16b FS
  {16,640,480,640,480,GFX_AUTODETECT_FULLSCREEN,no_adjust  }   // 640x480x16b FS
 #else
 #error No screen modes defined.

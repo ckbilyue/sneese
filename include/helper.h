@@ -3,7 +3,7 @@
 SNEeSe, an Open Source Super NES emulator.
 
 
-Copyright (c) 1998-2005, Charles Bilyue'.
+Copyright (c) 1998-2006, Charles Bilyue'.
 Portions copyright (c) 1998-2003, Brad Martin.
 Portions copyright (c) 2003-2004, Daniel Horchner.
 Portions copyright (c) 2004-2005, Nach. ( http://nsrt.edgeemu.com/ )
@@ -27,6 +27,7 @@ You must read and accept the license prior to use.
 #include "platform.h"
 
 #include "misc.h"
+#include "snes.h"
 
 EXTERN unsigned char WRAM[131072];  /* Buffer for Work RAM */
 EXTERN unsigned char VRAM[65536];   /* Buffer for Video RAM */
@@ -82,10 +83,11 @@ EXTERN signed char stretch_x, stretch_y;
 /* This flag is set when palette recomputation is necessary */
 EXTERN signed char PaletteChanged;
 
-EXTERN SNEESE_GFX_BUFFER gbSNES_Screen8;
 EXTERN SNEESE_GFX_BUFFER gbSNES_Screen16;
 
-EXTERN unsigned char *SNES_Screen8;
+EXTERN unsigned char (*Real_SNES_Screen8)[2];
+EXTERN unsigned char (*main_screen)[2];
+EXTERN unsigned char (*sub_screen)[2];
 EXTERN unsigned short *SNES_Screen16;
 
 EXTERN BITMAP *Allegro_Bitmap;  /* Renamed (I'm using mostly allegro now so what the hell!) */
@@ -107,5 +109,7 @@ EXTERN char fixedpalettecheck;
 
 EXTERN void SetPalette(void);
 EXTERN void Copy_Screen(void);
+
+EXTERN unsigned Current_Line_Render;
 
 #endif /* !defined(SNEeSe_helper_h) */

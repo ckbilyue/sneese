@@ -3,7 +3,7 @@
 SNEeSe, an Open Source Super NES emulator.
 
 
-Copyright (c) 1998-2005, Charles Bilyue'.
+Copyright (c) 1998-2006, Charles Bilyue'.
 Portions copyright (c) 1998-2003, Brad Martin.
 Portions copyright (c) 2003-2004, Daniel Horchner.
 Portions copyright (c) 2004-2005, Nach. ( http://nsrt.edgeemu.com/ )
@@ -34,6 +34,33 @@ You must read and accept the license prior to use.
 #define BIT(bit) (1 << (bit))
 /* lowest bit in mask, highest bit in mask */
 #define BITMASK(lsb,msb) ((BIT((msb) - (lsb) + 1) - 1) << (lsb))
+
+
+/* macros to help with building names from parts */
+#define _CONCAT_NAME(PART1,PART2) PART1 ## PART2
+#define CONCAT_NAME(PART1,PART2) _CONCAT_NAME(PART1,PART2)
+
+#define _CONCAT_3_NAME(PART1,PART2,PART3) PART1 ## PART2 ## PART3
+#define CONCAT_3_NAME(PART1,PART2,PART3) _CONCAT_3_NAME(PART1,PART2,PART3)
+
+#define _CONCAT_4_NAME(PART1,PART2,PART3,PART4) \
+ PART1 ## PART2 ## PART3 ## PART4
+#define CONCAT_4_NAME(PART1,PART2,PART3,PART4) _CONCAT_4_NAME(PART1,PART2,PART3,PART4)
+
+#define _CONCAT_5_NAME(PART1,PART2,PART3,PART4,PART5) \
+ PART1 ## PART2 ## PART3 ## PART4 ## PART5
+#define CONCAT_5_NAME(PART1,PART2,PART3,PART4,PART5) \
+ _CONCAT_5_NAME(PART1,PART2,PART3,PART4,PART5)
+
+#define _CONCAT_6_NAME(PART1,PART2,PART3,PART4,PART5,PART6) \
+ PART1 ## PART2 ## PART3 ## PART4 ## PART5 ## PART6
+#define CONCAT_6_NAME(PART1,PART2,PART3,PART4,PART5,PART6) \
+ _CONCAT_6_NAME(PART1,PART2,PART3,PART4,PART5,PART6)
+
+#define _CONCAT_7_NAME(PART1,PART2,PART3,PART4,PART5,PART6,PART7) \
+ PART1 ## PART2 ## PART3 ## PART4 ## PART5 ## PART6 ## PART7
+#define CONCAT_7_NAME(PART1,PART2,PART3,PART4,PART5,PART6,PART7) \
+ _CONCAT_7_NAME(PART1,PART2,PART3,PART4,PART5,PART6,PART7)
 
 
 #endif /* !defined(SNEeSe_misc_h) */

@@ -3,7 +3,7 @@
 SNEeSe, an Open Source Super NES emulator.
 
 
-Copyright (c) 1998-2005, Charles Bilyue'.
+Copyright (c) 1998-2006, Charles Bilyue'.
 Portions copyright (c) 1998-2003, Brad Martin.
 Portions copyright (c) 2003-2004, Daniel Horchner.
 Portions copyright (c) 2004-2005, Nach. ( http://nsrt.edgeemu.com/ )
@@ -42,7 +42,7 @@ You must read and accept the license prior to use.
 extern unsigned char BG1SC,BG2SC,BG3SC,BG4SC,BG12NBA,BG34NBA;
 extern unsigned short BG1HOFS,BG2HOFS,BG3HOFS,BG4HOFS;
 extern unsigned short BG1VOFS,BG2VOFS,BG3VOFS,BG4VOFS;
-extern unsigned char BGMODE,OBSEL,VMAIN,TM,TS,M7SEL,SETINI,INIDISP;
+extern unsigned char BGMODE,OBSEL,VMAIN,TM,TS,M7SEL,SETINI,INIDISP,MOSAIC;
 extern unsigned char WH0,WH1,WH2,WH3,W12SEL,W34SEL,WOBJSEL;
 extern unsigned char WBGLOG,WOBJLOG,CGWSEL,CGADSUB,TMW,TSW;
 extern unsigned short HiSpriteAddr;
@@ -270,8 +270,8 @@ void DisplayStatus()
   (unsigned) W12SEL, (unsigned) W34SEL, (unsigned) WOBJSEL);
  printf("WLOG BG:%02X\tOBJ:%02X\n",
   (unsigned) WBGLOG, (unsigned) WOBJLOG);
- printf("CGWSEL:%02X\tCGADSUB:%02X\n",
-  (unsigned) CGWSEL, (unsigned) CGADSUB);
+ printf("CGWSEL:%02X\tCGADSUB:%02X\tMOSAIC:%02X\n",
+  (unsigned) CGWSEL, (unsigned) CGADSUB, (unsigned) MOSAIC);
 
 /*
  printf("OBSEL:%02X\tHiSprite:%02X\n", (unsigned) OBSEL,

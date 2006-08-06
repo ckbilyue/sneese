@@ -3,7 +3,7 @@
 SNEeSe, an Open Source Super NES emulator.
 
 
-Copyright (c) 1998-2005, Charles Bilyue'.
+Copyright (c) 1998-2006, Charles Bilyue'.
 Portions copyright (c) 1998-2003, Brad Martin.
 Portions copyright (c) 2003-2004, Daniel Horchner.
 Portions copyright (c) 2004-2005, Nach. ( http://nsrt.edgeemu.com/ )
@@ -152,7 +152,8 @@ EXTERN_MAP_WRITE_DMA 7
 %define DMA_B1 0x15
 %define DMA_B2 0x16
 %define DMA_B3 0x17
-%define DMATableSize 0x18
+%define HDMA_Need_Transfer 0x18
+%define DMATableSize 0x19
 
 %macro MAP_READ_DMA_LIST 1
  dd MAP_READ_DMAP%1

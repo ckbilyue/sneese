@@ -3,7 +3,7 @@
 SNEeSe, an Open Source Super NES emulator.
 
 
-Copyright (c) 1998-2005, Charles Bilyue'.
+Copyright (c) 1998-2006, Charles Bilyue'.
 Portions copyright (c) 1998-2003, Brad Martin.
 Portions copyright (c) 2003-2004, Daniel Horchner.
 Portions copyright (c) 2004-2005, Nach. ( http://nsrt.edgeemu.com/ )
@@ -208,6 +208,20 @@ section .text
 
 ALIGNC
 EXPORT Recache_Tile_Set
+ push ebx
+ push ebp
+ push esi
+ push edi
+ mov edi,[esp+20]
+ call Recache_Tile_Set_work
+ pop edi
+ pop esi
+ pop ebp
+ pop ebx
+ ret
+
+ALIGNC
+EXPORT Recache_Tile_Set_work
 %ifdef NEVER_RECACHE_TILES
  ret
 %endif

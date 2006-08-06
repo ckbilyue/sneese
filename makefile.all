@@ -3,7 +3,7 @@
 # SNEeSe, an Open Source Super NES emulator.
 #
 #
-# Copyright (c) 1998-2005, Charles Bilyue'.
+# Copyright (c) 1998-2006, Charles Bilyue'.
 # Portions copyright (c) 1998-2003, Brad Martin.
 # Portions copyright (c) 2003-2004, Daniel Horchner.
 # Portions copyright (c) 2004-2005, Nach. ( http://nsrt.edgeemu.com/ )
@@ -49,7 +49,7 @@ ASM_OBJ_EXT := o
 ifneq ($(DEBUG),0)
 
 OBJ    := $(OBJ_BASE)/$(PLATFORM)/debug
-PFLAGS = -ggdb3
+PFLAGS = -g3
 EXE    := sneese$(SUFFIX)d$(EXE_EXT)
 OFLAGS = $(PFLAGS)
 
@@ -65,9 +65,12 @@ EXE    := sneese$(SUFFIX)p$(EXE_EXT)
 else
 
 OBJ    := $(OBJ_BASE)/$(PLATFORM)/release
-PFLAGS = -fomit-frame-pointer
+PFLAGS = -fomit-frame-pointer -g3
 EXE    := sneese$(SUFFIX)$(EXE_EXT)
 
+endif
+
+OFLAGS = -march=pentium -mtune=pentiumpro -O3 -ffast-math $(PFLAGS)
 endif
 
 
@@ -78,10 +81,7 @@ ifdef OBJFIX_INCLUDE
 include $(OBJFIX_INCLUDE)
 endif
 
-OFLAGS = -march=i486 -mcpu=pentium -O3 -ffast-math $(PFLAGS)
 
-
-endif
 
 RELEASE ?= 0
 
@@ -93,7 +93,7 @@ DFLAGS += -DRELEASE_BUILD
 endif
 
 
-CFLAGS = $(OFLAGS) -ggdb3 -I$(INCLUDE)
+CFLAGS = $(OFLAGS) -I$(INCLUDE)
 ifdef ZLIB
 CFLAGS += -DZLIB
 endif
@@ -111,15 +111,17 @@ include $(PLATFORMRULES)
 ASMOBJS := $(addsuffix .$(ASM_OBJ_EXT), \
             $(addprefix cpu/, 65c816 memmap dma) \
             $(addprefix apu/, apuskip) \
-            $(addprefix ppu/, screen windows mode7 tiles sprites ppu \
-             bg8 bg8m bg8o bg8om bg16 bg16m bg16o bg16om bg16e bg16me \
-             bg16oe bg16ome) \
-           clear scrmode font)
+            $(addprefix ppu/, screen windows mode7 tiles sprites ppu) \
+           clear font)
+
 JMAOBJS := $(addprefix jma/, 7zlzma.o crc32.o iiostrm.o inbyte.o jma.o \
             lzma.o lzmadec.o winout.o)
-OBJS   := $(ASMOBJS) $(PLATFORMOBJS) $(JMAOBJS) main.o romload.o snes.o \
-           timers.o debug.o input.o helper.o apu/spc700.o apu/sound.o \
+OBJS   := $(ASMOBJS) $(PLATFORMOBJS) $(JMAOBJS) \
+           $(addprefix apu/, spc700.o sound.o) \
+           $(addprefix ppu/, pass1.o pass2.o) \
+           main.o romload.o snes.o timers.o debug.o input.o helper.o \
            guicore.o emugui.o map.o multiio.o patch.o
+
 ifdef ZLIB
 OBJS += unzip.o
 endif
@@ -143,6 +145,8 @@ ifdef OBJFIX
 	$(OBJFIX) $@
 endif
 
+
+ifneq ($(SAVE_ASM_OUTPUT),0)
 $(OBJ)/%.o: $(OBJ)/%.s
 	$(GCC) -c $(DFLAGS) -o $@ $<
 
@@ -151,12 +155,14 @@ $(OBJ)/%.s: $(SRC)/%.c
 
 $(OBJ)/%.s: $(SRC)/%.cpp
 	$(GCC) -S $(CPPFLAGS) $(DFLAGS) -o $@ $<
-
+else
 $(OBJ)/%.o: $(SRC)/%.c
 	$(GCC) -c $(CFLAGS) $(DFLAGS) -o $@ $<
 
 $(OBJ)/%.o: $(SRC)/%.cpp
 	$(GCC) -c $(CPPFLAGS) $(DFLAGS) -o $@ $<
+endif
+
 
 $(EXE): $(addprefix $(OBJ)/, $(OBJS))
 	$(GXX) $(PFLAGS) $(DFLAGS) -o $(EXE) $(addprefix $(OBJ)/, $(OBJS)) $(MIOFLAGS) $(ALLEG)
@@ -188,91 +194,66 @@ $(OBJ)/ppu/screen.$(ASM_OBJ_EXT): $(SRC)/ppu/screen.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, ppu/sprites.inc ppu/ppu.inc ppu/tiles.inc \
  ppu/screen.inc misc.inc clear.inc)
 
-$(OBJ)/ppu/bg8.$(ASM_OBJ_EXT): $(SRC)/ppu/bg8.asm $(OBJFIX) \
- $(addprefix $(INCLUDE)/, misc.inc ppu/ppu.inc ppu/tiles.inc \
- ppu/screen.inc)
-$(OBJ)/ppu/bg8m.$(ASM_OBJ_EXT): $(SRC)/ppu/bg8m.asm $(OBJFIX) \
- $(addprefix $(INCLUDE)/, misc.inc ppu/ppu.inc ppu/tiles.inc \
- ppu/screen.inc)
-$(OBJ)/ppu/bg8o.$(ASM_OBJ_EXT): $(SRC)/ppu/bg8o.asm $(OBJFIX) \
- $(addprefix $(INCLUDE)/, misc.inc ppu/ppu.inc ppu/tiles.inc \
- ppu/screen.inc)
-$(OBJ)/ppu/bg8om.$(ASM_OBJ_EXT): $(SRC)/ppu/bg8om.asm $(OBJFIX) \
- $(addprefix $(INCLUDE)/, misc.inc ppu/ppu.inc ppu/tiles.inc \
- ppu/screen.inc)
-$(OBJ)/ppu/bg16.$(ASM_OBJ_EXT): $(SRC)/ppu/bg16.asm $(OBJFIX) \
- $(addprefix $(INCLUDE)/, misc.inc ppu/ppu.inc ppu/tiles.inc \
- ppu/screen.inc)
-$(OBJ)/ppu/bg16m.$(ASM_OBJ_EXT): $(SRC)/ppu/bg16m.asm $(OBJFIX) \
- $(addprefix $(INCLUDE)/, misc.inc ppu/ppu.inc ppu/tiles.inc \
- ppu/screen.inc)
-$(OBJ)/ppu/bg16o.$(ASM_OBJ_EXT): $(SRC)/ppu/bg16o.asm $(OBJFIX) \
- $(addprefix $(INCLUDE)/, misc.inc ppu/ppu.inc ppu/tiles.inc \
- ppu/screen.inc)
-$(OBJ)/ppu/bg16om.$(ASM_OBJ_EXT): $(SRC)/ppu/bg16om.asm $(OBJFIX) \
- $(addprefix $(INCLUDE)/, misc.inc ppu/ppu.inc ppu/tiles.inc \
- ppu/screen.inc)
-$(OBJ)/ppu/bg16e.$(ASM_OBJ_EXT): $(SRC)/ppu/bg16e.asm $(OBJFIX) \
- $(addprefix $(INCLUDE)/, misc.inc ppu/ppu.inc ppu/tiles.inc \
- ppu/screen.inc)
-$(OBJ)/ppu/bg16me.$(ASM_OBJ_EXT): $(SRC)/ppu/bg16me.asm $(OBJFIX) \
- $(addprefix $(INCLUDE)/, misc.inc ppu/ppu.inc ppu/tiles.inc \
- ppu/screen.inc)
-$(OBJ)/ppu/bg16oe.$(ASM_OBJ_EXT): $(SRC)/ppu/bg16oe.asm $(OBJFIX) \
- $(addprefix $(INCLUDE)/, misc.inc ppu/ppu.inc ppu/tiles.inc \
- ppu/screen.inc)
-$(OBJ)/ppu/bg16ome.$(ASM_OBJ_EXT): $(SRC)/ppu/bg16ome.asm $(OBJFIX) \
- $(addprefix $(INCLUDE)/, misc.inc ppu/ppu.inc ppu/tiles.inc \
- ppu/screen.inc)
+$(OBJ)/ppu/windows.$(OBJBASE): $(SRC)/ppu/windows.c \
+ $(addprefix $(INCLUDE)/, misc.h snes.h)
 
-$(OBJ)/ppu/windows.$(ASM_OBJ_EXT): $(SRC)/ppu/windows.asm $(OBJFIX) \
- $(addprefix $(INCLUDE)/, ppu/ppu.inc ppu/screen.inc misc.inc)
 $(OBJ)/ppu/tiles.$(ASM_OBJ_EXT): $(SRC)/ppu/tiles.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, misc.inc ppu/ppu.inc ppu/tiles.inc ppu/screen.inc)
 $(OBJ)/ppu/sprites.$(ASM_OBJ_EXT): $(SRC)/ppu/sprites.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, misc.inc clear.inc ppu/tiles.inc ppu/screen.inc \
  ppu/ppu.inc)
-$(OBJ)/scrmode.$(ASM_OBJ_EXT): $(SRC)/scrmode.asm $(OBJFIX) \
- $(addprefix $(INCLUDE)/, misc.inc ppu/screen.inc)
 $(OBJ)/font.$(ASM_OBJ_EXT): $(SRC)/font.asm $(INCLUDE)/misc.inc $(OBJFIX)
+
+$(OBJ)/ppu/pass1.$(OBJBASE): $(SRC)/ppu/pass1.c \
+ $(addprefix $(INCLUDE)/, helper.h wrapaleg.h platform.h misc.h snes.h \
+ ppu/plotbase.h ppu/obj.h ppu/bgn.h ppu/bgm.h ppu/bgo.h ppu/bgom.h \
+ ppu/pln.h ppu/plm.h ppu/plo.h ppu/plom.h ppu/dispatch.h ppu/mode7.h)
+
+$(OBJ)/ppu/pass2.$(OBJBASE): $(SRC)/ppu/pass2.c \
+ $(addprefix $(INCLUDE)/, helper.h platform.h misc.h snes.h wrapaleg.h)
 
 $(OBJ)/main.$(OBJBASE): $(SRC)/main.cpp \
  $(addprefix $(INCLUDE)/, platform.h font.h misc.h romload.h helper.h \
- guicore.h emugui.h debug.h snes.h timers.h types.h scrmode.h wrapaleg.h \
+ guicore.h emugui.h debug.h snes.h timers.h types.h wrapaleg.h \
  version.h)
 $(OBJ)/guicore.$(OBJBASE): $(SRC)/guicore.cpp \
- $(addprefix $(INCLUDE)/, guicore.h types.h font.h misc.h helper.h \
- romload.h wrapaleg.h)
+ $(addprefix $(INCLUDE)/, guicore.h platform.h types.h font.h misc.h \
+ helper.h snes.h romload.h wrapaleg.h)
 $(OBJ)/emugui.$(OBJBASE): $(SRC)/emugui.cpp \
- $(addprefix $(INCLUDE)/, guicore.h types.h font.h misc.h cpu/cpu.h \
- apu/spc.h apu/sound.h romload.h debug.h snes.h wrapaleg.h)
+ $(addprefix $(INCLUDE)/, guicore.h platform.h types.h font.h misc.h \
+ helper.h input.h cpu/cpu.h apu/spc.h apu/sound.h romload.h debug.h snes.h \
+ wrapaleg.h)
 $(OBJ)/romload.$(OBJBASE): $(SRC)/romload.cpp \
  $(addprefix $(INCLUDE)/, romload.h helper.h misc.h cpu/cpu.h apu/spc.h \
- cpu/mem.h snes.h wrapaleg.h patch.h)
+ cpu/mem.h snes.h wrapaleg.h patch.h platform.h multiio.h unzip.h) \
+ src/jma/jma.h
 $(OBJ)/patch.$(OBJBASE): $(SRC)/patch.cpp \
- $(addprefix $(INCLUDE)/, romload.h patch.h)
+ $(addprefix $(INCLUDE)/, unzip.h romload.h misc.h platform.h)
 $(OBJ)/snes.$(OBJBASE): $(SRC)/snes.c \
- $(addprefix $(INCLUDE)/, timers.h helper.h platform.h apu/sound.h \
+ $(addprefix $(INCLUDE)/, timers.h helper.h platform.h snes.h apu/sound.h \
  cpu/cpu.h apu/spc.h apu/apuskip.h misc.h wrapaleg.h)
 $(OBJ)/timers.$(OBJBASE): $(SRC)/timers.c $(INCLUDE)/wrapaleg.h
 $(OBJ)/debug.$(OBJBASE): $(SRC)/debug.c \
  $(addprefix $(INCLUDE)/, debug.h misc.h cpu/cpu.h apu/sound.h apu/spc.h \
- helper.h snes.h wrapaleg.h)
+ helper.h platform.h snes.h wrapaleg.h)
 $(OBJ)/helper.$(OBJBASE): $(SRC)/helper.c \
- $(addprefix $(INCLUDE)/, helper.h apu/sound.h apu/spc.h misc.h cpu/cpu.h \
- wrapaleg.h)
+ $(addprefix $(INCLUDE)/, helper.h platform.h snes.h apu/sound.h apu/spc.h \
+ misc.h cpu/cpu.h wrapaleg.h)
 $(OBJ)/input.$(OBJBASE): $(SRC)/input.c \
- $(addprefix $(INCLUDE)/, input.h helper.h cpu/cpu.h apu/sound.h misc.h \
- wrapaleg.h)
+ $(addprefix $(INCLUDE)/, input.h helper.h platform.h snes.h cpu/cpu.h \
+ apu/sound.h apu/spc.h misc.h wrapaleg.h)
+
 $(OBJ)/apu/spc700.$(OBJBASE): $(SRC)/apu/spc700.c $(OBJFIX) \
  $(addprefix $(INCLUDE)/, helper.h wrapaleg.h platform.h misc.h \
  apu/sound.h apu/spc.h apu/sounddef.h debug.h cpu/cpu.h snes.h)
 $(OBJ)/apu/sound.$(OBJBASE): $(SRC)/apu/sound.c \
- $(addprefix $(INCLUDE)/, helper.h apu/sound.h apu/sounddef.h apu/spc.h \
- misc.h wrapaleg.h)
+ $(addprefix $(INCLUDE)/, helper.h platform.h snes.h apu/sound.h \
+ apu/sounddef.h apu/spc.h misc.h wrapaleg.h)
 $(OBJ)/map.$(OBJBASE): $(SRC)/map.c \
- $(addprefix $(INCLUDE)/, map.h version.h)
+ $(addprefix $(INCLUDE)/, map.h misc.h)
 $(OBJ)/multiio.$(OBJBASE): $(SRC)/multiio.c \
- $(addprefix $(INCLUDE)/, multiio.h map.h version.h)
+ $(addprefix $(INCLUDE)/, multiio.h map.h misc.h unzip.h)
+
+$(OBJ)/unzip.o: $(SRC)/unzip.c $(INCLUDE)/unzip.h
 
 .PHONY: all maketree clean badplatform $(sort $(OBJDIRS))

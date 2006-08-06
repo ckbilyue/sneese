@@ -21,7 +21,7 @@ Changes
   DBJH          Daniel Horchner
 
 
- 0.843
+ 0.85
   5A22: Improved self-generated IRQ behavior, thanks to byuu for
    information [TRAC]
   PPU: Added some missing precision limitations to mode 7, thanks to
@@ -30,6 +30,23 @@ Changes
    early [TRAC]
   Source: fixed a few minor source issues that could lead to compiler
    warnings or errors [TRAC]
+  PPU: Translated much of the graphics rendering code to C [TRAC]
+  PPU: Fixed bugs in rendering of offset-change BGs when mosaic was
+   enabled [TRAC]
+  PPU: Added window clipping to OBJ and to EXTBG mode 7 [TRAC]
+  PPU: Implemented direct color mode for 8-bit pixels on BG1 [TRAC]
+  PPU: Implemented color window emulation, including fixed color and 
+   sub screen arithmetic modes and most, if not all, of the various
+   edge cases [TRAC]
+  ROM loader: Fixed a bug where IPS auto-patching would only work
+   on the first ROM loaded [TRAC]
+  PPU: Fixed mosaic support [TRAC]
+  ROM loader: Fixed a bug in ROM allocation resizing which could
+   cause crashes [TRAC]
+  ROM loader: Fixed a bug where IPS auto-patching could cause
+   incorrect memory mapping on LoROM [TRAC]
+  ROM loader: Fixed a bug where IPS auto-patching could potentially
+   cause bad patches or crashes when extending the ROM size [TRAC]
  0.842
   SPC700: Added support for BCD fixup opcodes DAA and DAS, thanks to
    anomie and Overload for information and resources for research and

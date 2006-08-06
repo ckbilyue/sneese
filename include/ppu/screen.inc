@@ -3,7 +3,7 @@
 SNEeSe, an Open Source Super NES emulator.
 
 
-Copyright (c) 1998-2005, Charles Bilyue'.
+Copyright (c) 1998-2006, Charles Bilyue'.
 Portions copyright (c) 1998-2003, Brad Martin.
 Portions copyright (c) 2003-2004, Daniel Horchner.
 Portions copyright (c) 2004-2005, Nach. ( http://nsrt.edgeemu.com/ )
@@ -35,7 +35,6 @@ EXTERN DisplayZ
 EXTERN Zbase,Zpositions,Zbase_main,Zbase_sub
 EXTERN_C screen_text_start,screen_data_start,screen_bss_start
 EXTERN Tile_Offset_Table_16_8
-EXTERN Screen_Mode
 
 EXTERN palette_2bpl,palette_4bpl
 
@@ -58,7 +57,6 @@ EXTERN Tile_priority_bit
 EXTERN Tile_Priority_Used
 EXTERN Tile_Priority_Unused
 
-EXTERN Render_Select,Render_Mode
 EXTERN_C Update_Display
 EXTERN Tile_Width,Tile_Height
 EXTERN NO_PLANES
@@ -66,14 +64,17 @@ EXTERN NO_PLANES
 EXTERN Sort_Screen_Height_Mosaic
 EXTERN Sort_Screen_Height
 
-EXTERN_C SCREEN_MODE_0
-EXTERN_C SCREEN_MODE_1
-EXTERN_C SCREEN_MODE_2
-EXTERN_C SCREEN_MODE_3
-EXTERN_C SCREEN_MODE_4
-EXTERN_C SCREEN_MODE_5
-EXTERN_C SCREEN_MODE_6
+EXTERN_C Render_Select,Render_Mode
 %endif
+
+EXTERN_C Screen_Mode
+
+EXTERN_C SCREEN_MODE_0_1
+EXTERN_C SCREEN_MODE_2_6
+
+EXTERN_C Render_Layering_Option_0
+EXTERN_C Render_Layering_Option_1
+EXTERN_C Render_Layering_Option_2
 
 %ifndef SNEeSe_ppu_mode7_asm
 EXTERN SNES_R2134,SNES_R2135,SNES_R2136
@@ -156,10 +157,7 @@ EXTERN ClipTableStart,ClipLeftTable,ClipRightTable
 EXTERN TileClip1,TileClip1Left,TileClip1Right
 EXTERN TileClip2,TileClip2Left,TileClip2Right
 
-EXTERN Redo_Layering,Redo_Windowing
-EXTERN_C Render_Layering_Option_0
-EXTERN_C Render_Layering_Option_1
-EXTERN_C Render_Layering_Option_2
+EXTERN_C Redo_Layering,Redo_Windowing
 EXTERN_C Recalc_Window_Effects
 EXTERN_C Recalc_Window_Area_BG
 EXTERN_C Intersect_Window_Area_AND
@@ -172,10 +170,13 @@ EXTERN_C Win2_Count_In,Win2_Count_Out,Win2_Bands_In,Win2_Bands_Out
 EXTERN_C WH0,WH1,WH2,WH3
 EXTERN_C TM,TS,TMW,TSW
 
-EXTERN Window_Offset_First,Window_Offset_Second
-EXTERN TM_Allowed,TS_Allowed,Layers_In_Use
+EXTERN_C Window_Offsets
+Window_Offset_First  equ C_LABEL(Window_Offsets)
+Window_Offset_Second equ (C_LABEL(Window_Offsets) + 4)
+
+EXTERN_C TM_Allowed,TS_Allowed,Layers_In_Use
 EXTERN Layers_Low,Layers_High
-EXTERN SCR_TM,SCR_TS,SCR_TMW,SCR_TSW
+EXTERN_C SCR_TM,SCR_TS,SCR_TMW,SCR_TSW
 EXTERN_C Layer_Disable_Mask,Layering_Mode
 
 %macro EXTERN_WIN_DATA 1
@@ -203,9 +204,7 @@ EXTERN_C Win%1_Bands
 
 %endif
 
-%define GfxBufferLineSlack BIT(GfxBufferLineSlackShift)
-%define GfxBufferLineSlackShift 3
-%define GfxBufferLinePitch (256+GfxBufferLineSlack)
+%define GfxBufferLinePitch (256)
 
 %define Redo_Win_BG(x) BIT((x) - 1)
 %define Redo_Win_OBJ BIT(4)
@@ -291,7 +290,6 @@ ALIGNC
  mov edi,[ScreenDestPtr]
  add edi,256        ; Point screen to next line
 %%screen_off:
- add edi,byte GfxBufferLineSlack
  mov [ScreenDestPtr],edi
 %endif
 %endmacro

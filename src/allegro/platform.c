@@ -3,7 +3,7 @@
 SNEeSe, an Open Source Super NES emulator.
 
 
-Copyright (c) 1998-2005, Charles Bilyue'.
+Copyright (c) 1998-2006, Charles Bilyue'.
 Portions copyright (c) 1998-2003, Brad Martin.
 Portions copyright (c) 2003-2004, Daniel Horchner.
 Portions copyright (c) 2004-2005, Nach. ( http://nsrt.edgeemu.com/ )
@@ -153,17 +153,11 @@ void LoadConfigCurrent(void)
   /* Pentium class CPU, except Pentium Overdrive CPUs for 486 systems */
   (cpu_family == 5 && cpu_model != 5));
 
- /* Enable partial cache preloading by default on Pentium class CPUs, */
- /*  and on 486DX2WBE and 486DX4 CPUs */
+ /* Enable partial cache preloading by default on Pentium class CPUs */
  preload_cache_2 = preload_cache ? preload_cache :
   get_config_int("extras", "preload_cache_2",
-   ((cpu_family == 4 &&
-   /* 486DX2WBE or 486DX4 */
-    (cpu_model == 7 || cpu_model == 8 ||
-   /* am5x86 */
-    (cpu_model == 15 && !strcmp(cpu_vendor, "AuthenticAMD")))) ||
    /* Pentium class CPU */
-   (cpu_family == 5)));
+   (cpu_family == 5));
 
  CONTROLLER_1_TYPE = get_config_int("input", "controller_1_type", 0);
  if (CONTROLLER_1_TYPE > 2 || (CONTROLLER_1_TYPE == 2 && !mouse_available))
@@ -204,7 +198,59 @@ void LoadConfigCurrent(void)
 void FixupConfig(void)
 {
  /* Compatibility with old screen modes */
- if (cfg_version < 0.72)
+ if (cfg_version < 0.843)
+ {
+#ifdef ALLEGRO_DOS
+  switch (SCREEN_MODE)
+  {
+  case 0:   /* 0: 320x200x256 VGA    -> 0: 320x200x16b VESA2 */
+  case 4:   /* 4: 320x200x16b VESA2  -> 0: 320x200x16b VESA2 */
+   SCREEN_MODE = 0;
+   break;
+
+  case 1:   /* 1: 320x240x256 VESA2  -> 1: 320x240x16b VESA2 */
+  case 2:   /* 2: 320x240x256 MODE-X -> 1: 320x240x16b VESA2 */
+  case 3:   /* 3: 256x239x256 VGA    -> 1: 320x240x16b VESA2 */
+  case 5:   /* 5: 320x240x16b VESA2  -> 1: 320x240x16b VESA2 */
+   SCREEN_MODE = 1;
+   break;
+
+  case 6:   /* 6: 640x480x16b VESA2  -> 2: 640x480x16b VESA2 */
+   SCREEN_MODE = 2;
+   break;
+  }
+#elif defined(ALLEGRO_WINDOWS) || defined(ALLEGRO_UNIX) || defined(ALLEGRO_BEOS)
+  switch (SCREEN_MODE)
+  {
+  case 0:   /* 0: 320x200x256 WIN    -> 0: 320x200x16b WIN   */
+  case 4:   /* 4: 320x200x16b WIN    -> 0: 320x200x16b WIN   */
+   SCREEN_MODE = 0;
+   break;
+
+  case 1:   /* 1: 320x240x256 WIN    -> 1: 320x240x16b WIN   */
+  case 5:   /* 5: 320x240x16b WIN    -> 1: 320x240x16b WIN   */
+   SCREEN_MODE = 1;
+   break;
+
+  case 6:   /* 6: 640x480x16b WIN    -> 2: 640x480x16b WIN   */
+   SCREEN_MODE = 2;
+   break;
+
+  case 3:   /* 3: 256x239x256 WIN    -> 3: 256x239x16b WIN   */
+   SCREEN_MODE = 3;
+   break;
+
+  case 2:   /* 2: 320x240x256 FS     -> 4: 320x240x16b FS    */
+   SCREEN_MODE = 4;
+   break;
+
+  case 7:   /* 7: 640x480x16b FS     -> 5: 640x480x16b FS    */
+   SCREEN_MODE = 5;
+   break;
+  }
+#endif
+ }
+ else if (cfg_version < 0.72)
  {
   if (SCREEN_MODE > 8)
   {
@@ -285,13 +331,10 @@ void SaveConfig(void)
  fprintf(cfg, "[display]\n");
  fprintf(cfg, "# Available screen modes:\n");
 #ifdef ALLEGRO_DOS
- fprintf(cfg, "#  0:320x200x256 VGA       1:320x240x256 VESA2     2:320x240x256 MODE-X\n");
- fprintf(cfg, "#  3:256x239x256 VGA       4:320x200x16b VESA2     5:320x240x16b VESA2\n");
- fprintf(cfg, "#  6:640x480x16b VESA2\n");
+ fprintf(cfg, "#  0:320x200x16b VESA2     1:320x240x16b VESA2     2:640x480x16b VESA2\n");
 #elif defined(ALLEGRO_WINDOWS) || defined(ALLEGRO_UNIX) || defined(ALLEGRO_BEOS)
- fprintf(cfg, "#  0:320x200x256 WIN       1:320x240x256 WIN       2:320x240x256 FS\n");
- fprintf(cfg, "#  3:256x239x256 WIN       4:320x200x16b WIN       5:320x240x16b WIN\n");
- fprintf(cfg, "#  6:640x480x16b WIN       7:640x480x16b FS\n");
+ fprintf(cfg, "#  0:320x200x16b WIN       1:320x240x16b WIN       2:640x480x16b WIN\n");
+ fprintf(cfg, "#  3:256x239x16b WIN       4:320x240x16b FS        5:640x480x16b FS\n");
 #endif
  fprintf(cfg, "screenmode=%d\n", SCREEN_MODE);
  fprintf(cfg, "\n");
@@ -437,9 +480,9 @@ int platform_init(int argc, char **argv)
 
  allegro_init();
 
- if (cpu_family < 4)
+ if (cpu_family < 5)
  {
-  printf("SNEeSe requires a 486 or better!\n");
+  printf("SNEeSe requires a 586-class CPU or better!\n");
   return 1;
  }
 
@@ -937,3 +980,7 @@ void platform_resume_audio_voice(SNEESE_AUDIO_VOICE *audio_voice)
   voice_start(((AUDIOSTREAM *) (audio_voice->platform_interface))->voice);
 }
 
+void platform_yield(void)
+{
+ rest(1);
+}

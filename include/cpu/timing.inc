@@ -3,7 +3,7 @@
 SNEeSe, an Open Source Super NES emulator.
 
 
-Copyright (c) 1998-2005, Charles Bilyue'.
+Copyright (c) 1998-2006, Charles Bilyue'.
 Portions copyright (c) 1998-2003, Brad Martin.
 Portions copyright (c) 2003-2004, Daniel Horchner.
 Portions copyright (c) 2004-2005, Nach. ( http://nsrt.edgeemu.com/ )
@@ -593,7 +593,14 @@ EXTERN_C fast_forward_enabled
  test ebx,ebx
 ; HLT should be more multi-tasking friendly but appears
 ; to cause problems with pure DOS in some cases?
- jz .speed_cap_wait    ;speed_cap_wait_hlt
+ jnz .no_speed_cap
+ push ecx
+ push edx
+EXTERN C_LABEL(platform_yield)
+ call C_LABEL(platform_yield)
+ pop edx
+ pop ecx
+ jmp .speed_cap_wait    ;speed_cap_wait_hlt
 
 .no_speed_cap:
  mov ebx,[C_LABEL(Timer_Counter_Throttle)]
@@ -837,73 +844,7 @@ section .text
 ALIGNC
 EXPORT NMI
  UpdateDisplay  ;*
- mov ax,[C_LABEL(Real_SNES_Palette)]
- push eax
 
- mov al,[C_LABEL(fixedpalettecheck)]
- test al,al
- jz .Do_Copy
-
-.Fixed_Back_Color_Add_Hack:
- mov eax,[C_LABEL(COLDATA)]
-%if 1
- push ebx
- mov bx,[C_LABEL(Real_SNES_Palette)]
- push ecx
- push edx
- mov ecx,(BIT(5) + BIT(10) + BIT(15))
- mov edx,ebx
-
- ; get LSBs
- and edx,ecx
- and ebx,~(BIT(5) + BIT(10) + BIT(15))
- and ecx,eax
- and eax,~(BIT(5) + BIT(10) + BIT(15))
- ; add LSBs
- add ecx,edx
- mov edx,(BIT(5) + BIT(10) + BIT(15)) * 2
- ; add colors
- add eax,ebx
- and edx,ecx
- mov ebx,(BIT(5) + BIT(10) + BIT(15))
- add eax,edx
- and ecx,ebx
- and ebx,eax
- add eax,ecx
- ; Perform saturation
-
- ; save carry bits
- mov edx,ebx
- ; correct for carry/overflow into LSBs of adjacent color components
- sub eax,ebx
- shr edx,5      ; shift carry bits down to color LSBs
- neg edx        ; subtract from zero to get mask...
- add edx,ebx    ; add in carry bits to correct for borrows
- or eax,edx     ; apply saturation mask
-
-.Add_Hack_End:
- pop edx
- pop ecx
- pop ebx
-%endif
- mov [C_LABEL(Real_SNES_Palette)],ax
-
- mov byte [C_LABEL(PaletteChanged)],1
-
-.Do_Copy:
- cmp byte [C_LABEL(FPS_ENABLED)],0
- jz .no_fps_counter
-%ifndef SNEeSe_No_GUI
- call C_LABEL(ShowFPS)
-%endif
-.no_fps_counter:
- cmp byte [C_LABEL(BREAKS_ENABLED)],0
- jz .no_breaks_counter
-%ifndef SNEeSe_No_GUI
- call C_LABEL(ShowBreaks)
-%endif
-.no_breaks_counter:
- mov dword [C_LABEL(BreaksLast)],0
 %ifndef SINGLE_STEP
  call C_LABEL(Copy_Screen)
  mov eax,[C_LABEL(Current_Line_Render)]
@@ -911,8 +852,6 @@ EXPORT NMI
 %endif
 ;call C_LABEL(Display_Debug)
 
- pop eax
- mov [C_LABEL(Real_SNES_Palette)],ax
 EXPORT NMI_NoRender
 section .data
 .str:db " nmi_norender ",0

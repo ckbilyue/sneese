@@ -3,7 +3,7 @@
 SNEeSe, an Open Source Super NES emulator.
 
 
-Copyright (c) 1998-2005, Charles Bilyue'.
+Copyright (c) 1998-2006, Charles Bilyue'.
 Portions copyright (c) 1998-2003, Brad Martin.
 Portions copyright (c) 2003-2004, Daniel Horchner.
 Portions copyright (c) 2004-2005, Nach. ( http://nsrt.edgeemu.com/ )
@@ -20,7 +20,7 @@ You must read and accept the license prior to use.
 
 %endif
 
-;%define FORCE_MOSAIC 2
+;%define FORCE_MOSAIC 3
 %define Set_Based_Tile_Cache
 ;%define Profile_VRAM_Writes
 ;%define Check_Within_Tile_Set
@@ -67,7 +67,6 @@ EXTERN_C SNES_COUNTRY
 EXTERN Ready_Line_Render
 EXTERN_C PaletteChanged
 EXTERN_C Offset_Change_Disable
-EXTERN_C fixedpalettecheck
 
 EXTERN_C SPC_MASK
 EXTERN_C OutputScreen
@@ -328,12 +327,16 @@ dd 0<<10,1<<10,2<<10,3<<10,4<<10,5<<10,6<<10,7<<10
 ;  5 = 2-bit   6 = 4-bit   7=8-bit
 ; Special
 ;  4 = mode-7  9 = 2-bit mode-0        0 = no more layers
+; Offset Change Hi-Res
+; 10 = 4-bit
+; Hi-Res
+; 13 = 2-bit  14 = 4-bit
 ; 4 layers, 8 bytes per layer ([4][8] array)
 BGMODE_Depth_Table:
-db 9,2,6,3,7,2,6,4
-db 9,2,6,2,5,1,0,0
-db 9,1,0,0,0,0,0,0
-db 9,0,0,0,0,0,0,0
+db  9, 2, 6, 3, 7,14,10, 4
+db  9, 2, 6, 2, 5,13, 0, 8
+db  9, 1, 0, 0, 0, 0, 0, 0
+db  9, 0, 0, 0, 0, 0, 0, 0
 
 ; These layers are allowed ***
 BGMODE_Allowed_Layer_Mask_Table:
@@ -348,35 +351,7 @@ BGMODE_Allowed_Offset_Change_Table:
 db 0,0,0xFF,0,0xFF,0,0xFF,0
 
 ALIGND
-LineRenderSmall:
-dd 0,C_LABEL(Render_8x8_C2)
-dd C_LABEL(Render_8x8_C4),C_LABEL(Render_8x8_C8)
-dd C_LABEL(SCREEN_MODE_7),C_LABEL(Render_Offset_8x8_C2)
-dd C_LABEL(Render_Offset_8x8_C4),C_LABEL(Render_Offset_8x8_C8)
-dd 0,C_LABEL(Render_8x8_C2)
-
-LineRenderLarge:
-dd 0,C_LABEL(Render_16x16_C2)
-dd C_LABEL(Render_16x16_C4),C_LABEL(Render_16x16_C8)
-dd C_LABEL(SCREEN_MODE_7),C_LABEL(Render_Offset_16x16_C2)
-dd C_LABEL(Render_Offset_16x16_C4),C_LABEL(Render_Offset_16x16_C8)
-dd 0,C_LABEL(Render_16x16_C2)
-
-LineRenderEvenSmall:
-dd 0,C_LABEL(Render_16x8_Even_C2)
-dd C_LABEL(Render_16x8_Even_C4),0
-dd C_LABEL(SCREEN_MODE_7),C_LABEL(Render_16x8_Even_C2)
-;dd C_LABEL(Render_16x8_Even_C4),0
-dd C_LABEL(Render_Offset_16x8_Even_C4),0
-
-LineRenderEvenLarge:
-dd 0,C_LABEL(Render_16x16_Even_C2)
-dd C_LABEL(Render_16x16_Even_C4),0
-dd C_LABEL(SCREEN_MODE_7),C_LABEL(Render_16x16_Even_C2)
-;dd C_LABEL(Render_16x16_Even_C4),0
-dd C_LABEL(Render_Offset_16x16_Even_C4),0
-
-Depth_NBA_Table:
+EXPORT Depth_NBA_Table
 %ifdef USE_8BPL_CACHE_FOR_4BPL
 dd 0,BGNBA_Table_2,BGNBA_Table_8,BGNBA_Table_8  ;*
 %else
@@ -552,19 +527,14 @@ EXPORT Reset_Ports
  ;Reset PPU2 Latch state
  mov byte [PPU2_Latch_External],0
 
- mov dword [Render_Select],C_LABEL(Render_Layering_Option_0)
  mov byte [C_LABEL(Layering_Mode)],0
 
  mov dword [C_LABEL(LastRenderLine)],224
 
  mov [Display_Needs_Update],al
 
- mov byte [Redo_Windowing],-1
- mov byte [Redo_Layering],-1
- mov dword [Window_Offset_First],BG_Win_Main
- mov dword [Window_Offset_Second],BG_Win_Sub
- mov [Layers_Low],al
- mov [Layers_High],al
+ mov byte [C_LABEL(Redo_Windowing)],-1
+ mov byte [C_LABEL(Redo_Layering)],-1
 
  mov [WMADDL],eax
 
@@ -605,8 +575,6 @@ EXPORT Reset_Ports
  mov byte [Redo_Offset_Change],0
  mov byte [Redo_Offset_Change_VOffsets],0xFF
 
- mov [C_LABEL(BGMODE)],al
- mov [C_LABEL(Base_BGMODE)],al
  mov [C_LABEL(BG12NBA)],al
  mov [C_LABEL(BG34NBA)],al
  mov [NBABG1],al
@@ -658,46 +626,28 @@ EXPORT Reset_Ports
  mov [C_LABEL(BG4HOFS)],eax
  mov [C_LABEL(BG4VOFS)],eax
 
- mov [SetAddressBG1],eax
- mov [SetAddressBG2],eax
- mov [SetAddressBG3],eax
- mov [SetAddressBG4],eax
+ mov byte [BG_Flag_BG1],BIT(0)
+ mov byte [BG_Flag_BG2],BIT(1)
+ mov byte [BG_Flag_BG3],BIT(2)
+ mov byte [BG_Flag_BG4],BIT(3)
+
+ mov byte [OC_Flag_BG1],BIT(5)
+ mov byte [OC_Flag_BG2],BIT(6)
+
+ mov [C_LABEL(BGMODE)],al
+ mov [C_LABEL(Base_BGMODE)],al
 
  mov dword [M0_Color_BG1],0x03030303
  mov dword [M0_Color_BG2],0x23232323
  mov dword [M0_Color_BG3],0x43434343
  mov dword [M0_Color_BG4],0x63636363
 
- mov byte [BG_Flag_BG1],BIT(0)
- mov byte [BG_Flag_BG2],BIT(1)
- mov byte [BG_Flag_BG3],BIT(2)
- mov byte [BG_Flag_BG4],BIT(3)
-
- mov byte [OC_Flag_BG1],0x20
- mov byte [OC_Flag_BG2],0x40
-
- mov dword [NBATableBG1],BGNBA_Table_2
- mov dword [NBATableBG2],BGNBA_Table_2
- mov dword [NBATableBG3],BGNBA_Table_2
- mov dword [NBATableBG4],BGNBA_Table_2
-
- mov dword [LineRenderBG1],C_LABEL(Render_8x8_C2)
- mov dword [LineRenderBG2],C_LABEL(Render_8x8_C2)
- mov dword [LineRenderBG3],C_LABEL(Render_8x8_C2)
- mov dword [LineRenderBG4],C_LABEL(Render_8x8_C2)
-
- mov byte [TileHeightBG1],1
- mov byte [TileHeightBG2],1
- mov byte [TileHeightBG3],1
- mov byte [TileHeightBG4],1
- mov byte [TileWidthBG1],1
- mov byte [TileWidthBG2],1
- mov byte [TileWidthBG3],1
- mov byte [TileWidthBG4],1
- mov byte [DepthBG1],1
- mov byte [DepthBG2],1
- mov byte [DepthBG3],1
- mov byte [DepthBG4],1
+ pusha
+ push eax
+EXTERN C_LABEL(update_bg_handlers)
+ call C_LABEL(update_bg_handlers)
+ pop eax
+ popa
 
  mov eax,C_LABEL(VRAM)
  mov [TLMapAddressBG1],eax  ;MapAddressBG1
@@ -726,8 +676,8 @@ EXPORT Reset_Ports
  Set_21_Write 0x19,SNES_W2119_NORM
  mov [VMDATAREAD_buffer],eax
 
- mov eax,[Screen_Mode]
- mov [Render_Mode],eax
+ mov eax,[C_LABEL(Screen_Mode)]
+ mov [C_LABEL(Render_Mode)],eax
 
  popa
  ret
@@ -1008,189 +958,24 @@ SNES_W2105: ; BGMODE
  mov [BGMODE_Allowed_Layer_Mask],bl
 
  mov bl,[BGMODE_Allowed_Offset_Change_Table+edx]
- mov ecx,[Screen_Mode+edx*4]
+ mov ecx,[C_LABEL(Screen_Mode)+edx*4]
  lea edx,[BGMODE_Depth_Table+edx]
  mov [BGMODE_Allowed_Offset_Change],bl
  mov [Redo_Offset_Change],bl
- mov [Render_Mode],ecx
+ mov [C_LABEL(Render_Mode)],ecx
 
-; DepthBG1 = BGMODE_Depth_Table[0][mode];
-; if (DepthBG1 & 3)
-; {
-;  int tilesize;
-;  NBATableBG1 = Depth_NBA_Table[DepthBG1 & 3];
-;  SetAddressBG1 = NBATableBG1[NBABG1];
-;  tilesize = BGMODE & 0x10 ? 2 : 1;
-;  TileHeightBG1 = TileWidthBG1 = tilesize;
-;
-;  DepthBG2 = BGMODE_Depth_Table[1][mode];
-;  if (DepthBG2 & 3)
-;  {
-;   NBATableBG2 = Depth_NBA_Table[DepthBG2 & 3];
-;   SetAddressBG2 = NBATableBG2[NBABG2];
-;   tilesize = BGMODE & 0x20 ? 2 : 1;
-;   TileHeightBG2 = TileWidthBG2 = tilesize;
-;
-;   DepthBG3 = BGMODE_Depth_Table[2][mode];
-;   DepthBG4 = BGMODE_Depth_Table[3][mode];
-;
-;   tilesize = BGMODE & 0x40 ? 2 : 1;
-;   TileHeightBG3 = TileWidthBG3 = tilesize;
-;
-;   tilesize = BGMODE & 0x80 ? 2 : 1;
-;   TileHeightBG4 = TileWidthBG4 = tilesize;
-;  }
+ mov byte [C_LABEL(Redo_Layering)],-1
 
- mov cl,[edx]
- mov bl,[NBABG1]
- mov [DepthBG1],cl
- and ecx,byte 3
- jz .no_more_tile_layers
-
- mov ecx,[Depth_NBA_Table+ecx*4]
- mov [NBATableBG1],ecx
- mov ecx,[ecx+ebx*4]
- mov [SetAddressBG1],ecx
-
- test al,0x10   ; get (tile height / 8) for BG1
- mov bl,2
- jnz .large_tiles_bg1_1
- mov bl,1
-.large_tiles_bg1_1:
- mov [TileHeightBG1],bl
- mov [TileWidthBG1],bl
-
- mov cl,[edx+8]
- mov bl,[NBABG2]
- mov [DepthBG2],cl
- and ecx,byte 3
- jz .no_more_tile_layers
- mov ecx,[Depth_NBA_Table+ecx*4]
- mov [NBATableBG2],ecx
- mov ecx,[ecx+ebx*4]
- mov [SetAddressBG2],ecx
-
- test al,0x20   ; get (tile height / 8) for BG2
- mov bl,2
- jnz .large_tiles_bg2_1
- mov bl,1
-.large_tiles_bg2_1:
- mov [TileHeightBG2],bl
- mov [TileWidthBG2],bl
-
- mov bl,[edx+16]
- mov cl,[edx+24]
- mov [DepthBG3],bl
- mov [DepthBG4],cl
-
- test al,0x40   ; get (tile height / 8) for BG3
- mov bl,2
- jnz .large_tiles_bg3_1
- mov bl,1
-.large_tiles_bg3_1:
- mov [TileHeightBG3],bl
- mov [TileWidthBG3],bl
-
- test al,al     ; get (tile height / 8) for BG4
- mov bl,2
- js .large_tiles_bg4_1
- mov bl,1
-.large_tiles_bg4_1:
- mov [TileHeightBG4],bl
- mov [TileWidthBG4],bl
-
-
-.no_more_tile_layers:
- mov byte [Redo_Layering],-1
- mov al,[C_LABEL(BGMODE)]
-
- mov edx,eax
- and edx,byte 7
- xor ebx,ebx
- cmp edx,byte 5
- jae .wide_mode
-
- mov bl,[DepthBG1]
- test al,0x10
- mov edx,[LineRenderLarge+ebx*4]
- jnz .large_tiles_bg1_2
- mov edx,[LineRenderSmall+ebx*4]
-.large_tiles_bg1_2:
- mov [LineRenderBG1],edx
-
- mov bl,[DepthBG2]
- test al,0x20
- mov edx,[LineRenderLarge+ebx*4]
- jnz .large_tiles_bg2_2
- mov edx,[LineRenderSmall+ebx*4]
-.large_tiles_bg2_2:
- mov [LineRenderBG2],edx
-
- mov bl,[DepthBG3]
- test al,0x40
- mov edx,[LineRenderLarge+ebx*4]
- jnz .large_tiles_bg3_2
- mov edx,[LineRenderSmall+ebx*4]
-.large_tiles_bg3_2:
- mov [LineRenderBG3],edx
-
- mov bl,[DepthBG4]
- test al,al
- mov edx,[LineRenderLarge+ebx*4]
- js .large_tiles_bg4_2
- mov edx,[LineRenderSmall+ebx*4]
-.large_tiles_bg4_2:
- mov [LineRenderBG4],edx
+ pusha
+ movzx eax,byte [C_LABEL(BGMODE)]
+ push eax
+ call C_LABEL(update_bg_handlers)
+ pop eax
+ popa
 
  pop ecx
  pop ebx
 .no_change:
- ret
-
-ALIGNC
-; Mode 5/6: uses half-wide tile counts for half-512
-.wide_mode:
- mov bl,1
- ; 16-wide tiles with 8-wide addressing on background layers always
- mov [TileWidthBG1],bl
- mov [TileWidthBG2],bl
- mov [TileWidthBG3],bl
- mov [TileWidthBG4],bl
-
- mov bl,[DepthBG1]
- test al,0x10
- mov edx,[LineRenderEvenLarge+ebx*4]
- jnz .large_tiles_wide_bg1
- mov edx,[LineRenderEvenSmall+ebx*4]
-.large_tiles_wide_bg1:
- mov [LineRenderBG1],edx
-
- mov bl,[DepthBG2]
- test al,0x20
- mov edx,[LineRenderEvenLarge+ebx*4]
- jnz .large_tiles_wide_bg2
- mov edx,[LineRenderEvenSmall+ebx*4]
-.large_tiles_wide_bg2:
- mov [LineRenderBG2],edx
-
- mov bl,[DepthBG3]
- test al,0x40
- mov edx,[LineRenderEvenLarge+ebx*4]
- jnz .large_tiles_wide_bg3
- mov edx,[LineRenderEvenSmall+ebx*4]
-.large_tiles_wide_bg3:
- mov [LineRenderBG3],edx
-
- mov bl,[DepthBG4]
- test al,al
- mov edx,[LineRenderEvenLarge+ebx*4]
- js .large_tiles_wide_bg4
- mov edx,[LineRenderEvenSmall+ebx*4]
-.large_tiles_wide_bg4:
- mov [LineRenderBG4],edx
-
- pop ecx
- pop ebx
  ret
 
 ALIGNC
@@ -1205,6 +990,17 @@ SNES_W2106: ; MOSAIC
  mov al,0x0F + (FORCE_MOSAIC << 4) ;***
 %endif
  mov [MOSAIC],al
+
+ jmp .mosaic_on ;*
+ test al,0xF0
+ jnz .mosaic_on
+ cmp byte [MosaicCountdown],0
+ jnz .mosaic_on
+
+ ; turn mosaic handling off, since it won't be doing anything
+ and al,~0x0F
+.mosaic_on:
+
  mov edx,eax
  and al,0x01
  mov [MosaicBG1],al
@@ -1334,15 +1130,33 @@ SNES_W210B: ; BG12NBA
  and ebx,byte 7
  mov edx,[NBATableBG1]
  mov [NBABG1],bl
+ test edx,edx
+ jz .no_nba1
+
  mov ebx,[edx+ebx*4]
  mov [SetAddressBG1],ebx
+ jmp .have_nba1
+
+.no_nba1:
+ mov dword [SetAddressBG1],0
+.have_nba1:
+
  mov bl,al
  shr ebx,4
  and ebx,byte 7
  mov edx,[NBATableBG2]
  mov [NBABG2],bl
+ test edx,edx
+ jz .no_nba2
+
  mov ebx,[edx+ebx*4]
  mov [SetAddressBG2],ebx
+ jmp .have_nba2
+
+.no_nba2:
+ mov dword [SetAddressBG2],0
+.have_nba2:
+
  pop ebx
 .no_change:
  ret
@@ -1357,12 +1171,14 @@ SNES_W210C: ; BG34NBA
 
  mov ebx,eax
  and ebx,byte 7
+ mov [NBABG3],bl
  shl ebx,12     ; * 8k * 4 (2bpl) / 8
  mov [SetAddressBG3],ebx
 
  mov ebx,eax
  shr ebx,4
  and ebx,byte 7
+ mov [NBABG4],bl
  shl ebx,12     ; * 8k * 4 (2bpl) / 8
  mov [SetAddressBG4],ebx
 
@@ -1755,7 +1571,7 @@ SNES_W2117: ; VMADDH
  inc edi
  js %%recache_done  ; No set to recache?
  sub edi,[Tile_Recache_Set_Begin]
- call Recache_Tile_Set
+ call Recache_Tile_Set_work
 %%recache_done:
  pop edi
  mov [Tile_Recache_Set_Begin],edx
@@ -1956,7 +1772,7 @@ SNES_W2122: ; CGDATA
  ; Palette should be set even if just lo byte set!
  ; We now set the palette in CGRAM
 
-;UpdateDisplay  ;*16-bit rendering only
+ UpdateDisplay  ;*16-bit rendering only
 ;push edx
  push ebx
  push eax
@@ -2000,7 +1816,7 @@ SNES_W2123: ; W12SEL
  cmp al,[C_LABEL(W12SEL)]
  je .no_change
  UpdateDisplay  ;*windowing only
- or byte [Redo_Windowing],Redo_Win_BG(1) | Redo_Win_BG(2)
+ or byte [C_LABEL(Redo_Windowing)],Redo_Win_BG(1) | Redo_Win_BG(2)
  mov [C_LABEL(W12SEL)],al
  mov [WSELBG1],al
  shr al,4
@@ -2015,7 +1831,7 @@ SNES_W2124: ; W34SEL
  cmp al,[C_LABEL(W34SEL)]
  je .no_change
  UpdateDisplay  ;*windowing only
- or byte [Redo_Windowing],Redo_Win_BG(3) | Redo_Win_BG(4)
+ or byte [C_LABEL(Redo_Windowing)],Redo_Win_BG(3) | Redo_Win_BG(4)
  mov [C_LABEL(W34SEL)],al
  mov [WSELBG3],al
  shr al,4
@@ -2030,7 +1846,7 @@ SNES_W2125: ; WOBJSEL
  cmp al,[C_LABEL(WOBJSEL)]
  je .no_change
  UpdateDisplay  ;*windowing only
- or byte [Redo_Windowing],Redo_Win_OBJ | Redo_Win_Color
+ or byte [C_LABEL(Redo_Windowing)],Redo_Win_OBJ | Redo_Win_Color
  mov [C_LABEL(WOBJSEL)],al
 
 .no_change:
@@ -2041,7 +1857,7 @@ SNES_W2126: ; WH0
  cmp al,[C_LABEL(WH0)]
  je .no_change
  UpdateDisplay  ;*windowing only
- or byte [Redo_Windowing],Redo_Win(1) | \
+ or byte [C_LABEL(Redo_Windowing)],Redo_Win(1) | \
   Redo_Win_BG(1) | Redo_Win_BG(2) | Redo_Win_BG(3) | Redo_Win_BG(4) | \
   Redo_Win_OBJ | Redo_Win_Color
  mov [C_LABEL(WH0)],al
@@ -2055,7 +1871,7 @@ SNES_W2127: ; WH1
  cmp al,[C_LABEL(WH1)]
  je .no_change
  UpdateDisplay  ;*windowing only
- or byte [Redo_Windowing],Redo_Win(1) | \
+ or byte [C_LABEL(Redo_Windowing)],Redo_Win(1) | \
   Redo_Win_BG(1) | Redo_Win_BG(2) | Redo_Win_BG(3) | Redo_Win_BG(4) | \
   Redo_Win_OBJ | Redo_Win_Color
  mov [C_LABEL(WH1)],al
@@ -2069,7 +1885,7 @@ SNES_W2128: ; WH2
  cmp al,[C_LABEL(WH2)]
  je .no_change
  UpdateDisplay  ;*windowing only
- or byte [Redo_Windowing],Redo_Win(2) | \
+ or byte [C_LABEL(Redo_Windowing)],Redo_Win(2) | \
   Redo_Win_BG(1) | Redo_Win_BG(2) | Redo_Win_BG(3) | Redo_Win_BG(4) | \
   Redo_Win_OBJ | Redo_Win_Color
  mov [C_LABEL(WH2)],al
@@ -2083,7 +1899,7 @@ SNES_W2129: ; WH3
  cmp al,[C_LABEL(WH3)]
  je .no_change
  UpdateDisplay  ;*windowing only
- or byte [Redo_Windowing],Redo_Win(2) | \
+ or byte [C_LABEL(Redo_Windowing)],Redo_Win(2) | \
   Redo_Win_BG(1) | Redo_Win_BG(2) | Redo_Win_BG(3) | Redo_Win_BG(4) | \
   Redo_Win_OBJ | Redo_Win_Color
  mov [C_LABEL(WH3)],al
@@ -2097,7 +1913,7 @@ SNES_W212A: ; WBGLOG
  cmp al,[C_LABEL(WBGLOG)]
  je .no_change
  UpdateDisplay  ;*windowing only
- or byte [Redo_Windowing], \
+ or byte [C_LABEL(Redo_Windowing)], \
   Redo_Win_BG(1) | Redo_Win_BG(2) | Redo_Win_BG(3) | Redo_Win_BG(4)
  push ebx
  mov ebx,eax
@@ -2119,167 +1935,11 @@ ALIGNC
 SNES_W212B: ; WOBJLOG
  cmp al,[C_LABEL(WOBJLOG)]
  je .no_change
-;UpdateDisplay  ;*windowing only
-;or byte [Redo_Windowing],Redo_Win_OBJ | Redo_Win_Color
+ UpdateDisplay  ;*windowing only
+;or byte [C_LABEL(Redo_Windowing)],Redo_Win_OBJ | Redo_Win_Color
  mov [C_LABEL(WOBJLOG)],al
 
 .no_change:
- ret
-
-ALIGNC
-EXPORT Update_Layering
- pusha
-
- mov byte [Redo_Layering],0
-
- or byte [Redo_Windowing], \
-  Redo_Win_BG(1) | Redo_Win_BG(2) | Redo_Win_BG(3) | Redo_Win_BG(4) | \
-  Redo_Win_OBJ
-
- mov al,[C_LABEL(TM)]
- mov bl,[C_LABEL(TS)]
- mov cl,[BGMODE_Allowed_Layer_Mask]
- mov dl,[C_LABEL(Layer_Disable_Mask)]
- and al,cl
- and bl,cl
- and al,dl
- and bl,dl
- mov [TM_Allowed],al
- mov [TS_Allowed],bl
- or al,bl
- mov [Layers_In_Use],al
-
- cmp byte [C_LABEL(Layering_Mode)],1
- je .Update_Layering_1
- ja .Update_Layering_2
-.Update_Layering_0:
- mov dword [Render_Select],C_LABEL(Render_Layering_Option_0)
- mov dword [Window_Offset_First],BG_Win_Sub
- mov dword [Window_Offset_Second],BG_Win_Main
-
- ; layering option 0: main-on-sub
- mov al,[TM_Allowed]
- mov bl,[C_LABEL(TMW)]
- mov [SCR_TM],al
- mov [SCR_TMW],bl
- mov bl,[C_LABEL(TSW)]
- mov dl,0x20    ;back area
- mov [SCR_TSW],bl
- or dl,al
-
- ;ignore TM layers in TS
- xor al,0xFF
-
- ;ignore TS if arithmetic disabled for all main screen layers
- test byte [C_LABEL(CGADSUB)],dl
- setz bl
- dec bl
- and al,bl
-
- ;ignore TS if arithmetic disabled globally
- mov bl,[C_LABEL(CGWSEL)]
- and bl,0x30
- cmp bl,0x30
- setz bl
- dec bl
- and al,bl
-
- ;ignore TS if sub-screen arithmetic disabled
- test byte [C_LABEL(CGWSEL)],0x02
- setz bl
- dec bl
- and al,bl
-
-
- and al,[TS_Allowed]
- mov [SCR_TS],al
- popa
- ret
-ALIGNC
-.Update_Layering_1:
- mov dword [Render_Select],C_LABEL(Render_Layering_Option_1)
- mov dword [Window_Offset_First],BG_Win_Main
- mov dword [Window_Offset_Second],BG_Win_Sub
-
- ; layering option 1: sub-on-main
- mov dl,[TM_Allowed]
- mov al,[TS_Allowed]
- or dl,0x20     ;back area
-
- ;ignore TS if arithmetic disabled for all layers
- test byte [C_LABEL(CGADSUB)],dl
- setz bl
- dec bl
- and al,bl
-
- ;ignore TS if arithmetic disabled globally
- mov bl,[C_LABEL(CGWSEL)]
- and bl,0x30
- cmp bl,0x30
- setz bl
- dec bl
- and al,bl
-
- ;ignore TS if sub-screen arithmetic disabled
- test byte [C_LABEL(CGWSEL)],0x02
- setz bl
- dec bl
- and al,bl
-
- mov bl,[C_LABEL(TSW)]
- mov [SCR_TS],al
- mov [SCR_TSW],bl
-
- ;ignore TS layers in TM
- xor al,0xFF
- mov bl,[C_LABEL(TMW)]
- and al,[TM_Allowed]
- mov [SCR_TMW],bl
- mov [SCR_TM],al
- popa
- ret
-ALIGNC
-.Update_Layering_2:
- mov dword [Render_Select],C_LABEL(Render_Layering_Option_2)
- mov dword [Window_Offset_First],BG_Win_Main
- mov dword [Window_Offset_Second],BG_Win_Sub
-
- ; layering option 2: main-with-sub
- mov dl,[TM_Allowed]
- mov al,[TS_Allowed]
- or dl,0x20     ;back area
-
- ;ignore TS if arithmetic disabled for all layers
- test byte [C_LABEL(CGADSUB)],dl
- setz bl
- dec bl
- and al,bl
-
- ;ignore TS if arithmetic disabled globally
- mov bl,[C_LABEL(CGWSEL)]
- and bl,0x30
- cmp bl,0x30
- setz bl
- dec bl
- and al,bl
-
- ;ignore TS if sub-screen arithmetic disabled
- test byte [C_LABEL(CGWSEL)],0x02
- setz bl
- dec bl
- and al,bl
-
- mov dl,[TM_Allowed]
- mov bl,[C_LABEL(TMW)]
- mov cl,[C_LABEL(TSW)]
- and bl,dl
- and cl,al
- or al,dl
- or bl,cl
- mov byte [SCR_TS],0
- mov [SCR_TM],al
- mov [SCR_TMW],bl
- popa
  ret
 
 ALIGNC
@@ -2288,8 +1948,8 @@ SNES_W212C: ; TM
  je .no_change
  UpdateDisplay  ;*
  mov [C_LABEL(TM)],al
- mov byte [Redo_Layering],-1
- or byte [Redo_Windowing], \
+ mov byte [C_LABEL(Redo_Layering)],-1
+ or byte [C_LABEL(Redo_Windowing)], \
   Redo_Win_BG(1) | Redo_Win_BG(2) | Redo_Win_BG(3) | Redo_Win_BG(4) | \
   Redo_Win_OBJ
  mov al,[C_LABEL(TM)]
@@ -2303,8 +1963,8 @@ SNES_W212D: ; TS
  je .no_change
  UpdateDisplay  ;*
  mov [C_LABEL(TS)],al
- mov byte [Redo_Layering],-1
- or byte [Redo_Windowing], \
+ mov byte [C_LABEL(Redo_Layering)],-1
+ or byte [C_LABEL(Redo_Windowing)], \
   Redo_Win_BG(1) | Redo_Win_BG(2) | Redo_Win_BG(3) | Redo_Win_BG(4) | \
   Redo_Win_OBJ
  mov al,[C_LABEL(TS)]
@@ -2318,8 +1978,8 @@ SNES_W212E: ; TMW
  je .no_change
  UpdateDisplay  ;*windowing only
  mov [C_LABEL(TMW)],al
- mov byte [Redo_Layering],-1
- or byte [Redo_Windowing], \
+ mov byte [C_LABEL(Redo_Layering)],-1
+ or byte [C_LABEL(Redo_Windowing)], \
   Redo_Win_BG(1) | Redo_Win_BG(2) | Redo_Win_BG(3) | Redo_Win_BG(4) | \
   Redo_Win_OBJ
  mov al,[C_LABEL(TMW)]
@@ -2333,8 +1993,8 @@ SNES_W212F: ; TSW
  je .no_change
  UpdateDisplay  ;*windowing only
  mov [C_LABEL(TSW)],al
- mov byte [Redo_Layering],-1
- or byte [Redo_Windowing], \
+ mov byte [C_LABEL(Redo_Layering)],-1
+ or byte [C_LABEL(Redo_Windowing)], \
   Redo_Win_BG(1) | Redo_Win_BG(2) | Redo_Win_BG(3) | Redo_Win_BG(4) | \
   Redo_Win_OBJ
  mov al,[C_LABEL(TSW)]
@@ -2346,8 +2006,9 @@ ALIGNC
 SNES_W2130: ; CGWSEL
  cmp al,[C_LABEL(CGWSEL)]
  je .no_change
-;UpdateDisplay  ;*windowing only
- or byte [Redo_Windowing],Redo_Win_Color
+ UpdateDisplay  ;*windowing only
+ mov byte [C_LABEL(Redo_Layering)],-1
+ or byte [C_LABEL(Redo_Windowing)],Redo_Win_Color
  mov [C_LABEL(CGWSEL)],al
 
 .no_change:
@@ -2357,56 +2018,49 @@ ALIGNC
 SNES_W2131: ; CGADSUB
  cmp al,[C_LABEL(CGADSUB)]
  je .no_change
-;UpdateDisplay  ;*16-bit rendering only
- push eax
+ UpdateDisplay  ;*16-bit rendering only
+ mov byte [C_LABEL(Redo_Layering)],-1
+ or byte [C_LABEL(Redo_Windowing)],Redo_Win_Color
  mov [C_LABEL(CGADSUB)],al
 
- test al,0xA0   ; Hack for back area color addition
- mov ah,0
- jz .no_add_hack
- js .no_add_hack
- mov ah,-1
-.no_add_hack:
- mov [C_LABEL(fixedpalettecheck)],ah
- pop eax
 .no_change:
  ret
 
 ALIGNC
 SNES_W2132: ; COLDATA
-;UpdateDisplay  ;*16-bit rendering only
+ UpdateDisplay  ;*16-bit rendering only
  push ebx
  mov edx,[C_LABEL(COLDATA)]
 
- test al,0xC0
+ test al,BITMASK(6,7)
  jns .no_blue
 
  mov bl,al
- and ebx,0x1F
+ and ebx,BITMASK(0,4)
  shl ebx,10
 
- and edx,0x3FF
+ and edx,BITMASK(0,4) | BITMASK(5,9)
  or edx,ebx
 
- test al,0x40
+ test al,BIT(6)
 .no_blue:
  jz .no_green
 
  mov bl,al
- and ebx,0x1F
+ and ebx,BITMASK(0,4)
  shl ebx,5
 
- and edx,0x7C1F
+ and edx,BITMASK(0,4) | BITMASK(10,15)
  or edx,ebx
 
 .no_green:
- test al,0x20
+ test al,BIT(5)
  jz .no_red
 
  mov bl,al
- and ebx,0x1F
+ and ebx,BITMASK(0,4)
 
- and edx,0x7FE0
+ and edx,BITMASK(5,9) | BITMASK(10,15)
  or edx,ebx
 
 .no_red:

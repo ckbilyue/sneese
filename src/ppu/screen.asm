@@ -3,7 +3,7 @@
 SNEeSe, an Open Source Super NES emulator.
 
 
-Copyright (c) 1998-2005, Charles Bilyue'.
+Copyright (c) 1998-2006, Charles Bilyue'.
 Portions copyright (c) 1998-2003, Brad Martin.
 Portions copyright (c) 2003-2004, Daniel Horchner.
 Portions copyright (c) 2004-2005, Nach. ( http://nsrt.edgeemu.com/ )
@@ -80,16 +80,6 @@ ALIGND
 EXPORT Tile_Offset_Table_16_8
 Generate_Tile_Offset_Table 0
 Generate_Tile_Offset_Table 1
-
-EXPORT Screen_Mode
- dd C_LABEL(SCREEN_MODE_0)
- dd C_LABEL(SCREEN_MODE_1)
- dd C_LABEL(SCREEN_MODE_2)
- dd C_LABEL(SCREEN_MODE_3)
- dd C_LABEL(SCREEN_MODE_4)
- dd C_LABEL(SCREEN_MODE_5)
- dd C_LABEL(SCREEN_MODE_6)
- dd C_LABEL(SCREEN_MODE_7)
 
 EXPORT palette_2bpl
  dd 0x03030303, 0x07070707, 0x0B0B0B0B, 0x0F0F0F0F
@@ -183,7 +173,7 @@ EXPORT Offset_Change_Disable,skipb
 
 section .text
 ALIGNC
-Update_Offset_Change:
+EXPORT Update_Offset_Change
  mov byte [Redo_Offset_Change],0
 
  mov al,[Redo_Offset_Change_VOffsets]
@@ -296,22 +286,20 @@ Update_Offset_Change:
 
  ret
 
-%macro SORT_OFFSET_CHANGE 0
- test byte [Tile_Layers_Enabled],3  ;BG1 || BG2
- jz %%no_recalc
-
- mov al,[BGMODE_Allowed_Offset_Change]
- test al,al
- jz %%no_recalc
-
- mov al,[Redo_Offset_Change]
- test al,al
- jz %%no_recalc
-
- call Update_Offset_Change
-
-%%no_recalc:
-%endmacro
+ALIGNC
+EXPORT clear_scanlines_old
+ push ebx
+ push ebp
+ push esi
+ push edi
+ mov edi,[esp+20]   ;pointer to first line to clear
+ mov ebp,[esp+24]   ;count of lines to clear
+ call Clear_Scanlines
+ pop edi
+ pop esi
+ pop ebp
+ pop ebx
+ ret
 
 ALIGNC
 EXPORT Clear_Scanlines
@@ -326,7 +314,7 @@ EXPORT Clear_Scanlines
 
  xor eax,eax
 
- mov ecx,256/4
+ mov ecx,256*2/4
  push es
  mov edx,ds
  mov es,edx
@@ -338,9 +326,8 @@ EXPORT Clear_Scanlines
 .clear_loop:
  rep stosd
 
- add edi,byte GfxBufferLineSlack    ; Point screen to next line
  dec ebp
- mov ecx,256/4
+ mov ecx,256*2/4
  jnz .clear_loop
 
  pop es
@@ -349,7 +336,7 @@ EXPORT Clear_Scanlines
 ALIGNC
 .clear_fpu:
  fldz
- mov ecx,256/16
+ mov ecx,256*2/16
 
 .clear_fpu_loop:
  fst qword [edi+0]
@@ -358,9 +345,8 @@ ALIGNC
  dec ecx
  jnz .clear_fpu_loop
 
- add edi,byte GfxBufferLineSlack    ; Point screen to next line
  dec ebp
- mov ecx,256/16
+ mov ecx,256*2/16
  jnz .clear_fpu_loop
 
  fstp st0
@@ -369,7 +355,7 @@ ALIGNC
 ALIGNC
 .clear_mmx:
  pxor mm0,mm0
- mov ecx,256/16
+ mov ecx,256*2/16
 
 .clear_mmx_loop:
  movq [edi+0],mm0
@@ -378,12 +364,26 @@ ALIGNC
  dec ecx
  jnz .clear_mmx_loop
 
- add edi,byte GfxBufferLineSlack    ; Point screen to next line
  dec ebp
- mov ecx,256/16
+ mov ecx,256*2/16
  jnz .clear_mmx_loop
 
  emms
+ ret
+
+ALIGNC
+EXPORT clear_scanlines_preload
+ push ebx
+ push ebp
+ push esi
+ push edi
+ mov edi,[esp+20]   ;pointer to first line to clear
+ mov ebp,[esp+24]   ;count of lines to clear
+ call Clear_Scanlines_Preload
+ pop edi
+ pop esi
+ pop ebp
+ pop ebx
  ret
 
 ALIGNC
@@ -402,7 +402,7 @@ EXPORT Clear_Scanlines_Preload
 
  xor eax,eax
 
- mov ecx,256/4
+ mov ecx,256*2/4
  push es
  mov edx,ds
  mov es,edx
@@ -429,9 +429,8 @@ EXPORT Clear_Scanlines_Preload
 
  rep stosd
 
- add edi,byte GfxBufferLineSlack    ; Point screen to next line
  dec ebp
- mov ecx,256/4
+ mov ecx,256*2/4
  jnz .clear_loop
 
  pop es
@@ -440,7 +439,7 @@ EXPORT Clear_Scanlines_Preload
 ALIGNC
 .clear_fpu:
  fldz
- mov ecx,256/16
+ mov ecx,256*2/16
 
 .clear_fpu_next_line:
  ; Load area to clear into cache
@@ -460,9 +459,8 @@ ALIGNC
  dec ecx
  jnz .clear_fpu_loop
 
- add edi,byte GfxBufferLineSlack    ; Point screen to next line
  dec ebp
- mov ecx,256/16
+ mov ecx,256*2/16
  jnz .clear_fpu_next_line
 
  fstp st0
@@ -471,7 +469,7 @@ ALIGNC
 ALIGNC
 .clear_mmx:
  pxor mm0,mm0
- mov ecx,256/16
+ mov ecx,256*2/16
 
 .clear_mmx_next_line:
  ; Load area to clear into cache
@@ -491,9 +489,8 @@ ALIGNC
  dec ecx
  jnz .clear_mmx_next_line
 
- add edi,byte GfxBufferLineSlack    ; Point screen to next line
  dec ebp
- mov ecx,256/16
+ mov ecx,256*2/16
  jnz .clear_mmx_loop
 
  emms
@@ -501,292 +498,11 @@ ALIGNC
 
 ALIGNC
 EXPORT Update_Display
- ; edx = number of lines to recache
- mov edx,[Ready_Line_Render]
- push eax
- sub edx,[C_LABEL(Current_Line_Render)]
- mov byte [Display_Needs_Update],0
-
- push ebx
- push ecx
- push edi
- push ebp
- push esi
- push edx
-
-;handle mosaic - setup linecounters for first line drawn
-%if 0
-LineCounter_BG[no mosaic] = current_line
-if (!MosaicCountdown)
-{
- LineCounter_BG[mosaic] = current_line
-}
-%endif
- mov cl,[MosaicCountdown]
- mov al,[MOSAIC]
- mov ebx,[C_LABEL(Current_Line_Render)]
- add cl,255
- sbb cl,cl
- inc ebx
- and al,cl
-
- test al,1
- jnz .no_update_linecounter_bg1
- mov [LineCounter_BG1],ebx
-.no_update_linecounter_bg1:
- test al,2
- jnz .no_update_linecounter_bg2
- mov [LineCounter_BG2],ebx
-.no_update_linecounter_bg2:
- test al,4
- jnz .no_update_linecounter_bg3
- mov [LineCounter_BG3],ebx
-.no_update_linecounter_bg3:
- test al,8
- jnz .no_update_linecounter_bg4
- mov [LineCounter_BG4],ebx
-.no_update_linecounter_bg4:
-
- mov ah,[C_LABEL(INIDISP)]
- test ah,ah         ; Check for screen off
- js .screen_off
-
- cmp byte [Redo_Layering],0
- jz .no_layering_recalc_needed
- call C_LABEL(Update_Layering)
-.no_layering_recalc_needed:
-
- xor eax,eax
- mov [Priority_Used_BG1],ax
- mov [Priority_Used_BG2],ax
- mov [Priority_Used_BG3],ax
- mov [Priority_Used_BG4],ax
-
-%ifdef WATCH_RENDER_BREAKS
-EXTERN_C BreaksLast
- inc dword [C_LABEL(BreaksLast)]
-%endif
-
- mov al,[SCR_TM]
- mov bl,[BGMODE_Tile_Layer_Mask]
- or al,[SCR_TS]
- and al,bl
- mov [Tile_Layers_Enabled],al
- jz .no_tile_layers
-
- mov edi,[Tile_Recache_Set_End]
- inc edi
- js .no_tile_recache_needed ; No set to recache?
- sub edi,[Tile_Recache_Set_Begin]
- mov byte [Redo_Offset_Change],0xFF
- call Recache_Tile_Set
- mov edi,-2
- mov [Tile_Recache_Set_Begin],edi
- mov [Tile_Recache_Set_End],edi
-.no_tile_recache_needed:
-
- test byte [Tile_Layers_Enabled],0x10
- jz .no_oam_recache_needed
- call C_LABEL(Check_OAM_Recache)
-.no_oam_recache_needed:
-
- SORT_OFFSET_CHANGE
-
-.no_tile_layers:
-
- cmp byte [Redo_Windowing],0
- jz .no_window_recalc_needed
- call C_LABEL(Recalc_Window_Effects)
-.no_window_recalc_needed:
-
- mov ebx,[C_LABEL(Current_Line_Render)]
- mov edi,[BaseDestPtr]
- inc ebx
- mov ebp,[esp]
-
- call dword [Render_Select]
-
- pop edx
- mov ebx,[C_LABEL(Current_Line_Render)]
- add ebx,edx
- mov [C_LABEL(Current_Line_Render)],ebx
-
- mov al,[MOSAIC]
- test al,1
- jnz .mosaic_bg1
- mov [LineCounter_BG1],ebx
-.mosaic_bg1:
- test al,2
- jnz .mosaic_bg2
- mov [LineCounter_BG2],ebx
-.mosaic_bg2:
- test al,4
- jnz .mosaic_bg3
- mov [LineCounter_BG3],ebx
-.mosaic_bg3:
- test al,8
- jnz .mosaic_bg4
- mov [LineCounter_BG4],ebx
-.mosaic_bg4:
-
-;if (countdown >= linecount) countdown -= linecount;
-;else
-;{
-; line += countdown + MosaicLine[linecount - countdown - 1];
-; countdown = MosaicCount[linecount - countdown];
-; if (countdown == size) countdown = 0;
-;}
- mov eax,[MosaicCountdown]
- mov ebp,eax
- sub eax,edx
- jge .mosaic_fixup_done
-
- mov esi,[Mosaic_Size_Select]
- xor eax,-1
- xor ecx,ecx
- xor ebx,ebx
- mov cl,[C_LABEL(MosaicCount)+esi+eax+1]  ;1
- mov bl,[C_LABEL(MosaicLine)+esi+eax+1-1] ;6c
- mov eax,[Mosaic_Size] ;1
- add ebx,ebp           ;6c
- cmp ecx,eax           ;
- sbb eax,eax
- and eax,ecx
-.mosaic_fixup_done:
- mov [MosaicCountdown],eax
-
- mov al,[MOSAIC]
- mov ebx,[LineCounter_BG1]
- mov ecx,[LineCounter_BG2]
- mov esi,[LineCounter_BG3]
- mov edi,[LineCounter_BG4]
-
- test al,1
- jz .no_mosaic_bg1
- add [LineCounter_BG1],ebp
-.no_mosaic_bg1:
- test al,2
- jz .no_mosaic_bg2
- add [LineCounter_BG2],ebp
-.no_mosaic_bg2:
- test al,4
- jz .no_mosaic_bg3
- add [LineCounter_BG3],ebp
-.no_mosaic_bg3:
- test al,8
- jz .no_mosaic_bg4
- add [LineCounter_BG4],ebp
-.no_mosaic_bg4:
-
- pop esi
- pop ebp
- pop edi
- pop ecx
- pop ebx
-
- mov eax,GfxBufferLinePitch
- imul eax,edx
- add [BaseDestPtr],eax
- pop eax
-.return:
+extern C_LABEL(_Update_Display)
+ pusha
+ call C_LABEL(_Update_Display)
+ popa
  ret
-
-ALIGNC
-.screen_off:
- mov ebp,edx
- mov edi,[C_LABEL(SNES_Screen8)]    ; (256+16)*(239+1) framebuffer
- mov ebx,[BaseDestPtr]
- add edi,ebx
-
- ; Clear the framebuffer
- call C_LABEL(Clear_Scanlines)
-
- pop edx
- mov ebx,[C_LABEL(Current_Line_Render)]
- add ebx,edx
- mov [C_LABEL(Current_Line_Render)],ebx
-
- mov al,[MOSAIC]
- test al,1
- jnz .so_mosaic_bg1
- mov [LineCounter_BG1],ebx
-.so_mosaic_bg1:
- test al,2
- jnz .so_mosaic_bg2
- mov [LineCounter_BG2],ebx
-.so_mosaic_bg2:
- test al,4
- jnz .so_mosaic_bg3
- mov [LineCounter_BG3],ebx
-.so_mosaic_bg3:
- test al,8
- jnz .so_mosaic_bg4
- mov [LineCounter_BG4],ebx
-.so_mosaic_bg4:
-
-;if (countdown >= linecount) countdown -= linecount;
-;else
-;{
-; line += countdown + MosaicLine[linecount - countdown - 1];
-; countdown = MosaicCount[linecount - countdown];
-; if (countdown == size) countdown = 0;
-;}
- mov eax,[MosaicCountdown]
- mov ebp,eax
- sub eax,edx
- jge .so_mosaic_fixup_done
-
- mov esi,[Mosaic_Size_Select]
- xor eax,-1
- xor ecx,ecx
- xor ebx,ebx
- mov ecx,[C_LABEL(MosaicCount)+esi+eax+1]
- mov ebx,[C_LABEL(MosaicLine)+esi+eax+1-1]
- mov eax,[Mosaic_Size]
- add ebx,ebp
- cmp ecx,eax
- sbb eax,eax
- and ecx,eax
- mov [MosaicCountdown],cl
-
- mov al,[MOSAIC]
- mov ebx,[LineCounter_BG1]
- mov ecx,[LineCounter_BG2]
- mov esi,[LineCounter_BG3]
- mov edi,[LineCounter_BG4]
-
- test al,1
- jz .so_no_mosaic_bg1
- add [LineCounter_BG1],ebp
-.so_no_mosaic_bg1:
- test al,2
- jz .so_no_mosaic_bg2
- add [LineCounter_BG2],ebp
-.so_no_mosaic_bg2:
- test al,4
- jz .so_no_mosaic_bg3
- add [LineCounter_BG3],ebp
-.so_no_mosaic_bg3:
- test al,8
- jz .so_no_mosaic_bg4
- add [LineCounter_BG4],ebp
-.so_no_mosaic_bg4:
-
-.so_mosaic_fixup_done:
- mov [MosaicCountdown],eax
-
- pop esi
- pop ebp
- pop edi
- pop ecx
- pop ebx
-
- mov eax,GfxBufferLinePitch
- imul eax,edx
- add [BaseDestPtr],eax
- pop eax
- ret
-
 ; esi is screen address, works cos we only plot until wraparound!
 ; ch contains the X counter
 ; cl contains the screen addition for palette offsetting (2bpl only)
@@ -877,394 +593,6 @@ Addendum by TRAC (0.33 -> 0.34)
 
 %endif
 
-;Sets up VLMapAddress and VRMapAddress
-
-;Uses mosaic setting, horizontal/vertical offsets, screen map size and
-;current scanline
-;eax = C_LABEL(Current_Line_Render)
-ALIGNC
-EXPORT Sort_Screen_Height_Mosaic
- Get_Current_Line
-EXPORT Sort_Screen_Height
- ; Corrupts eax,ebx,ecx,esi
- mov bl,[HScroll+1+edx]
- mov ecx,TLMapAddress
- mov bh,[TileWidth+edx]     ; 1 = 8x8, 2 = 16x8, 16x16
- mov esi,TRMapAddress
- test bl,bh
- jz .first_tile_in_left_screen_map
- add ecx,byte (TRMapAddress-TLMapAddress)
- add esi,byte (TLMapAddress-TRMapAddress)
-.first_tile_in_left_screen_map:
- mov bl,[TileHeight+edx]    ; 1 = 8x8, 16x8, 2 = 16x16
- add eax,[VScroll+edx]
- test ah,bl
- jz .line_in_top_screen_map
-
- mov eax,[edx+ecx+(BLMapAddress-TLMapAddress)]
- mov ebx,[edx+esi+(BLMapAddress-TLMapAddress)]
- mov [VRMapAddress+edx],ebx
- mov [VLMapAddress+edx],eax
- ret
-
-ALIGNC
-.line_in_top_screen_map:
- mov eax,[edx+ecx]
- mov ebx,[edx+esi]
- mov [VRMapAddress+edx],ebx
- mov [VLMapAddress+edx],eax
- ret
-
-;%1 = planenum, 2 = priority
-%macro RENDER_LINE 2
- LOAD_BG_TABLE %1
-
-%if %2 == 0
- xor eax,eax
- mov [Tile_Priority_Used],ax
-%else
- mov al,[Priority_Unused+edx]
- test al,al
- jz %%no_plot
-
- mov al,[Priority_Used+edx]
- cmp al,1
- sbb al,al
-%endif
-
- ; set up depth
- mov byte [Tile_priority_bit],(1 - (%2)) << (13 - 8)
-
- ; tile size and depth selected in BGMODE write handler
- call dword [LineRender+edx]
-%%no_plot:
-%endmacro
-
-;%1 = planenum
-%macro RENDER_LINE_NP 1
- LOAD_BG_TABLE %1
-
- mov al,1
- ; tile size and depth selected in BGMODE write handler
- call dword [LineRender+edx]
-%endmacro
-
-%if 0
- Mode 0 - 4 background layers, 8x8 and 16x16 tile sizes
-  2bpl tile depth in all layers
-  special: each background layer has its own set of palettes
-
- Mode 1 - 3 background layers, 8x8 and 16x16 tile sizes
-  4bpl tile depth in layers 1 and 2, 2bpl tile depth in layer 3
-  special: BG3 high priority selection
-%endif
-
-%define SM01_Local_Bytes 20
-%define SM01_Layers_Copy esp+16
-%define SM01_Current_Line esp+12
-%define SM01_BaseDestPtr esp+8
-%define SM01_Lines esp+4
-%define SM01_Layers esp
-
-%macro Check_Present_Layer 2
- test byte %2,BIT((%1)-1)
-%endmacro
-
-%macro Jump_Present_Layer 3
- Check_Present_Layer (%1),%2
- jnz (%3)
-%endmacro
-
-%macro Jump_Not_Present_Layer 3
- Check_Present_Layer (%1),%2
- jz (%3)
-%endmacro
-
-%macro Check_Present_OBJ 1
- test byte %1,0x10
-%endmacro
-
-%macro Jump_Present_OBJ 2
- Check_Present_OBJ %1
- jnz (%2)
-%endmacro
-
-%macro Jump_Not_Present_OBJ 2
- Check_Present_OBJ %1
- jz (%2)
-%endmacro
-
-%macro Jump_BG3_Highest 1
- cmp byte [C_LABEL(Base_BGMODE)],1
- jne %%not_highest
- test byte [C_LABEL(BGMODE)],8
- jnz (%1)
-%%not_highest:
-%endmacro
-
-%macro Jump_Not_BG3_Highest 1
- cmp byte [C_LABEL(Base_BGMODE)],1
- jne (%1)
- test byte [C_LABEL(BGMODE)],8
- jz (%1)
-%endmacro
-
-;requires current line in ebx, uses cl
-%macro Check_Present_OBJ_Priority 1
- mov cl,[OAM_Count_Priority+ebx*4-4+(%1)]
- test cl,cl
-%endmacro
-
-%macro Jump_Present_OBJ_Priority 2
- Check_Present_OBJ_Priority (%1)
- jnz (%2)
-%endmacro
-
-%macro Jump_Not_Present_OBJ_Priority 2
- Check_Present_OBJ_Priority (%1)
- jz (%2)
-%endmacro
-
-%macro Get_Clip_Window 1
- mov esi,[Window_Offset_First+(%1)*4]
-%endmacro
-
-%macro Render_SM01 2
- Jump_Not_Present_Layer 4,[SM01_Layers+%1],%%bg4_lo_done
- mov ebx,[SM01_Current_Line]
- mov edi,[SM01_BaseDestPtr]
- mov ebp,%2
-
- Get_Clip_Window %1
-
-%ifndef NO_EARLY_PRIORITY_ELIMINATION
- Jump_Present_Layer 3,[SM01_Layers+%1],%%bg4_lo_priority
- Jump_Not_Present_OBJ [SM01_Layers+%1],%%bg4_no_priority
- Jump_Present_OBJ_Priority 0,%%bg4_lo_priority
-
-%%bg4_no_priority:
- 
- RENDER_LINE_NP 4
- and byte [SM01_Layers+%1],~8
- jmp %%bg3_done
-
-%%bg4_lo_priority:
-%endif
- RENDER_LINE 4,0
-
-%%bg4_lo_done:
-
- Jump_Not_Present_Layer 3,[SM01_Layers+%1],%%bg3_lo_done
- mov ebx,[SM01_Current_Line]
- mov edi,[SM01_BaseDestPtr]
- mov ebp,%2
-
- Get_Clip_Window %1
-
-%ifndef NO_EARLY_PRIORITY_ELIMINATION
- Jump_BG3_Highest %%bg3_lo_priority
- Jump_Present_Layer 4,[SM01_Layers+%1],%%bg3_lo_priority
- Jump_Not_Present_OBJ [SM01_Layers+%1],%%bg3_no_priority
- Jump_Present_OBJ_Priority 0,%%bg3_lo_priority
-
-%%bg3_no_priority:
- RENDER_LINE_NP 3
- and byte [SM01_Layers+%1],~4
- jmp %%bg3_done
-
-%%bg3_lo_priority:
-%endif
- RENDER_LINE 3,0
-
-%%bg3_lo_done:
-
- Jump_Not_Present_OBJ [SM01_Layers+%1],%%no_sprites_0
-
- mov ebx,[SM01_Current_Line]
- mov edi,[SM01_BaseDestPtr]
- mov ebp,%2
-;inc ebx
- mov dl,0x00
- call Plot_Sprites
-%%no_sprites_0:
-
- Jump_Not_Present_Layer 4,[SM01_Layers+%1],%%bg4_hi_done
- mov ebx,[SM01_Current_Line]
- mov edi,[SM01_BaseDestPtr]
- mov ebp,%2
-
- Get_Clip_Window %1
-
- RENDER_LINE 4,1
-%%bg4_hi_done:
-
- Jump_Not_Present_Layer 3,[SM01_Layers+%1],%%bg3_hi_done
- Jump_BG3_Highest %%bg3_hi_done
- mov ebx,[SM01_Current_Line]
- mov edi,[SM01_BaseDestPtr]
- mov ebp,%2
-
- Get_Clip_Window %1
-
- RENDER_LINE 3,1
-%%bg3_hi_done:
-%%bg3_done:
-
- Jump_Not_Present_OBJ [SM01_Layers+%1],%%no_sprites_1
-
- mov ebx,[SM01_Current_Line]
- mov edi,[SM01_BaseDestPtr]
- mov ebp,%2
-;inc ebx
- mov dl,0x10
- call Plot_Sprites
-%%no_sprites_1:
-
- Jump_Not_Present_Layer 2,[SM01_Layers+%1],%%bg2_lo_done
- mov ebx,[SM01_Current_Line]
- mov edi,[SM01_BaseDestPtr]
- mov ebp,%2
-
- Get_Clip_Window %1
-
-%ifndef NO_EARLY_PRIORITY_ELIMINATION
- Jump_Present_Layer 1,[SM01_Layers+%1],%%bg2_lo_priority
- Jump_Not_Present_OBJ [SM01_Layers+%1],%%bg2_no_priority
- Jump_Present_OBJ_Priority 2,%%bg2_lo_priority
-
-%%bg2_no_priority:
- RENDER_LINE_NP 2
- and byte [SM01_Layers+%1],~2
- jmp %%bg1_done
-
-%%bg2_lo_priority:
-%endif
- RENDER_LINE 2,0
-
-%%bg2_lo_done:
-
- Jump_Not_Present_Layer 1,[SM01_Layers+%1],%%bg1_lo_done
- mov ebx,[SM01_Current_Line]
- mov edi,[SM01_BaseDestPtr]
- mov ebp,%2
-
- Get_Clip_Window %1
-
-%ifndef NO_EARLY_PRIORITY_ELIMINATION
- Jump_Present_Layer 2,[SM01_Layers+%1],%%bg1_lo_priority
- Jump_Not_Present_OBJ [SM01_Layers+%1],%%bg1_no_priority
- Jump_Present_OBJ_Priority 2,%%bg1_lo_priority
-
-%%bg1_no_priority:
- RENDER_LINE_NP 1
- and byte [SM01_Layers+%1],~1
- jmp %%bg1_done
-
-%%bg1_lo_priority:
-%endif
- RENDER_LINE 1,0
-
-%%bg1_lo_done:
-
- Jump_Not_Present_OBJ [SM01_Layers+%1],%%no_sprites_2
-
- mov ebx,[SM01_Current_Line]
- mov edi,[SM01_BaseDestPtr]
- mov ebp,%2
-;inc ebx
- mov dl,0x20
- call Plot_Sprites
-%%no_sprites_2:
-
- Jump_Not_Present_Layer 2,[SM01_Layers+%1],%%bg2_hi_done
- mov ebx,[SM01_Current_Line]
- mov edi,[SM01_BaseDestPtr]
- mov ebp,%2
-
- Get_Clip_Window %1
-
- RENDER_LINE 2,1
-%%bg2_hi_done:
-
- Jump_Not_Present_Layer 1,[SM01_Layers+%1],%%bg1_hi_done
- mov ebx,[SM01_Current_Line]
- mov edi,[SM01_BaseDestPtr]
- mov ebp,%2
-
- Get_Clip_Window %1
-
- RENDER_LINE 1,1
-%%bg1_hi_done:
-%%bg1_done:
-
- Jump_Not_Present_OBJ [SM01_Layers+%1],%%no_sprites_3
-
- mov ebx,[SM01_Current_Line]
- mov edi,[SM01_BaseDestPtr]
- mov ebp,%2
-;inc ebx
- mov dl,0x30
- call Plot_Sprites
-%%no_sprites_3:
-
- Jump_Not_BG3_Highest %%bg3_max_done
- Jump_Not_Present_Layer 3,[SM01_Layers+%1],%%bg3_max_done
- mov ebx,[SM01_Current_Line]
- mov edi,[SM01_BaseDestPtr]
- mov ebp,%2
-
- Get_Clip_Window %1
-
- RENDER_LINE 3,1
-%%bg3_max_done:
-
-%endmacro
-
-ALIGNC
-EXPORT SCREEN_MODE_0
-EXPORT SCREEN_MODE_1
- push eax
- push ebx
- push edi
- push ebp
- push eax
-
-.next_line:
- mov edi,[C_LABEL(SNES_Screen8)]    ; (256+16)*(239+1) framebuffer
- ; Clear the framebuffer
- mov ebx,[SM01_BaseDestPtr]
-%ifdef LAYERS_PER_LINE
- mov ebp,1
-%else
- mov ebp,[SM01_Lines]
-%endif
-
- add edi,ebx
-
- ; Clear the framebuffer
- call C_LABEL(Clear_Scanlines)
-
-%ifndef LAYERS_PER_LINE
- Render_SM01 0,[SM01_Lines]
- Render_SM01 1,[SM01_Lines]
-%else
- Render_SM01 0,1
- Render_SM01 1,1
-
- mov eax,[SM01_Layers_Copy]
- mov [SM01_Layers],eax
-
- mov edi,[SM01_BaseDestPtr]
- inc dword [SM01_Current_Line]
- add edi,GfxBufferLinePitch
- dec dword [SM01_Lines]
- mov [SM01_BaseDestPtr],edi
- jnz .next_line
-%endif
-
- add esp,byte SM01_Local_Bytes
- ret
-
 %if 0
  Mode 2 - 2 background layers, 8x8 and 16x16 tile sizes
   4bpl tile depth in layers 1 and 2
@@ -1288,175 +616,6 @@ EXPORT SCREEN_MODE_1
   special: 512 mode
            offset change data (h and v?) stored in layer 3 (?)
 %endif
-
-%define SM26_Local_Bytes 20
-%define SM26_Layers_Copy esp+16
-%define SM26_Current_Line esp+12
-%define SM26_BaseDestPtr esp+8
-%define SM26_Lines esp+4
-%define SM26_Layers esp
-
-%macro Render_SM26 2
- Jump_Not_Present_Layer 2,[SM26_Layers+%1],%%bg2_lo_done
- mov ebx,[SM26_Current_Line]
- mov edi,[SM26_BaseDestPtr]
- mov ebp,%2
-
- Get_Clip_Window %1
-
-%ifndef NO_EARLY_PRIORITY_ELIMINATION
- Jump_Present_Layer 1,[SM26_Layers+%1],%%bg2_lo_priority
- Jump_Not_Present_OBJ [SM26_Layers+%1],%%bg2_no_priority
- Jump_Present_OBJ_Priority 0,%%bg2_lo_priority
- Jump_Present_OBJ_Priority 1,%%bg2_lo_priority
-
-%%bg2_no_priority:
- RENDER_LINE_NP 2
- and byte [SM26_Layers+%1],~2
- jmp %%bg2_done
-
-%%bg2_lo_priority:
-%endif
-
- RENDER_LINE 2,0
-
-%%bg2_lo_done:
-
- Jump_Not_Present_OBJ [SM26_Layers+%1],%%no_sprites_0
-
- mov ebx,[SM26_Current_Line]
- mov edi,[SM26_BaseDestPtr]
- mov ebp,%2
-;inc ebx
- mov dl,0x00
- call Plot_Sprites
-%%no_sprites_0:
-
- Jump_Not_Present_Layer 1,[SM26_Layers+%1],%%bg1_lo_done
- mov ebx,[SM26_Current_Line]
- mov edi,[SM26_BaseDestPtr]
- mov ebp,%2
-
- Get_Clip_Window %1
-
-%ifndef NO_EARLY_PRIORITY_ELIMINATION
- Jump_Present_Layer 2,[SM26_Layers+%1],%%bg1_lo_priority
- Jump_Not_Present_OBJ [SM26_Layers+%1],%%bg1_no_priority
- Jump_Present_OBJ_Priority 1,%%bg1_lo_priority
- Jump_Present_OBJ_Priority 2,%%bg1_lo_priority
-
-%%bg1_no_priority:
- RENDER_LINE_NP 1
- and byte [SM26_Layers+%1],~1
- jmp %%bg1_done
-
-%%bg1_lo_priority:
-%endif
- RENDER_LINE 1,0
-
-%%bg1_lo_done:
-
- Jump_Not_Present_OBJ [SM26_Layers+%1],%%no_sprites_1
-
- mov ebx,[SM26_Current_Line]
- mov edi,[SM26_BaseDestPtr]
- mov ebp,%2
-;inc ebx
- mov dl,0x10
- call Plot_Sprites
-%%no_sprites_1:
-
- Jump_Not_Present_Layer 2,[SM26_Layers+%1],%%bg2_hi_done
- mov ebx,[SM26_Current_Line]
- mov edi,[SM26_BaseDestPtr]
- mov ebp,%2
-
- Get_Clip_Window %1
-
- RENDER_LINE 2,1
-%%bg2_hi_done:
-%%bg2_done:
-
- Jump_Not_Present_OBJ [SM26_Layers+%1],%%no_sprites_2
-
- mov ebx,[SM26_Current_Line]
- mov edi,[SM26_BaseDestPtr]
- mov ebp,%2
-;inc ebx
- mov dl,0x20
- call Plot_Sprites
-%%no_sprites_2:
-
- Jump_Not_Present_Layer 1,[SM26_Layers+%1],%%bg1_hi_done
- mov ebx,[SM26_Current_Line]
- mov edi,[SM26_BaseDestPtr]
- mov ebp,%2
-
- Get_Clip_Window %1
-
- RENDER_LINE 1,1
-%%bg1_hi_done:
-%%bg1_done:
-
- Jump_Not_Present_OBJ [SM26_Layers+%1],%%no_sprites_3
-
- mov ebx,[SM26_Current_Line]
- mov edi,[SM26_BaseDestPtr]
- mov ebp,%2
-;inc ebx
- mov dl,0x30
- call Plot_Sprites
-%%no_sprites_3:
-
-%endmacro
-
-EXPORT SCREEN_MODE_2
-EXPORT SCREEN_MODE_3
-EXPORT SCREEN_MODE_4
-EXPORT SCREEN_MODE_5
-EXPORT SCREEN_MODE_6
-
- push eax
- push ebx
- push edi
- push ebp
- push eax
-
-.next_line:
- mov edi,[C_LABEL(SNES_Screen8)]    ; (256+16)*(239+1) framebuffer
- ; Clear the framebuffer
- mov ebx,[SM26_BaseDestPtr]
-%ifdef LAYERS_PER_LINE
- mov ebp,1
-%else
- mov ebp,[SM26_Lines]
-%endif
-
- add edi,ebx
-
- ; Clear the framebuffer
- call C_LABEL(Clear_Scanlines)
-
-%ifndef LAYERS_PER_LINE
- Render_SM26 0,[SM26_Lines]
- Render_SM26 1,[SM26_Lines]
-%else
- Render_SM26 0,1
- Render_SM26 1,1
-
- mov eax,[SM26_Layers_Copy]
- mov [SM26_Layers],eax
-
- mov edi,[SM26_BaseDestPtr]
- inc dword [SM26_Current_Line]
- add edi,GfxBufferLinePitch
- dec dword [SM26_Lines]
- mov [SM26_BaseDestPtr],edi
- jnz .next_line
-%endif
-
- add esp,byte SM26_Local_Bytes
- ret
 
 section .text
 ALIGNC

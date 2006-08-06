@@ -3,7 +3,7 @@
 SNEeSe, an Open Source Super NES emulator.
 
 
-Copyright (c) 1998-2005, Charles Bilyue'.
+Copyright (c) 1998-2006, Charles Bilyue'.
 Portions copyright (c) 1998-2003, Brad Martin.
 Portions copyright (c) 2003-2004, Daniel Horchner.
 Portions copyright (c) 2004-2005, Nach. ( http://nsrt.edgeemu.com/ )
@@ -47,6 +47,7 @@ You must read and accept the license prior to use.
 #include "apu/sound.h"
 #include "cpu/cpu.h"
 #include "platform.h"
+#include "snes.h"
 
 unsigned short ScreenX,ScreenY;
 
@@ -165,10 +166,11 @@ signed char stretch_x, stretch_y;
 /* This flag is set when palette recomputation is necessary */
 signed char PaletteChanged;
 
-SNEESE_GFX_BUFFER gbSNES_Screen8 = NULL_GFX_BUFFER;
 SNEESE_GFX_BUFFER gbSNES_Screen16 = NULL_GFX_BUFFER;
 
-unsigned char *SNES_Screen8;
+unsigned char (*Real_SNES_Screen8)[2];
+unsigned char (*main_screen)[2];
+unsigned char (*sub_screen)[2];
 unsigned short *SNES_Screen16;
 
 BITMAP *Allegro_Bitmap=0;   /* Renamed (I'm using mostly allegro now so what the hell!) */
@@ -200,33 +202,34 @@ void OutputScreen()
  save_pcx(filename, screenshot_source, SNES_Palette);
 }
 
-int qsort_int(const void *i1, const void *i2)
+#if 0
+int qsort_short(const void *i1, const void *i2)
 {
- return *(int *)i1 - *(int *)i2;
+ return *(short *)i1 - *(short *)i2;
 }
 
-int xor_bands(const unsigned char *win1, const unsigned char *win2,
- unsigned char count1, unsigned char count2, unsigned char *out_point_set)
+int intersect_bands_with_xor(int count1, unsigned char (*edges1)[2],
+ int count2, unsigned char (*edges2)[2], unsigned char (*merged_edges)[2])
 {
  int i;
  int points = 0, out_count = 0;
- int point_set[12];
+ short point_set[12];
 
  for (i = 0; i < count1; i++, points += 2)
  {
-  point_set[points] = win1[i * 2];
-  point_set[points + 1] = win1[i * 2 + 1] ? win1[i * 2 + 1] : 256;
+  point_set[points] = edges1[i][0];
+  point_set[points + 1] = edges1[i][1] ? edges1[i][1] : 256;
  }
 
  for (i = 0; i < count2; i++, points += 2)
  {
-  point_set[points] = win2[i * 2];
-  point_set[points + 1] = win2[i * 2 + 1] ? win2[i * 2 + 1] : 256;
+  point_set[points] = edges2[i][0];
+  point_set[points + 1] = edges2[i][1] ? edges2[i][1] : 256;
  }
 
  
  /* sort points */
- qsort(point_set, points, sizeof(int), qsort_int);
+ qsort(point_set, points, sizeof(short), qsort_short);
 
  /* remove duplicates and output bands */
  for (i = 0; i < points - 1; i += 2)
@@ -234,7 +237,7 @@ int xor_bands(const unsigned char *win1, const unsigned char *win2,
   /* skip duplicates */
   if (point_set[i] == point_set[i + 1]) continue;
 
-  out_point_set[out_count * 2] = point_set[i];
+  merged_edges[out_count][0] = point_set[i];
 
   /* check for duplicates while they may still exist */
   while (i + 2 < points)
@@ -243,12 +246,13 @@ int xor_bands(const unsigned char *win1, const unsigned char *win2,
    if (point_set[i + 1] != point_set[i + 2]) break;
    i += 2;
   }
-  out_point_set[out_count * 2 + 1] = point_set[i + 1];
+  merged_edges[out_count][1] = point_set[i + 1];
   out_count++;
  }
 
  return out_count;
 }
+#endif
 
 unsigned char BrightnessLevel;  /* SNES Brightness level, set up in PPU.asm */
 
@@ -271,44 +275,25 @@ void SetPalette()
  unsigned char Red,Green,Blue;
  int Count;
 
- if (SCREEN_MODE >= 4 && SCREEN_MODE <= 7)
- /* Hi colour mode so do different palette set up */
+ for (Count = 0; Count < 256; Count++)
  {
-  for (Count = 0; Count < 256; Count++)
-  {
-   color = Real_SNES_Palette[Count];
+  color = Real_SNES_Palette[Count];
 
-   Red = BrightnessAdjust_256[BrightnessLevel][color.red];
-   Green = BrightnessAdjust_256[BrightnessLevel][color.green];
-   Blue = BrightnessAdjust_256[BrightnessLevel][color.blue];
+  Red = BrightnessAdjust_256[BrightnessLevel][color.red];
+  Green = BrightnessAdjust_256[BrightnessLevel][color.green];
+  Blue = BrightnessAdjust_256[BrightnessLevel][color.blue];
 
-   Hi.red = Red >> 3;
-   Hi.green = Green >> 2;
-   Hi.blue = Blue >> 3;
-   HICOLOUR_Palette[Count] = Hi;
+  Hi.red = Red >> 3;
+  Hi.green = Green >> 2;
+  Hi.blue = Blue >> 3;
+  HICOLOUR_Palette[Count] = Hi;
 
-   /* We still have to do this or screenshot will fail */
-   SNES_Palette[Count].r = Red >> 2;
-   SNES_Palette[Count].g = Green >> 2;
-   SNES_Palette[Count].b = Blue >> 2;
-  }
-  set_palette_range((RGB *)SNES_Palette, 0, 255, FALSE);
- } else {
-  for(Count = 0; Count < 256; Count++)
-  {
-   color = Real_SNES_Palette[Count];
-
-   Red = BrightnessAdjust_64[BrightnessLevel][color.red];
-   Green = BrightnessAdjust_64[BrightnessLevel][color.green];
-   Blue = BrightnessAdjust_64[BrightnessLevel][color.blue];
-
-   SNES_Palette[Count].r = Red;
-   SNES_Palette[Count].g = Green;
-   SNES_Palette[Count].b = Blue;
-
-  }
-  set_palette_range((RGB *)SNES_Palette, 0, 255, FALSE);
+  /* We still have to do this or screenshot will fail */
+  SNES_Palette[Count].r = Red >> 2;
+  SNES_Palette[Count].g = Green >> 2;
+  SNES_Palette[Count].b = Blue >> 2;
  }
+ set_palette_range((RGB *)SNES_Palette, 0, 255, FALSE);
 }
 
 extern unsigned Current_Line_Render;
@@ -332,219 +317,83 @@ void Copy_Screen()
   PaletteChanged = 0;
  }
 
- switch (SCREEN_MODE)
+ extern void cg_translate_finish(void);
+
+ cg_translate_finish();
+
+ extern unsigned char BREAKS_ENABLED;
+ extern unsigned BreaksLast;
+ if (FPS_ENABLED)
  {
-  case 0:   /* VGA mode 13h - linear 320x200 */
-  case 1:   /* VESA2 - linear 320x240 */
-  case 2:   /* VGA mode-x - planar 320x240 */
-  case 3:   /* VGA - linear 256x239 */
-   screenshot_source = gbSNES_Screen8.subbitmap;
-
-   switch (stretch_x)
-   {
-    case 0:
-     out_size_x = 256;
-     out_position_x = (ScreenX - out_size_x) / 2;
-     break;
-    default:
-     out_size_x = 256 * stretch_x;
-     out_position_x = (ScreenX - out_size_x) / 2;
-     break;
-    case 1:
-     out_position_x = 0;
-     out_size_x = ScreenX;
-     break;
-   }
-
-   switch (stretch_y)
-   {
-    case 0:
-     out_size_y = 239;
-     out_position_y = (ScreenY - out_size_y) / 2;
-     break;
-    default:
-     out_size_y = 239 * stretch_y;
-     out_position_y = (ScreenY - out_size_y) / 2;
-     break;
-    case 1:
-     out_position_y = 0;
-     out_size_y = ScreenY;
-     break;
-   }
-
-   if (stretch_x || stretch_y)
-   {
-    if (Current_Line_Render < 239 && Current_Line_Render < Last_Frame_Line)
-    {
-     /* fill unrendered area with black */
-     rectfill(gbSNES_Screen8.subbitmap,
-      0, Current_Line_Render,
-      255, Last_Frame_Line - 1,
-      0);
-    }
-
-    acquire_screen();
-
-    stretch_blit(gbSNES_Screen8.subbitmap, screen,
-     0, 0, 256, 239,
-     out_position_x, out_position_y, out_size_x, out_size_y);
-
-    release_screen();
-   }
-   else
-   {
-    acquire_screen();
-
-    blit(gbSNES_Screen8.subbitmap, screen, 0, 0,
-     out_position_x, out_position_y, out_size_x, Current_Line_Render);
-
-    if (Current_Line_Render < 239 && Current_Line_Render < Last_Frame_Line)
-    {
-     /* fill unrendered area with black */
-     rectfill(screen,
-      out_position_x, out_position_y + Current_Line_Render,
-      out_position_x + out_size_x - 1, out_position_y + Last_Frame_Line - 1,
-      0);
-    }
-
-    release_screen();
-   }
-
-   break;
-
-  case 4:   /* VESA 2 16-bit - 320x200 */
-  case 5:   /* VESA 2 16-bit - 320x240 */
-  case 6:   /* VESA 2 16-bit - 640x480 */
-  case 7:   /* Windows/X windowing system 16-bit - 640x480 */
-#if 0
-   {
-    int ox, oy;
-
-    out_position_x = (ScreenX > 256) ? (ScreenX - 256) / 2 : 0;
-    out_size_x = (ScreenX < 256) ? ScreenX : 256;
-    out_position_y = (ScreenY > 239) ? (ScreenY - 239) / 2 : 0;
-    out_size_y = (ScreenY < Current_Line_Render) ? ScreenY : Current_Line_Render;
-
-    acquire_screen();
-
-    for (oy = 0; oy < out_size_y; oy++)
-    {
-     unsigned char *src_line_address = gbSNES_Screen8.subbitmap->line[oy];
-
-     for (ox = 0; ox < out_size_x; ox++)
-     {
-      unsigned char color = src_line_address[ox];
-      unsigned short color16 =
-       ((unsigned short *)HICOLOUR_Palette)[color];
-
-      _putpixel16(screen, out_position_x + ox, out_position_y + oy, color16);
-     }
-    }
-
-    if (Current_Line_Render < 239 && Current_Line_Render < Last_Frame_Line)
-    {
-     /* fill unrendered area with black */
-     rectfill(screen,
-      out_position_x, out_position_y + Current_Line_Render,
-      out_position_x + out_size_x - 1, out_position_y + Last_Frame_Line - 1,
-      0);
-    }
-
-    release_screen();
-
-    break;
-   }
-#else
-   switch (stretch_x)
-   {
-    case 0:
-     out_size_x = 256;
-     out_position_x = (ScreenX - out_size_x) / 2;
-     break;
-    default:
-     out_size_x = 256 * stretch_x;
-     out_position_x = (ScreenX - out_size_x) / 2;
-     break;
-    case 1:
-     out_position_x = 0;
-     out_size_x = ScreenX;
-     break;
-   }
-
-   switch (stretch_y)
-   {
-    case 0:
-     out_size_y = 239;
-     out_position_y = (ScreenY - out_size_y) / 2;
-     break;
-    default:
-     out_size_y = 239 * stretch_y;
-     out_position_y = (ScreenY - out_size_y) / 2;
-     break;
-    case 1:
-     out_position_y = 0;
-     out_size_y = ScreenY;
-     break;
-   }
-
-   if (stretch_x || stretch_y)
-   {
-    screenshot_source = gbSNES_Screen16.subbitmap;
-
-    if (Current_Line_Render < 239 && Current_Line_Render < Last_Frame_Line)
-    {
-     /* fill unrendered area with black */
-     rectfill(gbSNES_Screen8.subbitmap,
-      0, Current_Line_Render,
-      255, Last_Frame_Line - 1,
-      0);
-    }
-
-    blit(gbSNES_Screen8.subbitmap, gbSNES_Screen16.subbitmap,
-     0, 0, 0, 0, 256, 239);
-
-    acquire_screen();
-
-    stretch_blit(gbSNES_Screen16.subbitmap, screen,
-     0, 0, 256, 239,
-     out_position_x, out_position_y, out_size_x, out_size_y);
-
-    release_screen();
-   }
-   else
-   {
-    screenshot_source = gbSNES_Screen8.subbitmap;
-
-    acquire_screen();
-
-    blit(gbSNES_Screen8.subbitmap, screen, 0, 0, out_position_x, out_position_y,
-     out_size_x, Current_Line_Render);
-
-    if (Current_Line_Render < 239 && Current_Line_Render < Last_Frame_Line)
-    {
-     /* fill unrendered area with black */
-     rectfill(screen,
-      out_position_x, out_position_y + Current_Line_Render,
-      out_position_x + out_size_x - 1, out_position_y + Last_Frame_Line - 1,
-      0);
-    }
-
-    release_screen();
-   }
-
-   break;
-
+#ifndef SNEeSe_No_GUI
+  extern void ShowFPS(void);
+  ShowFPS();
 #endif
-
-  default:
-   screenshot_source = gbSNES_Screen8.subbitmap;
-
-   acquire_screen();
-
-   blit(gbSNES_Screen8.subbitmap, screen, 0, 0, 0, 0, ScreenX, ScreenY);
-
-   release_screen();
  }
+ if (BREAKS_ENABLED)
+ {
+#ifndef SNEeSe_No_GUI
+  extern void ShowBreaks(void);
+  ShowBreaks();
+  BreaksLast = 0;
+#endif
+ }
+
+ switch (stretch_x)
+ {
+  case 0:
+   out_size_x = 256;
+   out_position_x = (ScreenX - out_size_x) / 2;
+   break;
+  default:
+   out_size_x = 256 * stretch_x;
+   out_position_x = (ScreenX - out_size_x) / 2;
+   break;
+  case 1:
+   out_position_x = 0;
+   out_size_x = ScreenX;
+   break;
+ }
+
+ switch (stretch_y)
+ {
+  case 0:
+   out_size_y = 239;
+   out_position_y = (ScreenY - out_size_y) / 2;
+   break;
+  default:
+   out_size_y = 239 * stretch_y;
+   out_position_y = (ScreenY - out_size_y) / 2;
+   break;
+  case 1:
+   out_position_y = 0;
+   out_size_y = ScreenY;
+   break;
+ }
+
+ screenshot_source = gbSNES_Screen16.subbitmap;
+
+ if (stretch_x || stretch_y)
+ {
+  acquire_screen();
+
+  stretch_blit(gbSNES_Screen16.subbitmap, screen,
+   0, 0, 256, 239,
+   out_position_x, out_position_y, out_size_x, out_size_y);
+
+  release_screen();
+ }
+ else
+ {
+  acquire_screen();
+
+  blit(gbSNES_Screen16.subbitmap, screen, 0, 0,
+   out_position_x, out_position_y, out_size_x, out_size_y);
+
+  release_screen();
+ }
+
+ clear(gbSNES_Screen16.subbitmap);
 }
 
 #if defined(UNIX) || defined(__BEOS__)
