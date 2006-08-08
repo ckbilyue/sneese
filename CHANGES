@@ -37,7 +37,8 @@ Changes
   PPU: Implemented direct color mode for 8-bit pixels on BG1 [TRAC]
   PPU: Implemented color window emulation, including fixed color and 
    sub screen arithmetic modes and most, if not all, of the various
-   edge cases [TRAC]
+   edge cases, thanks to Blargg for fast 15-bit blending algorithms
+   [TRAC]
   ROM loader: Fixed a bug where IPS auto-patching would only work
    on the first ROM loaded [TRAC]
   PPU: Fixed mosaic support [TRAC]
@@ -47,6 +48,8 @@ Changes
    incorrect memory mapping on LoROM [TRAC]
   ROM loader: Fixed a bug where IPS auto-patching could potentially
    cause bad patches or crashes when extending the ROM size [TRAC]
+  5A22: Improved H-DMA behavior accuracy in a couple ways, thanks to
+   byuu for information [TRAC]
  0.842
   SPC700: Added support for BCD fixup opcodes DAA and DAS, thanks to
    anomie and Overload for information and resources for research and

@@ -444,7 +444,7 @@ Emulation details:
  - Open bus states emulated (currently on A bus only).
  - DMA and HDMA, all 8 channels, modes 0-4 (5-7 supported but possibly
     incorrect).  General DMA timing (not 100% correct).
-    Partial HDMA timing.  HDMA may have some bugs.
+    Partial HDMA timing.
 
  - SPC700 sound CPU with 254/256 opcodes implemented, running with
     on-demand execution and cycle-based emulation.
@@ -590,16 +590,20 @@ Thanks go out to...
  KnucklesD, for getting on my case to put in save dir support!
  Windwalker, neptron, and Siloh, for the logos!
 
+ Nach: for code for IPS soft-patching and JMA compressed ROM image support
+ Deathlike: for testing and bug reports, something this project gets too
+  little of
+
  Siloh: for putting up with me, and being the friend you are
  MKendora, Lord_Nightmare: for all the support, and always reaffirming
   my belief that there's a reason to continue.
 
- anomie, Overload, for all your research...
+ anomie, byuu, Overload, for all your research...
 
 
  Beta testing:
   RibOnIzEr, QbProgger, AC/DC, Malenko, Richard Ferreira, rOss, Siloh,
-   MKendora, akito, slow
+   MKendora, akito, slow, Deathlike
 
   Y0ssarian, PoleStar, Steve, Vilmar, Enternal, [E|YSiUM], Goku-X, JaguarPaw,
   JJJJ, KnucklesD, dps, Cowering, Lanice, EddyB43 from EFnet-#snesromz and
@@ -607,16 +611,18 @@ Thanks go out to...
 
 Greets
 """"""
- TCF, Borson, neptron, Avarice, KnucklesD, Richard Ferreira, AC/DC
+ TCF, Borson, LBMDT, neptron, Avarice, KnucklesD, Richard Ferreira, AC/DC
  Goku-X, Lanice, Azimer, TNSe, dps, polarz, rOss, Neill Corlett,
  Richard Mitton, illus, Slaik, StCreator, RibOnIzEr, Thane, QbProgger,
- krial, pagefault, Siloh, Zero-X, MrGrim, kode54, akito, MKendora,
- Lord_Nightmare, anomie, ipher, amit, Diablo-D3, Neviksti, slow, SamB,
- Sabretooth, amptor, Harekiet, Nach
+ krial, pagefault, Siloh, Astxist, Em, sarencele, anewuser, Mexandrew,
+ Zero-X, MrGrim, kode54, akito, MKendora, Lord_Nightmare, anomie, ipher,
+ amit, Diablo-D3, Neviksti, slow, SamB, Sabretooth, amptor, Harekiet,
+ SupraFast, Karasu, DeadlyRave-Neo, Battousai, Nach, byuu, Deathlike,
+ kevtris, EFX, Blues, Mottzilla, Zephiris
 
- Everyone from EFnet IRC #snesromz, #classicgames, #snesdev, #zsnes, #mugen,
-  Newnet IRC #snesromz, and Freenode IRC #fakenes, #zsnes, #assembler, and
-  #nsrt
+ Everyone from EFnet IRC #snesromz, #classicgames, #snesdev, #zsnes,
+  #mugen, #nesdev; Newnet IRC #snesromz; and Freenode IRC #mindless-drones,
+  #fakeware, #zsnes, #assembler, #dosbox, #nsrt, and #insanes
 
  Savoury SnaX and Gridle
 

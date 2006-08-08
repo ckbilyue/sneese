@@ -202,6 +202,7 @@ void clear_scanlines(unsigned lines)
  }
 }
 
+/* Thanks to Blargg for fast 15-bit blending algorithms */
 void cg_process_arithmetic(unsigned short *main_buf, unsigned short *sub_buf,
  int lines, int first_pixel, int last_pixel_plus_1,
  int do_all, int arithmetic_mode)

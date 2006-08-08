@@ -96,6 +96,8 @@ DMA_B0_%1:  skipb
 DMA_B1_%1:  skipb
 DMA_B2_%1:  skipb
 DMA_B3_%1:  skipb
+
+HDMA_Need_Transfer_%1:skipb
 %endmacro
 
 DMA_DATA 0
@@ -111,7 +113,7 @@ DMA_Transfer_Size:skipl ;Size for active DMA transfer
 
 EXPORT MDMAEN,skipb     ; DMA enable
 EXPORT HDMAEN,skipb     ; HDMA enable
-EXPORT HDMAON,skipb     ; HDMA enabled this refresh
+EXPORT HDMA_Not_Ended,skipb     ; HDMA not yet disabled this frame
                         ; 0000dccc | d = in DMA/HDMA, if 0 all should be 0
 EXPORT In_DMA,skipb     ; c = channel # 0-7
 EXPORT DMA_Pending_B_Address,skipb  ; address # 0-3, or -1 if n/a
@@ -200,7 +202,8 @@ section .text
 
 ;macro for processing a channel during HDMA transfer
 %macro HDMAOPERATION 1
-  mov al,[HDMAON]
+  mov al,[C_LABEL(HDMAEN)]
+  and al,[HDMA_Not_Ended]
   test al,BIT(%1)
   jz %%no_hdma
 
@@ -208,10 +211,11 @@ section .text
 
   mov byte [In_DMA],(%1) | DMA_IN_PROGRESS
   LOAD_DMA_TABLE %1
-  call C_LABEL(Do_HDMA_Channel) ; CF clear if channel disabled
+  call C_LABEL(Do_HDMA_Channel) ; CF set if channel disabled
+  jnc %%no_disable
 
-  jc %%no_hdma
-  and byte [HDMAON],~BIT(%1)    ; Disable this channel
+  and byte [HDMA_Not_Ended],~BIT(%1)    ; Disable this channel
+%%no_disable:
 %%no_hdma:
 %endmacro
 
@@ -299,6 +303,100 @@ section .text
  jmp .ppu_write_done
 
 
+EXPORT Relatch_HDMA_Channel
+ mov ebx,[edi+A1T]      ; Src Address in ebx
+ and ebx,BITMASK(0,23)
+
+ mov al,[edi+DMAP]      ; Get HDMA control byte
+ test al,0x40           ; Check for indirect addressing
+
+ jnz HDMA_Indirect_Common.New_Set
+
+ jmp HDMA_Absolute_Common.New_Set
+
+
+HDMA_Absolute_Common:
+.End_Transfer:
+ mov [edi+A2T],ebx
+
+.Continue:
+ dec ah
+
+ mov cl,0x80
+ and cl,ah
+ mov [edi+HDMA_Need_Transfer],cl
+
+ mov [edi+NTRL],ah      ; Update number of lines to transfer
+ test ah,0x7F
+ jnz ..@HDMA_Channel_Exit
+
+.New_Set:
+ ; Need new set
+ GET_BYTE 0
+
+ inc bx                 ; Adjust table address
+ mov [edi+NTRL],al      ; Save length of set
+ mov [edi+A2T],ebx      ; Save new table address
+ mov [edi+HDMA_Need_Transfer],al
+ ; set carry flag if channel terminating
+ cmp al,1
+ ret
+
+HDMA_Indirect_Common:
+.End_Transfer:
+ mov [edi+DAS],ebx
+
+.Continue:
+ dec ah
+
+ mov cl,0x80
+ and cl,ah
+ mov [edi+HDMA_Need_Transfer],cl
+
+ mov [edi+NTRL],ah      ; Update number of lines to transfer
+ test ah,0x7F
+ jnz ..@HDMA_Channel_Exit
+
+ mov ebx,[edi+A2T]      ; Get table address
+ and ebx,BITMASK(0,23)
+
+.New_Set:
+ ; Need new set
+ GET_BYTE 0
+ inc bx                 ; Adjust table address
+ mov [edi+NTRL],al      ; Save length of set
+ mov [edi+HDMA_Need_Transfer],al
+
+ mov cl,al      ; save byte to check later
+
+ GET_BYTE _5A22_SLOW_CYCLE      ; Address load low
+ inc bx
+
+ test cl,cl
+ jz .End_Channel
+
+ mov [edi+DASL],al
+ GET_BYTE _5A22_SLOW_CYCLE      ; Address load high
+
+ inc bx
+ mov [edi+DASH],al
+ mov [edi+A2T],ebx      ; Save new table address
+..@HDMA_Channel_Exit:
+ ; clear carry flag, channel not terminating
+ clc
+
+ ret
+
+.End_Channel:
+ shl eax,8
+ mov [edi+A2T],ebx      ; Save new table address
+ mov [edi+DAS],ax       ; Save broken indirect address
+
+ ; set carry flag, channel terminating
+ stc
+
+ ret
+
 %macro Generate_Do_HDMA_Channel 1
 %ifidni %1,Read
 %define _DHC_Transfer HDMA_TRANSFER_B_TO_A
@@ -312,20 +410,12 @@ section .text
  jnz Do_HDMA_Indirect_%1
 
 Do_HDMA_Absolute_%1:
- mov ah,[edi+NTRL]      ; Get number of lines to transfer
- test ah,0x7F           ; Need new set?
- jz .Next_Set
- test ah,ah
- js .Next_Transfer
- jmp .Continue
+ mov ebx,[edi+A2T]      ; Get table address
+ and ebx,BITMASK(0,23)
 
-.Next_Set:
- GET_BYTE 0
- inc bx                 ; Adjust table address
- test al,al             ; Check for zero-length set
- mov [edi+NTRL],al      ; Save length of set
- jz HDMA_End_Channel
- mov [edi+A2T],ebx      ; Save new table address
+ mov al,[edi+HDMA_Need_Transfer]
+ test al,al             ; Need new transfer?
+ jz HDMA_Absolute_Common.Continue
 
 .Next_Transfer:
  add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
@@ -333,14 +423,14 @@ Do_HDMA_Absolute_%1:
 
  cmp cl,2
  inc bx                 ; Adjust temporary table pointer
- jb .End_Transfer
+ jb HDMA_Absolute_Common.End_Transfer
 
  add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
  _DHC_Transfer [edi+DMA_B1]
 
  cmp cl,4
  inc bx                 ; Adjust temporary table pointer
- jb .End_Transfer
+ jb HDMA_Absolute_Common.End_Transfer
 
  add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
  _DHC_Transfer [edi+DMA_B2]
@@ -350,37 +440,16 @@ Do_HDMA_Absolute_%1:
  add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
  _DHC_Transfer [edi+DMA_B3]
 
+ inc bx
 
-.End_Transfer:
- add [edi+A2T],cx
-.Continue:
- dec byte [edi+NTRL]
- stc
- ret
+ jmp HDMA_Absolute_Common.End_Transfer
+
 
 Do_HDMA_Indirect_%1:
- mov ah,[edi+NTRL]      ; Get number of lines to transfer
- test ah,0x7F
- jz  .Next_Set
- test ah,ah
- js .Next_Transfer
- jmp .Continue
+ mov al,[edi+HDMA_Need_Transfer]
+ test al,al             ; Need new transfer?
+ jz HDMA_Indirect_Common.Continue
 
-.Next_Set:
- GET_BYTE 0
- inc bx
- mov [edi+NTRL],al
- test al,al
- jz HDMA_End_Channel
-
- mov ah,al
- GET_BYTE _5A22_SLOW_CYCLE      ; Address load low
- inc bx
- mov [edi+DASL],al
- GET_BYTE _5A22_SLOW_CYCLE      ; Address load high
- inc bx
- mov [edi+DASH],al
- mov [edi+A2T],ebx
 .Next_Transfer:
  mov ebx,[edi+DAS]
  and ebx,BITMASK(0,23)
@@ -390,14 +459,14 @@ Do_HDMA_Indirect_%1:
 
  cmp cl,2
  inc bx                 ; Adjust temporary table pointer
- jb .End_Transfer
+ jb HDMA_Indirect_Common.End_Transfer
 
  add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
  _DHC_Transfer [edi+DMA_B1]
 
  cmp cl,4
  inc bx                 ; Adjust temporary table pointer
- jb .End_Transfer
+ jb HDMA_Indirect_Common.End_Transfer
 
  add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
  _DHC_Transfer [edi+DMA_B2]
@@ -407,13 +476,9 @@ Do_HDMA_Indirect_%1:
  add R_65c816_Cycles,byte _5A22_SLOW_CYCLE      ; HDMA transfer
  _DHC_Transfer [edi+DMA_B3]
 
+ inc bx
 
-.End_Transfer:
- add [edi+DAS],cx
-.Continue:
- dec byte [edi+NTRL]
- stc
- ret
+ jmp HDMA_Indirect_Common.End_Transfer
 
 %undef _DHC_Transfer
 %endmacro
@@ -423,9 +488,7 @@ EXPORT Do_HDMA_Channel
  ; Overhead, also used for loading next NTRLx ($43xA)
  add R_65c816_Cycles,byte _5A22_SLOW_CYCLE
 
- mov ebx,[edi+A2T]      ; Get table address
- and ebx,BITMASK(0,23)
-
+ mov ah,[edi+NTRL]
  mov ecx,[edi+HDMA_Siz] ; Get HDMA transfer size
 
  mov al,[edi+DMAP]      ; Get HDMA control byte
@@ -449,28 +512,34 @@ EXPORT SNES_W420C ; HDMAEN      ; Actually handled within screen core!
  ret
 %endif
  mov [C_LABEL(HDMAEN)],al
-;ret
 
- mov [HDMAON],al
+;mov [HDMAON],al
  ret
 
 ;macro for processing a channel during HDMA init
 %macro RELATCH_HDMA_CHANNEL 1
+ LOAD_DMA_TABLE %1
  test byte [C_LABEL(HDMAEN)],BIT(%1)
+ mov byte [edi+HDMA_Need_Transfer],0
  jz %%no_relatch
 
- mov eax,[A1T_%1]        ; Src Address in ebx
- mov [A2T_%1],eax
+ mov byte [In_DMA],(%1) | DMA_IN_PROGRESS
+ call C_LABEL(Relatch_HDMA_Channel)
+ jnc %%no_disable
 
- mov byte [NTRL_%1],0
+ ; keep track of terminated channels
+ and byte [HDMA_Not_Ended],~BIT(%1)
 
+%%no_disable:
 %%no_relatch:
 %endmacro
 
 ALIGNC
 EXPORT init_HDMA
+ mov byte [HDMA_Not_Ended],BITMASK(0,7)
+
  mov al,[C_LABEL(HDMAEN)]
- mov [HDMAON],al
+;mov [HDMAON],al
  test al,al
  jz .no_hdma
 
@@ -494,7 +563,8 @@ EXPORT init_HDMA
 
 ALIGNC
 EXPORT do_HDMA
- mov al,[HDMAON]
+ mov al,[HDMAEN]
+ and al,[HDMA_Not_Ended]
  test al,al
  jz .no_hdma
  add R_65c816_Cycles,byte _5A22_FAST_CYCLE * 3  ; HDMA processing
@@ -515,6 +585,7 @@ EXPORT do_HDMA
  HDMAOPERATION 5
  HDMAOPERATION 6
  HDMAOPERATION 7
+
  pop eax
  mov [In_DMA],al
  pop edi
@@ -581,7 +652,7 @@ EXPORT Reset_DMA
  xor eax,eax
  mov [C_LABEL(MDMAEN)],al
  mov [C_LABEL(HDMAEN)],al
- mov [HDMAON],al
+;mov [HDMAON],al
  mov [In_DMA],al
  mov byte [DMA_Pending_B_Address],-1
 
