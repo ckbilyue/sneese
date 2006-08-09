@@ -81,7 +81,7 @@ void LoadConfigCurrent(void)
  SCREEN_MODE = get_config_int("display", "screenmode", 1);
 #if defined(ALLEGRO_DOS)
  if ((cfg_version >= 0.72 && cfg_version <= 0.842 && SCREEN_MODE > 6) ||
-	 (cfg_version >= 0.843 && SCREEN_MODE > 2)) SCREEN_MODE = 0;
+	 (cfg_version >= 0.843 && SCREEN_MODE > 5)) SCREEN_MODE = 0;
 #elif defined(ALLEGRO_WINDOWS) || defined(ALLEGRO_UNIX) || defined(ALLEGRO_BEOS)
  if (cfg_version >= 0.72 && SCREEN_MODE > 7) SCREEN_MODE = 0;
  if ((cfg_version >= 0.72 && cfg_version <= 0.842 && SCREEN_MODE > 7) ||
@@ -351,6 +351,7 @@ void SaveConfig(void)
  fprintf(cfg, "# Available screen modes:\n");
 #ifdef ALLEGRO_DOS
  fprintf(cfg, "#  0:320x200x16b VESA2     1:320x240x16b VESA2     2:640x480x16b VESA2\n");
+ fprintf(cfg, "#  3:800x600x16b VESA2     4:960x720x16b VESA2     5:1024x768x16b VESA2\n");
 #elif defined(ALLEGRO_WINDOWS) || defined(ALLEGRO_UNIX) || defined(ALLEGRO_BEOS)
  fprintf(cfg, "#  0:320x200x16b           1:320x240x16b           2:640x480x16b\n");
  fprintf(cfg, "#  3:800x600x16b           4:960x720x16b           5:1024x768x16b\n");
