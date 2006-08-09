@@ -170,9 +170,14 @@ The config file
 user quit. It can be edited with a text editor for those interested, but
 most options can be changed inside the GUI, with less hassle...
 
+Note: for the Win32 port, the config file is instead named "sneesew.cfg".
+
+
+Save RAM file extensions
+------------------------
  If you want to change the standard .SRM extension for Save RAM files
 (perhaps to prevent corruption of saved files, in case of bugs) simply
-edit the SNEeSe.CFG file with a text editor and change the line:
+edit the "sneese.cfg" file with a text editor and change the line:
 
 saveextension=SRM
 
@@ -182,17 +187,44 @@ saveextension=RAM
 
 to use the .RAM extension, for example.
 
+
+Save Directory (for Save RAM files and IPS patches)
+---------------------------------------------------
  If you want to use a fixed save directory for your Save RAM files instead
 of the same directory of the ROM (to keep all your ROM directories from
 getting cluttered, and to be able to use Save RAM with ROMs on read-only
-media such as CD-ROM), edit the SNEeSe.CFG file and add the line:
+media such as CD-ROM), edit the "sneese.cfg" file and add the line:
 
-savedirectory=D:\SRAMDIR\
+savedirectory=D:/SRAMDIR/
 
-replacing 'D:\SRAMDIR\' with the save directory you wish to use.
-The directory specified MUST exist - if not, it will not be created,
-and SRAM loads and saves will simply fail without warning.
+replacing 'D:/SRAMDIR/' with the save directory you wish to use.
 (note: the trailing slash is not required and may be omitted)
+
+ The directory specified MUST exist - if not, it will not be created,
+and SRAM loads and saves will simply fail without warning.
+
+ IPS patches placed in the save directory with the same filename as the
+ROM image will automatically be applied on ROM load.
+
+
+ROM Directory (for ROM image files)
+-----------------------------------
+ If you want a default ROM directory to be used whenever you first use
+the 'Load ROM' menu in the GUI, edit the "sneese.cfg" file and add the
+line:
+
+romdirectory=D:/SNESDIR/
+
+replacing 'D:/SNESDIR/' with the ROM directory you wish to use.
+(note: the trailing slash is not required and may be omitted)
+
+ The directory specified MUST exist - if not, the GUI will likely
+ignore it and instead default to the current directory.
+ Additionally, the above-mentioned ROM directory is searched when
+SNEeSe is started from the commandline with a specified filename
+that has no explicitly specified directory and it is not located
+in the current directory.
+
 
 The GUI
 """""""
@@ -346,11 +378,13 @@ Video output:
  DOS:
    0:320x200x16b VESA2     1:320x240x16b VESA2     2:640x480x16b VESA2
  Win32, Unix & BeOS:
-   0:320x200x16b WIN 2     1:320x240x16b WIN       2:640x480x16b WIN
-   3:256x239x16b WIN       4:320x240x16b FS        5:640x480x16b FS
+   0:320x200x16b           1:320x240x16b           2:640x480x16b
+   3:800x600x16b           4:960x720x16b           5:1024x768x16b
+   6:256x239x16b           7:512x478x16b           8:768x717x16b
 Paths and files:
  -saveext RAM     Set extension for save RAM files
- -savedir .\saves Set save directory
+ -savedir ./saves Set save directory
+ -romdir  ./snes  Set ROM directory
 Performance:
  -pt  Disable cache preloads    -pt2 Disable cache preloads (alt)
  -pb  Enable cache preloads     -pb2 Enable cache preloads (alt)
@@ -552,6 +586,8 @@ TO DO:
   Skipper  : Fails to work on MANY ROMs, need at least an alternate skipper
 
  GUI: interface cleanup/rewrite/ease-of-use/versatility/mouse
+  Better error reporting on failed video mode set
+
 
  ROM loader: More memory maps
  Savestates: ...

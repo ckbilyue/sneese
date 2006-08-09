@@ -485,7 +485,6 @@ void PlotCharTDirect(pGUI_FONT font,char Character,int x,int y,int color){
  int width=font->get_width();
  unsigned c=font->xlat[(unsigned char) Character];
  unsigned char *Pointer=font->faces+c*((width+7)/8)*font->get_height();
- color+=240;
 
  for(int v=0;v<font->get_height();v++){
   // Enforce vertical boundaries
@@ -499,8 +498,9 @@ void PlotCharTDirect(pGUI_FONT font,char Character,int x,int y,int color){
    if((x+h)<0) continue;
    if(!bit) bit=0x80;
    if(Pointer[(h/8)+((width+7)/8)*v] & bit)
+   {
     putpixel((BITMAP *) gbSNES_Screen16.subbitmap, x+h, y+v, color);
-//  SNES_Screen8[x+h+(256+16)*(y+v)]=color;
+   }
   }
  }
 }
@@ -550,7 +550,8 @@ void ShowFPS(void){
   FPS[0] = 'X'; FPS[1] = 'X'; FPS[2] = 'X'; FPS[3] = 'X';
   FPS[4] = 0;
  }
- PlotStringSDirect(default_font,FPS,180,2,1,2);
+ PlotStringSDirect(default_font,FPS,180,2,
+  makecol(255,255,255),makecol(0,0,0));
 }
 
 extern "C" unsigned BreaksLast;
@@ -583,7 +584,8 @@ void ShowBreaks(void){
   Breaks[0] = 'X'; Breaks[1] = 'X'; Breaks[2] = 'X'; Breaks[3] = 'X';
   Breaks[4] = 0;
  }
- PlotStringSDirect(default_font,Breaks,76,2,1,2);
+ PlotStringSDirect(default_font,Breaks,76,2,
+  makecol(255,255,255),makecol(0,0,0));
 }
 
 void PlotCharT(WINDOW *window,pGUI_FONT font,

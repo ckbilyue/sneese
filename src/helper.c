@@ -158,6 +158,7 @@ unsigned Frames;
 /* Mode 4 = 320x200x16b SVGA    : Mode 5 = 320x240x16b SVGA     */
 /* Mode 6 = 640x480x16b SVGA    : Mode 7 = 640x480x16b SVGA FIT */
 unsigned char SCREEN_MODE;
+unsigned char screen_mode_windowed;
 
 DISPLAY_PROCESS display_process;
 

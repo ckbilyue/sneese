@@ -80,12 +80,21 @@ void LoadConfigCurrent(void)
 
  SCREEN_MODE = get_config_int("display", "screenmode", 1);
 #if defined(ALLEGRO_DOS)
- if (cfg_version >= 0.72 && SCREEN_MODE > 6) SCREEN_MODE = 0;
+ if ((cfg_version >= 0.72 && cfg_version <= 0.842 && SCREEN_MODE > 6) ||
+	 (cfg_version >= 0.843 && SCREEN_MODE > 2)) SCREEN_MODE = 0;
 #elif defined(ALLEGRO_WINDOWS) || defined(ALLEGRO_UNIX) || defined(ALLEGRO_BEOS)
  if (cfg_version >= 0.72 && SCREEN_MODE > 7) SCREEN_MODE = 0;
+ if ((cfg_version >= 0.72 && cfg_version <= 0.842 && SCREEN_MODE > 7) ||
+	 (cfg_version >= 0.843 && SCREEN_MODE > 8)) SCREEN_MODE = 0;
 #else
 #error Unable to determine platform for limiting screen mode.
 #endif
+
+#ifndef ALLEGRO_DOS
+ screen_mode_windowed = get_config_int("display", "use_window", 1);
+#else   /* !defined(ALLEGRO_DOS) */
+ screen_mode_windowed = 0;
+#endif  /* !defined(ALLEGRO_DOS) */
 
  display_process = (DISPLAY_PROCESS) get_config_int("display", "process", SDP_NONE);
  if ((unsigned) display_process >= NUM_DISPLAY_PROCESSES)
@@ -122,6 +131,9 @@ void LoadConfigCurrent(void)
 
  memset(save_dir, 0, MAXPATH);
  strncpy(save_dir, get_config_string("paths", "savedirectory", ""), MAXPATH - 1);
+
+ memset(rom_dir, 0, MAXPATH);
+ strncpy(rom_dir, get_config_string("paths", "romdirectory", ""), MAXPATH - 1);
 
  SPC_ENABLED = get_config_int("hardware", "emulatespc", 1);
 
@@ -222,30 +234,36 @@ void FixupConfig(void)
 #elif defined(ALLEGRO_WINDOWS) || defined(ALLEGRO_UNIX) || defined(ALLEGRO_BEOS)
   switch (SCREEN_MODE)
   {
-  case 0:   /* 0: 320x200x256 WIN    -> 0: 320x200x16b WIN   */
-  case 4:   /* 4: 320x200x16b WIN    -> 0: 320x200x16b WIN   */
+  case 0:   /* 0: 320x200x256 WIN    -> 0: 320x200x16b  */
+  case 4:   /* 4: 320x200x16b WIN    -> 0: 320x200x16b  */
    SCREEN_MODE = 0;
+   screen_mode_windowed = 1;
    break;
 
-  case 1:   /* 1: 320x240x256 WIN    -> 1: 320x240x16b WIN   */
-  case 5:   /* 5: 320x240x16b WIN    -> 1: 320x240x16b WIN   */
+  case 1:   /* 1: 320x240x256 WIN    -> 1: 320x240x16b  */
+  case 5:   /* 5: 320x240x16b WIN    -> 1: 320x240x16b  */
    SCREEN_MODE = 1;
+   screen_mode_windowed = 1;
    break;
 
-  case 6:   /* 6: 640x480x16b WIN    -> 2: 640x480x16b WIN   */
-   SCREEN_MODE = 2;
-   break;
-
-  case 3:   /* 3: 256x239x256 WIN    -> 3: 256x239x16b WIN   */
+  case 3:   /* 3: 256x239x256 WIN    -> 6: 256x239x16b  */
    SCREEN_MODE = 3;
+   screen_mode_windowed = 1;
    break;
 
-  case 2:   /* 2: 320x240x256 FS     -> 4: 320x240x16b FS    */
-   SCREEN_MODE = 4;
+  case 6:   /* 6: 640x480x16b WIN    -> 7: 512x478x16b  */
+   SCREEN_MODE = 2;
+   screen_mode_windowed = 1;
    break;
 
-  case 7:   /* 7: 640x480x16b FS     -> 5: 640x480x16b FS    */
-   SCREEN_MODE = 5;
+  case 2:   /* 2: 320x240x256 FS     -> 1: 320x240x16b  */
+   SCREEN_MODE = 1;
+   screen_mode_windowed = 0;
+   break;
+
+  case 7:   /* 7: 640x480x16b FS     -> 2: 640x480x16b  */
+   SCREEN_MODE = 2;
+   screen_mode_windowed = 0;
    break;
   }
 #endif
@@ -269,7 +287,7 @@ void FixupConfig(void)
    /* old 640x480x16b stretch = 2x h-stretch, 2x v-stretch */
    else if (SCREEN_MODE == 7)
    {
-    SCREEN_MODE = 6;
+    SCREEN_MODE = 2;
     stretch_x = 2;
     stretch_y = 2;
    }
@@ -326,6 +344,7 @@ void SaveConfig(void)
  fprintf(cfg, "[paths]\n");
  fprintf(cfg, "saveextension=%s\n", save_extension);
  fprintf(cfg, "savedirectory=%s\n", save_dir);
+ fprintf(cfg, "romdirectory=%s\n", rom_dir);
  fprintf(cfg, "\n");
  fprintf(cfg, "# Display settings\n");
  fprintf(cfg, "[display]\n");
@@ -333,10 +352,14 @@ void SaveConfig(void)
 #ifdef ALLEGRO_DOS
  fprintf(cfg, "#  0:320x200x16b VESA2     1:320x240x16b VESA2     2:640x480x16b VESA2\n");
 #elif defined(ALLEGRO_WINDOWS) || defined(ALLEGRO_UNIX) || defined(ALLEGRO_BEOS)
- fprintf(cfg, "#  0:320x200x16b WIN       1:320x240x16b WIN       2:640x480x16b WIN\n");
- fprintf(cfg, "#  3:256x239x16b WIN       4:320x240x16b FS        5:640x480x16b FS\n");
+ fprintf(cfg, "#  0:320x200x16b           1:320x240x16b           2:640x480x16b\n");
+ fprintf(cfg, "#  3:800x600x16b           4:960x720x16b           5:1024x768x16b\n");
+ fprintf(cfg, "#  6:256x239x16b           7:512x478x16b           8:768x717x16b\n");
 #endif
  fprintf(cfg, "screenmode=%d\n", SCREEN_MODE);
+#ifndef ALLEGRO_DOS
+ fprintf(cfg, "use_window=%d\n", screen_mode_windowed);
+#endif  /* !defined(ALLEGRO_DOS) */
  fprintf(cfg, "\n");
 
  fprintf(cfg, "# Available screen processing methods:\n");
@@ -783,13 +806,38 @@ int parse_args(int argc, char **argv, char **names, int maxnames)
      }
      break;
 
+    case 'r':
+    case 'R':
+     if (!stricmp(tv + 1, "romdir"))
+     {
+      if (tc + 1 >= argc)
+      {
+       printf("Missing path for switch: %s\n", tv); cmdhelp(); return 1;
+      }
+
+      if (strlen(argv[tc + 1]) > MAXPATH - 1)
+      {
+       printf("Path too long: %s\n", argv[tc + 1]); cmdhelp(); return 1;
+      }
+
+      memset(rom_dir, 0, MAXPATH);
+      strcpy(rom_dir, argv[++tc]);
+      cfg_changed = -1;
+     }
+
+     else
+     {
+      printf("Invalid switch: %s\n", tv); cmdhelp(); return 1;
+     }
+     break;
+
     case 's':
     case 'S':
      if (!stricmp(tv + 1, "savedir"))
      {
       if (tc + 1 >= argc)
       {
-       printf("Invalid switch: %s\n", tv); cmdhelp(); return 1;
+       printf("Missing path for switch: %s\n", tv); cmdhelp(); return 1;
       }
 
       if (strlen(argv[tc + 1]) > MAXPATH - 1)

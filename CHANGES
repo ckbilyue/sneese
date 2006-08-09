@@ -50,6 +50,11 @@ Changes
    cause bad patches or crashes when extending the ROM size [TRAC]
   5A22: Improved H-DMA behavior accuracy in a couple ways, thanks to
    byuu for information [TRAC]
+  Config: Added default ROM directory support (must be set manually in cfg
+   file, read the config file section of the readme for info) [TRAC]
+  Config: Added full-screen/window configuration option (controllable
+   via GUI and config file but not commandline, at this time), and
+   a few new resolution options [TRAC]
  0.842
   SPC700: Added support for BCD fixup opcodes DAA and DAS, thanks to
    anomie and Overload for information and resources for research and

@@ -70,6 +70,7 @@ EXTERN unsigned FrameLimit;
 EXTERN unsigned M7X,M7Y,M7A,M7B,M7C,M7D;
 
 EXTERN unsigned char SCREEN_MODE;
+EXTERN unsigned char screen_mode_windowed;
 
 /* Display processing methods, such as interpolation/EAGLE, would go here */
 typedef enum {

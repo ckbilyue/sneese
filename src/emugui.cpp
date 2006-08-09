@@ -52,30 +52,45 @@ extern PALETTE sneesepal;
 extern BITMAP *sneese;
 extern BITMAP *joypad;
 
+extern const int screenmode_fallback;
 extern SCREEN screenmodes[];
 
 // Used to configure the screen and set internal variables for rendering!
-BITMAP *SetGUIScreen(int ScreenMode)
+BITMAP *SetGUIScreen(int ScreenMode, int windowed)
 {
+ int using_screen_mode;
+ int using_windowed;
+
  if (Allegro_Bitmap)    // If bitmap exists destroy it
  {
   destroy_bitmap(Allegro_Bitmap);
   Allegro_Bitmap = NULL;
  }
 
- if (screenmodes[SCREEN_MODE = ScreenMode].set())
+ using_screen_mode = ScreenMode;
+ using_windowed = windowed;
+ if (screenmodes[using_screen_mode].set(using_windowed))
  {
-  switch(ScreenMode)
+  /* failed, attempt fallback to previous mode */
+  using_screen_mode = SCREEN_MODE;
+  using_windowed = screen_mode_windowed;
+  if (screenmodes[using_screen_mode].set(using_windowed))
   {
-   case 0:
-   case 2:
-   case 3:
-    return (BITMAP *) 0;
-    break;
-   default:
-    if (screenmodes[SCREEN_MODE = 0].set()) return (BITMAP *) 0;
+   /* failed, attempt fallback to 'safe' mode */
+   using_screen_mode = screenmode_fallback;
+   if (screenmodes[using_screen_mode].set(using_windowed))
+   {
+    using_windowed = !using_windowed;
+
+    /* failed, attempt to toggle windowed/fullscreen state */
+    if (screenmodes[using_screen_mode].set(using_windowed))
+     return (BITMAP *) 0;
+   }
   }
  }
+
+ SCREEN_MODE = using_screen_mode;
+ screen_mode_windowed = using_windowed;
 
  ScreenX = screenmodes[SCREEN_MODE].w;
  ScreenY = screenmodes[SCREEN_MODE].h;
@@ -267,21 +282,37 @@ const char *Controls_Options[CONTROLS_NUM_OPTIONS]=
 
 WINDOW *Screen_window=0;
 #if defined(ALLEGRO_DOS)
+enum
+{
+ SCREEN_OPTIONS_MODE_OFFSET,
+ SCREEN_USE_WINDOW
+};
 #define NUM_SCREEN_OPTIONS 3
 char *Screen_Options[NUM_SCREEN_OPTIONS]={
  "320x200x16b VESA2",
  "320x240x16b VESA2",
  "640x480x16b VESA2"
 };
+
 #elif defined(ALLEGRO_WINDOWS) || defined(ALLEGRO_UNIX) || defined(ALLEGRO_BEOS)
-#define NUM_SCREEN_OPTIONS 6
+
+enum
+{
+ SCREEN_USE_WINDOW,
+ SCREEN_OPTIONS_MODE_OFFSET
+};
+#define NUM_SCREEN_OPTIONS 10
 char *Screen_Options[NUM_SCREEN_OPTIONS]={
- "320x200x16b WIN",
- "320x240x16b WIN",
- "640x480x16b WIN",
- "256x239x16b WIN",
- "320x240x16b FS",
- "640x480x16b FS"
+ 0,
+ "320x200x16b",
+ "320x240x16b",
+ "640x480x16b",
+ "800x600x16b",
+ "960x720x16b",
+ "1024x768x16b",
+ "256x239x16b",
+ "512x478x16b",
+ "768x717x16b"
 };
 #else
 #error Unsupported platform.
@@ -388,14 +419,32 @@ void UpdateControlsWindow(int Selected)
 const char *FileWindow()
 {
  clear_keybuf();
+
  static int FileListPos = 0;
  static int SelFile = 0;
  int NumFiles;
  int keypress, key_asc, key_scan;
- static char current_file_window_dir[MAXPATH] = ".";
+
+ char dir[MAXDIR];
+ static char current_file_window_dir[MAXPATH] = "";
  static char filename[MAXPATH];
 
+ if (!strcmp(current_file_window_dir, ""))
+ {
+  if (strlen(rom_dir))
+  /* default ROM path set */
+  {
+   strcpy(current_file_window_dir, rom_dir);
+  }
+  else
+  /* no default ROM path, use cwd */
+  {
+   strcpy(current_file_window_dir, ".");
+  }
+ }
+
  chdir(current_file_window_dir);
+ strcpy(current_file_window_dir, getcwd(dir, MAXDIR)); // "remember" last opened dir
  NumFiles = GetDirList("*.*", DirList, FileListPos);
 
  UpdateFileWindow(SelFile,
@@ -496,8 +545,6 @@ const char *FileWindow()
    case KEY_ENTER:
     if (DirList[FileListPos + SelFile].Directory)
     {
-     char dir[MAXDIR];
-
      chdir(DirList[FileListPos + SelFile].Name);
      strcpy(current_file_window_dir, getcwd(dir, MAXDIR)); // "remember" last opened dir
      FileListPos = 0;
@@ -519,7 +566,20 @@ const char *FileWindow()
 }
 int ScreenWindow()
 {
- int CursorAt = SCREEN_MODE;
+ if (SCREEN_USE_WINDOW < SCREEN_OPTIONS_MODE_OFFSET)
+ {
+  switch (screen_mode_windowed)
+  {
+  case 0:
+   Screen_Options[SCREEN_USE_WINDOW] = "Mode: full-screen";
+   break;
+  default:
+   Screen_Options[SCREEN_USE_WINDOW] = "Mode: windowed";
+  }
+ }
+
+ int CursorAt = SCREEN_MODE + SCREEN_OPTIONS_MODE_OFFSET;
+
  int keypress, key_asc, key_scan;
  clear_keybuf();
 
@@ -535,17 +595,18 @@ int ScreenWindow()
 
   switch (key_scan)
   {
-   case KEY_UP:
-    if(CursorAt) CursorAt--; else CursorAt=NUM_SCREEN_OPTIONS-1;
-    break;
-   case KEY_DOWN:
-    if(CursorAt < NUM_SCREEN_OPTIONS-1) CursorAt++; else CursorAt=0;
-    break;
-   case KEY_ESC:
-    return -1;
-   case KEY_ENTER:
-   case KEY_ENTER_PAD:
-    return CursorAt;
+  case KEY_UP:
+   if(CursorAt) CursorAt--; else CursorAt=NUM_SCREEN_OPTIONS-1;
+   break;
+  case KEY_DOWN:
+   if(CursorAt < NUM_SCREEN_OPTIONS-1) CursorAt++; else CursorAt=0;
+   break;
+  case KEY_ESC:
+   return -1;
+  case KEY_ENTER:
+  case KEY_ENTER_PAD:
+   return CursorAt;
+
   }
  }
  return -1; // Signify normal exit
@@ -1041,7 +1102,8 @@ int ConfigWindow()
 {
  int temp;
 
- Config_Options[CONFIG_SCREEN_MODE] = Screen_Options[SCREEN_MODE];
+ Config_Options[CONFIG_SCREEN_MODE] =
+  Screen_Options[SCREEN_MODE + SCREEN_OPTIONS_MODE_OFFSET];
 
  if(SPC_ENABLED) Config_Options[CONFIG_ENABLE_SPC] = "Emulate SPC";
  else Config_Options[CONFIG_ENABLE_SPC] = "Skip SPC";
@@ -1261,10 +1323,30 @@ int ConfigWindow()
     {
      while((temp = ScreenWindow()) != -1)
      {
-      // Setup screen mode (SCREEN_MODE is set here so following works)
-      SetGUIScreen(temp);
+      int using_screen_mode, using_windowed;
 
-      Config_Options[CONFIG_SCREEN_MODE] = Screen_Options[SCREEN_MODE];
+      if (temp < SCREEN_OPTIONS_MODE_OFFSET)
+      /* fs/windowed switch */
+      {
+       using_screen_mode = SCREEN_MODE;
+       using_windowed = !screen_mode_windowed;
+      }
+      else
+      /* resolution switch */
+      {
+       using_screen_mode = temp - SCREEN_OPTIONS_MODE_OFFSET;
+       using_windowed = screen_mode_windowed;
+      }
+
+      // Setup screen mode (SCREEN_MODE is set here so following works)
+      if (!SetGUIScreen(using_screen_mode, using_windowed))
+      // All mode set attempts failed, inform caller of critical failure
+      {
+       return 0;
+      }
+
+      Config_Options[CONFIG_SCREEN_MODE] =
+       Screen_Options[SCREEN_MODE + SCREEN_OPTIONS_MODE_OFFSET];
 #ifndef NO_LOGO
       if (sneese)
       { // Prevent a crash if file not found!
@@ -1901,7 +1983,13 @@ GUI_ERROR GUI()
    }
 
    if (CursorAt == MAIN_CONFIGURE)
-    ConfigWindow();
+   {
+    if (!ConfigWindow())
+    {
+     /* critical failure, fall-through to exit */
+     CursorAt = MAIN_EXIT;
+    }
+   }
 
    if (CursorAt == MAIN_EXIT)
    {

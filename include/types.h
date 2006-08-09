@@ -40,29 +40,31 @@ You must read and accept the license prior to use.
 extern "C" unsigned char *GUI_Screen;
 
 struct SCREEN {
- int depth,w_base,h_base,w,h,driver;
- void (*adjust)(void);
- int set(){
-  int error;
-  set_color_depth(depth);
-  error=set_gfx_mode(driver, w_base, h_base, w_base, h_base);
-  if(error) return error;
-#ifdef ALLEGRO_DOS
-  if(w_base != w || h_base != h){
-   switch(driver){
-    case GFX_MODEX:
-    case GFX_VGA:
-     (*adjust)();
-     break;
+ int depth,w_base,h_base,w,h;
+ /* driver for full-screen display */
+ int driver;
+#ifndef ALLEGRO_DOS
+ /* driver for windowed display */
+ int driver_win;
+#endif  /* !defined(ALLEGRO_DOS) */
 
-    default:
-     /* Size adjustment not supported */
-     break;
-   }
-  }
-#endif
+ int set(bool windowed = false)
+ {
+  int error;
+  int using_driver;
+
+#ifndef ALLEGRO_DOS
+   using_driver = windowed ? driver_win : driver;
+#else   /* defined(ALLEGRO_DOS) */
+   using_driver = driver;
+#endif  /* defined(ALLEGRO_DOS) */
+
+  set_color_depth(depth);
+  error = set_gfx_mode(using_driver, w_base, h_base, w_base, h_base);
+  if(error) return error;
   return 0;
  }
+
 };
 
 typedef SCREEN * pSCREEN;

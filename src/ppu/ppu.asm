@@ -1944,62 +1944,74 @@ SNES_W212B: ; WOBJLOG
 
 ALIGNC
 SNES_W212C: ; TM
- cmp al,[C_LABEL(TM)]
+ mov dl,[C_LABEL(TM)]
+ xor dl,al
+ and dl,BITMASK(0,4)
  je .no_change
+
+ push edx
  UpdateDisplay  ;*
- mov [C_LABEL(TM)],al
+ pop edx
+
  mov byte [C_LABEL(Redo_Layering)],-1
- or byte [C_LABEL(Redo_Windowing)], \
-  Redo_Win_BG(1) | Redo_Win_BG(2) | Redo_Win_BG(3) | Redo_Win_BG(4) | \
-  Redo_Win_OBJ
- mov al,[C_LABEL(TM)]
+ or [C_LABEL(Redo_Windowing)],dl
 
 .no_change:
+ mov [C_LABEL(TM)],al
  ret
 
 ALIGNC
 SNES_W212D: ; TS
- cmp al,[C_LABEL(TS)]
+ mov dl,[C_LABEL(TS)]
+ xor dl,al
+ and dl,BITMASK(0,4)
  je .no_change
+
+ push edx
  UpdateDisplay  ;*
- mov [C_LABEL(TS)],al
+ pop edx
+
  mov byte [C_LABEL(Redo_Layering)],-1
- or byte [C_LABEL(Redo_Windowing)], \
-  Redo_Win_BG(1) | Redo_Win_BG(2) | Redo_Win_BG(3) | Redo_Win_BG(4) | \
-  Redo_Win_OBJ
- mov al,[C_LABEL(TS)]
+ or [C_LABEL(Redo_Windowing)],dl
 
 .no_change:
+ mov [C_LABEL(TS)],al
  ret
 
 ALIGNC
 SNES_W212E: ; TMW
- cmp al,[C_LABEL(TMW)]
+ mov dl,[C_LABEL(TMW)]
+ xor dl,al
+ and dl,BITMASK(0,4)
  je .no_change
- UpdateDisplay  ;*windowing only
- mov [C_LABEL(TMW)],al
+
+ push edx
+ UpdateDisplay  ;*
+ pop edx
+
  mov byte [C_LABEL(Redo_Layering)],-1
- or byte [C_LABEL(Redo_Windowing)], \
-  Redo_Win_BG(1) | Redo_Win_BG(2) | Redo_Win_BG(3) | Redo_Win_BG(4) | \
-  Redo_Win_OBJ
- mov al,[C_LABEL(TMW)]
+ or [C_LABEL(Redo_Windowing)],dl
 
 .no_change:
+ mov [C_LABEL(TMW)],al
  ret
 
 ALIGNC
 SNES_W212F: ; TSW
- cmp al,[C_LABEL(TSW)]
+ mov dl,[C_LABEL(TSW)]
+ xor dl,al
+ and dl,BITMASK(0,4)
  je .no_change
- UpdateDisplay  ;*windowing only
- mov [C_LABEL(TSW)],al
+
+ push edx
+ UpdateDisplay  ;*
+ pop edx
+
  mov byte [C_LABEL(Redo_Layering)],-1
- or byte [C_LABEL(Redo_Windowing)], \
-  Redo_Win_BG(1) | Redo_Win_BG(2) | Redo_Win_BG(3) | Redo_Win_BG(4) | \
-  Redo_Win_OBJ
- mov al,[C_LABEL(TSW)]
+ or [C_LABEL(Redo_Windowing)],dl
 
 .no_change:
+ mov [C_LABEL(TSW)],al
  ret
 
 ALIGNC

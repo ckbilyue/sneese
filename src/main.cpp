@@ -43,20 +43,33 @@ using namespace std;
 #include "types.h"
 #include "version.h"
 
-void no_adjust(void){}
+
+extern const int screenmode_fallback = 2;  /* 640x480x16b */
 
 SCREEN screenmodes[]={
 #if defined(ALLEGRO_DOS)
- {16,320,200,320,200,GFX_VESA2L,no_adjust  },  // 320x200x16b VESA2L
- {16,320,240,320,240,GFX_VESA2L,no_adjust  },  // 320x240x16b VESA2L
- {16,640,480,640,480,GFX_VESA2L,no_adjust  }   // 640x480x16b VESA2L
+ {16,320,200,320,200,GFX_VESA2L,},  // 320x200x16b VESA2L
+ {16,320,240,320,240,GFX_VESA2L,},  // 320x240x16b VESA2L
+ {16,640,480,640,480,GFX_VESA2L,}   // 640x480x16b VESA2L
 #elif defined(ALLEGRO_WINDOWS) || defined(ALLEGRO_UNIX) || defined(ALLEGRO_BEOS)
- {16,320,200,320,200,GFX_AUTODETECT_WINDOWED  ,no_adjust  },  // 320x200x16b WIN
- {16,320,240,320,240,GFX_AUTODETECT_WINDOWED  ,no_adjust  },  // 320x240x16b WIN
- {16,640,480,640,480,GFX_AUTODETECT_WINDOWED  ,no_adjust  },  // 640x480x16b WIN
- {16,256,239,256,239,GFX_AUTODETECT_WINDOWED  ,no_adjust  },  // 256x239x16b WIN
- {16,320,240,320,240,GFX_AUTODETECT_FULLSCREEN,no_adjust  },  // 320x240x16b FS
- {16,640,480,640,480,GFX_AUTODETECT_FULLSCREEN,no_adjust  }   // 640x480x16b FS
+ {16,320,200,320,200,               // 320x200x16b
+  GFX_AUTODETECT_FULLSCREEN, GFX_AUTODETECT_WINDOWED },
+ {16,320,240,320,240,               // 320x240x16b
+  GFX_AUTODETECT_FULLSCREEN, GFX_AUTODETECT_WINDOWED },
+ {16,640,480,640,480,               // 640x480x16b
+  GFX_AUTODETECT_FULLSCREEN, GFX_AUTODETECT_WINDOWED },
+ {16,800,600,800,600,               // 800x600x16b
+  GFX_AUTODETECT_FULLSCREEN, GFX_AUTODETECT_WINDOWED },
+ {16,960,720,960,720,               // 960x720x16b
+  GFX_AUTODETECT_FULLSCREEN, GFX_AUTODETECT_WINDOWED },
+ {16,1024,768,1024,768,               // 1024x768x16b
+  GFX_AUTODETECT_FULLSCREEN, GFX_AUTODETECT_WINDOWED },
+ {16,256,239,256,239,               // 256x239x16b
+  GFX_AUTODETECT_FULLSCREEN, GFX_AUTODETECT_WINDOWED },
+ {16,512,478,512,478,               // 512x478x16b
+  GFX_AUTODETECT_FULLSCREEN, GFX_AUTODETECT_WINDOWED },
+ {16,768,717,768,717,               // 768x717x16b
+  GFX_AUTODETECT_FULLSCREEN, GFX_AUTODETECT_WINDOWED }
 #else
 #error No screen modes defined.
 #endif
@@ -87,13 +100,9 @@ int main(int argc, char **argv)
 
  if (name != NULL)
  {
-  char filename[MAXPATH];
-
   cout << "Attempting to load " << name << endl;
 
-  fix_filename_path(filename, name, MAXPATH);
-
-  if (!open_rom(filename))
+  if (!open_rom_with_default_path(name))
   {
    cout << "Failed to load cartridge ROM: " << name << endl;
    return 1;
@@ -132,7 +141,7 @@ int main(int argc, char **argv)
  }
 #endif
 
- if (!SetGUIScreen(SCREEN_MODE)) return 1;
+ if (!SetGUIScreen(SCREEN_MODE, screen_mode_windowed)) return 1;
 
 #ifndef NO_GUI
  GUI_ERROR GUI_error = GUI_EXIT;

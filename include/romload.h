@@ -99,7 +99,10 @@ extern int ROM_format;
 extern SNESRomInfoStruct RomInfoLo,RomInfoHi;
 
 extern char *ROM_filename;
+extern char rom_dir[MAXPATH];
+
 extern char fn_drive[MAXDRIVE], fn_dir[MAXDIR], fn_file[MAXFILE], fn_ext[MAXEXT];
+
 extern char SRAM_filename[MAXPATH];
 extern char save_dir[MAXPATH];
 extern char save_extension[MAXEXT];
@@ -133,6 +136,7 @@ bool CreateSaveFilename(char *save_filename, const char *ROM_filename,
 int Allocate_ROM(bool resize = false);
 
 int open_rom(const char *FileName);
+int open_rom_with_default_path(const char *filename);
 void DisplayRomStats(SNESRomInfoStruct *RomInfo);
 
 bool PatchROMAddress(const unsigned address, const unsigned char byte);

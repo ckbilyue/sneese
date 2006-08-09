@@ -198,7 +198,10 @@ int SaveSRAM(char *SRAM_filename)
 }
 
 char *ROM_filename = 0;
+char rom_dir[MAXPATH];
+
 char fn_drive[MAXDRIVE], fn_dir[MAXDIR], fn_file[MAXFILE], fn_ext[MAXEXT];
+
 char SRAM_filename[MAXPATH];
 char save_dir[MAXPATH];
 char save_extension[MAXEXT];
@@ -242,7 +245,7 @@ bool CreateSaveFilename(char *save_filename, const char *ROM_filename,
 
  length = 1;    // 1 for the null
  fnsplit(ROM_filename, fn_drive, fn_dir, fn_file, fn_ext);
- if (!fn_file) return TRUE;
+ if (!strlen(fn_file)) return TRUE;
  length += strlen(fn_file);
 
  if (strlen(save_extension))
@@ -1699,8 +1702,10 @@ int open_rom(const char *Filename)
   || !rom_sram || !rom_country)
   return FALSE;
 
- strcpy(ROM_filename, Filename);
- strcpy(rom_romfile, Filename);
+ strncpy(ROM_filename, Filename, MAXPATH);
+ ROM_filename[MAXPATH - 1] = 0;
+ strncpy(rom_romfile, Filename, MAXPATH);
+ rom_romfile[MAXPATH - 1] = 0;
 
  switch (filetype)
  {
@@ -1744,6 +1749,52 @@ int open_rom(const char *Filename)
 #endif
 
  return TRUE;
+}
+
+int open_rom_with_default_path(const char *filename)
+{
+ char full_pathname[MAXPATH];
+ char temp_filename[MAXPATH];
+ int length, slength;
+
+ temp_filename[0] = 0;
+
+ length = 1;    // 1 for the null
+ fnsplit(filename, fn_drive, fn_dir, fn_file, fn_ext);
+
+ if (!strlen(fn_file)) return TRUE;
+
+ fix_filename_path(full_pathname, filename, MAXPATH);
+ if (!access(full_pathname, F_OK))
+ {
+  return open_rom(full_pathname);
+ }
+
+ /* don't try default ROM path if an explicit path was specified */
+ if (!strlen(rom_dir) || (strlen(fn_drive) || strlen(fn_dir))) return TRUE;
+
+ /* check length of new path */
+ length += strlen(filename);
+
+ slength = strlen(rom_dir);
+
+ length += slength;
+ if (rom_dir[slength - 1] != '/' && rom_dir[slength - 1] != '\\')
+  ++length;    // One for trailing slash
+
+ /* fail if it's too long */
+ if (length > MAXPATH) return TRUE;
+
+ /* construct the new path */
+ strcat(temp_filename, rom_dir);
+ if (rom_dir[slength - 1] != '/' && rom_dir[slength - 1] != '\\')
+  strcat(temp_filename, "/");  // Add missing trailing slash
+
+ strcat(temp_filename, filename);
+
+ fix_filename_path(full_pathname, temp_filename, MAXPATH);
+
+ return open_rom(full_pathname);
 }
 
 char *TypeTable[]={

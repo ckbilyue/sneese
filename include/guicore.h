@@ -98,10 +98,10 @@ class CTL {
 public:
  CTL(){ next = 0; handle = 0; }
  CTL(WINDOW *parent);
- virtual void refresh(WINDOW *parent){};
- virtual void process(WINDOW *parent){};
- virtual void attach(WINDOW *parent){ this->parent = parent; };
- virtual void detach(WINDOW *parent){};
+ virtual void refresh(WINDOW *parent){}
+ virtual void process(WINDOW *parent){}
+ virtual void attach(WINDOW *parent){ this->parent = parent; }
+ virtual void detach(WINDOW *parent){}
 };
 
 /*
@@ -266,7 +266,7 @@ void PlotMenuItem(WINDOW *window,pGUI_FONT font,
 void PlotSelectedMenuItem(WINDOW *window,pGUI_FONT font,
  const char *String,int x,int y,int maxlen=0);
 
-BITMAP *SetGUIScreen(int);
+BITMAP *SetGUIScreen(int ScreenMode, int windowed);
 
 int WaitForKeyPress();
 
