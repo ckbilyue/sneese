@@ -85,9 +85,10 @@ int fncmp(const FILELIST *f1, const FILELIST *f2){
 // from the path given, starting at file number Offset
 // and with a maximum number of files of max_listed_files
 
-int GetDirList(char *Path, FILELIST *&Files, int Offset){
+int GetDirList(char *Path, FILELIST *&Files, int Offset, int *real_file_count){
  al_ffblk FileInfo;
- int FilesRead;
+ int FilesRead = 0;
+ *real_file_count = 0;
 
  int done = al_findfirst(Path, &FileInfo, FA_ARCH | FA_DIREC | FA_RDONLY);
  if (done)
@@ -104,7 +105,11 @@ int GetDirList(char *Path, FILELIST *&Files, int Offset){
  FilesRead = 1;
 
  do {
+#if defined(ALLEGRO_DOS) || defined(ALLEGRO_WINDOWS)
   if (FilesRead == max_listed_files - 26)
+#else
+  if (FilesRead == max_listed_files)
+#endif
   {
    FILELIST *tempFiles;
 
@@ -125,12 +130,15 @@ int GetDirList(char *Path, FILELIST *&Files, int Offset){
    strcpy(Files[FilesRead].Name, FileInfo.name);
    Files[FilesRead].Size = FileInfo.size;
    Files[FilesRead].Directory = FileInfo.attrib & FA_DIREC;
+   if (Files[FilesRead].Directory) (*real_file_count)--;
    FilesRead++;
   }
   done = al_findnext(&FileInfo);
  } while (!done);   // while more files and more wanted
 
  al_findclose(&FileInfo);
+
+ *real_file_count += FilesRead;
 
  // Sort starting one entry after the entry for ".."
  qsort(&Files[1], FilesRead - 1, sizeof(FILELIST),

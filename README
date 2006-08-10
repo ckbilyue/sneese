@@ -241,8 +241,9 @@ In the file loading window:
  PAGE UP and PAGE DOWN allow you to travel through the listing a window
   at a time;
  HOME will go to the top of the list;
- and END to the bottom of the files/directories (first press),
- then to the bottom of the drives (second press).
+ and END to the bottom of the files (first press),
+ then to the bottom of the directories (second press),
+ then (DOS/Win32 only) to the bottom of the drives (third press).
 
 There is no exclusion by extension, and no jump-to-pressed-letter in
 the file loader yet, and LFNs are truncated... sorry, but will fix

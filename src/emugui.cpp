@@ -425,7 +425,7 @@ const char *FileWindow()
 
  static int FileListPos = 0;
  static int SelFile = 0;
- int NumFiles;
+ int NumListings, NumFiles;
  int keypress, key_asc, key_scan;
 
  char dir[MAXDIR];
@@ -448,10 +448,10 @@ const char *FileWindow()
 
  chdir(current_file_window_dir);
  strcpy(current_file_window_dir, getcwd(dir, MAXDIR)); // "remember" last opened dir
- NumFiles = GetDirList("*.*", DirList, FileListPos);
+ NumListings = GetDirList("*.*", DirList, FileListPos, &NumFiles);
 
  UpdateFileWindow(SelFile,
-  FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos,
+  FileListPos + 15 <= NumListings ? 15 : NumListings - FileListPos,
   FileListPos);
 
  for(;;)
@@ -468,20 +468,49 @@ const char *FileWindow()
     SelFile = 0;
 
     UpdateFileWindow(SelFile,
-     FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos,
+     FileListPos + 15 <= NumListings ? 15 : NumListings - FileListPos,
      FileListPos);
     continue;
 
    case KEY_END:
-    // Jump to end of files, then to end of drives
-    if (FileListPos + 15 + 26 < NumFiles) FileListPos = NumFiles - 15 - 26;
-    else FileListPos = NumFiles - 15;
+#if defined(ALLEGRO_DOS) || defined(ALLEGRO_WINDOWS)
+    if (FileListPos + 15 + 26 < NumListings + 1)
+    {
+     if (FileListPos + 15 < NumFiles + 1)
+     // Jump to end of files...
+     {
+      FileListPos = NumFiles + 1 - 15;
+     }
+     else
+     // then end of directories...
+     {
+      FileListPos = NumListings + 1 - 15 - 26;
+     }
+    }
+    // then end of drives
+    else
+    {
+     FileListPos = NumListings - 15;
+    }
+#else
+    // Jump to end of files...
+    if (FileListPos + 15 < NumFiles + 1)
+    {
+     FileListPos = NumFiles + 1 - 15;
+    }
+    // then end of directories
+    else
+    {
+     FileListPos = NumListings - 15;
+    }
+#endif
 
     if (FileListPos < 0) FileListPos = 0;
-    SelFile = (FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos) - 1;
+    SelFile = (FileListPos + 15 <= NumListings ?
+     15 : NumListings - FileListPos) - 1;
 
     UpdateFileWindow(SelFile,
-     FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos,
+     FileListPos + 15 <= NumListings ? 15 : NumListings - FileListPos,
      FileListPos);
     continue;
 
@@ -493,20 +522,20 @@ const char *FileWindow()
     } else SelFile = 0;
 
     UpdateFileWindow(SelFile,
-     FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos,
+     FileListPos + 15 <= NumListings ? 15 : NumListings - FileListPos,
      FileListPos);
     continue;
 
    case KEY_PGDN:
-    if (FileListPos + 15 < NumFiles)
+    if (FileListPos + 15 < NumListings)
     {
      FileListPos += 15;
-     if (FileListPos + 15 >= NumFiles) FileListPos = NumFiles - 15;
+     if (FileListPos + 15 >= NumListings) FileListPos = NumListings - 15;
     } else SelFile =
-     (FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos) - 1;
+     (FileListPos + 15 <= NumListings ? 15 : NumListings - FileListPos) - 1;
 
     UpdateFileWindow(SelFile,
-     FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos,
+     FileListPos + 15 <= NumListings ? 15 : NumListings - FileListPos,
      FileListPos);
     continue;
 
@@ -516,28 +545,28 @@ const char *FileWindow()
     FileListPos--;
 
     UpdateFileWindow(SelFile,
-     FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos,
+     FileListPos + 15 <= NumListings ? 15 : NumListings - FileListPos,
      FileListPos);
    } else if (SelFile > 0)
    {
     UpdateFileWindow(--SelFile,
-     FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos,
+     FileListPos + 15 <= NumListings ? 15 : NumListings - FileListPos,
      FileListPos);
    }
    continue;
 
    case KEY_DOWN:
-    if(SelFile == 14 && FileListPos < NumFiles - 15)
+    if(SelFile == 14 && FileListPos < NumListings - 15)
     {
      FileListPos++;
      UpdateFileWindow(SelFile,
-      FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos,
+      FileListPos + 15 <= NumListings ? 15 : NumListings - FileListPos,
       FileListPos);
     } else if (SelFile
-     < (FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos) - 1)
+     < (FileListPos + 15 <= NumListings ? 15 : NumListings - FileListPos) - 1)
     {
      UpdateFileWindow(++SelFile,
-      FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos,
+      FileListPos + 15 <= NumListings ? 15 : NumListings - FileListPos,
       FileListPos);
     }
     continue;
@@ -552,9 +581,9 @@ const char *FileWindow()
      strcpy(current_file_window_dir, getcwd(dir, MAXDIR)); // "remember" last opened dir
      FileListPos = 0;
      SelFile = 0;
-     NumFiles = GetDirList("*.*", DirList, FileListPos);
+     NumListings = GetDirList("*.*", DirList, FileListPos, &NumFiles);
      UpdateFileWindow(SelFile,
-      FileListPos + 15 <= NumFiles ? 15 : NumFiles - FileListPos,
+      FileListPos + 15 <= NumListings ? 15 : NumListings - FileListPos,
       FileListPos);
      continue;
     } else {

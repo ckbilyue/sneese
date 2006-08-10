@@ -46,7 +46,7 @@ extern FILELIST *DirList;
 
 // This fills an array of FILELIST with file information
 // from the path given, starting at file number Offset
-int GetDirList(char *Path, FILELIST *&Files, int Offset);
+int GetDirList(char *Path, FILELIST *&Files, int Offset, int *real_file_count);
 
 /* ------------------------- GUI STUFF ------------------------- */
 
