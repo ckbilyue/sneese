@@ -21,41 +21,40 @@ Changes
   DBJH          Daniel Horchner
 
 
- 0.85
+ 0.85 [TRAC]
   5A22: Improved self-generated IRQ behavior, thanks to byuu for
-   information [TRAC]
+   information
   PPU: Added some missing precision limitations to mode 7, thanks to
-   anomie and byuu for research [TRAC]
+   anomie and byuu for research
   5A22: Fixed a bug where HDMA was being terminated one scanline too
-   early [TRAC]
+   early
   Source: fixed a few minor source issues that could lead to compiler
-   warnings or errors [TRAC]
-  PPU: Translated much of the graphics rendering code to C [TRAC]
+   warnings or errors
+  PPU: Translated much of the graphics rendering code to C
   PPU: Fixed bugs in rendering of offset-change BGs when mosaic was
-   enabled [TRAC]
-  PPU: Added window clipping to OBJ and to EXTBG mode 7 [TRAC]
-  PPU: Implemented direct color mode for 8-bit pixels on BG1 [TRAC]
+   enabled
+  PPU: Added window clipping to OBJ and to EXTBG mode 7
+  PPU: Implemented direct color mode for 8-bit pixels on BG1
   PPU: Implemented color window emulation, including fixed color and 
    sub screen arithmetic modes and most, if not all, of the various
    edge cases, thanks to Blargg for fast 15-bit blending algorithms
-   [TRAC]
   ROM loader: Fixed a bug where IPS auto-patching would only work
-   on the first ROM loaded [TRAC]
-  PPU: Fixed mosaic support [TRAC]
+   on the first ROM loaded
+  PPU: Fixed mosaic support
   ROM loader: Fixed a bug in ROM allocation resizing which could
-   cause crashes [TRAC]
+   cause crashes
   ROM loader: Fixed a bug where IPS auto-patching could cause
-   incorrect memory mapping on LoROM [TRAC]
+   incorrect memory mapping on LoROM
   ROM loader: Fixed a bug where IPS auto-patching could potentially
-   cause bad patches or crashes when extending the ROM size [TRAC]
+   cause bad patches or crashes when extending the ROM size
   5A22: Improved H-DMA behavior accuracy in a couple ways, thanks to
-   byuu for information [TRAC]
+   byuu for information
   Config: Added default ROM directory support (must be set manually in cfg
-   file, read the config file section of the readme for info) [TRAC]
+   file, read the config file section of the readme for info)
   Config: Added full-screen/window configuration option (controllable
    via GUI and config file but not commandline, at this time), and
-   a few new resolution options [TRAC]
-  GUI: Slight improvement to load ROM dialog [TRAC]
+   a few new resolution options
+  GUI: Slight improvement to load ROM dialog
  0.842
   SPC700: Added support for BCD fixup opcodes DAA and DAS, thanks to
    anomie and Overload for information and resources for research and

@@ -10,7 +10,7 @@ The SNES emulator with the extra e's...
         SSSSS   NN    NN  EEEEEE   eeee    SSSSS    eeee
 
                                             v0.85 (Public BETA)
-                                            xx August 2006
+                                            9 August 2006
 
   Please read the license (LICENSE file) before using or distributing
    SNEeSe in any way!
@@ -150,7 +150,7 @@ Here is a rough guide to the things you need to run this emulator:
 
 
 -- Linux/Unix --
- - A PC running X (windowing system), with Allegro 4.1.16.
+ - A PC running X (windowing system), with Allegro 4.2.
  - A video adapter compatible with X; improved performance may be achieved
     by having DGA(2) support and the necessary privileges to access it.
  - A sound output device compatible with OSS, ESD, or ALSA, for sound
@@ -158,7 +158,7 @@ Here is a rough guide to the things you need to run this emulator:
 
 
 -- BeOS --
- - A PC running BeOS R5 PE, with Allegro 4.1.16. Other versions of BeOS
+ - A PC running BeOS R5 PE, with Allegro 4.2. Other versions of BeOS
     might also work.
  - A video adapter supported by BeOS.
  - A sound output device supported by BeOS.
@@ -423,9 +423,7 @@ feel free to e-mail me at:
  esaelon* *at* *users.sf.net
 
 Or you can visit the SNEeSe homepage at:
- http://sneese.n3.net/
- http://www.emuunlim.com/sneese/
- http://skyscraper.fortunecity.com/online/312/sneese.html
+ http://sneese.sf.net/
 
 The source code for this release of SNEeSe should be available at the
 homepage.
