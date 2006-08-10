@@ -40,7 +40,7 @@ EXTERN_C SPCRAM
 
 EXTERN_C Update_SPC_Timer
 ;%1 = timer
-%macro Update_SPC_Timer 1
+%macro UpdateSPCTimer 1
  push dword %1
  call C_LABEL(Update_SPC_Timer)
  add esp,4

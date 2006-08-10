@@ -532,9 +532,9 @@ EXTERN_C rest
  Update_Cycles Execute
 
  ; Update SPC timers to prevent overflow
- Update_SPC_Timer 0
- Update_SPC_Timer 1
- Update_SPC_Timer 2
+ UpdateSPCTimer 0
+ UpdateSPCTimer 1
+ UpdateSPCTimer 2
 
  call C_LABEL(update_sound) ; Added by Butcha
 
