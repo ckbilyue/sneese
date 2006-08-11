@@ -83,7 +83,6 @@ void LoadConfigCurrent(void)
  if ((cfg_version >= 0.72 && cfg_version <= 0.842 && SCREEN_MODE > 6) ||
 	 (cfg_version >= 0.843 && SCREEN_MODE > 5)) SCREEN_MODE = 0;
 #elif defined(ALLEGRO_WINDOWS) || defined(ALLEGRO_UNIX) || defined(ALLEGRO_BEOS)
- if (cfg_version >= 0.72 && SCREEN_MODE > 7) SCREEN_MODE = 0;
  if ((cfg_version >= 0.72 && cfg_version <= 0.842 && SCREEN_MODE > 7) ||
 	 (cfg_version >= 0.843 && SCREEN_MODE > 8)) SCREEN_MODE = 0;
 #else
