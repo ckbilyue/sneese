@@ -402,8 +402,8 @@ void add_obj_worker(obj_line_descriptor *ring, int start_count, int end_count,
     (BITMASK(0,8) * 8 + /* OBJ tile range */
     BITMASK(0,2));      /* line in tile range */
 
-   temp_line_address += !(temp_line_address & (BIT(8) * BIT(3))) ?
-    OBNAME : OBBASE;
+   temp_line_address += !(temp_line_address & (BIT(8) * 8)) ?
+    OBBASE : OBNAME;
 
    partial.address = temp_line_address;
 
