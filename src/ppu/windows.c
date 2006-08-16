@@ -570,6 +570,17 @@ void merge_layer_win_with_and(LAYER_WIN_DATA *out,
 }
 
 
+#include <stdio.h>
+void print_win(char *win_str, LAYER_WIN_DATA *l_win)
+{
+ sprintf(win_str, " %d (%3d-%3d %3d-%3d %3d-%3d)",
+  l_win->count,
+  l_win->bands[0][0], l_win->bands[0][1],
+  l_win->bands[1][0], l_win->bands[1][1],
+  l_win->bands[2][0], l_win->bands[2][1]);
+}
+
+
 /* layering mode 1 uses OFFSET_BG_WIN_MAIN with TM */
 /* layering mode 2 uses OFFSET_BG_WIN_SUB with TS, back color = fixed color */
 void Recalc_Window_Areas_Layer(LAYER_WIN_DATA (*layer_win)[COUNT_BG_WIN],
@@ -645,31 +656,31 @@ void Recalc_Window_Areas_Layer(LAYER_WIN_DATA (*layer_win)[COUNT_BG_WIN],
  }
 
 #if 0
-  if (layer_bit & BIT(4))
+  if (layer_bit & BIT(1))
   {
    extern unsigned Current_Line_Render;
-   char obj_win[7][40];
-   print_win(obj_win[0], &layer_win[0][0]);
-   print_win(obj_win[1], &layer_win[0][1]);
-   print_win(obj_win[2], &layer_win[0][2]);
-   print_win(obj_win[3], &layer_win[0][3]);
-   print_win(obj_win[4], &layer_win[0][4]);
-   print_win(obj_win[5], &layer_win[0][5]);
-   print_win(obj_win[6], &layer_win[0][6]);
-   printf("OBJ L%3u - W%d -%s\n"
-          "OBJ L%3u - W%d -%s\n"
-          "OBJ L%3u - W%d -%s\n"
-          "OBJ L%3u - W%d -%s\n"
-          "OBJ L%3u - W%d -%s\n"
-          "OBJ L%3u - W%d -%s\n"
-          "OBJ L%3u - W%d -%s\n",
-    Current_Line_Render, 0, obj_win[0],
-    Current_Line_Render, 1, obj_win[1],
-    Current_Line_Render, 2, obj_win[2],
-    Current_Line_Render, 3, obj_win[3],
-    Current_Line_Render, 4, obj_win[4],
-    Current_Line_Render, 5, obj_win[5],
-    Current_Line_Render, 6, obj_win[6]);
+   char l_win[7][40];
+   print_win(l_win[0], &layer_win[0][0]);
+   print_win(l_win[1], &layer_win[0][1]);
+   print_win(l_win[2], &layer_win[0][2]);
+   print_win(l_win[3], &layer_win[0][3]);
+   print_win(l_win[4], &layer_win[0][4]);
+   print_win(l_win[5], &layer_win[0][5]);
+   print_win(l_win[6], &layer_win[0][6]);
+   printf("BG2 L%3u - W%d -%s\n"
+          "BG2 L%3u - W%d -%s\n"
+          "BG2 L%3u - W%d -%s\n"
+          "BG2 L%3u - W%d -%s\n"
+          "BG2 L%3u - W%d -%s\n"
+          "BG2 L%3u - W%d -%s\n"
+          "BG2 L%3u - W%d -%s\n",
+    Current_Line_Render, 0, l_win[0],
+    Current_Line_Render, 1, l_win[1],
+    Current_Line_Render, 2, l_win[2],
+    Current_Line_Render, 3, l_win[3],
+    Current_Line_Render, 4, l_win[4],
+    Current_Line_Render, 5, l_win[5],
+    Current_Line_Render, 6, l_win[6]);
   }
 #endif
 }

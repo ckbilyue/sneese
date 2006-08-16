@@ -71,7 +71,7 @@ static void CONCAT_6_NAME(Plot_Lines_, SCREEN_TYPE, M_Offset_, OFFSET_TYPE, _C2_
 
    /* offset map look-up, check enable bit */
    if (!(* ((const unsigned char *) offset_map_address + 1) &
-    oc_flag))
+    oc_flag) || DISABLE_HV_OFFSET_CHANGE)
    {
     /* no change, use default offsets */
     map_address = map_address_current;
@@ -217,7 +217,7 @@ static void CONCAT_7_NAME(Plot_Lines_, RES_SUFFIX_U, SCREEN_TYPE, M_Offset_, OFF
 
    /* v-offset map look-up, check enable bit */
    if (!(* ((const unsigned char *) offset_map_address +
-    offset_v_map_difference + 1) & oc_flag))
+    offset_v_map_difference + 1) & oc_flag) || DISABLE_V_OFFSET_CHANGE)
    {
     /* no change, use default v-offset */
     map_address = map_address_current;
@@ -249,7 +249,7 @@ static void CONCAT_7_NAME(Plot_Lines_, RES_SUFFIX_U, SCREEN_TYPE, M_Offset_, OFF
 
    /* h-offset map look-up, check enable bit */
    if (!(* ((const unsigned char *) offset_map_address + 1) &
-    oc_flag))
+    oc_flag) || DISABLE_H_OFFSET_CHANGE)
    {
     /* no change, use default v-offset */
     tile_offset = first_tile_offset_current;
@@ -374,7 +374,7 @@ static void CONCAT_6_NAME(Plot_Lines_, SCREEN_TYPE, M_Offset_, OFFSET_TYPE, _C8_
 
    /* offset map look-up, check enable bit */
    if (!(* ((const unsigned char *) offset_map_address + 1) &
-    oc_flag))
+    oc_flag) || DISABLE_HV_OFFSET_CHANGE)
    {
     /* no change, use default offsets */
     map_address = map_address_current;

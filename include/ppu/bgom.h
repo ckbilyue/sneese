@@ -332,6 +332,34 @@ static void CONCAT_5_NAME(Render_, RES_SUFFIX_U, SCREEN_TYPE, M_Offset_, OFFSET_
  unsigned current_line_mosaic = bg_table->line_counter;
 
 
+ if (Offset_Change_Disable)
+ {
+  switch (plotter_base & BBT_BASE)
+  {
+  case BBT_2BPP_OPT:
+   plotter_base = (plotter_base & ~BBT_BASE) + BBT_2BPP;
+   break;
+  case BBT_4BPP_OPT:
+   plotter_base = (plotter_base & ~BBT_BASE) + BBT_4BPP;
+   break;
+  case BBT_8BPP_OPT:
+   plotter_base = (plotter_base & ~BBT_BASE) + BBT_8BPP;
+   break;
+  case BBT_4BPP_OPT_HI:
+   plotter_base = (plotter_base & ~BBT_BASE) + BBT_4BPP_HI;
+   break;
+  }
+
+  CONCAT_4_NAME(Render_, RES_SUFFIX_U, SCREEN_TYPE, M)(
+   main_buf, sub_buf, output_surface_offset,
+   layers1, layers2, plotter_base,
+   depth_low, depth_high,
+   bg_table, current_line, lines);
+
+  return;
+ }
+
+
  sort_screen_height(&bg_table_3, 0);
 
  for (; lines > 0; current_line += lines_in_set, countdown -= lines_in_set,
@@ -369,7 +397,7 @@ static void CONCAT_5_NAME(Render_, RES_SUFFIX_U, SCREEN_TYPE, M_Offset_, OFFSET_
 
   /* add in offset to the first tile, in the line of the screen map we're on */
   map_address_current = (!((bg_table->vscroll + current_line_mosaic) & SCREEN_HEIGHT) ?
-   bg_table->tl_map_address : bg_table->tr_map_address);
+   t_map_address : b_map_address);
   
   map_address_current = (unsigned char *) map_address_current +
    screen_line_address;

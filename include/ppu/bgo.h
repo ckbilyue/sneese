@@ -372,8 +372,6 @@ static void CONCAT_5_NAME(Render_, RES_SUFFIX_U, SCREEN_TYPE, _Offset_, OFFSET_T
  BG_TABLE *bg_table,
  unsigned current_line,
  unsigned lines
-// void *output_surface //,
-// int screen_select  /* main, sub, both */
 )
 {
  unsigned tileset_address = bg_table->set_address;
@@ -395,6 +393,34 @@ static void CONCAT_5_NAME(Render_, RES_SUFFIX_U, SCREEN_TYPE, _Offset_, OFFSET_T
  unsigned first_tile_offset = bg_table->hscroll / (8 / DOT_WIDTH_DIVISOR);
 
  const void *map_address_current;
+
+
+ if (Offset_Change_Disable)
+ {
+  switch (plotter_base & BBT_BASE)
+  {
+  case BBT_2BPP_OPT:
+   plotter_base = (plotter_base & ~BBT_BASE) + BBT_2BPP;
+   break;
+  case BBT_4BPP_OPT:
+   plotter_base = (plotter_base & ~BBT_BASE) + BBT_4BPP;
+   break;
+  case BBT_8BPP_OPT:
+   plotter_base = (plotter_base & ~BBT_BASE) + BBT_8BPP;
+   break;
+  case BBT_4BPP_OPT_HI:
+   plotter_base = (plotter_base & ~BBT_BASE) + BBT_4BPP_HI;
+   break;
+  }
+
+  CONCAT_3_NAME(Render_, RES_SUFFIX_U, SCREEN_TYPE)(
+   main_buf, sub_buf, output_surface_offset,
+   layers1, layers2, plotter_base,
+   depth_low, depth_high,
+   bg_table, current_line, lines);
+
+  return;
+ }
 
 
  sort_screen_height(&bg_table_3, 0);
@@ -428,7 +454,7 @@ static void CONCAT_5_NAME(Render_, RES_SUFFIX_U, SCREEN_TYPE, _Offset_, OFFSET_T
 
   /* add in offset to the first tile, in the line of the screen map we're on */
   map_address_current = (!((bg_table->vscroll + current_line) & SCREEN_HEIGHT) ?
-   bg_table->tl_map_address : bg_table->tr_map_address);
+   t_map_address : b_map_address);
   
   map_address_current = (unsigned char *) map_address_current +
    screen_line_address;

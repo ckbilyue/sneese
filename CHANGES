@@ -26,6 +26,9 @@ Changes
    restored properly from the config file [TRAC]
   PPU: Fixed a bug which caused OBJ tile upper-page address offset
    to be incorrectly added only for lower-page tile references [TRAC]
+  PPU: Fixed a bug in screen addressing in offset-change mode
+   that affected tiles with V-offset-change disabled [TRAC]
+  PPU: Fixed option to disable offset-change emulation [TRAC]
  0.85 [TRAC]
   5A22: Improved self-generated IRQ behavior, thanks to byuu for
    information

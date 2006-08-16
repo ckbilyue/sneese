@@ -256,6 +256,9 @@ EXPORT PPU_READ
 .b_bus_read:
     jmp [(C_LABEL(Read_Map_20_5F)-0x2000*4)+edx*4]
 
+arrow_str:db " -> ",0
+at_str:db " @ ",0
+nl_str:db 10,0
 ALIGNC
 ; Write hardware - 2000-5FFF in 00-3F/80-BF
 EXPORT PPU_WRITE
@@ -273,7 +276,49 @@ EXPORT PPU_WRITE
     cmp edx,0x437F
     jbe C_LABEL(IGNORE_WRITE)
 .access_ok:
+    jmp [(C_LABEL(Write_Map_20_5F)-0x2000*4)+edx*4]
 .b_bus_write:
+%if 0
+    pusha
+extern C_LABEL(print_str),C_LABEL(print_hexnum),C_LABEL(print_decnum)
+    cmp dl,0x02
+    jb .log
+    cmp dl,0x05
+    jb .no_log
+    cmp dl,0x15
+    jb .log
+    cmp dl,0x1A
+    jb .no_log
+    cmp dl,0x21
+    jb .log
+    cmp dl,0x23
+    jb .no_log
+    cmp dl,0x40
+    jb .log
+    jmp .no_log
+.log:
+    movzx eax,al
+    movzx edx,dx
+    push byte 4
+    push edx
+    push arrow_str
+    push byte 2
+    push eax
+    call C_LABEL(print_hexnum)
+    add esp,4*2
+    call C_LABEL(print_str)
+    add esp,4
+    call C_LABEL(print_hexnum)
+    push at_str
+    call C_LABEL(print_str)
+    push dword [C_LABEL(Current_Line_Timing)]
+    call C_LABEL(print_decnum)
+    push nl_str
+    call C_LABEL(print_str)
+    add esp,4*5
+.no_log:
+    popa
+%endif
     jmp [(C_LABEL(Write_Map_20_5F)-0x2000*4)+edx*4]
 
 ALIGNC

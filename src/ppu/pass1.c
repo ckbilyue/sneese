@@ -46,6 +46,8 @@ extern unsigned Mosaic_Size;
 extern unsigned char MosaicLine[16][256];
 extern unsigned char MosaicCount[16][256];
 
+extern unsigned char Offset_Change_Disable;
+
 extern unsigned char CGWSEL;
 
 
@@ -372,6 +374,10 @@ extern void clear_scanlines(unsigned lines);
 
 #include "ppu/bgm.h"
 
+#define DISABLE_H_OFFSET_CHANGE 0
+#define DISABLE_V_OFFSET_CHANGE 0
+#define DISABLE_HV_OFFSET_CHANGE 0
+
 #include "ppu/bgo.h"
  
 #include "ppu/bgom.h"
@@ -646,6 +652,12 @@ void _Update_Display(void)
  unsigned current_line;
  unsigned lines_in_set;
 
+ lines = Ready_Line_Render - Current_Line_Render;
+
+ if (lines <= 0) return;
+#if 0
+ printf("UD: %3d @ %3d\n", Ready_Line_Render - Current_Line_Render, Current_Line_Render);
+#endif
 
  Display_Needs_Update = 0;
 
@@ -719,8 +731,7 @@ void _Update_Display(void)
 
 
  for (
-  current_line = Current_Line_Render,
-  lines = Ready_Line_Render - Current_Line_Render;
+  current_line = Current_Line_Render;
   lines > 0;
   lines -= lines_in_set,
   Update_Mosaic_Postdraw(current_line, lines_in_set),
@@ -915,8 +926,6 @@ void Render_Line(
   bg_table,
   current_line,
   lines
-// void *output_surface //,
-// int screen_select  // main, sub, both
  );
 }
 

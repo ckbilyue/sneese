@@ -232,8 +232,6 @@ static void CONCAT_4_NAME(Render_, RES_SUFFIX_U, SCREEN_TYPE, M_Run)(
  BG_TABLE *bg_table,
  unsigned current_line,
  unsigned lines
-// void *output_surface //,
-// int screen_select  /* main, sub, both */
 )
 {
  unsigned tileset_address = bg_table->set_address;
