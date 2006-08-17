@@ -30,6 +30,8 @@ Changes
    that affected tiles with V-offset-change disabled [TRAC]
   PPU: Fixed option to disable offset-change emulation [TRAC]
   Screenshots: Fixed a bug where all screenshots saved were blank [TRAC]
+  Source: Removed some debugging code that was no longer needed and
+  could cause issues when the period key was pressed [TRAC]
  0.85 [TRAC]
   5A22: Improved self-generated IRQ behavior, thanks to byuu for
    information

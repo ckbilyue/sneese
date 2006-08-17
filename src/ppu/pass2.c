@@ -326,14 +326,6 @@ void cg_translate(unsigned current_line, unsigned lines)
   (Base_BGMODE == 3 || Base_BGMODE == 4 || Base_BGMODE == 7)) ?
   1 : 0;
 
- if (key[KEY_STOP])
- {
-  FILE *tmp = fopen("framebug.dmp", "wb");
-  fwrite(sub_screen, 256 * 2, 239, tmp);
-  fclose(tmp);
-  while (!key[KEY_COMMA]);
- }
-
  /* compensate for blank line 0 */
  current_line--;
 
