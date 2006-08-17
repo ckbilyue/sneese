@@ -394,7 +394,7 @@ void Copy_Screen()
   release_screen();
  }
 
- clear(gbSNES_Screen16.subbitmap);
+// clear(gbSNES_Screen16.subbitmap);
 }
 
 #if defined(UNIX) || defined(__BEOS__)
