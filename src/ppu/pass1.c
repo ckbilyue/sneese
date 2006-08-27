@@ -113,9 +113,9 @@ void update_bg_handlers(unsigned char BGMODE)
   &bg_table_1, &bg_table_2, &bg_table_3, &bg_table_4
  };
  int i;
- int small_tile_width;
+ int large_tile_width;
 
- small_tile_width = ((BGMODE & 7) == 5 || (BGMODE & 7) == 6) ? 2 : 1;
+ large_tile_width = ((BGMODE & 7) == 5 || (BGMODE & 7) == 6) ? 1 : 2;
 
  for (i = 0; i < 4; i++)
  {
@@ -129,12 +129,12 @@ void update_bg_handlers(unsigned char BGMODE)
   {
    depth |= BBT_TILES_LARGE;
    bg[i]->tile_height = 2;
-   bg[i]->tile_width = 2;
+   bg[i]->tile_width = large_tile_width;
   }
   else
   {
    bg[i]->tile_height = 1;
-   bg[i]->tile_width = small_tile_width;
+   bg[i]->tile_width = 1;
   }
 
   /* set flag on large BG3 tiles */

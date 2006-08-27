@@ -22,6 +22,9 @@ Changes
 
 
  0.852
+  PPU: Fixed scrolling in modes 5 and 6 when multiple horizontal
+   pages were in use; thanks to powerspike and Deathlike for the
+   report [TRAC]
  0.851 [TRAC]
   Config: Fixed a bug where the 768x717 resolution setting was not
    restored properly from the config file
