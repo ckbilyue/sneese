@@ -21,19 +21,23 @@ Changes
   DBJH          Daniel Horchner
 
 
- 0.851
+ 0.851 [TRAC]
   Config: Fixed a bug where the 768x717 resolution setting was not
-   restored properly from the config file [TRAC]
+   restored properly from the config file
   PPU: Fixed a bug which caused OBJ tile upper-page address offset
-   to be incorrectly added only for lower-page tile references [TRAC]
+   to be incorrectly added only for lower-page tile references
   PPU: Fixed a bug in screen addressing in offset-change mode
-   that affected tiles with V-offset-change disabled [TRAC]
-  PPU: Fixed option to disable offset-change emulation [TRAC]
-  Screenshots: Fixed a bug where all screenshots saved were blank [TRAC]
+   that affected tiles with V-offset-change disabled
+  PPU: Fixed option to disable offset-change emulation
+  Screenshots: Fixed a bug where all screenshots saved were blank
   Source: Removed some debugging code that was no longer needed and
-   could cause issues when the period key was pressed [TRAC]
+   could cause issues when the period key was pressed
   PPU: Fixed a bug which caused incorrect behavior when OBJ tile count
-   exceeded their time limit [TRAC]
+   exceeded their time limit
+
+  Thanks go out to Deathlike and grinvader for their testing and
+   numerous bug reports which helped lead to fixes in both the 0.85
+   and 0.851 releases!
  0.85 [TRAC]
   5A22: Improved self-generated IRQ behavior, thanks to byuu for
    information

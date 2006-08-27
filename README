@@ -10,7 +10,7 @@ The SNES emulator with the extra e's...
         SSSSS   NN    NN  EEEEEE   eeee    SSSSS    eeee
 
                                             v0.851 (Public BETA)
-                                            xx August 2006
+                                            26 August 2006
 
   Please read the license (LICENSE file) before using or distributing
    SNEeSe in any way!
@@ -626,8 +626,8 @@ Thanks go out to...
  Windwalker, neptron, and Siloh, for the logos!
 
  Nach: for code for IPS soft-patching and JMA compressed ROM image support
- Deathlike: for testing and bug reports, something this project gets too
-  little of
+ Deathlike and grinvader: for testing and bug reports, something this
+  project gets too little of
 
  Siloh: for putting up with me, and being the friend you are
  MKendora, Lord_Nightmare: for all the support, and always reaffirming
@@ -638,7 +638,7 @@ Thanks go out to...
 
  Beta testing:
   RibOnIzEr, QbProgger, AC/DC, Malenko, Richard Ferreira, rOss, Siloh,
-   MKendora, akito, slow, Deathlike
+   MKendora, akito, slow, Deathlike, grinvader
 
   Y0ssarian, PoleStar, Steve, Vilmar, Enternal, [E|YSiUM], Goku-X, JaguarPaw,
   JJJJ, KnucklesD, dps, Cowering, Lanice, EddyB43 from EFnet-#snesromz and
@@ -653,7 +653,7 @@ Greets
  Zero-X, MrGrim, kode54, akito, MKendora, Lord_Nightmare, anomie, ipher,
  amit, Diablo-D3, Neviksti, slow, SamB, Sabretooth, amptor, Harekiet,
  SupraFast, Karasu, DeadlyRave-Neo, Battousai, Nach, byuu, Deathlike,
- kevtris, EFX, Blues, Mottzilla, Zephiris
+ grinvader, kevtris, EFX, Blues, Mottzilla, Zephiris
 
  Everyone from EFnet IRC #snesromz, #classicgames, #snesdev, #zsnes,
   #mugen, #nesdev; Newnet IRC #snesromz; and Freenode IRC #mindless-drones,
