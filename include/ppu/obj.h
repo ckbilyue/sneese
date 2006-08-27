@@ -383,6 +383,8 @@ void _Plot_Sprites(unsigned char (*main_buf)[2], unsigned char (*sub_buf)[2],
    YXPP CCC  - bits 1-7 of OAM attribute word
    X - X position
 */
+/* adds start_count line-descriptors to end of list,
+  end_count line-descriptors to start of list */
 void add_obj_worker(obj_line_descriptor *ring, int start_count, int end_count,
  unsigned line_address, unsigned tile_offset, unsigned line_offset,
  unsigned tile_increment, obj_line_descriptor partial)
@@ -463,8 +465,10 @@ void Add_OBJ(unsigned char *obj_data, int obj_size_select,
 
   /* Check OBJ count for line (if 32, set range over and ignore OBJ) */
   if (OAM_Count[line][OAM_COUNT_RANGE] >= 32)
+  /* skip OBJ over 'range' limit (32 OBJ) */
   {
    OAM_TimeRange[line] |= OAM_RANGE_OVER;
+
    continue;
   }
   /* else increment OBJ count */
@@ -495,11 +499,17 @@ void Add_OBJ(unsigned char *obj_data, int obj_size_select,
    {
     count1 = 34 - OAM_Tail[line];
    }
-   if (OAM_Tail[line] + tile_count >= 34)
+
+   if (OAM_Tail[line] + tile_count < 34)
    {
-    /* handle ring buffer wrapping */
+    OAM_Tail[line] = OAM_Tail[line] + tile_count;
+   }
+   else
+   /* handle ring buffer wrapping */
+   {
     OAM_Tail[line] = OAM_Tail[line] + tile_count - 34;
    }
+
    OAM_TimeRange[line] |= OAM_TIME_OVER;
   }
   else
