@@ -23,9 +23,9 @@ You must read and accept the license prior to use.
 #ifndef SNEeSe_version_h
 #define SNEeSe_version_h
 
-#define SNEESE_VERSION_STR "0.851"
-#define SNEESE_VERSION 0.851
+#define SNEESE_VERSION_STR "0.852"
+#define SNEESE_VERSION 0.852
 
-#define RELEASE_DATE "26 August 2006"
+#define RELEASE_DATE __DATE__
 
 #endif /* !defined(SNEeSe_version_h) */

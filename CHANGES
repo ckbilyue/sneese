@@ -21,6 +21,7 @@ Changes
   DBJH          Daniel Horchner
 
 
+ 0.852
  0.851 [TRAC]
   Config: Fixed a bug where the 768x717 resolution setting was not
    restored properly from the config file
