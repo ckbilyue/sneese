@@ -514,7 +514,7 @@ void Recalc_Window_Area_Layer(LAYER_WIN_DATA *bgwin, int extra,
   WLOG ^= 1;
  }
 
- switch (WLOG)
+ switch (WLOG & BITMASK(0,1))
  {
  case 0:    /* OR */
   bgwin->count = intersect_bands_with_and(

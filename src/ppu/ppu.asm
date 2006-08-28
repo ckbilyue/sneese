@@ -1936,7 +1936,7 @@ SNES_W212B: ; WOBJLOG
  cmp al,[C_LABEL(WOBJLOG)]
  je .no_change
  UpdateDisplay  ;*windowing only
-;or byte [C_LABEL(Redo_Windowing)],Redo_Win_OBJ | Redo_Win_Color
+ or byte [C_LABEL(Redo_Windowing)],Redo_Win_OBJ | Redo_Win_Color
  mov [C_LABEL(WOBJLOG)],al
 
 .no_change:
