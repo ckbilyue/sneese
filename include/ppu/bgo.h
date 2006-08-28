@@ -216,7 +216,8 @@ static void CONCAT_6_NAME(Render_, RES_SUFFIX_U, SCREEN_TYPE, _Offset_, OFFSET_T
    (clip_left_table + 4 - (next_pixel & ((8 / DOT_WIDTH_DIVISOR) - 1)));
 #endif  /* !SCREEN_HIRES */
 
-  if ((((8 / DOT_WIDTH_DIVISOR) - 1) ^ ((next_pixel & ((8 / DOT_WIDTH_DIVISOR) - 1)) - (8 / DOT_WIDTH_DIVISOR))) - pixel_count < 0)
+  if (8 / DOT_WIDTH_DIVISOR >
+   (next_pixel & (8 / DOT_WIDTH_DIVISOR - 1)) + pixel_count)
   /* right-edge clip */
   {
    /* set up right edge clipping */

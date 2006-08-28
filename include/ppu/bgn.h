@@ -161,9 +161,8 @@ static void CONCAT_4_NAME(Render_, RES_SUFFIX_U, SCREEN_TYPE, _Run)(
    (next_pixel & (SCREEN_TILE_WIDTH / DOT_WIDTH_DIVISOR - 1)));
 #endif
 
-  if (((SCREEN_TILE_WIDTH / DOT_WIDTH_DIVISOR - 1) ^ ((next_pixel &
-   (SCREEN_TILE_WIDTH / DOT_WIDTH_DIVISOR - 1)) -
-   SCREEN_TILE_WIDTH / DOT_WIDTH_DIVISOR)) - pixel_count < 0)
+  if (SCREEN_TILE_WIDTH / DOT_WIDTH_DIVISOR >
+   (next_pixel & (SCREEN_TILE_WIDTH / DOT_WIDTH_DIVISOR - 1)) + pixel_count)
   /* right-edge clip */
   {
    /* set up right edge clipping */

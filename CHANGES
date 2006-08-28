@@ -21,6 +21,9 @@ Changes
   DBJH          Daniel Horchner
 
 
+ 0.853 [TRAC]
+  PPU: Fixed handling of tiles clipped on both sides, thanks to
+   Deathlike for the report
  0.852 [TRAC]
   PPU: Fixed scrolling in modes 5 and 6 when multiple horizontal
    pages were in use; thanks to powerspike and Deathlike for the
