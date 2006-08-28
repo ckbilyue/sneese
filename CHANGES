@@ -21,15 +21,15 @@ Changes
   DBJH          Daniel Horchner
 
 
- 0.852
+ 0.852 [TRAC]
   PPU: Fixed scrolling in modes 5 and 6 when multiple horizontal
    pages were in use; thanks to powerspike and Deathlike for the
-   report [TRAC]
+   report
   PPU: Fixed a bug which could cause improper behavior when dual-window
    logic was in use; thanks to Deathlike for the report which led me
-   to this [TRAC]
+   to this
   PPU: Fixed an issue which could cause writes to the $212B register
-   to not take immediate effect [TRAC]
+   to not take immediate effect
  0.851 [TRAC]
   Config: Fixed a bug where the 768x717 resolution setting was not
    restored properly from the config file
