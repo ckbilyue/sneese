@@ -119,4 +119,7 @@ EXTERN void platform_pause_audio_voice(SNEESE_AUDIO_VOICE *audio_voice);
 EXTERN void platform_resume_audio_voice(SNEESE_AUDIO_VOICE *audio_voice);
 
 
+EXTERN void platform_yield(void);
+
+
 #endif /* !defined(SNEeSe_platform_h) */

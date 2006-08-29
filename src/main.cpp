@@ -125,7 +125,7 @@ int main(int argc, char **argv)
    textout_ex(screen, font, "Press any key to continue...", 38, 36, makecol(220, 220, 220), -1);
 #endif
 
-  while (!keypressed());
+  while (!keypressed()) platform_yield();
   readkey();
   cout << " continuing..." << endl;
 #endif

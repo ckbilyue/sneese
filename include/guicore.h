@@ -268,7 +268,9 @@ void PlotSelectedMenuItem(WINDOW *window,pGUI_FONT font,
 
 BITMAP *SetGUIScreen(int ScreenMode, int windowed);
 
-int WaitForKeyPress();
+
+void gui_wait_for_input();
+
 
 #endif /* defined(__cplusplus)||defined(c_plusplus) */
 

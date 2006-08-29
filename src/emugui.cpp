@@ -456,7 +456,7 @@ const char *FileWindow()
 
  for(;;)
  {
-  while (!keypressed());
+  gui_wait_for_input();
   keypress = readkey();
   key_asc = keypress & 0xFF;
   key_scan = keypress >> 8;
@@ -620,7 +620,7 @@ int ScreenWindow()
   UpdateScreenWindow(CursorAt);
   refresh_gui();
 
-  while (!keypressed());
+  gui_wait_for_input();
   keypress = readkey();
   key_asc = keypress & 0xFF;
   key_scan = keypress >> 8;
@@ -688,7 +688,7 @@ int SoundWindow()
   UpdateSoundWindow(CursorAt);
   refresh_gui();
 
-  while (!keypressed());
+  gui_wait_for_input();
   keypress = readkey();
   key_asc = keypress & 0xFF;
   key_scan = keypress >> 8;
@@ -1009,7 +1009,7 @@ void AskControllerInputs(SNES_CONTROLLER_INPUTS *input)
 
   for (;;)
   {
-   while (!keypressed());
+   gui_wait_for_input();
    if ((readkey() >> 8) == KEY_ESC) break;
   }
  }
@@ -1054,7 +1054,7 @@ int ControlsWindow()
   UpdateControlsWindow(CursorAt);
   refresh_gui();
 
-  while (!keypressed());
+  gui_wait_for_input();
   keypress = readkey();
   key_asc = keypress & 0xFF;
   key_scan = keypress >> 8;
@@ -1181,7 +1181,7 @@ int ConfigWindow()
   UpdateConfigWindow(CursorAt);
   refresh_gui();
 
-  while (!keypressed());
+  gui_wait_for_input();
   keypress = readkey();
   key_asc = keypress & 0xFF;
   key_scan = keypress >> 8;
@@ -1463,7 +1463,7 @@ void RomInfo(void)
 
  for (;;)
  {
-  while (!keypressed());
+  gui_wait_for_input();
   if ((readkey() >> 8) == KEY_ESC) break;
  }
 }
@@ -1589,7 +1589,7 @@ void HWStatus(void)
 
  for (;;)
  {
-  while (!keypressed());
+  gui_wait_for_input();
   if ((readkey() >> 8) == KEY_ESC) break;
  }
 }
@@ -1690,7 +1690,7 @@ void DMAStatus(void)
 
  for (;;)
  {
-  while (!keypressed());
+  gui_wait_for_input();
   if ((readkey() >> 8) == KEY_ESC) break;
  }
 }
@@ -1721,7 +1721,7 @@ void APUStatus(void)
 
  for (;;)
  {
-  while (!keypressed());
+  gui_wait_for_input();
   if ((readkey() >> 8) == KEY_ESC) break;
  }
 }
@@ -1833,7 +1833,7 @@ void BGWinStatus(void)
 
  for (;;)
  {
-  while (!keypressed());
+  gui_wait_for_input();
   if ((readkey() >> 8) == KEY_ESC) break;
  }
 }
@@ -1940,7 +1940,7 @@ GUI_ERROR GUI()
   UpdateMainWindow(CursorAt);
   refresh_gui();
 
-  while (!keypressed());
+  gui_wait_for_input();
   keypress = readkey();
   key_asc = keypress & 0xFF;
   key_scan = keypress >> 8;

@@ -54,6 +54,7 @@ You must read and accept the license prior to use.
 
 #include "wrapaleg.h"
 #include "guicore.h"
+#include "platform.h"
 
 /* ------------------------- DIRECTORY STUFF ------------------------- */
 
@@ -642,3 +643,8 @@ void PlotCharBorder(unsigned char Character,int x,int y){
   }
  }
 }*/
+
+void gui_wait_for_input()
+{
+ while (!keypressed()) platform_yield();
+}
