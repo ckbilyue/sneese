@@ -203,8 +203,8 @@ EXTERN_MAP_WRITE_DMA 7
 
  call C_LABEL(Do_DMA_Channel)
 
- cmp byte [In_DMA],0
- jnz %2
+ cmp byte [DMA_Pending_B_Address],0
+ jge %2
 
  and byte [C_LABEL(MDMAEN)],~BIT(%1)
 

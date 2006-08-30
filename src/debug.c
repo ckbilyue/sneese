@@ -676,3 +676,17 @@ void opcode_trace_5A22(unsigned char opcode)
    cpu_65c816_P & 0x02 ? '1' : '0', cpu_65c816_P & 0x01 ? '1' : '0',
    CPU_OpID[opcode]);
 }
+
+
+void check_op(unsigned pbpc, unsigned cycles, unsigned mode,
+ unsigned event_handler, unsigned event_trip,
+ unsigned fixed_handler, unsigned fixed_trip)
+{
+ if (key[KEY_M])
+ {
+  printf("%06X @ %3d - %3d - %08X @ %5d, %08X @ %5d\n",
+   pbpc & BITMASK(0,23), cycles, mode,
+   event_handler, event_trip,
+   fixed_handler, fixed_trip);
+ }
+}

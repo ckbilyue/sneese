@@ -144,4 +144,25 @@ alignb 16
 %define BITMASK(lsb,msb) ((BIT((msb) - (lsb) + 1) - 1) << (lsb))
 
 
+%ifndef RELEASE_BUILD
+extern C_LABEL(print_hexnum),C_LABEL(print_decnum),C_LABEL(print_str)
+section .data
+ALIGND
+nl_str:db 10,0
+gap_str:db " ",0
+arrow_str:db " -> ",0
+alert_str:db "!",0
+at_str:db " @ ",0
+mdmaen_str:db "MDMAEN: ",0
+hdma_init1_str:db "hdma_init1: ",0
+hdma_init2_str:db "hdma_init2: ",0
+hdma_xfer1_str:db "hdma_xfer1: ",0
+hdma_xfer2_str:db "hdma_xfer2: ",0
+dma_xfer1_str:db "dma_xfer1: ",0
+dma_xfer2_str:db "dma_xfer2: ",0
+dma_xfer3_str:db "dma_xfer3: ",0
+dma_exit_str:db "dma_exit: ",0
+comma_str:db ",",0
+%endif
+
 %endif ; !defined(SNEeSe_misc_inc)

@@ -290,12 +290,6 @@ EXTERN_C Dump_DMA
  Update_FPS_Counter
  ret
 
-EXTERN_C print_str,print_decnum,print_hexnum
-section .data
-gap_str:db " ",0
-nl_str:db 10,0
-section .text
-
 
 %macro report_event 0
 %ifdef REPORT_EVENTS
@@ -1900,6 +1894,8 @@ EXPORT SNES_W420A ; VTIMEH   ; Handled in screen core!
 ALIGNC
 EXPORT SNES_W420B ; MDMAEN
  or [C_LABEL(MDMAEN)],al
+
+ debug_dma_output mdmaen_str
 
  test al,al     ;don't repeat setup if no new channels
  jz .no_dma

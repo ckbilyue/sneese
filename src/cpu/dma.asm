@@ -266,7 +266,6 @@ section .text
 
 .ppu_read_done:
 .ppu_write_done:
- mov byte [In_DMA],0
  mov byte [DMA_Pending_B_Address],-1
 
 .early_out:
@@ -534,6 +533,90 @@ EXPORT SNES_W420C ; HDMAEN      ; Actually handled within screen core!
 %%no_relatch:
 %endmacro
 
+channel_to_bit:db BIT(0),BIT(1),BIT(2),BIT(3),BIT(4),BIT(5),BIT(6),BIT(7)
+
+extern C_LABEL(EventTrip)
+extern C_LABEL(cpu_65c816_PB_Shifted),C_LABEL(cpu_65c816_PC)
+extern FixedTrip,Fixed_Event,C_LABEL(EventTrip),Event_Handler
+extern CPU_Execution_Mode
+extern C_LABEL(check_op)
+
+%macro debug_dma_output 1
+%if 0
+ pusha
+
+ push dword [FixedTrip]
+ push dword [Fixed_Event]
+ push dword [C_LABEL(EventTrip)]
+ push dword [Event_Handler]
+ movzx eax,byte [CPU_Execution_Mode]
+ push eax
+
+ mov dword eax,[C_LABEL(EventTrip)]
+ add dword eax,ebp
+;GET_CYCLES eax
+ push eax
+ mov ebx,[C_LABEL(cpu_65c816_PB_Shifted)]
+ add ebx,[C_LABEL(cpu_65c816_PC)]
+ push ebx
+ call C_LABEL(check_op)
+ add esp,4*7
+
+ cmp byte [C_LABEL(MDMAEN)],0
+ jz %%no_dma
+
+ push dword alert_str
+ call C_LABEL(print_str)
+ add esp,4
+
+%%no_dma:
+ push dword %1
+ call C_LABEL(print_str)
+
+ movzx eax,byte [C_LABEL(MDMAEN)]
+ push byte 2
+ push eax
+ call C_LABEL(print_hexnum)
+
+ push comma_str
+ call C_LABEL(print_str)
+
+ movzx eax,byte [C_LABEL(HDMAEN)]
+ push byte 2
+ push eax
+ call C_LABEL(print_hexnum)
+
+ push comma_str
+ call C_LABEL(print_str)
+
+ movzx eax,byte [HDMA_Not_Ended]
+ push byte 2
+ push eax
+ call C_LABEL(print_hexnum)
+
+ push at_str
+ call C_LABEL(print_str)
+
+ mov dword eax,[C_LABEL(EventTrip)]
+ add dword eax,ebp
+;GET_CYCLES eax
+ push eax
+ call C_LABEL(print_decnum)
+
+ push comma_str
+ call C_LABEL(print_str)
+
+ push dword [C_LABEL(Current_Line_Timing)]
+ call C_LABEL(print_decnum)
+
+ push nl_str
+ call C_LABEL(print_str)
+
+ add esp,4*14
+ popa
+%endif
+%endmacro
+
 ALIGNC
 EXPORT init_HDMA
  mov byte [HDMA_Not_Ended],BITMASK(0,7)
@@ -543,8 +626,29 @@ EXPORT init_HDMA
  test al,al
  jz .no_hdma
 
+ debug_dma_output hdma_init1_str
+
  mov al,[In_DMA]
  push eax
+
+ ;HDMA init/transfer on same channel as active general DMA stops general DMA
+ test al,DMA_IN_PROGRESS
+ jz .no_dma
+
+ and eax,BITMASK(0,2)
+ mov cl,[channel_to_bit+eax]
+ mov al,[C_LABEL(HDMAEN)]
+ test cl,al
+ jz .no_conflict
+
+ mov byte [DMA_Pending_B_Address],-1
+
+.no_conflict:
+ xor al,~0
+ and [C_LABEL(MDMAEN)],al
+
+.no_dma:
+ debug_dma_output hdma_init2_str
 
  add R_65c816_Cycles,byte _5A22_FAST_CYCLE * 3  ; HDMA processing
  RELATCH_HDMA_CHANNEL 0
@@ -567,6 +671,7 @@ EXPORT do_HDMA
  and al,[HDMA_Not_Ended]
  test al,al
  jz .no_hdma
+
  add R_65c816_Cycles,byte _5A22_FAST_CYCLE * 3  ; HDMA processing
  push eax
  push ebx
@@ -577,6 +682,31 @@ EXPORT do_HDMA
  push edi
  mov al,[In_DMA]
  push eax
+
+ debug_dma_output hdma_xfer1_str
+
+ ;HDMA init/transfer on same channel as active general DMA stops general DMA
+ test al,DMA_IN_PROGRESS
+ jz .no_dma
+
+ and eax,BITMASK(0,2)
+ mov cl,[channel_to_bit+eax]
+
+ mov al,[HDMAEN]
+ and al,[HDMA_Not_Ended]
+ test cl,al
+ jz .no_conflict
+
+ mov byte [DMA_Pending_B_Address],-1
+
+.no_conflict:
+ xor al,~0
+ and [C_LABEL(MDMAEN)],al
+
+.no_dma:
+
+ debug_dma_output hdma_xfer2_str
+
  HDMAOPERATION 0
  HDMAOPERATION 1
  HDMAOPERATION 2

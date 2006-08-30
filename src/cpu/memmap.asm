@@ -256,9 +256,6 @@ EXPORT PPU_READ
 .b_bus_read:
     jmp [(C_LABEL(Read_Map_20_5F)-0x2000*4)+edx*4]
 
-arrow_str:db " -> ",0
-at_str:db " @ ",0
-nl_str:db 10,0
 ALIGNC
 ; Write hardware - 2000-5FFF in 00-3F/80-BF
 EXPORT PPU_WRITE

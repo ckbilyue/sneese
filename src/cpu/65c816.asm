@@ -1881,16 +1881,39 @@ EXPORT Reset_CPU
  popa
  ret
 
+%macro debug_dma_output 1
+%if 0
+ pusha
+ push byte 2
+ movzx eax,byte [C_LABEL(MDMAEN)]
+ push eax
+ push dword %1
+ call C_LABEL(print_str)
+
+ add esp,4
+ call C_LABEL(print_hexnum)
+
+ push nl_str
+ call C_LABEL(print_str)
+ add esp,4*3
+ popa
+%endif
+%endmacro
+
+
 ALIGNC
 EXPORT do_DMA
+ debug_dma_output dma_xfer1_str
+
  LOAD_CYCLES
 
  cmp byte [C_LABEL(MDMAEN)],0
  jz .dma_done
 
- cmp byte [DMA_Pending_B_Address],0
- jge .dma_started
+ cmp byte [In_DMA],0
+ jnz .dma_started
 
+.sync:
  ;first bus cycle doesn't overlap
  add R_65c816_Cycles,_5A22_SLOW_CYCLE
 .dma_started:
@@ -1905,6 +1928,10 @@ EXPORT do_DMA
  DMAOPERATION 7,.early_out
 
 .dma_done:
+ mov byte [In_DMA],0
+
+ debug_dma_output dma_xfer3_str
+
  mov byte [CPU_Execution_Mode],CEM_Normal_Execution
  SAVE_CYCLES
 
@@ -1933,6 +1960,8 @@ EXPORT do_DMA
  jmp CPU_START
 
 .early_out:
+ debug_dma_output dma_xfer2_str
+
  SAVE_CYCLES
  jmp dword [Event_Handler]
 
@@ -2067,6 +2096,24 @@ EXPORT CPU_START_NEXT
 %endif
 
  GET_PBPC ebx
+
+%if 0
+ pusha
+ push dword [FixedTrip]
+ push dword [Fixed_Event]
+ push dword [C_LABEL(EventTrip)]
+ push dword [Event_Handler]
+ movzx eax,byte [CPU_Execution_Mode]
+ push eax
+ GET_CYCLES eax
+ push eax
+ push ebx
+extern C_LABEL(check_op)
+ call C_LABEL(check_op)
+ add esp,4*7
+ popa
+%endif
+
  GET_BYTE               ; Get opcode
 
 %ifdef OPCODE_TRACE_LOG
