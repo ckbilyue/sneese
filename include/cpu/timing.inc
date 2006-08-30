@@ -548,17 +548,6 @@ EXTERN_C rest
 extern C_LABEL(Reload_OBSEL)
  call C_LABEL(Reload_OBSEL)
 
- mov al,[C_LABEL(INIDISP)]
- test al,al
- js .forced_blank
- mov eax,[C_LABEL(OAMAddress_VBL)]
- ; Restore OAM address and reset OAM read/write odd/even select
- ;  every Vblank, unless we're in forced blank
- mov [C_LABEL(OAMAddress)],eax
- xor eax,eax
- mov [OAMHigh],al
-.forced_blank:
-
  xor eax,eax
  dec dword [FrameCount] ; Should we redraw the screen this frame?
  mov [C_LABEL(Current_Line_Timing)],eax ; Reset scanline counter
@@ -870,6 +859,17 @@ section .text
  mov al,RDNMI_VBLANK_START | VERSION_NUMBER_5A22
  and al,[RDNMI_mask]    ; ensure only one vblank NMI per frame
  mov [RDNMI],al         ; Set NMI enabled bit in 0x4210
+
+ mov al,[C_LABEL(INIDISP)]
+ test al,al
+ js .forced_blank
+ mov eax,[C_LABEL(OAMAddress_VBL)]
+ ; Restore OAM address and reset OAM read/write odd/even select
+ ;  every Vblank, unless we're in forced blank
+ mov [C_LABEL(OAMAddress)],eax
+ xor eax,eax
+ mov [OAMHigh],al
+.forced_blank:
 
  mov eax,[C_LABEL(Current_Line_Timing)]
  inc eax
