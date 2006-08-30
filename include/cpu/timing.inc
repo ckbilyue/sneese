@@ -545,6 +545,9 @@ EXTERN_C rest
  mov byte [RDNMI],VERSION_NUMBER_5A22   ; Clear NMI enabled bit in 0x4210
  mov byte [NMI_pin],NMI_None            ;clear NMI input
 
+extern C_LABEL(Reload_OBSEL)
+ call C_LABEL(Reload_OBSEL)
+
  mov al,[C_LABEL(INIDISP)]
  test al,al
  js .forced_blank

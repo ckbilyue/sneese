@@ -44,7 +44,6 @@ static unsigned palette_obj[8] =
  GENERATE_OBJ_PALETTE(6), GENERATE_OBJ_PALETTE(7)
 };
 
-#if 0
 /* abc - a = X or Y, b = s(ize) or l(imit), c = s(mall) or l(arge)
    Xss, Xls, Xsl, Xll, Yss, Yls, Ysl, Yll
  */
@@ -59,7 +58,6 @@ static unsigned char OBJ_Size_Table[8][8] =
  {  2, -15,   4, -31,   4, -31,   8, -63 }, /* 16x32, 32x64 */
  {  2, -15,   4, -31,   4, -31,   4, -31 }  /* 16x32, 32x32 */
 };
-#endif
 
 /* Line counts when last OBJ of specified priority was added */
 extern unsigned char OAM_Count_Priority[240][4];
@@ -135,17 +133,14 @@ extern unsigned char *HiSpriteBits; /* OAM address of OBJ in 32b table */
 #define objlim_large_x obj_size_current_x[OBJ_LARGE][OBJ_LIM]
 #define objlim_small_y obj_size_current_y[OBJ_SMALL][OBJ_LIM]
 #define objlim_large_y obj_size_current_y[OBJ_LARGE][OBJ_LIM]
-#define obj_size_current_x Sprite_Size_Current_X
-#define obj_size_current_y Sprite_Size_Current_Y
-extern unsigned char Sprite_Size_Current_X[2][2];
-extern unsigned char Sprite_Size_Current_Y[2][2];
+unsigned char obj_size_current_x[2][2];
+unsigned char obj_size_current_y[2][2];
 
 //unsigned char obj_size_current_x[2][2];
 //unsigned char obj_size_current_y[2][2];
 
 /* value to XOR with OBJ current line for v-flip
-   used for rectangular (undocumented) OBJ
- */
+   used for rectangular (undocumented) OBJ */
 unsigned char obj_vflip_fixup;
 
 extern unsigned char Redo_OAM;
@@ -153,6 +148,7 @@ extern unsigned char Redo_OAM;
 extern unsigned char SPRLatch;
 /* sssnnxbb  sss=OBJ size,nn=upper 4k address,bb=offset */
 extern unsigned char OBSEL;
+extern unsigned char OBSEL_write;
 extern unsigned char OAMHigh;
 extern unsigned char OAM_Write_Low;
 
@@ -682,6 +678,7 @@ void _Recache_OAM(void)
  Redo_OAM = 0;
 }
 
+
 void _Check_OAM_Recache(void)
 {
  unsigned temp_oam_address;
@@ -711,6 +708,31 @@ void _Check_OAM_Recache(void)
  _Recache_OAM();
 }
 
+void Reload_OBSEL(void)
+{
+ OBSEL = OBSEL_write;
+
+ unsigned size_set = (OBSEL >> 5) & BITMASK(0,2);
+
+ objsize_small_x = OBJ_Size_Table[size_set][0];
+ objlim_small_x  = OBJ_Size_Table[size_set][1];
+ objsize_large_x = OBJ_Size_Table[size_set][2];
+ objlim_large_x  = OBJ_Size_Table[size_set][3];
+
+ objsize_small_y = OBJ_Size_Table[size_set][4];
+ objlim_small_y  = OBJ_Size_Table[size_set][5];
+ objsize_large_y = OBJ_Size_Table[size_set][6];
+ objlim_large_y  = OBJ_Size_Table[size_set][7];
+
+ /* base address is one of: 0x0000, 0x1000, 0x2000, 0x3000 lines */
+ OBBASE = ((OBSEL & BITMASK(0,1)) << 12) & BITMASK(0,13);
+ /* name address is one of: 0x0000, 0x0800, 0x1000, 0x1800 lines */
+ OBNAME = ((((OBSEL & BITMASK(3,4)) >> 3) << 12) + OBBASE) & BITMASK(0,13);
+
+ Redo_OAM = (0 - 1);
+}
+
+
 void _Reset_Sprites(void)
 {
  unsigned xobj_set_1_shift, xobj_set_1_count;
@@ -729,22 +751,15 @@ HiSpriteCnt2 = xobj_set_2_shift + (xobj_set_2_count << 8);
 
  Redo_OAM = (0 - 1);
 
- /*
- mov ecx,[OBJ_Size_Table]
- mov edx,[OBJ_Size_Table+4]
- mov [OBJ_Size_Current_X],ecx
- mov [OBJ_Size_Current_Y],edx
- */
-
- OBBASE = 0;
- OBNAME = 0;
-
  /* Reset OBJ port vars */
  OAMAddress = 0;
  OAMAddress_VBL = 0;
  OAMHigh = 0;
  OAM_Write_Low = 0;
  SPRLatch = 0;
+
  OBSEL = 0;
+ OBSEL_write = 0;
+ Reload_OBSEL();
 
 }

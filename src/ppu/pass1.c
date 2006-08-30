@@ -646,15 +646,12 @@ void Update_Mosaic_Postdraw(unsigned current_line, unsigned lines)
  }
 }
 
-void _Update_Display(void)
+
+void Do_Update_Display(unsigned lines)
 {
- unsigned lines;
  unsigned current_line;
  unsigned lines_in_set;
 
- lines = Ready_Line_Render - Current_Line_Render;
-
- if (lines <= 0) return;
 #if 0
  printf("UD: %3d @ %3d\n", Ready_Line_Render - Current_Line_Render, Current_Line_Render);
 #endif
@@ -768,6 +765,34 @@ void _Update_Display(void)
   cg_translate(current_line, lines_in_set);
  }
 }
+
+
+extern unsigned char OBSEL;
+extern unsigned char OBSEL_write;
+
+extern void Reload_OBSEL();
+
+void _Update_Display(void)
+{
+ unsigned lines;
+
+ lines = Ready_Line_Render - Current_Line_Render;
+ if (lines <= 0) return;
+
+ if (lines > 1 && OBSEL_write != OBSEL)
+ {
+  Do_Update_Display(1);
+  lines--;
+ }
+
+ if (OBSEL_write != OBSEL)
+ {
+  Reload_OBSEL();
+ }
+
+ Do_Update_Display(lines);
+}
+
 
 extern unsigned char Base_BGMODE, BGMODE;
 #define BG3_HIGHEST ((Base_BGMODE == 1) && (BGMODE & 8))

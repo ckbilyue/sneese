@@ -124,26 +124,14 @@ EXPORT OAMAddress,skipl
 EXPORT OAMAddress_VBL,skipl ; Restore this at VBL
 EXPORT HiSpriteAddr,skipl   ; OAM address of sprite in 512b table
 EXPORT HiSpriteBits,skipl   ; OAM address of sprite in 32b table
-ALIGNB
-EXPORT Sprite_Size_Current_X,skipl
-EXPORT_EQU sprsize_small_x,Sprite_Size_Current_X
-EXPORT_EQU sprlim_small_x,Sprite_Size_Current_X+1
-EXPORT_EQU sprsize_large_x,Sprite_Size_Current_X+2
-EXPORT_EQU sprlim_large_x,Sprite_Size_Current_X+3
-EXPORT Sprite_Size_Current_Y,skipl
-EXPORT_EQU sprsize_small_y,Sprite_Size_Current_Y
-EXPORT_EQU sprlim_small_y,Sprite_Size_Current_Y+1
-EXPORT_EQU sprsize_large_y,Sprite_Size_Current_Y+2
-EXPORT_EQU sprlim_large_y,Sprite_Size_Current_Y+3
 
-OBJ_vflip_fixup:skipb   ; value to XOR with OBJ current line for v-flip
-                        ; used for rectangular (undocumented) OBJ
+ALIGNB
 EXPORT Redo_OAM,skipb
 EXPORT SPRLatch   ,skipb    ; Sprite Priority Rotation latch flag
-EXPORT OBSEL    ,skipb      ; sssnnxbb  sss=sprite size,nn=upper 4k address,bb=offset
+EXPORT OBSEL      ,skipb    ; sssnnxbb  sss=sprite size,nn=upper 4k address,bb=offset
+EXPORT OBSEL_write,skipb
 EXPORT OAMHigh    ,skipb
 EXPORT OAM_Write_Low,skipb
-EXPORT Pixel_Allocation_Tag,skipb
 
 section .text
 %define PS_Local_Bytes   16
@@ -166,13 +154,6 @@ EXPORT Reset_Sprites
  mov dword [C_LABEL(HiSpriteCnt1)],0x8007
  mov dword [C_LABEL(HiSpriteCnt2)],0x0007
  mov byte [Redo_OAM],-1
- mov ecx,[Sprite_Size_Table]
- mov edx,[Sprite_Size_Table+4]
- mov [Sprite_Size_Current_X],ecx
- mov [Sprite_Size_Current_Y],edx
- mov byte [Pixel_Allocation_Tag],1
- mov [C_LABEL(OBBASE)],eax
- mov [C_LABEL(OBNAME)],eax
 
  ; Reset sprite port vars
  mov [C_LABEL(OAMAddress)],eax
@@ -180,7 +161,9 @@ EXPORT Reset_Sprites
  mov [OAMHigh],al
  mov [OAM_Write_Low],al
  mov [SPRLatch],al
+
  mov [C_LABEL(OBSEL)],al
+ mov [C_LABEL(OBSEL_write)],al
 
 ; Clear pixel allocation tag table
  mov edi,DisplayZ+8
@@ -223,40 +206,12 @@ ALIGNC
 
 ALIGNC
 EXPORT SNES_W2101 ; OBSEL
- cmp [C_LABEL(OBSEL)],al
+ cmp [C_LABEL(OBSEL_write)],al
  je .no_change
 
  UpdateDisplay  ;*
- push ebx
- mov [C_LABEL(OBSEL)],al    ; Get our copy of this
- mov ebx,eax
- shr eax,5
- and eax,byte 7
- mov edx,[Sprite_Size_Table+eax*8]
- mov eax,[Sprite_Size_Table+eax*8+4]
- mov [Sprite_Size_Current_X],edx
- mov [Sprite_Size_Current_Y],eax
- mov eax,ebx
- mov edx,eax
- and ebx,byte 3<<3  ; Name address 0000 0000 000n n000
- and edx,byte 3     ; Base address 0000 0000 0000 0xbb
-;shl ebx,10         ; Name is either 0x0000,0x1000,0x2000,0x3000 words
-;shl edx,14         ; Base is either 0x0000,0x2000,0x4000,0x6000 words
- shl ebx,8          ; Name is either 0x0000,0x0800,0x1000,0x1800 lines
- shl edx,12         ; Base is either 0x0000,0x1000,0x2000,0x3000 lines
- add ebx,edx
-;and edx,0xFFFF
-;and ebx,0xFFFF
- and edx,0x3FFF
- and ebx,0x3FFF
-;add edx,edx        ; Convert to offsets into tile cache
-;add ebx,ebx
-;add edx,C_LABEL(TileCache4)
-;add ebx,C_LABEL(TileCache4)
- mov [C_LABEL(OBBASE)],edx
- mov [C_LABEL(OBNAME)],ebx
- pop ebx
- mov byte [Redo_OAM],-1
+ mov [C_LABEL(OBSEL_write)],al  ; Get our copy of this
+
 .no_change:
  ret
 
