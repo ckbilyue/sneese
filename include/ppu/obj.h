@@ -727,7 +727,7 @@ void Reload_OBSEL(void)
  /* base address is one of: 0x0000, 0x1000, 0x2000, 0x3000 lines */
  OBBASE = ((OBSEL & BITMASK(0,1)) << 12) & BITMASK(0,13);
  /* name address is one of: 0x0000, 0x0800, 0x1000, 0x1800 lines */
- OBNAME = ((((OBSEL & BITMASK(3,4)) >> 3) << 12) + OBBASE) & BITMASK(0,13);
+ OBNAME = ((((OBSEL & BITMASK(3,4)) >> 3) << 11) + OBBASE) & BITMASK(0,13);
 
  Redo_OAM = (0 - 1);
 }

@@ -154,6 +154,14 @@ arrow_str:db " -> ",0
 alert_str:db "!",0
 at_str:db " @ ",0
 mdmaen_str:db "MDMAEN: ",0
+htime_str:db "HTIME: ",0
+vtime_str:db "VTIME: ",0
+nmitimen_str:db "NMITIMEN: ",0
+irqfire_str:db "IRQ @ ",0
+irqcnl_str:db "IRQ scheduled in IRQ_Check_Newline",10,0
+irqc_str:db "IRQ scheduled in IRQ_Check",10,0
+irqcl_str:db "IRQ scheduled in IRQ_Check_Late",10,0
+obsel_str:db "OBSEL: ",0
 hdma_init1_str:db "hdma_init1: ",0
 hdma_init2_str:db "hdma_init2: ",0
 hdma_xfer1_str:db "hdma_xfer1: ",0

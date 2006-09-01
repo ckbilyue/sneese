@@ -37,6 +37,7 @@ You must read and accept the license prior to use.
 ;  H+V-IRQ - on a specific point on the frame
 
 ;%define REPORT_EVENTS
+;%define DEBUG_IRQ
 
 %define ZERO_TRIP_CYCLE_COUNTER
 
@@ -181,6 +182,8 @@ EXPORT HVBJOY,skipb
 ; Nonzero if an IRQ set for current line has not been reached yet
 ;IRQ_set_this_line:skipb
 
+IRQ_fired_this_line:skipb
+
 section .text
 
 ;R_Cycles = C_LABEL(EventTrip) - C_LABEL(SNES_Cycles), trips on <= zero
@@ -263,6 +266,9 @@ EXPORT IRQNewFrameReset
  xor eax,eax
  mov [C_LABEL(Timer_Counter_Throttle)],eax  ; Reset speed-throttle timer
  mov [C_LABEL(Current_Line_Timing)],eax     ; Reset scanline counter
+
+ mov byte [IRQ_fired_this_line],0
+
  inc dword [FPSCount]           ; For FPS counter - 0.25b14
 
 ;%define TRAP_HDMA_RELATCH
@@ -550,7 +556,11 @@ extern C_LABEL(Reload_OBSEL)
 
  xor eax,eax
  dec dword [FrameCount] ; Should we redraw the screen this frame?
+
  mov [C_LABEL(Current_Line_Timing)],eax ; Reset scanline counter
+
+ mov byte [IRQ_fired_this_line],0
+
  mov edi,C_LABEL(IRQFirst)
  jnz .no_redraw
 
@@ -692,6 +702,9 @@ section .text
  mov eax,[C_LABEL(Current_Line_Timing)] ; Get current scanline
  inc eax
  mov [C_LABEL(Current_Line_Timing)],eax
+
+ mov byte [IRQ_fired_this_line],0
+
  jmp CPU_START_IRQ      ; Return to CPU
 
 ALIGNC
@@ -714,6 +727,9 @@ section .text
  mov eax,[C_LABEL(Current_Line_Timing)] ; Get current scanline
  inc eax
  mov [C_LABEL(Current_Line_Timing)],eax
+
+ mov byte [IRQ_fired_this_line],0
+
  cmp [C_LABEL(LastRenderLine)],eax
  ja CPU_START_IRQ       ; Return to CPU
 .end_of_display:
@@ -738,6 +754,9 @@ section .text
  mov eax,[C_LABEL(Current_Line_Timing)]
  inc eax
  mov [C_LABEL(Current_Line_Timing)],eax
+
+ mov byte [IRQ_fired_this_line],0
+
  sub eax,[Vblank_Start]
  cmp eax,byte 3
  jb .no_controller_update
@@ -766,6 +785,9 @@ section .text
  mov eax,[C_LABEL(Current_Line_Timing)] ; Get current scanline
  inc eax
  mov [C_LABEL(Current_Line_Timing)],eax
+
+ mov byte [IRQ_fired_this_line],0
+
  cmp [C_LABEL(LastVBLLine)],eax ; Needs adjustment for odd line?
  ja .not_end_of_frame
  mov dword [Event_Handler],IRQNewFrame
@@ -796,6 +818,9 @@ section .text
  mov eax,[C_LABEL(Current_Line_Timing)] ; Get current scanline
  inc eax
  mov [C_LABEL(Current_Line_Timing)],eax
+
+ mov byte [IRQ_fired_this_line],0
+
  jmp CPU_START_IRQ      ; Return to CPU
 
 ALIGNC
@@ -818,6 +843,9 @@ section .text
  mov eax,[C_LABEL(Current_Line_Timing)] ; Get current scanline
  inc eax
  mov [C_LABEL(Current_Line_Timing)],eax
+
+ mov byte [IRQ_fired_this_line],0
+
  cmp [C_LABEL(LastRenderLine)],eax
  ja CPU_START_IRQ       ; Return to CPU
 .end_of_display:
@@ -874,6 +902,9 @@ section .text
  mov eax,[C_LABEL(Current_Line_Timing)]
  inc eax
  mov [C_LABEL(Current_Line_Timing)],eax
+
+ mov byte [IRQ_fired_this_line],0
+
  mov [Vblank_Start],eax
 CheckNMI:
 %ifdef DEBUG
@@ -1064,7 +1095,32 @@ section .text
  mov eax,[C_LABEL(EventTrip)]
  mov [Last_Trip],eax
 
+%ifdef DEBUG_IRQ
+ pusha
+ LOAD_CYCLES
+ GET_CYCLES eax
+ push eax
+
+ push dword irqfire_str
+ call C_LABEL(print_str)
+ add esp,4
+
+ call C_LABEL(print_decnum)
+
+ push dword comma_str
+ call C_LABEL(print_str)
+
+ push dword [C_LABEL(Current_Line_Timing)]
+ call C_LABEL(print_decnum)
+
+ push nl_str
+ call C_LABEL(print_str)
+ add esp,4*4
+ popa
+%endif
+
  mov dh,0x80        ; Internal IRQ
+ mov [IRQ_fired_this_line],dh
  or [IRQ_pin],dh
 
  mov al,[CPU_Execution_Mode]
@@ -1138,6 +1194,14 @@ IRQ_Check_Newline:
  cmp edx,ebx
  jb .no_irq         ; Next static event is before IRQ?
 
+%ifdef DEBUG_IRQ
+ pusha
+ push dword irqcnl_str
+ call C_LABEL(print_str)
+ add esp,4
+ popa
+%endif
+
  mov [C_LABEL(EventTrip)],ebx
  mov dword [Event_Handler],IRQ_Event
  ret
@@ -1155,7 +1219,6 @@ ALIGNC
 IRQ_Check:
  SAVE_CYCLES edx
  cmp byte [NMI_pin],NMI_Raised
- push edx
  je .nmi_bypass
 
  mov [Last_Trip],edx
@@ -1175,8 +1238,24 @@ IRQ_Check:
  mov ebx,[HTimer]
  cmp edx,ebx
  jb .no_irq         ; Next static event is before IRQ?
- cmp [esp],ebx      ; Check against current cycle
- jae .no_irq        ; Are we after the IRQ position?
+ cmp [C_LABEL(SNES_Cycles)],ebx ; Check against current cycle
+ jbe .before_irq    ; Are we after the IRQ position?
+
+;mov ebx,[esp]      ;should we do this?
+
+ ;IRQ already fired on this line?
+ cmp byte [IRQ_fired_this_line],0
+ jnz .no_irq
+
+.before_irq:
+%ifdef DEBUG_IRQ
+ pusha
+ push dword irqc_str
+ call C_LABEL(print_str)
+ add esp,4
+ popa
+%endif
+
  mov [C_LABEL(EventTrip)],ebx
  mov dword [Event_Handler],IRQ_Event
  jmp .fixup_timing
@@ -1189,7 +1268,6 @@ IRQ_Check:
  mov [Event_Handler],ebx
 .fixup_timing:
  LOAD_CYCLES edx
- pop edx
  ret
 
 
@@ -1215,7 +1293,23 @@ IRQ_Check_Late:
  cmp edi,ebx
  jb .no_irq         ; Next static event is before IRQ?
  cmp [Last_Trip],ebx    ; Check against last event trip cycle
- jae .no_irq        ; Are we after the IRQ?
+ jb  .before_irq    ; Are we after the IRQ?
+
+;mov ebx,[esp]      ;should we do this?
+
+ ;IRQ already fired on this line?
+ cmp byte [IRQ_fired_this_line],0
+ jnz .no_irq
+
+.before_irq:
+%ifdef DEBUG_IRQ
+ pusha
+ push dword irqcl_str
+ call C_LABEL(print_str)
+ add esp,4
+ popa
+%endif
+
  mov [C_LABEL(EventTrip)],ebx
  mov dword [Event_Handler],IRQ_Event
  ret
@@ -1660,6 +1754,38 @@ EXPORT SNES_W4200 ; NMITIMEN
  cmp [C_LABEL(NMITIMEN)],al
  je .no_change
 
+%ifdef DEBUG_IRQ
+ pusha
+ GET_CYCLES edx
+ push edx
+ push byte 2
+ movzx eax,al
+ push eax
+
+ push dword nmitimen_str
+ call C_LABEL(print_str)
+ add esp,4
+
+ call C_LABEL(print_hexnum)
+
+ push dword at_str
+ call C_LABEL(print_str)
+ add esp,4*3
+
+ call C_LABEL(print_decnum)
+
+ push dword comma_str
+ call C_LABEL(print_str)
+
+ push dword [C_LABEL(Current_Line_Timing)]
+ call C_LABEL(print_decnum)
+
+ push nl_str
+ call C_LABEL(print_str)
+ add esp,4*4
+ popa
+%endif
+
  push ebx
  mov bl,[C_LABEL(NMITIMEN)]
  xor bl,al
@@ -1700,17 +1826,18 @@ EXPORT SNES_W4200 ; NMITIMEN
  test al,0x30
  jnz .irq_enabled
 
+ mov byte [IRQ_fired_this_line],0
  and byte [IRQ_pin],~0x80   ; Clear Internal IRQ
- jmp .no_irq_change
+ jmp .irq_reschedule
 
 .irq_enabled:
-
  mov edx,eax
  shr edx,5  ;shift out bit 4
  sbb edx,edx
  and edx,[HTimer_Set]
  mov [HTimer],edx
 
+.irq_reschedule:
  call IRQ_Check
 .no_irq_change:
  pop ebx
@@ -1834,6 +1961,37 @@ ALIGNC
  mov edx,-1
  jmp .got_timer
 
+%macro debug_irq_output 2
+%ifdef DEBUG_IRQ
+ pusha
+ GET_CYCLES eax
+ push eax
+
+ push dword %1
+ call C_LABEL(print_str)
+
+ push dword %2
+ call C_LABEL(print_decnum)
+
+ push dword at_str
+ call C_LABEL(print_str)
+ add esp,4*3
+
+ call C_LABEL(print_decnum)
+
+ push dword comma_str
+ call C_LABEL(print_str)
+
+ push dword [C_LABEL(Current_Line_Timing)]
+ call C_LABEL(print_decnum)
+
+ push nl_str
+ call C_LABEL(print_str)
+ add esp,4*4
+ popa
+%endif
+%endmacro
+
 ALIGNC
 EXPORT SNES_W4207 ; HTIMEL
  mov edx,[C_LABEL(HTIMEL)]
@@ -1841,6 +1999,8 @@ EXPORT SNES_W4207 ; HTIMEL
  je .no_change
  mov dl,al
  mov [C_LABEL(HTIMEL)],edx
+
+ debug_irq_output htime_str,[C_LABEL(HTIMEL)]
 
  call Update_HTimer
 .no_change:
@@ -1856,6 +2016,8 @@ EXPORT SNES_W4208 ; HTIMEH
  mov dh,al
  mov [C_LABEL(HTIMEL)],edx
 
+ debug_irq_output htime_str,[C_LABEL(HTIMEL)]
+
  call Update_HTimer
 
 .no_change:
@@ -1868,6 +2030,9 @@ EXPORT SNES_W4209 ; VTIMEL
  cmp al,dl
  je .no_change
  mov [C_LABEL(VTIMEL)],al
+
+ debug_irq_output vtime_str,[C_LABEL(VTIMEL)]
+
  test byte [C_LABEL(NMITIMEN)],0x20
  jz .no_change
  push ebx
@@ -1884,6 +2049,9 @@ EXPORT SNES_W420A ; VTIMEH   ; Handled in screen core!
  cmp al,dh
  je .no_change
  mov [C_LABEL(VTIMEH)],al
+
+ debug_irq_output vtime_str,[C_LABEL(VTIMEL)]
+
  test byte [C_LABEL(NMITIMEN)],0x20
  jz .no_change
  push ebx
