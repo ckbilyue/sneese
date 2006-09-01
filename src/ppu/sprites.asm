@@ -218,12 +218,11 @@ EXPORT SNES_W2101 ; OBSEL
 ALIGNC
 EXPORT SNES_W2102 ; OAMADDL
  UpdateDisplay  ;*
- push ebx
- xor ebx,ebx
- mov [OAMHigh],bh
- mov [C_LABEL(OAMAddress)],al
+ mov edx,[C_LABEL(OAMAddress_VBL)]
+ mov byte [OAMHigh],0
+ mov dl,al
  mov [C_LABEL(OAMAddress_VBL)],al
- pop ebx
+ mov [C_LABEL(OAMAddress)],edx
  ret
 
 ALIGNC
@@ -231,7 +230,6 @@ EXPORT SNES_W2103 ; OAMADDH
  UpdateDisplay  ;*
  push ebx
  mov ebx,[C_LABEL(OAMAddress_VBL)]
- xor edx,edx
  mov bh,1
  mov [OAMHigh],dl
  and bh,al      ; Only want MSB of address
