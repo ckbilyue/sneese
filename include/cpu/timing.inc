@@ -1938,13 +1938,6 @@ Update_HTimer:
 ALIGNC
 .after_refresh:
  sub edx,byte CYCLES_IN_REFRESH ; After memory refresh
- ;Fixup for 'long' dots
- cmp edx,LONG_DOT_1_START
- jbe .got_timer
- add edx,CYCLES_HALF_DOT
- cmp edx,LONG_DOT_2_START
- jbe .got_timer
- add edx,CYCLES_HALF_DOT
 .got_timer:
  mov [HTimer_Set],edx
  test byte [C_LABEL(NMITIMEN)],0x10
@@ -2019,7 +2012,6 @@ EXPORT SNES_W4208 ; HTIMEH
  debug_irq_output htime_str,[C_LABEL(HTIMEL)]
 
  call Update_HTimer
-
 .no_change:
  pop eax
  ret
@@ -2042,7 +2034,7 @@ EXPORT SNES_W4209 ; VTIMEL
  ret
 
 ALIGNC
-EXPORT SNES_W420A ; VTIMEH   ; Handled in screen core!
+EXPORT SNES_W420A ; VTIMEH
  push eax
  mov edx,[C_LABEL(VTIMEL)]
  and al,1
