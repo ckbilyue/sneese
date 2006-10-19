@@ -387,21 +387,23 @@ EXPORT VMAIN,skipb      ; i000abcd  i=inc type,ab=full graphic,cd=SC increment
 EXPORT PPU2_Latch_External,skipb
 
 ALIGNB
-EXPORT COLDATA,skipl    ; Actual data from COLDATA
-CGAddress:  skipl   ; Palette position for writes to CGRAM
+EXPORT Current_Line_Timing,skipl
+EXPORT Current_Line_IRQ,skipl
 
 WMADDL:     skipb   ; Work RAM Address Lo Byte
 WMADDM:     skipb   ; Work RAM Address Mid Byte
 WMADDH:     skipb   ; Work RAM Address Hi Byte - Just bit 0 used!
             skipb
+
+EXPORT COLDATA,skipl    ; Actual data from COLDATA
+CGAddress:  skipl   ; Palette position for writes to CGRAM
+
 VMDATAREAD_buffer:skipl
 VMDATAREAD_update:skipl ;funcptr
 CGHigh:     skipb   ; Holds whether writing to first or second byte
 CGReadHigh: skipb   ; Whether reading lo or high byte
 
 BGOFS_Last_Write:skipb
-
-EXPORT Current_Line_Timing,skipl
 
 EXPORT SETINI,skipb
 EXPORT STAT78,skipb     ; Enable support for field register

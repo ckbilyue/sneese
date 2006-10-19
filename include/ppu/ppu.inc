@@ -40,7 +40,7 @@ EXTERN_C BG12NBA,BG34NBA
 EXTERN_C VMAIN
 
 EXTERN_C COLDATA
-EXTERN_C Current_Line_Timing
+EXTERN_C Current_Line_Timing, Current_Line_IRQ
 EXTERN_C SETINI
 EXTERN STAT78
 EXTERN Redo_Offset_Change,Redo_Offset_Change_VOffsets

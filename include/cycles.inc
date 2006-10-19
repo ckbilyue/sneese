@@ -27,6 +27,8 @@ You must read and accept the license prior to use.
 %define _5A22_SLOW_CYCLE 8
 %define _5A22_LEGACY_CYCLE 12
 
+%define CYCLES_IRQ_DELAY 10
+
 %define CYCLES_PER_DOT 4
 %define CYCLES_HALF_DOT (CYCLES_PER_DOT / 2)
 %define DOTS_PER_SCANLINE 341

@@ -135,8 +135,8 @@ void snes_reset(void)
 
 extern unsigned FPSMaxTicks;
 
-#define PAL_TICKS (TIMERS_PER_SECOND / (21281370.0 / 312 / 4 / 341))
-#define NTSC_TICKS (TIMERS_PER_SECOND / (1.89e9 / 88 / 262 / 4 / 341))
+#define PAL_TICKS ((TIMERS_PER_SECOND / (21281370.0 / 312 / 4 / 341)) + 0.5)
+#define NTSC_TICKS ((TIMERS_PER_SECOND / (1.89e9 / 88 / 262 / 4 / 341)) + 0.5)
 
 void set_snes_pal(void)
 {
