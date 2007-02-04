@@ -22,6 +22,9 @@ Changes
 
 
  0.854
+  Sound: Improved behavior of channels that are off; fixes Clay
+   Fighter games and Weapon Lord, at least; thanks to DMV27 and anomie
+   for information [TRAC]
   GUI: Reduced CPU usage when waiting on keypresses [TRAC]
   5A22: Added behavior where HDMA init/transfer on the same channel
    as an active DMA terminates DMA on those channels, thanks to byuu

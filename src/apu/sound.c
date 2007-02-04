@@ -1185,7 +1185,6 @@ INLINE static void update_voice_pitch(int voice, struct voice_state *pvs,
        for (voice = 0, voice_bit = 1; voice < 8; voice++, voice_bit <<= 1) \
        { \
         struct voice_state *pvs; \
-        if (!(SNDkeys & voice_bit)) continue; \
  \
         pvs = &SNDvoices[voice]; \
         if (get_brr_blocks(voice,pvs)) continue; \
@@ -1202,9 +1201,10 @@ INLINE static void update_voice_pitch(int voice, struct voice_state *pvs,
  \
         pvs->outx &= ~1; \
  \
-        CHANNELS##_VOICE_VOLUME_##ECHO(SAMPLE_ADD) \
- \
         pvs->voice_sample_latch ++; \
+ \
+        if (!(SNDkeys & voice_bit)) continue; \
+        CHANNELS##_VOICE_VOLUME_##ECHO(SAMPLE_ADD) \
  \
        } \
  \
@@ -1365,6 +1365,20 @@ void update_sound(void)
 
     if (SPC_DSP[DSP_FLG] & DSP_FLG_RESET)
     {
+     int i;
+
+	 for (i = 0; i < 8; i++)
+	 {
+#ifndef ZERO_ENVX_ON_VOICE_OFF
+      SPC_DSP[(i << 4) + DSP_VOICE_ENVX] = 0;
+      SNDvoices[i].envx = 0;
+#endif
+#ifndef ZERO_OUTX_ON_VOICE_OFF
+      SPC_DSP[(i << 4) + DSP_VOICE_OUTX] = 0;
+      SNDvoices[i].outx = 0;
+#endif
+	 }
+
      SPC_DSP[DSP_FLG] |= DSP_FLG_RESET | DSP_FLG_NECEN | DSP_FLG_MUTE;
 
      SPC_VoicesOff(SNDkeys, "DSP reset");
