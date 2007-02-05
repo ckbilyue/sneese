@@ -326,6 +326,11 @@ int LoadConfig(void)
 void SaveConfig(void)
 {
  /*
+  Close the old config file, to ensure this doesn't fail!
+ */
+ set_config_file(NULL);
+
+ /*
    Open the file in text mode. Under DOS and Windows the compiler's runtime
     system will do the conversion from NL (\n) to CR/LF (\r\n).
  */
