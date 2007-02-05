@@ -326,11 +326,6 @@ int LoadConfig(void)
 void SaveConfig(void)
 {
  /*
-  Close the old config file, to ensure this doesn't fail!
- */
- set_config_file(NULL);
-
- /*
    Open the file in text mode. Under DOS and Windows the compiler's runtime
     system will do the conversion from NL (\n) to CR/LF (\r\n).
  */
@@ -557,7 +552,7 @@ int platform_init(int argc, char **argv)
 #endif
  strcat(dat_name, "sneese.dat");
 
- set_config_file(cfg_name); /* Yup, config files exist */
+ override_config_file(cfg_name);    /* Yup, config files exist */
 
  mouse_available = install_mouse();
  if (mouse_available == -1) mouse_available = 0;
