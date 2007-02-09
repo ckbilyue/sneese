@@ -22,6 +22,9 @@ Changes
 
 
  0.854
+  Sound: Fixed a bug in echo processing in stereo output mode [TRAC]
+  Sound: Moved echo index range-check from after sample echo processing
+   to before [TRAC]
   Sound: Improved behavior of channels that are off; fixes Clay
    Fighter games and Weapon Lord, at least; thanks to DMV27 and anomie
    for information [TRAC]

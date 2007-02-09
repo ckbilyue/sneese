@@ -1014,7 +1014,11 @@ INLINE static void update_voice_pitch(int voice, struct voice_state *pvs,
 #define MONO_COMPUTE_ECHO \
  { \
   int FIR_sample, FIR_temp_address; \
-  signed short *echo_ptr = (signed short *) \
+  signed short *echo_ptr; \
+  \
+  if (echo_address >= echo_delay) echo_address = 0; \
+  \
+  echo_ptr = (signed short *) \
    &SPCRAM[(echo_base + echo_address) & 0xFFFF]; \
   \
   FIR_taps[FIR_address][0] = (echo_ptr[0] + echo_ptr[1]) >> 1; \
@@ -1048,14 +1052,17 @@ INLINE static void update_voice_pitch(int voice, struct voice_state *pvs,
   } \
   \
   echo_address += 4; \
-  if (echo_address >= echo_delay) echo_address = 0; \
  }
 
 #define STEREO_COMPUTE_NO_ECHO
 #define STEREO_COMPUTE_ECHO \
  { \
   int FIR_lsample, FIR_rsample, FIR_temp_address; \
-  short *echo_ptr = (signed short *) \
+  signed short *echo_ptr; \
+  \
+  if (echo_address >= echo_delay) echo_address = 0; \
+  \
+  echo_ptr = (signed short *) \
    &SPCRAM[(echo_base + echo_address) & 0xFFFF]; \
   \
   FIR_taps[FIR_address][0] = echo_ptr[0]; \
@@ -1104,7 +1111,6 @@ INLINE static void update_voice_pitch(int voice, struct voice_state *pvs,
   } \
   \
   echo_address += 4; \
-  if (echo_address >= echo_delay) echo_address = 0; \
  }
 
 
