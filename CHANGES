@@ -22,9 +22,9 @@ Changes
 
 
  0.854
+  Sound: Improved echo index range checking to match new research from
+   Shay Green [TRAC]
   Sound: Fixed a bug in echo processing in stereo output mode [TRAC]
-  Sound: Moved echo index range-check from after sample echo processing
-   to before [TRAC]
   Sound: Improved behavior of channels that are off; fixes Clay
    Fighter games and Weapon Lord, at least; thanks to DMV27 and anomie
    for information [TRAC]
@@ -95,7 +95,7 @@ Changes
   PPU: Implemented direct color mode for 8-bit pixels on BG1
   PPU: Implemented color window emulation, including fixed color and 
    sub screen arithmetic modes and most, if not all, of the various
-   edge cases, thanks to Blargg for fast 15-bit blending algorithms
+   edge cases, thanks to Shay Green for fast 15-bit blending algorithms
   ROM loader: Fixed a bug where IPS auto-patching would only work
    on the first ROM loaded
   PPU: Fixed mosaic support

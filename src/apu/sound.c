@@ -94,6 +94,7 @@ unsigned char SPC_DSP[256];
 int main_lvol, main_rvol, main_jvol;
 int echo_lvol, echo_rvol, echo_jvol;
 unsigned short echo_base, echo_delay, echo_address;
+unsigned short echo_delay_limit;
 int echo_feedback;
 int FIR_taps[8][2];
 /* FIR_coeff[0] = C7, FIR_coeff[7] = C0 */
@@ -675,6 +676,7 @@ void Reset_Sound_DSP()
 
  main_lvol = main_rvol = echo_lvol = echo_rvol = 0;
  echo_base = echo_delay = echo_address = echo_feedback = FIR_address = 0;
+ echo_delay_limit = echo_delay;
 
  SPC_MASK = 0xFF;
  SNDkeys = 0;
@@ -1016,8 +1018,6 @@ INLINE static void update_voice_pitch(int voice, struct voice_state *pvs,
   int FIR_sample, FIR_temp_address; \
   signed short *echo_ptr; \
   \
-  if (echo_address >= echo_delay) echo_address = 0; \
-  \
   echo_ptr = (signed short *) \
    &SPCRAM[(echo_base + echo_address) & 0xFFFF]; \
   \
@@ -1052,6 +1052,12 @@ INLINE static void update_voice_pitch(int voice, struct voice_state *pvs,
   } \
   \
   echo_address += 4; \
+  \
+  if (echo_address >= echo_delay_limit) \
+  { \
+   echo_address = 0; \
+   echo_delay_limit = echo_delay; \
+  } \
  }
 
 #define STEREO_COMPUTE_NO_ECHO
@@ -1059,8 +1065,6 @@ INLINE static void update_voice_pitch(int voice, struct voice_state *pvs,
  { \
   int FIR_lsample, FIR_rsample, FIR_temp_address; \
   signed short *echo_ptr; \
-  \
-  if (echo_address >= echo_delay) echo_address = 0; \
   \
   echo_ptr = (signed short *) \
    &SPCRAM[(echo_base + echo_address) & 0xFFFF]; \
@@ -1111,6 +1115,12 @@ INLINE static void update_voice_pitch(int voice, struct voice_state *pvs,
   } \
   \
   echo_address += 4; \
+  \
+  if (echo_address > echo_delay_limit) \
+  { \
+   echo_address = 0; \
+   echo_delay_limit = echo_delay; \
+  } \
  }
 
 
