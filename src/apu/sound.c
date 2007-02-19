@@ -120,7 +120,7 @@ static struct voice_state {
     unsigned char brr_header, env_state, adsr_state, key_wait;
 } SNDvoices[8];
 
-unsigned char SNDkeys, keying_on;
+unsigned char SNDkeys, awaiting_key_on, keying_on;
 
 static const short gauss[]={
 	0x000, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000, 
@@ -311,19 +311,17 @@ static int get_brr_block(int voice, struct voice_state *pvs)
   {
    if (pvs->brr_header & BRR_PACKET_END)
    {
-    if (pvs->brr_header & BRR_PACKET_LOOP)
-    {
-       unsigned short *samp_dir = (unsigned short *)
-        &SPCRAM[(int) SPC_DSP[DSP_DIR] << 8];
+    unsigned short *samp_dir = (unsigned short *)
+     &SPCRAM[(int) SPC_DSP[DSP_DIR] << 8];
 
-       int cursamp = SPC_DSP[(voice << 4) + DSP_VOICE_SRCN];
+    int cursamp = SPC_DSP[(voice << 4) + DSP_VOICE_SRCN];
 
-       pvs->brrptr = samp_dir[cursamp * 2 + 1];
-    }
-    else
+    pvs->brrptr = samp_dir[cursamp * 2 + 1];
+
+    if (!(pvs->brr_header & BRR_PACKET_LOOP))
     {
      SPC_VoiceOff(voice, "end block completed without loop");
-    }
+	}
    }
 
    if (validate_brr_address(voice)) return 1;
@@ -419,7 +417,7 @@ INLINE static unsigned UpdateEnvelopeHeight(int voice)
 
   if (pvs->env_counter <= 0)
   {
-   pvs->env_counter = apu_counter_reset_value;
+   pvs->env_counter += apu_counter_reset_value;
 
    switch (pvs->env_state)
    {
@@ -549,12 +547,6 @@ INLINE static void SPC_KeyOn(int voices)
   /* Ignore voices forcibly disabled */
   voices &= SPC_MASK;
 
-  /* Clear key-on bits when acknowledged */
-  SPC_DSP[DSP_KON] &= SPC_DSP[DSP_KOF];
-
-  /* Don't acknowledge key-on when key-off is set */
-  voices &= ~SPC_DSP[DSP_KOF];
-
   /* 8-sample delay before key on */
   keying_on |= voices;
 
@@ -579,9 +571,6 @@ INLINE static void SPC_KeyOn(int voices)
   if (pvs->key_wait--) continue;
 
   keying_on &= ~BIT(voice);
-
-  /* Clear sample-end-block-decoded flag for voices being keyed on */
-  SPC_DSP[DSP_ENDX] &= ~BIT(voice);
 
   cursamp = SPC_DSP[(voice << 4) + DSP_VOICE_SRCN];
   pvs->brrptr = pvs->sample_start_address = samp_dir[cursamp * 2];
@@ -679,7 +668,9 @@ void Reset_Sound_DSP()
  echo_delay_limit = echo_delay;
 
  SPC_MASK = 0xFF;
- SNDkeys = 0;
+
+ awaiting_key_on = keying_on = SNDkeys = 0;
+
  sound_output_position = 0;
  block_written = TRUE;
 #ifdef DUMP_SOUND
@@ -1408,8 +1399,14 @@ void update_sound(void)
      echo_address = 0;
     }
 
-    SPC_KeyOn(SPC_DSP[DSP_KON]);
     SPC_KeyOff(SPC_DSP[DSP_KOF]);
+    SPC_KeyOn(awaiting_key_on);
+
+    /* Clear sample-end-block-decoded flag for voices being keyed on */
+    SPC_DSP[DSP_ENDX] &= ~awaiting_key_on;
+
+	/* Clear key-on bits when acknowledged */
+    awaiting_key_on = 0;
 
     sound_cycle_latch = (TotalCycles + SOUND_CYCLES_PER_SAMPLE) &
      ~(SOUND_CYCLES_PER_SAMPLE - 1);
@@ -1622,8 +1619,8 @@ void SPC_WRITE_DSP()
 #endif
 
 #ifdef DSP_SPEED_HACK
- /* if we're not writing to flg or endx */
- if (addr_lo != 0x0C || addr_hi < 6)
+ /* if we're not writing to kon, flg, or endx */
+ if (addr_lo != 0x0C || addr_hi < 4 || addr_hi == 5 )
  /* and write would not change data, return */
  if (SPC_DSP[SPC_DSP_ADDR] == SPC_DSP_DATA) return;
 
@@ -1831,6 +1828,7 @@ void SPC_WRITE_DSP()
 
   // Key on
   case DSP_KON >> 4:
+   awaiting_key_on = SPC_DSP_DATA;
    break;
 
   // Key off

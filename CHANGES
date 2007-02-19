@@ -22,6 +22,8 @@ Changes
 
 
  0.854
+  Sound: Improved key-on behavior to match new research from Shay Green
+   [TRAC]
   Sound: Improved echo index range checking to match new research from
    Shay Green [TRAC]
   Sound: Fixed a bug in echo processing in stereo output mode [TRAC]
