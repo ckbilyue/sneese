@@ -1494,7 +1494,7 @@ void update_sound(void)
          pvs->jvol = (pvs->lvol + pvs->rvol) >> 1;
         }
 
-        pvs->step = ((unsigned) *(unsigned short *)&SPC_DSP[(voice << 4) + DSP_VOICE_PITCH_L]);
+        pvs->step = SPC_DSP[(voice << 4) + DSP_VOICE_PITCH_L] + (SPC_DSP[(voice << 4) + DSP_VOICE_PITCH_H] << 8);
     }
 
 /* MMX mixing notes

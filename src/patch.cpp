@@ -48,7 +48,7 @@ struct
 
   unzFile zipfile;
   FILE *fp;
-} IPSPatch;
+} static IPSPatch;
 
 
 static bool reloadBuffer()

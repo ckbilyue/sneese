@@ -46,7 +46,7 @@ extern FILELIST *DirList;
 
 // This fills an array of FILELIST with file information
 // from the path given, starting at file number Offset
-int GetDirList(char *Path, FILELIST *&Files, int Offset, int *real_file_count);
+int GetDirList(const char *Path, FILELIST *&Files, int Offset, int *real_file_count);
 
 /* ------------------------- GUI STUFF ------------------------- */
 
@@ -54,7 +54,7 @@ int GetDirList(char *Path, FILELIST *&Files, int Offset, int *real_file_count);
 #include "font.h"
 #include "helper.h"
 
-extern RGB GUIPal[16];
+extern RGB GUIPal[256];
 
 extern GUI_FONT ZSNES_Font,Modified_Font,Old_Font;
 extern pGUI_FONT default_font;
@@ -102,6 +102,7 @@ public:
  virtual void process(WINDOW *parent){}
  virtual void attach(WINDOW *parent){ this->parent = parent; }
  virtual void detach(WINDOW *parent){}
+ virtual ~CTL(){}
 };
 
 /*
@@ -173,6 +174,7 @@ public:
   if(current){ current = current->next; }
   return temp;
  }
+ virtual ~WINDOW(){}
 };
 
 inline CTL::CTL(WINDOW *parent){

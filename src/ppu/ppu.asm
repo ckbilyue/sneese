@@ -395,7 +395,6 @@ WMADDM:     skipb   ; Work RAM Address Mid Byte
 WMADDH:     skipb   ; Work RAM Address Hi Byte - Just bit 0 used!
             skipb
 
-EXPORT COLDATA,skipl    ; Actual data from COLDATA
 CGAddress:  skipl   ; Palette position for writes to CGRAM
 
 VMDATAREAD_buffer:skipl

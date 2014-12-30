@@ -31,6 +31,10 @@ You must read and accept the license prior to use.
 
 EXTERN unsigned char WRAM[131072];  /* Buffer for Work RAM */
 EXTERN unsigned char VRAM[65536];   /* Buffer for Video RAM */
+
+/* Used to determine size of file for saving/loading, and to restrict writes
+ *  to non-existant SRAM
+ */
 EXTERN unsigned SaveRamLength;      /* Size of Save RAM */
 EXTERN unsigned char *SRAM;         /* Buffer for Save RAM */
 EXTERN unsigned char SPCRAM[65536]; /* Buffer for SPC RAM/ROM */

@@ -10,15 +10,10 @@ The SNES emulator with the extra e's...
         SSSSS   NN    NN  EEEEEE   eeee    SSSSS    eeee
 
                                             v0.854 (Public BETA)
-                                            xx February 2007
+                                            xx xx 2015
 
   Please read the license (LICENSE file) before using or distributing
    SNEeSe in any way!
-
-  This release is dedicated to the memory of the departed Scape, a young
-   Korat kitty with a sense of fairness, who showed love to all, and
-   malice to none, even to cats who showed aggression towards him...
-   you will be missed...
 
 
 NOTE:
@@ -33,7 +28,7 @@ Credits
 e-mail address sniffers)
 
 
-SNEeSe is copyright (c) 1998-2006, Charles Bilyue'.
+SNEeSe is copyright (c) 1998-2015, Charles Bilyue.
 Portions copyright (c) 1998-2003, Brad Martin.
 Portions copyright (c) 2003-2004, Daniel Horchner.
 Portions copyright (c) 2004-2005, Nach. ( http://nsrt.edgeemu.com/ )
@@ -48,7 +43,7 @@ Portions copyright (c) 2002 Andrea Mazzoleni. ( http://advancemame.sf.net )
 
 New development
 Core & DOS/Win32 Port Developer/Maintainer
- Charles Bilyue'    (TRAC)      esaelon* *at* *users.sf.net
+ Charles Bilyue     (TRAC)      esaelon* *at* *users.sf.net
 Unix/Linux/BeOS Port Developer/Maintainer
  Daniel Horchner                dbjh* *at* *gmx.net
 Assistant Developer (Sound system emulation)
@@ -150,7 +145,7 @@ Here is a rough guide to the things you need to run this emulator:
 
 
 -- Linux/Unix --
- - A PC running X (windowing system), with Allegro 4.2.
+ - A PC running X (windowing system), with Allegro 4.4.
  - A video adapter compatible with X; improved performance may be achieved
     by having DGA(2) support and the necessary privileges to access it.
  - A sound output device compatible with OSS, ESD, or ALSA, for sound
@@ -158,7 +153,7 @@ Here is a rough guide to the things you need to run this emulator:
 
 
 -- BeOS --
- - A PC running BeOS R5 PE, with Allegro 4.2. Other versions of BeOS
+ - A PC running BeOS R5 PE, with Allegro 4.4. Other versions of BeOS
     might also work.
  - A video adapter supported by BeOS.
  - A sound output device supported by BeOS.

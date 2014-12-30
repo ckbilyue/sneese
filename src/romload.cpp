@@ -209,7 +209,7 @@ char save_extension[MAXEXT];
 ROMFileType GetROMFileType(const char *ROM_filename)
 {
  fnsplit(ROM_filename, fn_drive, fn_dir, fn_file, fn_ext);
- if (!fn_ext) return ROMFileType_normal;
+ if (!strcmp(fn_ext, "")) return ROMFileType_normal;
  if (!strcmp(fn_ext, ".1")) return ROMFileType_split;
 /*
  if (fn_file)
@@ -1797,7 +1797,7 @@ int open_rom_with_default_path(const char *filename)
  return open_rom(full_pathname);
 }
 
-char *TypeTable[]={
+const char *TypeTable[]={
  "ROM",
  "ROM+RAM",
  "ROM+SRAM",
@@ -1821,7 +1821,7 @@ char *TypeTable[]={
  "FX(OBC1)"
 };
 
-char *CountryTable[]={
+const char *CountryTable[]={
  "Japan",
  "USA",
  "Europe, Oceania, Asia",     // Australia is part of Oceania
@@ -1901,7 +1901,7 @@ void DisplayRomStats(SNESRomInfoStruct *RomInfo)
  // ROM SRAM size
 
  SaveRamLength = RomInfo->SRAM_size;
- if (((RomInfo->ROM_type) == 2) || ((RomInfo->ROM_type) >= 5) &&
+ if ((((RomInfo->ROM_type) == 2) || ((RomInfo->ROM_type) >= 5)) &&
   SaveRamLength)
  {
   SaveRamLength = 1024 << SaveRamLength;

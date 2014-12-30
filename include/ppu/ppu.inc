@@ -23,6 +23,8 @@ You must read and accept the license prior to use.
 %ifndef SNEeSe_ppu_ppu_inc
 %define SNEeSe_ppu_ppu_inc
 
+EXTERN_C COLDATA
+
 %ifndef SNEeSe_ppu_ppu_asm
 
 EXTERN_C PPU_text_start,PPU_data_start,PPU_bss_start
@@ -39,7 +41,6 @@ EXTERN_C INIDISP,BGMODE,Base_BGMODE
 EXTERN_C BG12NBA,BG34NBA
 EXTERN_C VMAIN
 
-EXTERN_C COLDATA
 EXTERN_C Current_Line_Timing, Current_Line_IRQ
 EXTERN_C SETINI
 EXTERN STAT78

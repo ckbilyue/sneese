@@ -87,11 +87,6 @@ extern char *rom_country;
 
 extern unsigned char *RomAddress;       /* Address of SNES ROM */
 
-/* Used to determine size of file for saving/loading, and to restrict writes
- *  to non-existant SRAM
- */
-extern unsigned SaveRamLength;
-
 extern int rom_bank_count;
 extern int rom_bank_count_mask, rom_bank_count_premask;
 extern int ROM_format;
@@ -119,8 +114,8 @@ extern int ROM_interleaved;
 extern int ROM_force_video_standard;
 extern int ROM_video_standard;
 
-extern char *TypeTable[];
-extern char *CountryTable[];
+extern const char *TypeTable[];
+extern const char *CountryTable[];
 
 #define ROM_SIZE_MAX ((64 << 20) >> 3)
 

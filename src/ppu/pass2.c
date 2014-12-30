@@ -30,7 +30,7 @@ You must read and accept the license prior to use.
 
 
 extern unsigned char CGWSEL, CGADSUB;
-extern unsigned COLDATA;
+extern union { colorBGR555 color; unsigned u; } COLDATA; /* TODO: eliminate this union */
 
 static unsigned cg_translate_pixel_blank(const unsigned char (*pixel)[2])
 /* forced-blank or off-screen area */
@@ -228,7 +228,7 @@ void cg_process_arithmetic(unsigned short *main_buf, unsigned short *sub_buf,
     unsigned short main_color, sub_color;
 
     main_color = main_buf[y * 256 + x];
-    sub_color = screen_arithmetic ? sub_buf[y * 256 + x] : COLDATA;
+    sub_color = screen_arithmetic ? sub_buf[y * 256 + x] : COLDATA.u;
 
     /* if half-result disabled, or using screen arithmetic with back
 	  area of sub-screen */
@@ -428,10 +428,9 @@ void cg_translate(unsigned current_line, unsigned lines)
      /* screen arithmetic enabled */
      if (CGWSEL & BIT(1))
 	 {
-      unsigned short temp_color_0 =
-       ((unsigned short *) Real_SNES_Palette)[0];
+      colorBGR555 temp_color_0 = Real_SNES_Palette[0];
 
-      ((unsigned short *) Real_SNES_Palette)[0] = COLDATA;
+      Real_SNES_Palette[0] = COLDATA.color;
 
       if (direct_color_enabled &&
        /* BG1 on */
@@ -451,7 +450,7 @@ void cg_translate(unsigned current_line, unsigned lines)
         lines, first_pixel, last_pixel_plus_1, 1);
       }
 
-	  ((unsigned short *) Real_SNES_Palette)[0] = temp_color_0;
+	  Real_SNES_Palette[0] = temp_color_0;
 	 }
 
      cg_process_arithmetic(output_main, output_sub, lines,

@@ -185,7 +185,7 @@ enum {
  MAIN_NUM_OPTIONS
 };
 
-char *Main_Options[MAIN_NUM_OPTIONS]={
+const char *Main_Options[MAIN_NUM_OPTIONS]={
  "Resume emulation",
  "Reset emulation",
  "Load ROM",
@@ -288,7 +288,7 @@ enum
  SCREEN_USE_WINDOW
 };
 #define NUM_SCREEN_OPTIONS 6
-char *Screen_Options[NUM_SCREEN_OPTIONS]={
+const char *Screen_Options[NUM_SCREEN_OPTIONS]={
  "320x200x16b VESA2",
  "320x240x16b VESA2",
  "640x480x16b VESA2",
@@ -305,7 +305,7 @@ enum
  SCREEN_OPTIONS_MODE_OFFSET
 };
 #define NUM_SCREEN_OPTIONS 10
-char *Screen_Options[NUM_SCREEN_OPTIONS]={
+const char *Screen_Options[NUM_SCREEN_OPTIONS]={
  0,
  "320x200x16b",
  "320x240x16b",
@@ -645,8 +645,8 @@ int ScreenWindow()
 }
 
 
-char *on_off[2]={ "off", "on" };
-char *en_dis[2]={ "enabled", "disabled" };
+const char *on_off[2]={ "off", "on" };
+const char *en_dis[2]={ "enabled", "disabled" };
 
 int SoundWindow()
 {
@@ -1385,7 +1385,7 @@ int ConfigWindow()
        set_palette(sneesepal);
       }
 
-      set_palette_range(&GUIPal[-240],240,255,1);    // Set the GUI palette up.
+      set_palette_range(GUIPal,240,255,1);    // Set the GUI palette up.
 #endif
      }
      break;
@@ -1925,7 +1925,7 @@ GUI_ERROR GUI()
  }
 #endif
 
- set_palette_range(&GUIPal[-240],240,255,1);    // Set the GUI palette up.
+ set_palette_range(GUIPal,240,255,1);    // Set the GUI palette up.
 
  fill_backdrop(Allegro_Bitmap);
 

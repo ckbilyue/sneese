@@ -40,7 +40,7 @@ EXE_EXT := .exe
 
 # How to inform the linker of libraries we're using
 
-ALLEG  := -lalleg
+ALLEG  := -lalleg44
 
 
 # Set up build for this platform.

@@ -196,6 +196,7 @@ $(OBJ)/ppu/screen.$(ASM_OBJ_EXT): $(SRC)/ppu/screen.asm $(OBJFIX) \
 
 $(OBJ)/ppu/windows.$(OBJBASE): $(SRC)/ppu/windows.c \
  $(addprefix $(INCLUDE)/, misc.h snes.h)
+	$(GCC) -S $(CFLAGS) $(DFLAGS) -Wno-array-bounds -o $@ $<
 
 $(OBJ)/ppu/tiles.$(ASM_OBJ_EXT): $(SRC)/ppu/tiles.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, misc.inc ppu/ppu.inc ppu/tiles.inc ppu/screen.inc)
@@ -208,6 +209,7 @@ $(OBJ)/ppu/pass1.$(OBJBASE): $(SRC)/ppu/pass1.c \
  $(addprefix $(INCLUDE)/, helper.h wrapaleg.h platform.h misc.h snes.h \
  ppu/plotbase.h ppu/obj.h ppu/bgn.h ppu/bgm.h ppu/bgo.h ppu/bgom.h \
  ppu/pln.h ppu/plm.h ppu/plo.h ppu/plom.h ppu/dispatch.h ppu/mode7.h)
+	$(GCC) -S $(CFLAGS) $(DFLAGS) -Wno-unused-but-set-variable -o $@ $<
 
 $(OBJ)/ppu/pass2.$(OBJBASE): $(SRC)/ppu/pass2.c \
  $(addprefix $(INCLUDE)/, helper.h platform.h misc.h snes.h wrapaleg.h)
@@ -223,6 +225,7 @@ $(OBJ)/emugui.$(OBJBASE): $(SRC)/emugui.cpp \
  $(addprefix $(INCLUDE)/, guicore.h platform.h types.h font.h misc.h \
  helper.h input.h cpu/cpu.h apu/spc.h apu/sound.h romload.h debug.h snes.h \
  wrapaleg.h)
+	$(GCC) -S $(CFLAGS) $(DFLAGS) -Wno-unused-but-set-variable -o $@ $<
 $(OBJ)/romload.$(OBJBASE): $(SRC)/romload.cpp \
  $(addprefix $(INCLUDE)/, romload.h helper.h misc.h cpu/cpu.h apu/spc.h \
  cpu/mem.h snes.h wrapaleg.h patch.h platform.h multiio.h unzip.h) \
@@ -246,14 +249,18 @@ $(OBJ)/input.$(OBJBASE): $(SRC)/input.c \
 $(OBJ)/apu/spc700.$(OBJBASE): $(SRC)/apu/spc700.c $(OBJFIX) \
  $(addprefix $(INCLUDE)/, helper.h wrapaleg.h platform.h misc.h \
  apu/sound.h apu/spc.h apu/sounddef.h debug.h cpu/cpu.h snes.h)
+
 $(OBJ)/apu/sound.$(OBJBASE): $(SRC)/apu/sound.c \
  $(addprefix $(INCLUDE)/, helper.h platform.h snes.h apu/sound.h \
  apu/sounddef.h apu/spc.h misc.h wrapaleg.h)
+	$(GCC) -S $(CFLAGS) $(DFLAGS) -Wno-unused-but-set-variable -o $@ $<
+
 $(OBJ)/map.$(OBJBASE): $(SRC)/map.c \
  $(addprefix $(INCLUDE)/, map.h misc.h)
 $(OBJ)/multiio.$(OBJBASE): $(SRC)/multiio.c \
  $(addprefix $(INCLUDE)/, multiio.h map.h misc.h unzip.h)
 
 $(OBJ)/unzip.o: $(SRC)/unzip.c $(INCLUDE)/unzip.h
+	$(GCC) -c $(CFLAGS) $(DFLAGS) -Wno-maybe-uninitialized -o $@ $<
 
 .PHONY: all maketree clean badplatform $(sort $(OBJDIRS))

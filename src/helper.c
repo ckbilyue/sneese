@@ -259,6 +259,11 @@ unsigned char BrightnessLevel;  /* SNES Brightness level, set up in PPU.asm */
 
 char fixedpalettecheck=0;
 
+union {
+	colorBGR555 color;
+	unsigned u;
+} COLDATA;
+
 /* v0.15, we do palette conversion here */
 /* v0.20, support for brightness effects in 16-bit modes */
 void SetPalette()
