@@ -503,7 +503,7 @@ int platform_init(int argc, char **argv)
 
  allegro_init();
 
- if (cpu_family < 5)
+ if ((cpu_family > 0) && (cpu_family < 5))
  {
   printf("SNEeSe requires a 586-class CPU or better!\n");
   return 1;
