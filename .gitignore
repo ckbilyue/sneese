@@ -1,0 +1,15 @@
+# Ignore debugging data output files
+*.dmp
+*.DMP
+
+# Ignore compiled object files
+obj/
+
+# Ignore executables
+*.exe
+sneese
+
+# Ignore Eclipse files
+.project
+.cproject
+
