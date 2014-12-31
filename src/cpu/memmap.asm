@@ -59,9 +59,9 @@ EXPORT memmap_data_start
 section .bss
 EXPORT memmap_bss_start
 
-EXTERN_C SRAM_Mask
-EXTERN_C Map_Address
-EXTERN_C Map_Byte
+EXTERN SRAM_Mask
+EXTERN Map_Address
+EXTERN Map_Byte
 
 section .bss
 ALIGNB
@@ -155,13 +155,13 @@ EXPORT SNES_GET_LONG_WRAP
 
 ALIGNC
 EXPORT CPU_OPEN_BUS_READ
-    mov al,[C_LABEL(Last_Bus_Value_A)]
+    mov al,[Last_Bus_Value_A]
     ret
 
 ALIGNC
 EXPORT CPU_OPEN_BUS_READ_LEGACY
-    mov al,[C_LABEL(Last_Bus_Value_A)]
-    mov edx,[C_LABEL(Access_Speed_Mask)]
+    mov al,[Last_Bus_Value_A]
+    mov edx,[Access_Speed_Mask]
     and edx,_5A22_LEGACY_CYCLE - _5A22_FAST_CYCLE
     add R_65c816_Cycles,edx
     ret
@@ -172,14 +172,14 @@ EXPORT IGNORE_WRITE
 %ifdef DEBUG
 %ifdef TRAP_IGNORED_WRITES
 extern _InvalidHWWrite
-    mov [C_LABEL(Map_Address)],ebx  ; Set up Map Address so message works!
-    mov [C_LABEL(Map_Byte)],al      ; Set up Map Byte so message works
+    mov [Map_Address],ebx  ; Set up Map Address so message works!
+    mov [Map_Byte],al      ; Set up Map Byte so message works
     pusha
-    call C_LABEL(InvalidHWWrite)   ; Unmapped hardware address!
+    call InvalidHWWrite   ; Unmapped hardware address!
     popa
 %endif
 %endif
-    mov [C_LABEL(Last_Bus_Value_A)],al
+    mov [Last_Bus_Value_A],al
     ret
 
 
@@ -189,14 +189,14 @@ EXPORT UNSUPPORTED_READ
 %ifdef DEBUG
 %ifdef TRAP_BAD_READS
 extern _InvalidHWRead
-    mov [C_LABEL(Map_Address)],ebx  ; Set up Map Address so message works!
-    mov [C_LABEL(Map_Byte)],al      ; Set up Map Byte so message works
+    mov [Map_Address],ebx  ; Set up Map Address so message works!
+    mov [Map_Byte],al      ; Set up Map Byte so message works
     pusha
-    call C_LABEL(InvalidHWRead)     ; Unmapped hardware address!
+    call InvalidHWRead     ; Unmapped hardware address!
     popa
 %endif
 %endif
-    mov [C_LABEL(Last_Bus_Value_A)],al
+    mov [Last_Bus_Value_A],al
     ret
 
 ALIGNC
@@ -204,14 +204,14 @@ EXPORT UNSUPPORTED_WRITE
 %ifdef DEBUG
 %ifdef TRAP_BAD_WRITES
 extern _InvalidHWWrite
-    mov [C_LABEL(Map_Address)],ebx  ; Set up Map Address so message works!
-    mov [C_LABEL(Map_Byte)],al      ; Set up Map Byte so message works
+    mov [Map_Address],ebx  ; Set up Map Address so message works!
+    mov [Map_Byte],al      ; Set up Map Byte so message works
     pusha
-    call C_LABEL(InvalidHWWrite)    ; Unmapped hardware address!
+    call InvalidHWWrite    ; Unmapped hardware address!
     popa
 %endif
 %endif
-    mov [C_LABEL(Last_Bus_Value_A)],al
+    mov [Last_Bus_Value_A],al
     ret
 
 
@@ -219,18 +219,18 @@ ALIGNC
 EXPORT Read_Direct_Safeguard
  mov edx,ebx
  shr edx,13
- mov edx,[C_LABEL(Read_Bank8Offset)+edx*4]
+ mov edx,[Read_Bank8Offset+edx*4]
  mov al,[edx+ebx]
- mov [C_LABEL(Last_Bus_Value_A)],al
+ mov [Last_Bus_Value_A],al
  ret
 
 ALIGNC
 EXPORT Write_Direct_Safeguard
  mov edx,ebx
  shr edx,13
- mov edx,[C_LABEL(Write_Bank8Offset)+edx*4]
+ mov edx,[Write_Bank8Offset+edx*4]
  mov [edx+ebx],al
- mov [C_LABEL(Last_Bus_Value_A)],al
+ mov [Last_Bus_Value_A],al
  ret
 
 ALIGNC
@@ -249,12 +249,12 @@ EXPORT PPU_READ
     cmp edx,0x437F
     jbe CPU_OPEN_BUS_READ
 .access_ok:
-    call [(C_LABEL(Read_Map_20_5F)-0x2000*4)+edx*4]
-    mov [C_LABEL(Last_Bus_Value_A)],al
+    call [(Read_Map_20_5F-0x2000*4)+edx*4]
+    mov [Last_Bus_Value_A],al
     ret
 
 .b_bus_read:
-    jmp [(C_LABEL(Read_Map_20_5F)-0x2000*4)+edx*4]
+    jmp [(Read_Map_20_5F-0x2000*4)+edx*4]
 
 ALIGNC
 ; Write hardware - 2000-5FFF in 00-3F/80-BF
@@ -265,19 +265,19 @@ EXPORT PPU_WRITE
     cmp dh,0x21
     je .b_bus_write
 
-    mov [C_LABEL(Last_Bus_Value_A)],al
+    mov [Last_Bus_Value_A],al
     cmp byte [In_DMA],0
     jz .access_ok
     cmp dh,0x40
     jb .access_ok
     cmp edx,0x437F
-    jbe C_LABEL(IGNORE_WRITE)
+    jbe IGNORE_WRITE
 .access_ok:
-    jmp [(C_LABEL(Write_Map_20_5F)-0x2000*4)+edx*4]
+    jmp [(Write_Map_20_5F-0x2000*4)+edx*4]
 .b_bus_write:
 %if 0
     pusha
-extern C_LABEL(print_str),C_LABEL(print_hexnum),C_LABEL(print_decnum)
+extern print_str,print_hexnum,print_decnum
     cmp dl,0x02
     jb .log
     cmp dl,0x05
@@ -301,39 +301,39 @@ extern C_LABEL(print_str),C_LABEL(print_hexnum),C_LABEL(print_decnum)
     push arrow_str
     push byte 2
     push eax
-    call C_LABEL(print_hexnum)
+    call print_hexnum
     add esp,4*2
-    call C_LABEL(print_str)
+    call print_str
     add esp,4
-    call C_LABEL(print_hexnum)
+    call print_hexnum
     push at_str
-    call C_LABEL(print_str)
-    push dword [C_LABEL(Current_Line_Timing)]
-    call C_LABEL(print_decnum)
+    call print_str
+    push dword [Current_Line_Timing]
+    call print_decnum
     push nl_str
-    call C_LABEL(print_str)
+    call print_str
     add esp,4*5
 .no_log:
     popa
 %endif
-    jmp [(C_LABEL(Write_Map_20_5F)-0x2000*4)+edx*4]
+    jmp [(Write_Map_20_5F-0x2000*4)+edx*4]
 
 ALIGNC
 EXPORT SRAM_READ
-    mov edx,[C_LABEL(SRAM_Mask)]
+    mov edx,[SRAM_Mask]
     and edx,ebx
-    add edx,[C_LABEL(SRAM)]
+    add edx,[SRAM]
     mov al,[edx]
-    mov [C_LABEL(Last_Bus_Value_A)],al
+    mov [Last_Bus_Value_A],al
     ret
 
 ALIGNC
 EXPORT SRAM_WRITE
-    mov edx,[C_LABEL(SRAM_Mask)]
+    mov edx,[SRAM_Mask]
     and edx,ebx
-    add edx,[C_LABEL(SRAM)]
+    add edx,[SRAM]
     mov [edx],al
-    mov [C_LABEL(Last_Bus_Value_A)],al
+    mov [Last_Bus_Value_A],al
     ret
 
 ALIGNC
@@ -346,11 +346,11 @@ EXPORT SRAM_WRITE_ALT
     and edi,(32 << 10) - 1
     and ecx,~((32 << 10) - 1)
     add edi,ecx
-    mov edx,[C_LABEL(SRAM_Mask)]
+    mov edx,[SRAM_Mask]
     and edx,edi
-    add edx,[C_LABEL(SRAM)]
+    add edx,[SRAM]
     mov [edx],al
-    mov [C_LABEL(Last_Bus_Value_A)],al
+    mov [Last_Bus_Value_A],al
     pop edi
     pop ecx
     ret
@@ -364,11 +364,11 @@ EXPORT SRAM_WRITE_HIROM
     shr ecx,3
     and edx,ebx
     add edx,ecx
-    mov ecx,[C_LABEL(SRAM_Mask)]
+    mov ecx,[SRAM_Mask]
     and edx,ecx
-    mov ecx,[C_LABEL(SRAM)]
+    mov ecx,[SRAM]
     mov [edx+ecx],al
-    mov [C_LABEL(Last_Bus_Value_A)],al
+    mov [Last_Bus_Value_A],al
     pop ecx
     ret
 
@@ -376,22 +376,22 @@ ALIGNC
 EXPORT SRAM_WRITE_2k
     mov edx,(2 << 10) - 1
     and edx,ebx
-    add edx,[C_LABEL(SRAM)]
+    add edx,[SRAM]
     mov [edx],al
     mov [edx+2048],al
     mov [edx+4096],al
     mov [edx+6144],al
-    mov [C_LABEL(Last_Bus_Value_A)],al
+    mov [Last_Bus_Value_A],al
     ret
 
 ALIGNC
 EXPORT SRAM_WRITE_4k
     mov edx,(4 << 10) - 1
     and edx,ebx
-    add edx,[C_LABEL(SRAM)]
+    add edx,[SRAM]
     mov [edx],al
     mov [edx+4096],al
-    mov [C_LABEL(Last_Bus_Value_A)],al
+    mov [Last_Bus_Value_A],al
     ret
 
 section .text

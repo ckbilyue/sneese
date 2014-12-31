@@ -66,8 +66,6 @@ You must read and accept the license prior to use.
 %include "ppu/tiles.inc"
 %include "ppu/screen.inc"
 
-EXTERN_C SNES_Screen8
-
 section .text
 EXPORT tiles_text_start
 section .data
@@ -233,14 +231,14 @@ EXPORT Recache_Tile_Set_work
  push esi
 
 %ifdef Profile_Recache_Sets
-EXTERN_C Tiles_Recached, Sets_Recached
- add [C_LABEL(Tiles_Recached)],edi
- inc dword [C_LABEL(Sets_Recached)]
+EXTERN Tiles_Recached, Sets_Recached
+ add [Tiles_Recached],edi
+ inc dword [Sets_Recached]
 %endif
 
 %ifdef WATCH_RECACHE_SETS
-EXTERN_C BreaksLast
- inc dword [C_LABEL(BreaksLast)]
+EXTERN BreaksLast
+ inc dword [BreaksLast]
 %endif
 
 %ifndef ALT_RECACHE_4_8_BPL
@@ -258,7 +256,7 @@ EXTERN_C BreaksLast
 %endif
 
  shl edi,5      ; index for tile cache (*8)
- lea esi,[C_LABEL(VRAM)+edi*2]  ; address in VRAM of first 2bpl tile to recache
+ lea esi,[VRAM+edi*2]  ; address in VRAM of first 2bpl tile to recache
 
 .2bpl_tile_loop:
 %ifdef ALT_RECACHE_4_8_BPL
@@ -269,14 +267,14 @@ EXTERN_C BreaksLast
 
  mov bl,[esi]
  mov bl,[esi+16*2]
- mov bl,[C_LABEL(TileCache2)+edi*8]
- mov bl,[C_LABEL(TileCache2)+edi*8+16*2]
- mov bl,[C_LABEL(TileCache2)+edi*8+16*4]
- mov bl,[C_LABEL(TileCache2)+edi*8+16*6]
- mov bl,[C_LABEL(TileCache2)+edi*8+16*8]
- mov bl,[C_LABEL(TileCache2)+edi*8+16*10]
- mov bl,[C_LABEL(TileCache2)+edi*8+16*12]
- mov bl,[C_LABEL(TileCache2)+edi*8+16*14]
+ mov bl,[TileCache2+edi*8]
+ mov bl,[TileCache2+edi*8+16*2]
+ mov bl,[TileCache2+edi*8+16*4]
+ mov bl,[TileCache2+edi*8+16*6]
+ mov bl,[TileCache2+edi*8+16*8]
+ mov bl,[TileCache2+edi*8+16*10]
+ mov bl,[TileCache2+edi*8+16*12]
+ mov bl,[TileCache2+edi*8+16*14]
 
 .2bpl_line_loop:
  ;  Bp0=*(LineAddress+0)
@@ -302,9 +300,9 @@ EXTERN_C BreaksLast
  push ebp
  push eax
 %endif
- mov [C_LABEL(TileCache2)+edi*8],eax
+ mov [TileCache2+edi*8],eax
  add esi,byte 2
- mov [C_LABEL(TileCache2)+edi*8+4],ebp
+ mov [TileCache2+edi*8+4],ebp
  inc edi
  dec dh
  jnz .2bpl_line_loop
@@ -312,10 +310,10 @@ EXTERN_C BreaksLast
 %ifdef ALT_RECACHE_4_8_BPL
  mov dh,8
 
- mov bl,[C_LABEL(TileCache4)+edi*4-16*8]
- mov bl,[C_LABEL(TileCache4)+edi*4-16*6]
- mov bl,[C_LABEL(TileCache4)+edi*4-16*4]
- mov bl,[C_LABEL(TileCache4)+edi*4-16*2]
+ mov bl,[TileCache4+edi*4-16*8]
+ mov bl,[TileCache4+edi*4-16*6]
+ mov bl,[TileCache4+edi*4-16*4]
+ mov bl,[TileCache4+edi*4-16*2]
 
 .4bpl_line_loop:
  ;2bpl 0/1/2/3:7, 4bpl 0/1:7, 8bpl 0:7
@@ -338,8 +336,8 @@ EXTERN_C BreaksLast
  mov [esp+64-8],eax
  mov [esp+64-8+4],ebx
  ; and store in 4-bpl tile 1 line
- mov [C_LABEL(TileCache4)-8+edi*4],eax
- mov [C_LABEL(TileCache4)-4+edi*4],ebx
+ mov [TileCache4-8+edi*4],eax
+ mov [TileCache4-4+edi*4],ebx
 
  ;combine lines from 2-bpl tiles 0 & 1
  mov eax,[esp+64*2-8]
@@ -360,15 +358,15 @@ EXTERN_C BreaksLast
  mov [esp+64*2+64-8],eax
  mov [esp+64*2+64-8+4],ebx
  ; and store in 4-bpl tile 0 line
- mov [C_LABEL(TileCache4)-64-8+edi*4],eax
- mov [C_LABEL(TileCache4)-64-4+edi*4],ebx
+ mov [TileCache4-64-8+edi*4],eax
+ mov [TileCache4-64-4+edi*4],ebx
 
  sub edi,byte 2
  dec dh
  jnz .4bpl_line_loop
 
- mov bl,[C_LABEL(TileCache8)+edi*2+16*2-16*4]
- mov bl,[C_LABEL(TileCache8)+edi*2+16*2-16*2]
+ mov bl,[TileCache8+edi*2+16*2-16*4]
+ mov bl,[TileCache8+edi*2+16*2-16*2]
 
  mov dh,8
 
@@ -389,8 +387,8 @@ EXTERN_C BreaksLast
  or eax,ebp
  or ebx,ecx
  ; store new line 8-bpl line
- mov [C_LABEL(TileCache8)-8+16*2+edi*2],eax
- mov [C_LABEL(TileCache8)-4+16*2+edi*2],ebx
+ mov [TileCache8-8+16*2+edi*2],eax
+ mov [TileCache8-4+16*2+edi*2],ebx
 
  sub edi,byte 4
  dec dh
@@ -417,13 +415,13 @@ EXTERN_C BreaksLast
  add edx,edx
 
  push edx
- lea esi,[C_LABEL(VRAM)+edi*4]  ; address in VRAM of first 4bpl tile to recache
+ lea esi,[VRAM+edi*4]  ; address in VRAM of first 4bpl tile to recache
 
 .4bpl_tile_loop:
  mov dh,8
 
 .4bpl_line_loop:
- mov cl,[C_LABEL(TileCache4)+edi*8]
+ mov cl,[TileCache4+edi*8]
  ;  Bp0=*(LineAddress+0)
  mov dl,[esi]
  mov bl,0x0F
@@ -461,9 +459,9 @@ EXTERN_C BreaksLast
  or ebp,[BPL3_4+ebx*4]
  or eax,[BPL3_4+ecx]
 
- mov [C_LABEL(TileCache4)+edi*8],eax
+ mov [TileCache4+edi*8],eax
  add esi,byte 2
- mov [C_LABEL(TileCache4)+edi*8+4],ebp
+ mov [TileCache4+edi*8+4],ebp
  inc edi
  dec dh
  jnz .4bpl_line_loop
@@ -483,13 +481,13 @@ EXTERN_C BreaksLast
 
  shl edi,3      ; index for tile cache (*8)
  push edx
- lea esi,[C_LABEL(VRAM)+edi*8]  ; address in VRAM of first 8bpl tile to recache
+ lea esi,[VRAM+edi*8]  ; address in VRAM of first 8bpl tile to recache
 
 .8bpl_tile_loop:
  mov dh,8
 
 .8bpl_line_loop:
- mov cl,[C_LABEL(TileCache8)+edi*8]
+ mov cl,[TileCache8+edi*8]
  ;  Bp0=*(LineAddress+0)
  mov dl,[esi]
  mov bl,0x0F
@@ -563,9 +561,9 @@ EXTERN_C BreaksLast
  or ebp,[BPL7_8+ebx*4]
  or eax,[BPL7_8+ecx]
 
- mov [C_LABEL(TileCache8)+edi*8],eax
+ mov [TileCache8+edi*8],eax
  add esi,byte 2
- mov [C_LABEL(TileCache8)+edi*8+4],ebp
+ mov [TileCache8+edi*8+4],ebp
  inc edi
  dec dh
  jnz .8bpl_line_loop

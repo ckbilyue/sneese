@@ -244,7 +244,7 @@ ALIGNC
 ;%1 = flag
 %macro _BFC 1
  READ8_Immediate
- JUMP_FLAG %1,C_LABEL(CPU_RETURN)       ; flag set
+ JUMP_FLAG %1,CPU_RETURN       ; flag set
  movsx eax,al                   ; sign extend for addition
  short_branch
 %endmacro
@@ -252,7 +252,7 @@ ALIGNC
 ;%1 = flag
 %macro _BFS 1
  READ8_Immediate
- JUMP_NOT_FLAG %1,C_LABEL(CPU_RETURN)   ; flag clear
+ JUMP_NOT_FLAG %1,CPU_RETURN   ; flag clear
  movsx eax,al                   ; sign extend for addition
  short_branch
 %endmacro

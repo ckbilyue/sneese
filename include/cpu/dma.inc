@@ -33,27 +33,27 @@ You must read and accept the license prior to use.
 
 %ifndef SNEeSe_DMA_asm
 
-EXTERN_C DMA_text_start,DMA_data_start,DMA_bss_start
+EXTERN DMA_text_start,DMA_data_start,DMA_bss_start
 
 %macro EXTERN_DMA_DATA 1
 EXTERN TableDMA%1
 ; dh0bcttt d=CPU->PPU,h=addr,b=inc/dec,c=inc/fixed,t=type
-EXTERN_C DMAP_%1
-EXTERN_C BBAD_%1    ; Low byte of 0x21??
+EXTERN DMAP_%1
+EXTERN BBAD_%1    ; Low byte of 0x21??
 EXTERN DMA_Vid_%1
 EXTERN NTRL_%1
 EXTERN A1T_%1       ; Source Address L/H/B
-EXTERN_C A1TL_%1    ; Source Address L
-EXTERN_C A1TH_%1    ; Source Address H
-EXTERN_C A1B_%1     ; Source Bank Address
+EXTERN A1TL_%1    ; Source Address L
+EXTERN A1TH_%1    ; Source Address H
+EXTERN A1B_%1     ; Source Bank Address
 EXTERN DAS_%1       ; Data Size L/H
-EXTERN_C DASL_%1    ; Data Size L
-EXTERN_C DASH_%1    ; Data Size H
-EXTERN_C DASB_%1    ; Data address bank
+EXTERN DASL_%1    ; Data Size L
+EXTERN DASH_%1    ; Data Size H
+EXTERN DASB_%1    ; Data address bank
 EXTERN A2T_%1
-EXTERN_C A2L_%1     ; HDMA table address L
-EXTERN_C A2H_%1     ; HDMA table address H
-EXTERN_C A2B_%1     ; HDMA table bank address
+EXTERN A2L_%1     ; HDMA table address L
+EXTERN A2H_%1     ; HDMA table address H
+EXTERN A2B_%1     ; HDMA table bank address
 
 ; HDMA_Siz_x - These hold the register size for HDMA
 EXTERN HDMA_Siz_%1
@@ -68,10 +68,10 @@ EXTERN_DMA_DATA 5
 EXTERN_DMA_DATA 6
 EXTERN_DMA_DATA 7
 
-EXTERN_C MDMAEN,HDMAEN
+EXTERN MDMAEN,HDMAEN
 EXTERN HDMAON,In_DMA
 EXTERN DMA_Pending_B_Address,DMA_Pending_Data
-EXTERN_C Do_DMA_Channel,Do_HDMA_Channel
+EXTERN Do_DMA_Channel,Do_HDMA_Channel
 EXTERN SNES_W420C
 EXTERN init_HDMA,do_HDMA
 EXTERN Reset_DMA
@@ -167,10 +167,10 @@ EXTERN_MAP_WRITE_DMA 7
  dd MAP_READ_A2L%1
  dd MAP_READ_A2H%1
  dd MAP_READ_NTRL%1
- dd C_LABEL(UNSUPPORTED_READ)
+ dd UNSUPPORTED_READ
  ; 43xC-43xE: Open Bus A
  DUPLICATE dd,3,CPU_OPEN_BUS_READ
- dd C_LABEL(UNSUPPORTED_READ)
+ dd UNSUPPORTED_READ
 %endmacro
 
 %macro MAP_WRITE_DMA_LIST 1
@@ -185,7 +185,7 @@ EXTERN_MAP_WRITE_DMA 7
  dd MAP_WRITE_A2L%1
  dd MAP_WRITE_A2H%1
  dd MAP_WRITE_NTRL%1
- DUPLICATE dd,5,C_LABEL(UNSUPPORTED_WRITE)
+ DUPLICATE dd,5,UNSUPPORTED_WRITE
 %endmacro
 
 %macro LOAD_DMA_TABLE 1
@@ -194,19 +194,19 @@ EXTERN_MAP_WRITE_DMA 7
 
 ;%1 = num, 2 = branch target for early-exit
 %macro DMAOPERATION 2
- mov al,[C_LABEL(MDMAEN)]
+ mov al,[MDMAEN]
  test al,BIT(%1)
  jz %%no_dma
 
  mov byte [In_DMA],(%1) | DMA_IN_PROGRESS
  LOAD_DMA_TABLE %1
 
- call C_LABEL(Do_DMA_Channel)
+ call Do_DMA_Channel
 
  cmp byte [DMA_Pending_B_Address],0
  jge %2
 
- and byte [C_LABEL(MDMAEN)],~BIT(%1)
+ and byte [MDMAEN],~BIT(%1)
 
 %%no_dma:
 %endmacro

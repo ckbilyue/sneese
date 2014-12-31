@@ -65,7 +65,6 @@ EXPORT sprites_data_start
 section .bss
 EXPORT sprites_bss_start
 
-EXTERN Ready_Line_Render,BaseDestPtr
 EXTERN HVBJOY
 
 section .data
@@ -148,22 +147,22 @@ EXPORT Reset_Sprites
  xor eax,eax
 
  ; Reset sprite renderer vars
- mov byte [C_LABEL(HiSprite)],0
- mov dword [C_LABEL(HiSpriteAddr)],C_LABEL(OAM)+0x000
- mov dword [C_LABEL(HiSpriteBits)],C_LABEL(OAM)+0x200
- mov dword [C_LABEL(HiSpriteCnt1)],0x8007
- mov dword [C_LABEL(HiSpriteCnt2)],0x0007
+ mov byte [HiSprite],0
+ mov dword [HiSpriteAddr],OAM+0x000
+ mov dword [HiSpriteBits],OAM+0x200
+ mov dword [HiSpriteCnt1],0x8007
+ mov dword [HiSpriteCnt2],0x0007
  mov byte [Redo_OAM],-1
 
  ; Reset sprite port vars
- mov [C_LABEL(OAMAddress)],eax
- mov [C_LABEL(OAMAddress_VBL)],eax
+ mov [OAMAddress],eax
+ mov [OAMAddress_VBL],eax
  mov [OAMHigh],al
  mov [OAM_Write_Low],al
  mov [SPRLatch],al
 
- mov [C_LABEL(OBSEL)],al
- mov [C_LABEL(OBSEL_write)],al
+ mov [OBSEL],al
+ mov [OBSEL_write],al
 
 ; Clear pixel allocation tag table
  mov edi,DisplayZ+8
@@ -176,7 +175,7 @@ EXPORT Reset_Sprites
 
 ALIGNC
 EXPORT SNES_R2138 ; OAMDATAREAD
- mov edx,[C_LABEL(OAMAddress)]
+ mov edx,[OAMAddress]
  mov al,[OAMHigh]
  cmp edx,0x100  ; if address >= 0x100...
  jb .no_mirror
@@ -187,30 +186,30 @@ EXPORT SNES_R2138 ; OAMDATAREAD
  mov [OAMHigh],al
  jnz .read_low
 
- mov al,[C_LABEL(OAM)+edx*2+1]
+ mov al,[OAM+edx*2+1]
 
- mov edx,[C_LABEL(OAMAddress)]
+ mov edx,[OAMAddress]
  inc edx
  and edx,0x1FF  ; address is 9 bits
- mov [C_LABEL(OAMAddress)],edx
+ mov [OAMAddress],edx
 
  mov [Last_Bus_Value_PPU1],al
  ret
 
 ALIGNC
 .read_low:
- mov al,[C_LABEL(OAM)+edx*2]
+ mov al,[OAM+edx*2]
 
  mov [Last_Bus_Value_PPU1],al
  ret
 
 ALIGNC
 EXPORT SNES_W2101 ; OBSEL
- cmp [C_LABEL(OBSEL_write)],al
+ cmp [OBSEL_write],al
  je .no_change
 
  UpdateDisplay  ;*
- mov [C_LABEL(OBSEL_write)],al  ; Get our copy of this
+ mov [OBSEL_write],al  ; Get our copy of this
 
 .no_change:
  ret
@@ -218,25 +217,25 @@ EXPORT SNES_W2101 ; OBSEL
 ALIGNC
 EXPORT SNES_W2102 ; OAMADDL
  UpdateDisplay  ;*
- mov edx,[C_LABEL(OAMAddress_VBL)]
+ mov edx,[OAMAddress_VBL]
  mov byte [OAMHigh],0
  mov dl,al
- mov [C_LABEL(OAMAddress_VBL)],al
- mov [C_LABEL(OAMAddress)],edx
+ mov [OAMAddress_VBL],al
+ mov [OAMAddress],edx
  ret
 
 ALIGNC
 EXPORT SNES_W2103 ; OAMADDH
  UpdateDisplay  ;*
  push ebx
- mov ebx,[C_LABEL(OAMAddress_VBL)]
+ mov ebx,[OAMAddress_VBL]
  mov bh,1
  mov [OAMHigh],dl
  and bh,al      ; Only want MSB of address
  mov dl,0x80
- mov [C_LABEL(OAMAddress_VBL)+1],bh
+ mov [OAMAddress_VBL+1],bh
  and dl,al      ; Is priority rotation bit set?
- mov [C_LABEL(OAMAddress)],ebx
+ mov [OAMAddress],ebx
  mov [SPRLatch],dl
  pop ebx
  ret
@@ -247,12 +246,12 @@ EXPORT SNES_W2104 ; OAMDATA
  cmp byte [HVBJOY], 0
  js .in_vblank
 
- cmp byte [C_LABEL(INIDISP)], 0
+ cmp byte [INIDISP], 0
  jns .no_increment  ;.no_change
 
 .in_vblank:
  xor ebx,ebx
- mov edx,[C_LABEL(OAMAddress)]
+ mov edx,[OAMAddress]
  mov bl,[OAMHigh]
  cmp edx,0x100  ; if address >= 0x100, byte access
  jnb .byte_access
@@ -263,17 +262,17 @@ EXPORT SNES_W2104 ; OAMDATA
 
  mov bl,[OAM_Write_Low]
  mov bh,al
- cmp [C_LABEL(OAM)+edx*2],bx
+ cmp [OAM+edx*2],bx
  je .no_change
  UpdateDisplay  ;*
- mov edx,[C_LABEL(OAMAddress)]
+ mov edx,[OAMAddress]
  mov byte [Redo_OAM],-1
- mov [C_LABEL(OAM)+edx*2],bx
+ mov [OAM+edx*2],bx
 .no_change:
- mov edx,[C_LABEL(OAMAddress)]
+ mov edx,[OAMAddress]
  inc edx
  and edx,0x1FF  ; address is 9 bits
- mov [C_LABEL(OAMAddress)],edx
+ mov [OAMAddress],edx
 .no_increment:
 .ignore_write:
  pop ebx
@@ -287,23 +286,23 @@ ALIGNC
 ALIGNC
 .byte_access:
  and edx,0x10F   ; ignore disconnected lines
- cmp [C_LABEL(OAM)+edx*2+ebx],al
+ cmp [OAM+edx*2+ebx],al
  je .ba_no_change
  push edx
  UpdateDisplay  ;*
  pop edx
  mov byte [Redo_OAM],-1
- mov [C_LABEL(OAM)+edx*2+ebx],al
+ mov [OAM+edx*2+ebx],al
 .ba_no_change:
 
  xor ebx,byte 1
  mov [OAMHigh],bl
  jnz .no_increment
 
- mov edx,[C_LABEL(OAMAddress)]
+ mov edx,[OAMAddress]
  inc edx
  and edx,0x1FF  ; address is 9 bits
- mov [C_LABEL(OAMAddress)],edx
+ mov [OAMAddress],edx
  pop ebx
  ret
 

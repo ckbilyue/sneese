@@ -55,7 +55,7 @@ You must read and accept the license prior to use.
 %include "ppu/tiles.inc"
 %include "ppu/screen.inc"
 
-EXTERN_C use_mmx,use_fpu_copies,preload_cache,preload_cache_2
+EXTERN use_mmx,use_fpu_copies,preload_cache,preload_cache_2
 
 section .text
 EXPORT screen_text_start
@@ -304,11 +304,11 @@ EXPORT clear_scanlines_old
 ALIGNC
 EXPORT Clear_Scanlines
 ;edi = dest address, ebp = line count
- mov al,[C_LABEL(use_fpu_copies)]
+ mov al,[use_fpu_copies]
  test al,al
  jnz .clear_fpu
 
- mov al,[C_LABEL(use_mmx)]
+ mov al,[use_mmx]
  test al,al
  jnz .clear_mmx
 
@@ -320,7 +320,7 @@ EXPORT Clear_Scanlines
  mov es,edx
  cld
 
- cmp byte [C_LABEL(preload_cache)],0
+ cmp byte [preload_cache],0
  jnz Clear_Scanlines_Preload.clear_loop
 
 .clear_loop:
@@ -389,14 +389,14 @@ EXPORT clear_scanlines_preload
 ALIGNC
 EXPORT Clear_Scanlines_Preload
 ;edi = dest address, ebp = line count
- cmp byte [C_LABEL(preload_cache_2)],0
- jz C_LABEL(Clear_Scanlines)
+ cmp byte [preload_cache_2],0
+ jz Clear_Scanlines
 
- mov al,[C_LABEL(use_fpu_copies)]
+ mov al,[use_fpu_copies]
  test al,al
  jnz .clear_fpu
 
- mov al,[C_LABEL(use_mmx)]
+ mov al,[use_mmx]
  test al,al
  jnz .clear_mmx
 
@@ -497,10 +497,10 @@ ALIGNC
  ret
 
 ALIGNC
-EXPORT Update_Display
-extern C_LABEL(_Update_Display)
+EXPORT Update_Display_asm
+EXTERN Update_Display
  pusha
- call C_LABEL(_Update_Display)
+ call Update_Display
  popa
  ret
 ; esi is screen address, works cos we only plot until wraparound!

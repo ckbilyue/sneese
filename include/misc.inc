@@ -83,44 +83,41 @@ resb %1*1024
 
 ;Define a global label with optional directives/values
 %macro EXPORT 1-2+      ;label
-%ifnidn C_LABEL(%1),%1
 global C_LABEL(%1)
 C_LABEL(%1):
+
+%ifnidn C_LABEL(%1),%1
+%1:
 %endif
 
-global %1
-%1:
 %2
 %endmacro
 
 
 ;Define a global equate
 %macro EXPORT_EQU 2     ;label
-%ifnidn C_LABEL(%1),%1
 global C_LABEL(%1)
 C_LABEL(%1) equ (%2)
-%endif
 
-global %1
+%ifnidn C_LABEL(%1),%1
 %1 equ (%2)
+%endif
 %endmacro
 
-
-;Declare a list of labels to be external
-%macro EXTERN 1-*       ;label
-%rep %0
-extern %1
-%rotate 1
-%endrep
-%endmacro
 
 ;Declare a list of labels to be external, using C label conventions
-%macro EXTERN_C 1-*     ;label
+%macro EXTERN 1-*       ;label
 %rep %0
 extern C_LABEL(%1)
+
+%ifnidn C_LABEL(%1),%1
+%1 equ C_LABEL(%1)
+%endif
+
 %rotate 1
 %endrep
 %endmacro
+
 
 ;Helper macro for aligning the code section
 %macro ALIGNC 0

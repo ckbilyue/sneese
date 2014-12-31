@@ -23,26 +23,26 @@ You must read and accept the license prior to use.
 %ifndef SNEeSe_ppu_ppu_inc
 %define SNEeSe_ppu_ppu_inc
 
-EXTERN_C COLDATA
+EXTERN COLDATA
 
 %ifndef SNEeSe_ppu_ppu_asm
 
-EXTERN_C PPU_text_start,PPU_data_start,PPU_bss_start
-EXTERN_C Read_Map_20_5F,Write_Map_20_5F
-EXTERN_C Read_Map_21,Write_Map_21
-EXTERN_C Read_Map_40,Write_Map_40
-EXTERN_C Read_Map_42,Write_Map_42
-EXTERN_C Read_Map_43,Write_Map_43
-EXTERN_C WRAM,VRAM,SRAM,SPCRAM,Blank;,PortRAM
+EXTERN PPU_text_start,PPU_data_start,PPU_bss_start
+EXTERN Read_Map_20_5F,Write_Map_20_5F
+EXTERN Read_Map_21,Write_Map_21
+EXTERN Read_Map_40,Write_Map_40
+EXTERN Read_Map_42,Write_Map_42
+EXTERN Read_Map_43,Write_Map_43
+EXTERN WRAM,VRAM,SRAM,PortRAM
 
 EXTERN Tile_Recache_Set_Begin,Tile_Recache_Set_End
 EXTERN Mosaic_Size_Select,Mosaic_Size,MOSAIC
-EXTERN_C INIDISP,BGMODE,Base_BGMODE
-EXTERN_C BG12NBA,BG34NBA
-EXTERN_C VMAIN
+EXTERN INIDISP,BGMODE,Base_BGMODE
+EXTERN BG12NBA,BG34NBA
+EXTERN VMAIN
 
-EXTERN_C Current_Line_Timing, Current_Line_IRQ
-EXTERN_C SETINI
+EXTERN Current_Line_Timing, Current_Line_IRQ
+EXTERN SETINI
 EXTERN STAT78
 EXTERN Redo_Offset_Change,Redo_Offset_Change_VOffsets
 
@@ -50,16 +50,16 @@ EXTERN BGMODE_Allowed_Layer_Mask,BGMODE_Tile_Layer_Mask
 EXTERN BGMODE_Allowed_Offset_Change
 
 %macro EXTERN_BG_WIN_DATA 2
-EXTERN_C TableWin%2BG%1
-EXTERN_C WinBG%1_%2_Count
-EXTERN_C WinBG%1_%2_Bands
+EXTERN TableWin%2BG%1
+EXTERN WinBG%1_%2_Count
+EXTERN WinBG%1_%2_Bands
 %endmacro
 
 %macro EXTERN_BG_DATA 1
-EXTERN_C TableBG%1
+EXTERN TableBG%1
 EXTERN WSELBG%1
 EXTERN WLOGBG%1
-EXTERN_C BGSC%1      ; SC size
+EXTERN BGSC%1      ; SC size
 EXTERN DepthBG%1
 
 EXTERN VScroll_%1
@@ -101,20 +101,20 @@ EXTERN_BG_DATA 2
 EXTERN_BG_DATA 3
 EXTERN_BG_DATA 4
 
-EXTERN_C BG1SC,BG2SC,BG3SC,BG4SC
-EXTERN_C BG1HOFS,BG2HOFS,BG3HOFS,BG4HOFS
-EXTERN_C BG1VOFS,BG2VOFS,BG3VOFS,BG4VOFS
+EXTERN BG1SC,BG2SC,BG3SC,BG4SC
+EXTERN BG1HOFS,BG2HOFS,BG3HOFS,BG4HOFS
+EXTERN BG1VOFS,BG2VOFS,BG3VOFS,BG4VOFS
 
 EXTERN Reset_Ports
-EXTERN_C Toggle_Offset_Change
-EXTERN_C Update_Layering
+EXTERN Toggle_Offset_Change
+EXTERN Update_Layering
 
 EXTERN Last_Bus_Value_PPU1
 EXTERN Last_Bus_Value_PPU2
 %endif
 
-%define Read_21_Address(reg) (C_LABEL(Read_Map_21)+(reg)*4)
-%define Write_21_Address(reg) (C_LABEL(Write_Map_21)+(reg)*4)
+%define Read_21_Address(reg) (Read_Map_21+(reg)*4)
+%define Write_21_Address(reg) (Write_Map_21+(reg)*4)
 
 ;%1 = address, %2 = handler
 %macro Set_21_Read 2
@@ -176,11 +176,11 @@ EXTERN Last_Bus_Value_PPU2
 
 
 %macro LOAD_BG_TABLE 1-2 edx
- mov dword %2,C_LABEL(TableBG%1)
+ mov dword %2,TableBG%1
 %endmacro
 
 %macro LOAD_WIN_TABLE 1-2 edx
- mov dword %2,C_LABEL(TableWin%1)
+ mov dword %2,TableWin%1
 %endmacro
 
 %endif ; !defined(SNEeSe_ppu_ppu_inc)

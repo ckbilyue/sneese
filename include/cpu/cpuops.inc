@@ -436,7 +436,7 @@ OPCODE_PROLOG(0x58) ; CLI i
  jz .no_irq_enable
  xor edx,edx
  SAVE_CYCLES
- mov [C_LABEL(EventTrip)],edx
+ mov [EventTrip],edx
  mov edx,Enabling_IRQ_Event
  LOAD_CYCLES
  mov [Event_Handler],edx

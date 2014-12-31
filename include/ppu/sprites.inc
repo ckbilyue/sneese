@@ -25,27 +25,27 @@ You must read and accept the license prior to use.
 
 %ifndef SNEeSe_ppu_sprites_asm
 
-EXTERN_C sprites_text_start,sprites_data_start,sprites_bss_start
-EXTERN_C OAM_Count_Priority
-EXTERN_C OAM
+EXTERN sprites_text_start,sprites_data_start,sprites_bss_start
+EXTERN OAM_Count_Priority
+EXTERN OAM
 EXTERN SpriteCount,Sprite_Mode
-EXTERN_C HiSprite
+EXTERN HiSprite
 EXTERN SPRLatch
-EXTERN_C OBSEL
+EXTERN OBSEL
 EXTERN OAMHigh
-EXTERN_C HiSpriteCnt1,HiSpriteCnt2
-EXTERN_C OBBASE,OBNAME
-EXTERN_C OAMAddress,OAMAddress_VBL
-EXTERN_C HiSpriteAddr,HiSpriteBits
+EXTERN HiSpriteCnt1,HiSpriteCnt2
+EXTERN OBBASE,OBNAME
+EXTERN OAMAddress,OAMAddress_VBL
+EXTERN HiSpriteAddr,HiSpriteBits
 ;EXTERN NextSprite,Priority_Used
 EXTERN Rendered_Sprites,SpriteList
 EXTERN Redo_OAM
 EXTERN Clear_Sprites
 
 EXTERN Plot_Sprites
-EXTERN_C Check_OAM_Recache
-EXTERN_C Recache_OAM
-EXTERN_C Reset_Sprites
+EXTERN Check_OAM_Recache
+EXTERN Recache_OAM
+EXTERN Reset_Sprites
 EXTERN SNES_R2138,SNES_W2101,SNES_W2102,SNES_W2103,SNES_W2104
 %endif
 

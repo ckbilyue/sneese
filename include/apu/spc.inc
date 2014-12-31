@@ -28,21 +28,21 @@ You must read and accept the license prior to use.
 
 %ifndef SNEeSe_SPC700_asm
 
-EXTERN_C SPC_READ_PORT_W, SPC_WRITE_PORT_R
-EXTERN_C SPC_READ_PORT_R, SPC_WRITE_PORT_W
+EXTERN SPC_READ_PORT_W, SPC_WRITE_PORT_R
+EXTERN SPC_READ_PORT_R, SPC_WRITE_PORT_W
 
 %define SPC_CTRL 0xF1
-EXTERN_C SPCRAM
+EXTERN SPCRAM
 
 %endif
 
 ;%define NO_TIMER_COUNTER_WRAP
 
-EXTERN_C Update_SPC_Timer
+EXTERN Update_SPC_Timer
 ;%1 = timer
 %macro UpdateSPCTimer 1
  push dword %1
- call C_LABEL(Update_SPC_Timer)
+ call Update_SPC_Timer
  add esp,4
 %endmacro
 
@@ -52,7 +52,7 @@ EXTERN_C Update_SPC_Timer
  pusha
 %ifidni %1,SaveCycles
 ;GET_CYCLES eax
- mov eax,[C_LABEL(EventTrip)]
+ mov eax,[EventTrip]
  add dword eax,R_65c816_Cycles
 
  cmp eax,CYCLES_REFRESH_START
@@ -86,7 +86,7 @@ EXTERN_C Update_SPC_Timer
 %endif
 
  push eax
- call C_LABEL(SPC_START)
+ call SPC_START
  add esp,4
  popa
 %endmacro

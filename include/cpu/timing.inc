@@ -62,10 +62,10 @@ You must read and accept the license prior to use.
 %include "ppu/sprites.inc"
 %include "cycles.inc"
 
-EXTERN_C FPSTicks
-EXTERN_C UPDATE_KEYS
-EXTERN_C CONTROLLER_1_TYPE,CONTROLLER_2_TYPE
-EXTERN_C MickeyMouse,MickeyRead,MouseButtons
+EXTERN FPSTicks
+EXTERN UPDATE_KEYS
+EXTERN CONTROLLER_1_TYPE,CONTROLLER_2_TYPE
+EXTERN MickeyMouse,MickeyRead,MouseButtons
 
 %define FRAME_LIMIT 0
 ; Set this to force emulation loop to break after x frames have been
@@ -186,14 +186,14 @@ IRQ_fired_this_line:skipb
 
 section .text
 
-;R_Cycles = C_LABEL(EventTrip) - C_LABEL(SNES_Cycles), trips on <= zero
+;R_Cycles = EventTrip - SNES_Cycles, trips on <= zero
 
 ;%1 = Execute
 %macro Update_Cycles 0-1 0
- mov eax,[C_LABEL(SNES_Cycles)] ; Update CPU and SPC cycles
+ mov eax,[SNES_Cycles] ; Update CPU and SPC cycles
 
- mov edi,[C_LABEL(SNES_Cycles)]
- sub edi,[C_LABEL(EventTrip)]
+ mov edi,[SNES_Cycles]
+ sub edi,[EventTrip]
 
  cmp eax,CYCLES_REFRESH_START
  jb %%before_refresh
@@ -201,11 +201,11 @@ section .text
 %%before_refresh:
 
  sub eax,[SPC_last_cycles]
- mov [C_LABEL(SNES_Cycles)],edi
+ mov [SNES_Cycles],edi
  mov [SPC_last_cycles],edi
 
 %ifidni %1,Execute
- cmp byte [C_LABEL(SPC_ENABLED)],0
+ cmp byte [SPC_ENABLED],0
  jz %%no_spc
  add eax,[SPC_CPU_cycles]
  Execute_SPC
@@ -217,20 +217,20 @@ section .text
 
 ; Uses 012-local labels, corrupts edx, zeroes eax
 %macro Update_FPS_Counter 0
- mov edx,[C_LABEL(FPSMaxTicks)]
+ mov edx,[FPSMaxTicks]
  xor eax,eax
- cmp [C_LABEL(FPSTicks)],edx
+ cmp [FPSTicks],edx
  jb %%no_update
  mov edx,[FPSCount]
  je %%fps_update
  cmp edx,byte 1
  ja %%fps_update
- mov dword [C_LABEL(FPSLast)],0
+ mov dword [FPSLast],0
  jmp %%less_than_1_fps
 %%fps_update:
- mov [C_LABEL(FPSLast)],edx
+ mov [FPSLast],edx
 %%less_than_1_fps:
- mov [C_LABEL(FPSTicks)],eax
+ mov [FPSTicks],eax
  mov [FPSCount],eax
 %%no_update:
 %endmacro
@@ -249,23 +249,23 @@ EXPORT IRQNewFrameReset
 
  mov dword [Last_Trip],0
 
- mov dword [C_LABEL(EventTrip)],CYCLES_HDMA_START
+ mov dword [EventTrip],CYCLES_HDMA_START
  mov dword [FixedTrip],CYCLES_HDMA_START
  mov dword [Event_Handler],HDMA_Event
  mov dword [Fixed_Event],HDMA_Event
- mov dword [HDMA_Next_Event],C_LABEL(IRQFirstRender)
+ mov dword [HDMA_Next_Event],IRQFirstRender
 
  ; Reset frameskip counter
  mov ebx,1
- cmp ebx,[C_LABEL(FRAME_SKIP_MIN)]
+ cmp ebx,[FRAME_SKIP_MIN]
  ja .no_fix_framecount
- mov ebx,[C_LABEL(FRAME_SKIP_MIN)]
+ mov ebx,[FRAME_SKIP_MIN]
 .no_fix_framecount:
  mov [FrameCount],ebx
 
  xor eax,eax
- mov [C_LABEL(Timer_Counter_Throttle)],eax  ; Reset speed-throttle timer
- mov [C_LABEL(Current_Line_Timing)],eax     ; Reset scanline counter
+ mov [Timer_Counter_Throttle],eax  ; Reset speed-throttle timer
+ mov [Current_Line_Timing],eax     ; Reset scanline counter
 
  mov byte [IRQ_fired_this_line],0
 
@@ -273,10 +273,10 @@ EXPORT IRQNewFrameReset
 
 ;%define TRAP_HDMA_RELATCH
 %ifdef TRAP_HDMA_RELATCH
-EXTERN_C Dump_DMA
+EXTERN Dump_DMA
  pusha
  push byte 0
- call C_LABEL(Dump_DMA)
+ call Dump_DMA
  pop edi
  popa
  LOAD_CYCLES
@@ -284,7 +284,7 @@ EXTERN_C Dump_DMA
  SAVE_CYCLES
  pusha
  push byte 1
- call C_LABEL(Dump_DMA)
+ call Dump_DMA
  pop edi
  popa
 %else
@@ -300,24 +300,24 @@ EXTERN_C Dump_DMA
 %macro report_event 0
 %ifdef REPORT_EVENTS
  push 8
- push dword [C_LABEL(EventTrip)]
- call C_LABEL(print_hexnum)
+ push dword [EventTrip]
+ call print_hexnum
 
  push gap_str
- call C_LABEL(print_str)
+ call print_str
 
  push 8
- push dword [C_LABEL(SNES_Cycles)]
- call C_LABEL(print_hexnum)
+ push dword [SNES_Cycles]
+ call print_hexnum
 
  push .str
- call C_LABEL(print_str)
+ call print_str
 
- push dword [C_LABEL(Current_Line_Timing)]
- call C_LABEL(print_decnum)
+ push dword [Current_Line_Timing]
+ call print_decnum
 
  push nl_str
- call C_LABEL(print_str)
+ call print_str
  add esp,4*8
 %endif
 %endmacro
@@ -330,11 +330,11 @@ section .text
 
  report_event
 
- mov eax,[C_LABEL(EventTrip)]
+ mov eax,[EventTrip]
  mov [Last_Trip],eax
 
  mov eax,[HDMA_Next_Event]
-;mov dword [C_LABEL(EventTrip)],CYCLES_NEW_SCANLINE
+;mov dword [EventTrip],CYCLES_NEW_SCANLINE
  mov dword [FixedTrip],CYCLES_NEW_SCANLINE
 ;mov [Event_Handler],eax
  mov [Fixed_Event],eax
@@ -344,7 +344,7 @@ section .text
 %ifdef TRAP_HDMA_RELATCH
  pusha
  push byte 2
- call C_LABEL(Dump_DMA)
+ call Dump_DMA
  pop edi
  popa
 %endif
@@ -412,7 +412,7 @@ section .text
 
 %ifdef WAI_DELAY
  ; WAI delay after interrupt signal: 2 IO
- add dword [C_LABEL(SNES_Cycles)],_5A22_FAST_CYCLE * 2
+ add dword [SNES_Cycles],_5A22_FAST_CYCLE * 2
 %endif
 
  inc word [CPU_LABEL(PC)]
@@ -462,7 +462,7 @@ section .text
  mov byte [CPU_Execution_Mode],CEM_In_DMA
 
  ;2 slow bus cycle setup period
- add dword [C_LABEL(SNES_Cycles)],byte (2 * _5A22_SLOW_CYCLE)
+ add dword [SNES_Cycles],byte (2 * _5A22_SLOW_CYCLE)
 
  mov eax,[DMA_Next_Event]
  mov [Fixed_Event],eax
@@ -487,14 +487,14 @@ section .text
 
  report_event
 
- mov eax,[C_LABEL(EventTrip)]
+ mov eax,[EventTrip]
  mov [Last_Trip],eax
 
  mov eax,[Render_Next_Event]
 ;mov [Event_Handler],eax
  mov [Fixed_Event],eax
  mov eax,[Render_Next_Trip]
-;mov [C_LABEL(EventTrip)],eax
+;mov [EventTrip],eax
  mov [FixedTrip],eax
  RenderScanline
  call IRQ_Check_Late    ; chain
@@ -521,8 +521,8 @@ section .text
 
 %ifdef DELAY_FRAMES
  push dword DELAY_FRAMES
-EXTERN_C rest
- call C_LABEL(rest)
+EXTERN rest
+ call rest
  add esp,4
 %endif
 
@@ -536,9 +536,9 @@ EXTERN_C rest
  UpdateSPCTimer 1
  UpdateSPCTimer 2
 
- call C_LABEL(update_sound) ; Added by Butcha
+ call update_sound ; Added by Butcha
 
-;mov dword [C_LABEL(EventTrip)],CYCLES_HDMA_START
+;mov dword [EventTrip],CYCLES_HDMA_START
  mov dword [FixedTrip],CYCLES_HDMA_START
 ;mov dword [Event_Handler],HDMA_Event
  mov dword [Fixed_Event],HDMA_Event
@@ -551,28 +551,28 @@ EXTERN_C rest
  mov byte [RDNMI],VERSION_NUMBER_5A22   ; Clear NMI enabled bit in 0x4210
  mov byte [NMI_pin],NMI_None            ;clear NMI input
 
-extern C_LABEL(Reload_OBSEL)
- call C_LABEL(Reload_OBSEL)
+EXTERN Reload_OBSEL
+ call Reload_OBSEL
 
  xor eax,eax
  dec dword [FrameCount] ; Should we redraw the screen this frame?
 
- mov [C_LABEL(Current_Line_Timing)],eax ; Reset scanline counter
+ mov [Current_Line_Timing],eax ; Reset scanline counter
 
  mov byte [IRQ_fired_this_line],0
 
- mov edi,C_LABEL(IRQFirst)
+ mov edi,IRQFirst
  jnz .no_redraw
 
  ; this frame not skipped - determine how many frames following to skip
  inc dword [FPSCount]   ; For FPS counter - 0.25b14
- mov edi,C_LABEL(IRQFirstRender)
+ mov edi,IRQFirstRender
 
 ; If fast-forward is on, skip the speed-throttle logic
-EXTERN_C fast_forward_enabled
+EXTERN fast_forward_enabled
  push ecx
  push edx
- call C_LABEL(fast_forward_enabled)
+ call fast_forward_enabled
  pop edx
  pop ecx
  test al,al
@@ -580,54 +580,54 @@ EXTERN_C fast_forward_enabled
  jnz .fast_forward
 
 ; If minimum frameskip set, don't wait for timer to tell us to draw one
- cmp [C_LABEL(FRAME_SKIP_MIN)],eax
+ cmp [FRAME_SKIP_MIN],eax
  jnz .no_speed_cap
 
 ; Wait for timer to tell us to draw a frame
 .speed_cap_wait:
- mov ebx,[C_LABEL(Timer_Counter_Throttle)]
+ mov ebx,[Timer_Counter_Throttle]
  test ebx,ebx
 ; HLT should be more multi-tasking friendly but appears
 ; to cause problems with pure DOS in some cases?
  jnz .no_speed_cap
  push ecx
  push edx
-EXTERN C_LABEL(platform_yield)
- call C_LABEL(platform_yield)
+EXTERN platform_yield
+ call platform_yield
  pop edx
  pop ecx
  jmp .speed_cap_wait    ;speed_cap_wait_hlt
 
 .no_speed_cap:
- mov ebx,[C_LABEL(Timer_Counter_Throttle)]
- cmp ebx,[C_LABEL(FRAME_SKIP_MAX)]
+ mov ebx,[Timer_Counter_Throttle]
+ cmp ebx,[FRAME_SKIP_MAX]
  jb .no_cap_max_skip
 
 .fast_forward:
- mov ebx,[C_LABEL(FRAME_SKIP_MAX)]
- mov [C_LABEL(Timer_Counter_Throttle)],eax  ; Reset speed-throttle timer
+ mov ebx,[FRAME_SKIP_MAX]
+ mov [Timer_Counter_Throttle],eax  ; Reset speed-throttle timer
  jmp .have_skip_count
 
 .no_cap_max_skip:
- sub [C_LABEL(Timer_Counter_Throttle)],ebx  ; Update speed-throttle timer
+ sub [Timer_Counter_Throttle],ebx  ; Update speed-throttle timer
 
- cmp ebx,[C_LABEL(FRAME_SKIP_MIN)]
+ cmp ebx,[FRAME_SKIP_MIN]
  ja .no_cap_min_skip
- mov ebx,[C_LABEL(FRAME_SKIP_MIN)]
+ mov ebx,[FRAME_SKIP_MIN]
 
 .no_cap_min_skip:
 .have_skip_count:
  mov [FrameCount],ebx   ; Reset frame counter
 
 %ifdef DEBUG
- inc dword [C_LABEL(Frames)]
+ inc dword [Frames]
 
 %if FRAME_LIMIT
- cmp dword [C_LABEL(Frames)],FRAME_LIMIT
+ cmp dword [Frames],FRAME_LIMIT
  jne .no_limit
 %if FRAME_LIMIT_PROFILE
-EXTERN_C Profiler_Start
- mov byte [C_LABEL(Profiler_Start)],1
+EXTERN Profiler_Start
+ mov byte [Profiler_Start],1
 %else
  ret
 %endif
@@ -635,12 +635,12 @@ EXTERN_C Profiler_Start
 %endif
 %endif
 
- mov al,[C_LABEL(INIDISP)]
+ mov al,[INIDISP]
  and al,0x0F
- cmp al,[C_LABEL(BrightnessLevel)]
+ cmp al,[BrightnessLevel]
  je .same_brightness
- mov byte [C_LABEL(PaletteChanged)],1
- mov [C_LABEL(BrightnessLevel)],al
+ mov byte [PaletteChanged],1
+ mov [BrightnessLevel],al
 .same_brightness:
 
 .no_redraw:
@@ -651,7 +651,7 @@ EXTERN_C Profiler_Start
 %ifdef TRAP_HDMA_RELATCH
  pusha
  push byte 0
- call C_LABEL(Dump_DMA)
+ call Dump_DMA
  pop edi
  popa
  LOAD_CYCLES
@@ -659,7 +659,7 @@ EXTERN_C Profiler_Start
  SAVE_CYCLES
  pusha
  push byte 1
- call C_LABEL(Dump_DMA)
+ call Dump_DMA
  pop edi
  popa
 %else
@@ -671,7 +671,7 @@ EXTERN_C Profiler_Start
  Update_FPS_Counter
 
  pusha
- call C_LABEL(update_sound_block)
+ call update_sound_block
  popa
 
  xor eax,eax
@@ -687,21 +687,21 @@ section .text
 
  mov dword [Last_Trip],0
 
-;mov dword [C_LABEL(EventTrip)],CYCLES_DISPLAY_START
+;mov dword [EventTrip],CYCLES_DISPLAY_START
  mov dword [FixedTrip],CYCLES_DISPLAY_START
 ;mov dword [Event_Handler],Render_Event
  mov dword [Fixed_Event],Render_Event
  mov dword [Render_Next_Event],HDMA_Event
  mov dword [Render_Next_Trip],CYCLES_HDMA_START
- mov dword [HDMA_Next_Event],C_LABEL(IRQRender)
+ mov dword [HDMA_Next_Event],IRQRender
 
  Render_Start_Frame ; Reset framebuffer render address
 
  Update_Cycles
 
- mov eax,[C_LABEL(Current_Line_Timing)] ; Get current scanline
+ mov eax,[Current_Line_Timing] ; Get current scanline
  inc eax
- mov [C_LABEL(Current_Line_Timing)],eax
+ mov [Current_Line_Timing],eax
 
  mov byte [IRQ_fired_this_line],0
 
@@ -719,18 +719,18 @@ section .text
 
  Update_Cycles
 
-;mov dword [C_LABEL(EventTrip)],CYCLES_DISPLAY_START
+;mov dword [EventTrip],CYCLES_DISPLAY_START
  mov dword [FixedTrip],CYCLES_DISPLAY_START
 ;mov dword [Event_Handler],Render_Event
  mov dword [Fixed_Event],Render_Event
 
- mov eax,[C_LABEL(Current_Line_Timing)] ; Get current scanline
+ mov eax,[Current_Line_Timing] ; Get current scanline
  inc eax
- mov [C_LABEL(Current_Line_Timing)],eax
+ mov [Current_Line_Timing],eax
 
  mov byte [IRQ_fired_this_line],0
 
- cmp [C_LABEL(LastRenderLine)],eax
+ cmp [LastRenderLine],eax
  ja CPU_START_IRQ       ; Return to CPU
 .end_of_display:
  mov eax,[NMI_Event_Handler]
@@ -751,9 +751,9 @@ section .text
 
  Update_Cycles
 
- mov eax,[C_LABEL(Current_Line_Timing)]
+ mov eax,[Current_Line_Timing]
  inc eax
- mov [C_LABEL(Current_Line_Timing)],eax
+ mov [Current_Line_Timing],eax
 
  mov byte [IRQ_fired_this_line],0
 
@@ -761,13 +761,13 @@ section .text
  cmp eax,byte 3
  jb .no_controller_update
 
-EXTERN_C update_controllers
- call C_LABEL(update_controllers)
+EXTERN update_controllers
+ call update_controllers
  mov dword [Event_Handler],VBL
  mov dword [Fixed_Event],VBL
  and byte [HVBJOY],~HVBJOY_CONTROLLERS_BUSY ; Controllers ready
 .no_controller_update:
- mov eax,[C_LABEL(Current_Line_Timing)] ; Get current scanline
+ mov eax,[Current_Line_Timing] ; Get current scanline
  jmp CPU_START_IRQ      ; Return to CPU
 
 ALIGNC
@@ -782,13 +782,13 @@ section .text
 
  Update_Cycles
 
- mov eax,[C_LABEL(Current_Line_Timing)] ; Get current scanline
+ mov eax,[Current_Line_Timing] ; Get current scanline
  inc eax
- mov [C_LABEL(Current_Line_Timing)],eax
+ mov [Current_Line_Timing],eax
 
  mov byte [IRQ_fired_this_line],0
 
- cmp [C_LABEL(LastVBLLine)],eax ; Needs adjustment for odd line?
+ cmp [LastVBLLine],eax ; Needs adjustment for odd line?
  ja .not_end_of_frame
  mov dword [Event_Handler],IRQNewFrame
  mov dword [Fixed_Event],IRQNewFrame
@@ -805,7 +805,7 @@ section .text
 
  mov dword [Last_Trip],0
 
-;mov dword [C_LABEL(EventTrip)],CYCLES_HDMA_START
+;mov dword [EventTrip],CYCLES_HDMA_START
  mov dword [FixedTrip],CYCLES_HDMA_START
 ;mov dword [Event_Handler],HDMA_Event
  mov dword [Fixed_Event],HDMA_Event
@@ -815,9 +815,9 @@ section .text
 
  Update_Cycles
 
- mov eax,[C_LABEL(Current_Line_Timing)] ; Get current scanline
+ mov eax,[Current_Line_Timing] ; Get current scanline
  inc eax
- mov [C_LABEL(Current_Line_Timing)],eax
+ mov [Current_Line_Timing],eax
 
  mov byte [IRQ_fired_this_line],0
 
@@ -835,18 +835,18 @@ section .text
 
  Update_Cycles
 
-;mov dword [C_LABEL(EventTrip)],CYCLES_HDMA_START
+;mov dword [EventTrip],CYCLES_HDMA_START
  mov dword [FixedTrip],CYCLES_HDMA_START
 ;mov dword [Event_Handler],HDMA_Event
  mov dword [Fixed_Event],HDMA_Event
 
- mov eax,[C_LABEL(Current_Line_Timing)] ; Get current scanline
+ mov eax,[Current_Line_Timing] ; Get current scanline
  inc eax
- mov [C_LABEL(Current_Line_Timing)],eax
+ mov [Current_Line_Timing],eax
 
  mov byte [IRQ_fired_this_line],0
 
- cmp [C_LABEL(LastRenderLine)],eax
+ cmp [LastRenderLine],eax
  ja CPU_START_IRQ       ; Return to CPU
 .end_of_display:
  mov eax,[NMI_Event_Handler]
@@ -860,11 +860,11 @@ EXPORT NMI
  UpdateDisplay  ;*
 
 %ifndef SINGLE_STEP
- call C_LABEL(Copy_Screen)
- mov eax,[C_LABEL(Current_Line_Render)]
- mov [C_LABEL(Last_Frame_Line)],eax
+ call Copy_Screen
+ mov eax,[Current_Line_Render]
+ mov [Last_Frame_Line],eax
 %endif
-;call C_LABEL(Display_Debug)
+;call Display_Debug
 
 EXPORT NMI_NoRender
 section .data
@@ -888,20 +888,20 @@ section .text
  and al,[RDNMI_mask]    ; ensure only one vblank NMI per frame
  mov [RDNMI],al         ; Set NMI enabled bit in 0x4210
 
- mov al,[C_LABEL(INIDISP)]
+ mov al,[INIDISP]
  test al,al
  js .forced_blank
- mov eax,[C_LABEL(OAMAddress_VBL)]
+ mov eax,[OAMAddress_VBL]
  ; Restore OAM address and reset OAM read/write odd/even select
  ;  every Vblank, unless we're in forced blank
- mov [C_LABEL(OAMAddress)],eax
+ mov [OAMAddress],eax
  xor eax,eax
  mov [OAMHigh],al
 .forced_blank:
 
- mov eax,[C_LABEL(Current_Line_Timing)]
+ mov eax,[Current_Line_Timing]
  inc eax
- mov [C_LABEL(Current_Line_Timing)],eax
+ mov [Current_Line_Timing],eax
 
  mov byte [IRQ_fired_this_line],0
 
@@ -909,9 +909,9 @@ section .text
 CheckNMI:
 %ifdef DEBUG
  mov al,[CPU_LABEL(PB)]
- mov [C_LABEL(OLD_PB)],al   ; Save program bank
+ mov [OLD_PB],al   ; Save program bank
  mov eax,[CPU_LABEL(PC)]
- mov [C_LABEL(OLD_PC)],eax  ; Save program counter
+ mov [OLD_PC],eax  ; Save program counter
 %endif
  cmp byte [NMI_pin],NMI_Raised  ;NMI input raised previously?
  je .setup_nmi
@@ -922,7 +922,7 @@ CheckNMI:
  test byte [RDNMI],RDNMI_VBLANK_START
  jz .CHECK_KEYS
 
- test byte [C_LABEL(NMITIMEN)],0x80
+ test byte [NMITIMEN],0x80
  jz .CHECK_KEYS         ; NMI off? (via hardware register)
 
  cmp byte [CPU_Execution_Mode],CEM_In_DMA
@@ -938,23 +938,23 @@ CheckNMI:
  mov [NMI_Next_Trip],edx
 
  ;NMI executes after one opcode
- mov eax,[C_LABEL(SNES_Cycles)]
+ mov eax,[SNES_Cycles]
  inc eax
  mov [FixedTrip],eax
- mov [C_LABEL(EventTrip)],eax
+ mov [EventTrip],eax
  mov eax,NMI_Event
  mov [Fixed_Event],eax
  mov [Event_Handler],eax
 
 .CHECK_KEYS:
- call C_LABEL(UPDATE_KEYS)
+ call UPDATE_KEYS
  test eax,eax
  jnz .break
 
 
 
 ; Return to emulation
- mov eax,[C_LABEL(Current_Line_Timing)] ; Get current scanline
+ mov eax,[Current_Line_Timing] ; Get current scanline
  jmp CPU_START_IRQ      ; Return to CPU
 
 .break:
@@ -963,10 +963,10 @@ CheckNMI:
 
  LOAD_CYCLES
  GET_BYTE
- mov [C_LABEL(Map_Byte)],al
+ mov [Map_Byte],al
 
 
- mov eax,[C_LABEL(Current_Line_Timing)] ; Get current scanline
+ mov eax,[Current_Line_Timing] ; Get current scanline
  call IRQ_Check_Newline
  
 .no_irq_check:
@@ -982,10 +982,10 @@ section .text
  report_event
 
  ;NMI executes after one opcode
- mov eax,[C_LABEL(SNES_Cycles)]
+ mov eax,[SNES_Cycles]
  inc eax
  mov [FixedTrip],eax
- mov [C_LABEL(EventTrip)],eax
+ mov [EventTrip],eax
  mov eax,NMI_Event
  mov [Fixed_Event],eax
  mov [Event_Handler],eax
@@ -1016,7 +1016,7 @@ section .text
 
 %ifdef WAI_DELAY
  ; WAI delay after interrupt signal: 2 IO
- add dword [C_LABEL(SNES_Cycles)],_5A22_FAST_CYCLE * 2
+ add dword [SNES_Cycles],_5A22_FAST_CYCLE * 2
 %endif
 
  inc word [CPU_LABEL(PC)]
@@ -1092,7 +1092,7 @@ section .text
 
  report_event
 
- mov eax,[C_LABEL(EventTrip)]
+ mov eax,[EventTrip]
  mov [Last_Trip],eax
 
 %ifdef DEBUG_IRQ
@@ -1102,19 +1102,19 @@ section .text
  push eax
 
  push dword irqfire_str
- call C_LABEL(print_str)
+ call print_str
  add esp,4
 
- call C_LABEL(print_decnum)
+ call print_decnum
 
  push dword comma_str
- call C_LABEL(print_str)
+ call print_str
 
- push dword [C_LABEL(Current_Line_Timing)]
- call C_LABEL(print_decnum)
+ push dword [Current_Line_Timing]
+ call print_decnum
 
  push nl_str
- call C_LABEL(print_str)
+ call print_str
  add esp,4*4
  popa
 %endif
@@ -1135,7 +1135,7 @@ section .text
 
 %ifdef WAI_DELAY
  ; WAI delay after interrupt signal: 2 IO
- add dword [C_LABEL(SNES_Cycles)],_5A22_FAST_CYCLE * 2
+ add dword [SNES_Cycles],_5A22_FAST_CYCLE * 2
 %endif
 
  inc word [CPU_LABEL(PC)]
@@ -1169,13 +1169,13 @@ ALIGNC
 .no_irq:
  mov edi,[FixedTrip]
  mov ebx,[Fixed_Event]
- mov [C_LABEL(EventTrip)],edi
+ mov [EventTrip],edi
  mov [Event_Handler],ebx
  jmp CPU_START  ; Return to CPU
 
 ALIGNC
 IRQ_Check_Newline:
- mov bl,[C_LABEL(NMITIMEN)]
+ mov bl,[NMITIMEN]
 
  mov edx,[FixedTrip]
 
@@ -1186,8 +1186,8 @@ IRQ_Check_Newline:
  jz .no_irq
  test bl,0x20       ; V-IRQ enabled?
  jz .no_virq
- mov ebx,[C_LABEL(Current_Line_Timing)]
- cmp [C_LABEL(VTIMEL)],ebx
+ mov ebx,[Current_Line_Timing]
+ cmp [VTIMEL],ebx
  jne .no_irq
 .no_virq:
  mov ebx,[HTimer]
@@ -1197,19 +1197,19 @@ IRQ_Check_Newline:
 %ifdef DEBUG_IRQ
  pusha
  push dword irqcnl_str
- call C_LABEL(print_str)
+ call print_str
  add esp,4
  popa
 %endif
 
- mov [C_LABEL(EventTrip)],ebx
+ mov [EventTrip],ebx
  mov dword [Event_Handler],IRQ_Event
  ret
 
 .nmi_bypass:
 .no_irq:
  mov ebx,[Fixed_Event]
- mov [C_LABEL(EventTrip)],edx
+ mov [EventTrip],edx
  mov [Event_Handler],ebx
  ret
 
@@ -1223,7 +1223,7 @@ IRQ_Check:
 
  mov [Last_Trip],edx
 
- mov bl,[C_LABEL(NMITIMEN)]
+ mov bl,[NMITIMEN]
 
  mov edx,[FixedTrip]
 
@@ -1231,14 +1231,14 @@ IRQ_Check:
  jz .no_irq
  test bl,0x20       ; V-IRQ enabled?
  jz .no_virq
- mov ebx,[C_LABEL(Current_Line_Timing)]
- cmp [C_LABEL(VTIMEL)],ebx
+ mov ebx,[Current_Line_Timing]
+ cmp [VTIMEL],ebx
  jne .no_irq
 .no_virq:
  mov ebx,[HTimer]
  cmp edx,ebx
  jb .no_irq         ; Next static event is before IRQ?
- cmp [C_LABEL(SNES_Cycles)],ebx ; Check against current cycle
+ cmp [SNES_Cycles],ebx ; Check against current cycle
  jbe .before_irq    ; Are we after the IRQ position?
 
 ;mov ebx,[esp]      ;should we do this?
@@ -1251,12 +1251,12 @@ IRQ_Check:
 %ifdef DEBUG_IRQ
  pusha
  push dword irqc_str
- call C_LABEL(print_str)
+ call print_str
  add esp,4
  popa
 %endif
 
- mov [C_LABEL(EventTrip)],ebx
+ mov [EventTrip],ebx
  mov dword [Event_Handler],IRQ_Event
  jmp .fixup_timing
 
@@ -1264,7 +1264,7 @@ IRQ_Check:
  mov edx,[FixedTrip]
 .no_irq:
  mov ebx,[Fixed_Event]
- mov [C_LABEL(EventTrip)],edx
+ mov [EventTrip],edx
  mov [Event_Handler],ebx
 .fixup_timing:
  LOAD_CYCLES edx
@@ -1274,7 +1274,7 @@ IRQ_Check:
 ALIGNC
 ; This can only trash ebx/edi!
 IRQ_Check_Late:
- mov bl,[C_LABEL(NMITIMEN)]
+ mov bl,[NMITIMEN]
 
  mov edi,[FixedTrip]
 
@@ -1285,8 +1285,8 @@ IRQ_Check_Late:
  jz .no_irq
  test bl,0x20       ; V-IRQ enabled?
  jz .no_virq
- mov ebx,[C_LABEL(Current_Line_Timing)]
- cmp [C_LABEL(VTIMEL)],ebx
+ mov ebx,[Current_Line_Timing]
+ cmp [VTIMEL],ebx
  jne .no_irq
 .no_virq:
  mov ebx,[HTimer]
@@ -1305,19 +1305,19 @@ IRQ_Check_Late:
 %ifdef DEBUG_IRQ
  pusha
  push dword irqcl_str
- call C_LABEL(print_str)
+ call print_str
  add esp,4
  popa
 %endif
 
- mov [C_LABEL(EventTrip)],ebx
+ mov [EventTrip],ebx
  mov dword [Event_Handler],IRQ_Event
  ret
 
 .nmi_bypass:
 .no_irq:
  mov ebx,[Fixed_Event]
- mov [C_LABEL(EventTrip)],edi
+ mov [EventTrip],edi
  mov [Event_Handler],ebx
  ret
 
@@ -1327,8 +1327,8 @@ EXTERN PPU2_Latch_External
 ALIGNC
 EXPORT SNES_R2137 ; SLHV  ; This latches the counter for horizontal/vertical data!
  ;counters cannot be latched if I/O port bit 7 held low
- mov al,[C_LABEL(WRIO)]
- and al,[C_LABEL(RDIO)]
+ mov al,[WRIO]
+ and al,[RDIO]
  jns .no_change
 
  cmp byte [PPU2_Latch_External],0
@@ -1366,10 +1366,10 @@ EXPORT SNES_R2137 ; SLHV  ; This latches the counter for horizontal/vertical dat
 
  mov [Latched_H],ebx    ; H counter
 
- mov ebx,[C_LABEL(Current_Line_Timing)]
+ mov ebx,[Current_Line_Timing]
  add ebx,edx        ; fixup for next line
 
- mov edx,[C_LABEL(LastVBLLine)]
+ mov edx,[LastVBLLine]
  cmp ebx,edx
  jbe .before_next_frame
  sub ebx,edx        ; fixup for next frame
@@ -1424,9 +1424,9 @@ EXPORT SNES_W4016 ; JOYC1
  test al,1
  jz .no_reset
  mov al,16
- mov [C_LABEL(Controller1_Pos)],al
- mov [C_LABEL(Controller23_Pos)],al
- mov [C_LABEL(Controller45_Pos)],al
+ mov [Controller1_Pos],al
+ mov [Controller23_Pos],al
+ mov [Controller45_Pos],al
 .no_reset:
  pop eax
 .no_ready_reset:
@@ -1459,7 +1459,7 @@ EXPORT SNES_R4016 ; JOYC1
 
 .fixup_read:
  ;merge in open bus bits
- mov dl,[C_LABEL(Last_Bus_Value_A)]
+ mov dl,[Last_Bus_Value_A]
  and dl,JOYC1_OPEN_BUS_BITS
 
  or al,dl
@@ -1470,13 +1470,13 @@ EXPORT SNES_R4016 ; JOYC1
 .read_enabled:
  push ecx
  push ebx
- cmp byte [C_LABEL(CONTROLLER_1_TYPE)],1    ; Is mouse plugged in?
+ cmp byte [CONTROLLER_1_TYPE],1    ; Is mouse plugged in?
  je .do_mouse
 
- mov cl,[C_LABEL(Controller1_Pos)]
+ mov cl,[Controller1_Pos]
  dec cl
- mov ebx,[C_LABEL(JOY1L)]
- mov [C_LABEL(Controller1_Pos)],cl
+ mov ebx,[JOY1L]
+ mov [Controller1_Pos],cl
  ror ebx,cl
  mov al,1
  and al,bl
@@ -1485,7 +1485,7 @@ EXPORT SNES_R4016 ; JOYC1
  jmp .fixup_read
 
 .unused:
- mov byte [C_LABEL(Controller1_Pos)],16
+ mov byte [Controller1_Pos],16
  mov al,1           ; Joypad connected
  pop ebx
  pop ecx
@@ -1493,11 +1493,11 @@ EXPORT SNES_R4016 ; JOYC1
 
 ALIGNC
 .do_mouse:
- mov cl,[C_LABEL(Controller1_Pos)]
+ mov cl,[Controller1_Pos]
  dec cl
  and cl,0x0F
- mov [C_LABEL(Controller1_Pos)],cl
- mov bx,[C_LABEL(MickeyRead)]
+ mov [Controller1_Pos],cl
+ mov bx,[MickeyRead]
  shr bx,cl
  mov al,1
  and al,bl
@@ -1514,7 +1514,7 @@ EXPORT SNES_R4017 ; JOYC2
 .fixup_read:
 
  ;merge in open bus bits
- mov dl,[C_LABEL(Last_Bus_Value_A)]
+ mov dl,[Last_Bus_Value_A]
  or al,JOYC2_ALWAYS_HIGH_BITS
  and dl,JOYC2_OPEN_BUS_BITS
 
@@ -1526,13 +1526,13 @@ EXPORT SNES_R4017 ; JOYC2
 .read_enabled:
  push ecx
  push ebx
- cmp byte [C_LABEL(CONTROLLER_2_TYPE)],1    ; Is mouse plugged in?
+ cmp byte [CONTROLLER_2_TYPE],1    ; Is mouse plugged in?
  je .do_mouse
 
- mov cl,[C_LABEL(Controller23_Pos)]
+ mov cl,[Controller23_Pos]
  dec cl
- mov ebx,[C_LABEL(JOY2L)]
- mov [C_LABEL(Controller23_Pos)],cl
+ mov ebx,[JOY2L]
+ mov [Controller23_Pos],cl
  ror ebx,cl
  mov al,bl
  and al,1
@@ -1541,7 +1541,7 @@ EXPORT SNES_R4017 ; JOYC2
  jmp .fixup_read
 
 .unused:
- mov byte [C_LABEL(Controller23_Pos)],16
+ mov byte [Controller23_Pos],16
  mov al,1           ; (???) Return 0 this bit is for mtap I think
  pop ebx
  pop ecx
@@ -1549,11 +1549,11 @@ EXPORT SNES_R4017 ; JOYC2
 
 ALIGNC
 .do_mouse:
- mov cl,[C_LABEL(Controller23_Pos)]
+ mov cl,[Controller23_Pos]
  dec cl
  and cl,0x0F
- mov [C_LABEL(Controller23_Pos)],cl
- mov bx,[C_LABEL(MickeyRead)]
+ mov [Controller23_Pos],cl
+ mov bx,[MickeyRead]
  shr bx,cl
  mov al,bl
  and al,1
@@ -1569,8 +1569,8 @@ EXPORT SNES_R4210 ; RDNMI
  test al,al
  js .got_nmi_source
 
- mov edx,[C_LABEL(Current_Line_Timing)]
- cmp edx,[C_LABEL(LastRenderLine)]
+ mov edx,[Current_Line_Timing]
+ cmp edx,[LastRenderLine]
  jb .no_reset
 
  test byte [RDNMI_mask],RDNMI_VBLANK_START
@@ -1585,9 +1585,9 @@ EXPORT SNES_R4210 ; RDNMI
  sbb edx,edx
 ;inc edx        ;don't add 1, as comparing against NMI line - 1
 
- add edx,[C_LABEL(Current_Line_Timing)]
+ add edx,[Current_Line_Timing]
 
- cmp edx,[C_LABEL(LastRenderLine)]
+ cmp edx,[LastRenderLine]
  jb .no_reset
 
  or al,RDNMI_VBLANK_START
@@ -1596,7 +1596,7 @@ EXPORT SNES_R4210 ; RDNMI
  and al,[RDNMI_mask]    ; ensure only one NMI per frame
  jns .no_reset  ;RDNMI_VBLANK_START not set
 
- test byte [C_LABEL(NMITIMEN)],0x80
+ test byte [NMITIMEN],0x80
  jz .no_nmi             ; NMI masked off?
 
  cmp byte [NMI_pin],NMI_None
@@ -1610,7 +1610,7 @@ EXPORT SNES_R4210 ; RDNMI
  mov byte [RDNMI_mask],~RDNMI_VBLANK_START
 .no_reset:
  ;merge in open bus bits
- mov dl,[C_LABEL(Last_Bus_Value_A)]
+ mov dl,[Last_Bus_Value_A]
  and dl,RDNMI_OPEN_BUS_BITS
 
  or al,dl
@@ -1625,7 +1625,7 @@ EXPORT SNES_R4211 ; TIMEUP
 .no_irq:
 
  ;merge in open bus bits
- mov dl,[C_LABEL(Last_Bus_Value_A)]
+ mov dl,[Last_Bus_Value_A]
  and dl,TIMEUP_OPEN_BUS_BITS
 
  or al,dl
@@ -1655,7 +1655,7 @@ EXPORT SNES_R4212 ; HVBJOY
 .no_hblank:
 
  ;merge in open bus bits
- mov dl,[C_LABEL(Last_Bus_Value_A)]
+ mov dl,[Last_Bus_Value_A]
  and dl,HVBJOY_OPEN_BUS_BITS
 
  or al,dl
@@ -1663,8 +1663,8 @@ EXPORT SNES_R4212 ; HVBJOY
 
 ALIGNC
 EXPORT SNES_R4213 ; RDIO
- mov al,[C_LABEL(RDIO)]
- and al,[C_LABEL(WRIO)]
+ mov al,[RDIO]
+ and al,[WRIO]
 
  cmp byte [PPU2_Latch_External],0
  jz .no_latch
@@ -1695,63 +1695,63 @@ EXPORT SNES_R4217 ; RDMPYH
 
 ALIGNC
 EXPORT SNES_R4218 ; JOY1L
- cmp byte [C_LABEL(CONTROLLER_1_TYPE)],1    ; Is mouse plugged in?
+ cmp byte [CONTROLLER_1_TYPE],1    ; Is mouse plugged in?
  je .mouse
- mov al,[C_LABEL(JOY1L)]
+ mov al,[JOY1L]
  ret
 
 .mouse:
- mov al,[C_LABEL(MouseButtons)]
+ mov al,[MouseButtons]
  or al,0x01
  ret
 
 ALIGNC
 EXPORT SNES_R4219 ; JOY1H
- mov al,[C_LABEL(JOY1H)]
+ mov al,[JOY1H]
  ret
 
 ALIGNC
 EXPORT SNES_R421A ; JOY2L
- cmp byte [C_LABEL(CONTROLLER_2_TYPE)],1    ; Is mouse plugged in?
+ cmp byte [CONTROLLER_2_TYPE],1    ; Is mouse plugged in?
  je .mouse
- mov al,[C_LABEL(JOY2L)]
+ mov al,[JOY2L]
  ret
 
 .mouse:
- mov al,[C_LABEL(MouseButtons)]
+ mov al,[MouseButtons]
  or al,0x01
  ret
 
 ALIGNC
 EXPORT SNES_R421B ; JOY2H
- mov al,[C_LABEL(JOY2H)]
+ mov al,[JOY2H]
  ret
 
 ALIGNC
 EXPORT SNES_R421C ; JOY3L
- mov al,[C_LABEL(JOY3L)]
+ mov al,[JOY3L]
  ret
 
 ALIGNC
 EXPORT SNES_R421D ; JOY3H
- mov al,[C_LABEL(JOY3H)]
+ mov al,[JOY3H]
  ret
 
 ALIGNC
 EXPORT SNES_R421E ; JOY4L
- mov al,[C_LABEL(JOY4L)]
+ mov al,[JOY4L]
  ret
 
 ALIGNC
 EXPORT SNES_R421F ; JOY4H
- mov al,[C_LABEL(JOY4H)]
+ mov al,[JOY4H]
  ret
 
 ; Write to 42xx handlers
 ALIGNC
 EXPORT SNES_W4200 ; NMITIMEN
 ; a0yx000b  a=NMI on/off,y=vert count,x=horiz count,b=joy read
- cmp [C_LABEL(NMITIMEN)],al
+ cmp [NMITIMEN],al
  je .no_change
 
 %ifdef DEBUG_IRQ
@@ -1763,33 +1763,33 @@ EXPORT SNES_W4200 ; NMITIMEN
  push eax
 
  push dword nmitimen_str
- call C_LABEL(print_str)
+ call print_str
  add esp,4
 
- call C_LABEL(print_hexnum)
+ call print_hexnum
 
  push dword at_str
- call C_LABEL(print_str)
+ call print_str
  add esp,4*3
 
- call C_LABEL(print_decnum)
+ call print_decnum
 
  push dword comma_str
- call C_LABEL(print_str)
+ call print_str
 
- push dword [C_LABEL(Current_Line_Timing)]
- call C_LABEL(print_decnum)
+ push dword [Current_Line_Timing]
+ call print_decnum
 
  push nl_str
- call C_LABEL(print_str)
+ call print_str
  add esp,4*4
  popa
 %endif
 
  push ebx
- mov bl,[C_LABEL(NMITIMEN)]
+ mov bl,[NMITIMEN]
  xor bl,al
- mov [C_LABEL(NMITIMEN)],al
+ mov [NMITIMEN],al
  jns .no_nmi_change
 
  test byte [RDNMI],RDNMI_VBLANK_START
@@ -1816,7 +1816,7 @@ EXPORT SNES_W4200 ; NMITIMEN
  mov [Event_Handler],edx
  SAVE_CYCLES edx
  mov [FixedTrip],edx
- mov [C_LABEL(EventTrip)],edx
+ mov [EventTrip],edx
  LOAD_CYCLES edx
 
 .no_nmi_change:
@@ -1846,10 +1846,10 @@ EXPORT SNES_W4200 ; NMITIMEN
 
 ALIGNC
 EXPORT SNES_W4201 ; WRIO
- mov dl,[C_LABEL(WRIO)]
+ mov dl,[WRIO]
  xor dl,al
  jz .no_change ;no latch?
- mov dl,[C_LABEL(WRIO)]
+ mov dl,[WRIO]
  push eax
 
  ;latch only on 1-to-0 transition
@@ -1862,10 +1862,10 @@ EXPORT SNES_W4201 ; WRIO
  call SNES_R2137
  sub R_Cycles,CYCLES_PER_DOT
 
- mov al,[C_LABEL(WRIO)]
+ mov al,[WRIO]
 .no_latch:
  pop eax
- mov [C_LABEL(WRIO)],al
+ mov [WRIO],al
 
 .no_change:
  ret
@@ -1940,7 +1940,7 @@ ALIGNC
  sub edx,byte CYCLES_IN_REFRESH ; After memory refresh
 .got_timer:
  mov [HTimer_Set],edx
- test byte [C_LABEL(NMITIMEN)],0x10
+ test byte [NMITIMEN],0x10
  jz .no_change
  mov [HTimer],edx
  push ebx
@@ -1961,25 +1961,25 @@ ALIGNC
  push eax
 
  push dword %1
- call C_LABEL(print_str)
+ call print_str
 
  push dword %2
- call C_LABEL(print_decnum)
+ call print_decnum
 
  push dword at_str
- call C_LABEL(print_str)
+ call print_str
  add esp,4*3
 
- call C_LABEL(print_decnum)
+ call print_decnum
 
  push dword comma_str
- call C_LABEL(print_str)
+ call print_str
 
- push dword [C_LABEL(Current_Line_Timing)]
- call C_LABEL(print_decnum)
+ push dword [Current_Line_Timing]
+ call print_decnum
 
  push nl_str
- call C_LABEL(print_str)
+ call print_str
  add esp,4*4
  popa
 %endif
@@ -1987,13 +1987,13 @@ ALIGNC
 
 ALIGNC
 EXPORT SNES_W4207 ; HTIMEL
- mov edx,[C_LABEL(HTIMEL)]
+ mov edx,[HTIMEL]
  cmp al,dl
  je .no_change
  mov dl,al
- mov [C_LABEL(HTIMEL)],edx
+ mov [HTIMEL],edx
 
- debug_irq_output htime_str,[C_LABEL(HTIMEL)]
+ debug_irq_output htime_str,[HTIMEL]
 
  call Update_HTimer
 .no_change:
@@ -2002,14 +2002,14 @@ EXPORT SNES_W4207 ; HTIMEL
 ALIGNC
 EXPORT SNES_W4208 ; HTIMEH
  push eax
- mov edx,[C_LABEL(HTIMEL)]
+ mov edx,[HTIMEL]
  and al,1
  cmp al,dh
  je .no_change
  mov dh,al
- mov [C_LABEL(HTIMEL)],edx
+ mov [HTIMEL],edx
 
- debug_irq_output htime_str,[C_LABEL(HTIMEL)]
+ debug_irq_output htime_str,[HTIMEL]
 
  call Update_HTimer
 .no_change:
@@ -2018,14 +2018,14 @@ EXPORT SNES_W4208 ; HTIMEH
 
 ALIGNC
 EXPORT SNES_W4209 ; VTIMEL
- mov edx,[C_LABEL(VTIMEL)]
+ mov edx,[VTIMEL]
  cmp al,dl
  je .no_change
- mov [C_LABEL(VTIMEL)],al
+ mov [VTIMEL],al
 
- debug_irq_output vtime_str,[C_LABEL(VTIMEL)]
+ debug_irq_output vtime_str,[VTIMEL]
 
- test byte [C_LABEL(NMITIMEN)],0x20
+ test byte [NMITIMEN],0x20
  jz .no_change
  push ebx
  call IRQ_Check
@@ -2036,15 +2036,15 @@ EXPORT SNES_W4209 ; VTIMEL
 ALIGNC
 EXPORT SNES_W420A ; VTIMEH
  push eax
- mov edx,[C_LABEL(VTIMEL)]
+ mov edx,[VTIMEL]
  and al,1
  cmp al,dh
  je .no_change
- mov [C_LABEL(VTIMEH)],al
+ mov [VTIMEH],al
 
- debug_irq_output vtime_str,[C_LABEL(VTIMEL)]
+ debug_irq_output vtime_str,[VTIMEL]
 
- test byte [C_LABEL(NMITIMEN)],0x20
+ test byte [NMITIMEN],0x20
  jz .no_change
  push ebx
  call IRQ_Check
@@ -2056,7 +2056,7 @@ EXPORT SNES_W420A ; VTIMEH
 
 ALIGNC
 EXPORT SNES_W420B ; MDMAEN
- or [C_LABEL(MDMAEN)],al
+ or [MDMAEN],al
 
  debug_dma_output mdmaen_str
 
@@ -2074,7 +2074,7 @@ EXPORT SNES_W420B ; MDMAEN
  ; event-handling (as opposed to opcode-based)
 ;add ebx,byte _5A22_FAST_CYCLE  ;delay of 1 bus cycle
  mov [FixedTrip],ebx
- mov [C_LABEL(EventTrip)],ebx
+ mov [EventTrip],ebx
 
  mov [DMA_Next_Trip],edx
 
@@ -2098,8 +2098,8 @@ EXPORT SNES_W420D ; MEMSEL    ; FastROM switch
  push ecx
  push edx
  push eax
-EXTERN_C set_upper_rom_speed
- call C_LABEL(set_upper_rom_speed)
+EXTERN set_upper_rom_speed
+ call set_upper_rom_speed
  pop eax
  pop edx
  pop ecx
@@ -2118,7 +2118,7 @@ SNES_R2143_SPC: ; APUIO3
  push ecx
 
  push ebx
- call C_LABEL(SPC_READ_PORT_W)
+ call SPC_READ_PORT_W
  add esp,4
  pop ecx
  pop edx
@@ -2138,7 +2138,7 @@ SNES_W2143_SPC: ; APUIO3
 
  push eax
  push ebx
- call C_LABEL(SPC_WRITE_PORT_R)
+ call SPC_WRITE_PORT_R
  add esp,8
  pop ecx
  pop eax
@@ -2149,7 +2149,7 @@ SNES_W2143_SPC: ; APUIO3
  push eax
 
  push ebx
- call C_LABEL(SPC_READ_PORT_R)
+ call SPC_READ_PORT_R
  add esp,4
 
  cmp al,[esp]
@@ -2161,7 +2161,7 @@ SNES_W2143_SPC: ; APUIO3
  Execute_SPC SaveCycles
 
  push ebx
- call C_LABEL(SPC_WRITE_PORT_R)
+ call SPC_WRITE_PORT_R
  add esp,8
 
  pop ecx

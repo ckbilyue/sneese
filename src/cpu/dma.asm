@@ -33,7 +33,7 @@ You must read and accept the license prior to use.
 %include "cpu/cpumem.inc"
 
 extern In_CPU,HVBJOY
-EXTERN_C SNES_Cycles
+EXTERN SNES_Cycles
 
 section .text
 EXPORT DMA_text_start
@@ -202,7 +202,7 @@ section .text
 
 ;macro for processing a channel during HDMA transfer
 %macro HDMAOPERATION 1
-  mov al,[C_LABEL(HDMAEN)]
+  mov al,[HDMAEN]
   and al,[HDMA_Not_Ended]
   test al,BIT(%1)
   jz %%no_hdma
@@ -211,7 +211,7 @@ section .text
 
   mov byte [In_DMA],(%1) | DMA_IN_PROGRESS
   LOAD_DMA_TABLE %1
-  call C_LABEL(Do_HDMA_Channel) ; CF set if channel disabled
+  call Do_HDMA_Channel ; CF set if channel disabled
   jnc %%no_disable
 
   and byte [HDMA_Not_Ended],~BIT(%1)    ; Disable this channel
@@ -510,7 +510,7 @@ EXPORT SNES_W420C ; HDMAEN      ; Actually handled within screen core!
 %ifdef NO_HDMA
  ret
 %endif
- mov [C_LABEL(HDMAEN)],al
+ mov [HDMAEN],al
 
 ;mov [HDMAON],al
  ret
@@ -518,12 +518,12 @@ EXPORT SNES_W420C ; HDMAEN      ; Actually handled within screen core!
 ;macro for processing a channel during HDMA init
 %macro RELATCH_HDMA_CHANNEL 1
  LOAD_DMA_TABLE %1
- test byte [C_LABEL(HDMAEN)],BIT(%1)
+ test byte [HDMAEN],BIT(%1)
  mov byte [edi+HDMA_Need_Transfer],0
  jz %%no_relatch
 
  mov byte [In_DMA],(%1) | DMA_IN_PROGRESS
- call C_LABEL(Relatch_HDMA_Channel)
+ call Relatch_HDMA_Channel
  jnc %%no_disable
 
  ; keep track of terminated channels
@@ -535,11 +535,11 @@ EXPORT SNES_W420C ; HDMAEN      ; Actually handled within screen core!
 
 channel_to_bit:db BIT(0),BIT(1),BIT(2),BIT(3),BIT(4),BIT(5),BIT(6),BIT(7)
 
-extern C_LABEL(EventTrip)
-extern C_LABEL(cpu_65c816_PB_Shifted),C_LABEL(cpu_65c816_PC)
-extern FixedTrip,Fixed_Event,C_LABEL(EventTrip),Event_Handler
+extern EventTrip
+extern cpu_65c816_PB_Shifted,cpu_65c816_PC
+extern FixedTrip,Fixed_Event,EventTrip,Event_Handler
 extern CPU_Execution_Mode
-extern C_LABEL(check_op)
+extern check_op
 
 %macro debug_dma_output 1
 %if 0
@@ -547,70 +547,70 @@ extern C_LABEL(check_op)
 
  push dword [FixedTrip]
  push dword [Fixed_Event]
- push dword [C_LABEL(EventTrip)]
+ push dword [EventTrip]
  push dword [Event_Handler]
  movzx eax,byte [CPU_Execution_Mode]
  push eax
 
- mov dword eax,[C_LABEL(EventTrip)]
+ mov dword eax,[EventTrip]
  add dword eax,ebp
 ;GET_CYCLES eax
  push eax
- mov ebx,[C_LABEL(cpu_65c816_PB_Shifted)]
- add ebx,[C_LABEL(cpu_65c816_PC)]
+ mov ebx,[cpu_65c816_PB_Shifted]
+ add ebx,[cpu_65c816_PC]
  push ebx
- call C_LABEL(check_op)
+ call check_op
  add esp,4*7
 
- cmp byte [C_LABEL(MDMAEN)],0
+ cmp byte [MDMAEN],0
  jz %%no_dma
 
  push dword alert_str
- call C_LABEL(print_str)
+ call print_str
  add esp,4
 
 %%no_dma:
  push dword %1
- call C_LABEL(print_str)
+ call print_str
 
- movzx eax,byte [C_LABEL(MDMAEN)]
+ movzx eax,byte [MDMAEN]
  push byte 2
  push eax
- call C_LABEL(print_hexnum)
+ call print_hexnum
 
  push comma_str
- call C_LABEL(print_str)
+ call print_str
 
- movzx eax,byte [C_LABEL(HDMAEN)]
+ movzx eax,byte [HDMAEN]
  push byte 2
  push eax
- call C_LABEL(print_hexnum)
+ call print_hexnum
 
  push comma_str
- call C_LABEL(print_str)
+ call print_str
 
  movzx eax,byte [HDMA_Not_Ended]
  push byte 2
  push eax
- call C_LABEL(print_hexnum)
+ call print_hexnum
 
  push at_str
- call C_LABEL(print_str)
+ call print_str
 
- mov dword eax,[C_LABEL(EventTrip)]
+ mov dword eax,[EventTrip]
  add dword eax,ebp
 ;GET_CYCLES eax
  push eax
- call C_LABEL(print_decnum)
+ call print_decnum
 
  push comma_str
- call C_LABEL(print_str)
+ call print_str
 
- push dword [C_LABEL(Current_Line_Timing)]
- call C_LABEL(print_decnum)
+ push dword [Current_Line_Timing]
+ call print_decnum
 
  push nl_str
- call C_LABEL(print_str)
+ call print_str
 
  add esp,4*14
  popa
@@ -621,7 +621,7 @@ ALIGNC
 EXPORT init_HDMA
  mov byte [HDMA_Not_Ended],BITMASK(0,7)
 
- mov al,[C_LABEL(HDMAEN)]
+ mov al,[HDMAEN]
 ;mov [HDMAON],al
  test al,al
  jz .no_hdma
@@ -637,7 +637,7 @@ EXPORT init_HDMA
 
  and eax,BITMASK(0,2)
  mov cl,[channel_to_bit+eax]
- mov al,[C_LABEL(HDMAEN)]
+ mov al,[HDMAEN]
  test cl,al
  jz .no_conflict
 
@@ -645,7 +645,7 @@ EXPORT init_HDMA
 
 .no_conflict:
  xor al,~0
- and [C_LABEL(MDMAEN)],al
+ and [MDMAEN],al
 
 .no_dma:
  debug_dma_output hdma_init2_str
@@ -701,7 +701,7 @@ EXPORT do_HDMA
 
 .no_conflict:
  xor al,~0
- and [C_LABEL(MDMAEN)],al
+ and [MDMAEN],al
 
 .no_dma:
 
@@ -763,8 +763,8 @@ DMA_Fix_B_Addresses:
 ; Requires %eax to be BITMASK(0,23)!
 ;%1 = num
 %macro Reset_DMA_Channel 1
- mov [C_LABEL(DMAP_%1)],al
- mov [C_LABEL(BBAD_%1)],al
+ mov [DMAP_%1],al
+ mov [BBAD_%1],al
  mov [NTRL_%1],al
  mov [A1T_%1],eax
  mov [DAS_%1],eax
@@ -780,8 +780,8 @@ DMA_Fix_B_Addresses:
 EXPORT Reset_DMA
  ; Set eax to 0...
  xor eax,eax
- mov [C_LABEL(MDMAEN)],al
- mov [C_LABEL(HDMAEN)],al
+ mov [MDMAEN],al
+ mov [HDMAEN],al
 ;mov [HDMAON],al
  mov [In_DMA],al
  mov byte [DMA_Pending_B_Address],-1
@@ -806,52 +806,52 @@ EXPORT Reset_DMA
 %macro MAP_READ_DMA 1
 ALIGNC
 EXPORT MAP_READ_DMAP%1
- mov al,[C_LABEL(DMAP_%1)]
+ mov al,[DMAP_%1]
  ret
 
 ALIGNC
 EXPORT MAP_READ_BBAD%1
- mov al,[C_LABEL(BBAD_%1)]
+ mov al,[BBAD_%1]
  ret
 
 ALIGNC
 EXPORT MAP_READ_A1TL%1
- mov al,[C_LABEL(A1TL_%1)]
+ mov al,[A1TL_%1]
  ret
 
 ALIGNC
 EXPORT MAP_READ_A1TH%1
- mov al,[C_LABEL(A1TH_%1)]
+ mov al,[A1TH_%1]
  ret
 
 ALIGNC
 EXPORT MAP_READ_A1B%1
- mov al,[C_LABEL(A1B_%1)]
+ mov al,[A1B_%1]
  ret
 
 ALIGNC
 EXPORT MAP_READ_DASL%1
- mov al,[C_LABEL(DASL_%1)]
+ mov al,[DASL_%1]
  ret
 
 ALIGNC
 EXPORT MAP_READ_DASH%1
- mov al,[C_LABEL(DASH_%1)]
+ mov al,[DASH_%1]
  ret
 
 ALIGNC
 EXPORT MAP_READ_DASB%1
- mov al,[C_LABEL(DASB_%1)]
+ mov al,[DASB_%1]
  ret
 
 ALIGNC
 EXPORT MAP_READ_A2L%1
- mov al,[C_LABEL(A2L_%1)]
+ mov al,[A2L_%1]
  ret
 
 ALIGNC
 EXPORT MAP_READ_A2H%1
- mov al,[C_LABEL(A2H_%1)]
+ mov al,[A2H_%1]
  ret
 
 ALIGNC
@@ -874,11 +874,11 @@ MAP_READ_DMA 7
 %macro MAP_WRITE_DMA 1
 ALIGNC
 EXPORT MAP_WRITE_DMAP%1
- cmp [C_LABEL(DMAP_%1)],al
+ cmp [DMAP_%1],al
  je .no_change
 
  mov edx,ebx
- mov [C_LABEL(DMAP_%1)],al
+ mov [DMAP_%1],al
 
  test al,8      ; Does the operation require address adjustment?
  mov bl,0
@@ -902,9 +902,9 @@ EXPORT MAP_WRITE_DMAP%1
 
 ALIGNC
 EXPORT MAP_WRITE_BBAD%1
- cmp [C_LABEL(BBAD_%1)],al
+ cmp [BBAD_%1],al
  je .no_change
- mov [C_LABEL(BBAD_%1)],al
+ mov [BBAD_%1],al
 
  mov edx,ebx
  shr edx,2
@@ -916,51 +916,51 @@ EXPORT MAP_WRITE_BBAD%1
 
 ALIGNC
 EXPORT MAP_WRITE_A1TL%1
- mov [C_LABEL(A1TL_%1)],al
+ mov [A1TL_%1],al
  ret
 
 ALIGNC
 EXPORT MAP_WRITE_A1TH%1
- mov [C_LABEL(A1TH_%1)],al
+ mov [A1TH_%1],al
  ret
 
 ALIGNC
 EXPORT MAP_WRITE_A1B%1
- cmp [C_LABEL(A1B_%1)],al
+ cmp [A1B_%1],al
  je .no_change
 
- mov [C_LABEL(A1B_%1)],al
- mov [C_LABEL(A2B_%1)],al
+ mov [A1B_%1],al
+ mov [A2B_%1],al
 .no_change:
  ret
 
 ALIGNC
 EXPORT MAP_WRITE_DASL%1
- mov [C_LABEL(DASL_%1)],al
+ mov [DASL_%1],al
  ret
 
 ALIGNC
 EXPORT MAP_WRITE_DASH%1
- mov [C_LABEL(DASH_%1)],al
+ mov [DASH_%1],al
  ret
 
 ALIGNC
 EXPORT MAP_WRITE_DASB%1
- cmp [C_LABEL(DASB_%1)],al
+ cmp [DASB_%1],al
  je .no_change
 
- mov [C_LABEL(DASB_%1)],al
+ mov [DASB_%1],al
 .no_change:
  ret
 
 ALIGNC
 EXPORT MAP_WRITE_A2L%1
- mov [C_LABEL(A2L_%1)],al
+ mov [A2L_%1],al
  ret
 
 ALIGNC
 EXPORT MAP_WRITE_A2H%1
- mov [C_LABEL(A2H_%1)],al
+ mov [A2H_%1],al
  ret
 
 ALIGNC

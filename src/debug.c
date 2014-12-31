@@ -296,14 +296,14 @@ void DisplayStatus()
 
 extern unsigned char HDMAEN;
 extern unsigned Current_Line_Timing;
-extern unsigned char NTRL_0 asm("NTRL_0");
-extern unsigned char NTRL_1 asm("NTRL_1");
-extern unsigned char NTRL_2 asm("NTRL_2");
-extern unsigned char NTRL_3 asm("NTRL_3");
-extern unsigned char NTRL_4 asm("NTRL_4");
-extern unsigned char NTRL_5 asm("NTRL_5");
-extern unsigned char NTRL_6 asm("NTRL_6");
-extern unsigned char NTRL_7 asm("NTRL_7");
+extern unsigned char NTRL_0;
+extern unsigned char NTRL_1;
+extern unsigned char NTRL_2;
+extern unsigned char NTRL_3;
+extern unsigned char NTRL_4;
+extern unsigned char NTRL_5;
+extern unsigned char NTRL_6;
+extern unsigned char NTRL_7;
 extern unsigned char DMAP_0, DMAP_1, DMAP_2, DMAP_3;
 extern unsigned char DMAP_4, DMAP_5, DMAP_6, DMAP_7;
 extern unsigned char BBAD_0, BBAD_1, BBAD_2, BBAD_3;

@@ -25,25 +25,25 @@ You must read and accept the license prior to use.
 
 %ifndef SNEeSe_memmap_asm
 
-EXTERN_C memmap_text_start,memmap_data_start,memmap_bss_start
-EXTERN_C Read_Bank8Mapping,Write_Bank8Mapping
-EXTERN_C Read_Bank8Offset,Write_Bank8Offset
-EXTERN_C Dummy
-EXTERN_C Last_Bus_Value_A
-EXTERN_C SNES_GET_BYTE,SNES_GET_BYTE_FIXED
-EXTERN_C SNES_GET_WORD,SNES_GET_WORD_WRAP
-EXTERN_C SNES_GET_WORD_FAST,SNES_GET_WORD_FAST_WRAP
-EXTERN_C SNES_GET_LONG,SNES_GET_LONG_WRAP
-EXTERN_C SNES_GET_LONG_FAST,SNES_GET_LONG_FAST_WRAP
+EXTERN memmap_text_start,memmap_data_start,memmap_bss_start
+EXTERN Read_Bank8Mapping,Write_Bank8Mapping
+EXTERN Read_Bank8Offset,Write_Bank8Offset
+EXTERN Dummy
+EXTERN Last_Bus_Value_A
+EXTERN SNES_GET_BYTE,SNES_GET_BYTE_FIXED
+EXTERN SNES_GET_WORD,SNES_GET_WORD_WRAP
+EXTERN SNES_GET_WORD_FAST,SNES_GET_WORD_FAST_WRAP
+EXTERN SNES_GET_LONG,SNES_GET_LONG_WRAP
+EXTERN SNES_GET_LONG_FAST,SNES_GET_LONG_FAST_WRAP
 EXTERN CPU_OPEN_BUS_READ,CPU_OPEN_BUS_READ_LEGACY
-EXTERN_C UNSUPPORTED_READ,UNSUPPORTED_WRITE,IGNORE_WRITE
-EXTERN_C PPU_READ,PPU_WRITE
-EXTERN_C SRAM_READ,SRAM_WRITE
-EXTERN_C SRAM_WRITE_2k,SRAM_WRITE_4k
-EXTERN_C Access_Speed_Mask
+EXTERN UNSUPPORTED_READ,UNSUPPORTED_WRITE,IGNORE_WRITE
+EXTERN PPU_READ,PPU_WRITE
+EXTERN SRAM_READ,SRAM_WRITE
+EXTERN SRAM_WRITE_2k,SRAM_WRITE_4k
+EXTERN Access_Speed_Mask
 %endif
 
-EXTERN_C BlockSpeed
+EXTERN BlockSpeed
 
 %if 0
 
@@ -78,48 +78,48 @@ byte accessed.
 %if %1
  add R_65c816_Cycles,%1
 %endif
- call C_LABEL(SNES_GET_BYTE_FIXED)
+ call SNES_GET_BYTE_FIXED
 %else
- call C_LABEL(SNES_GET_BYTE)
+ call SNES_GET_BYTE
 %endif
 %endmacro
 
 ;%1 = fixed cycle cost
 %macro GET_BYTE_CODE 0-1
 %if %0
- mov dword [C_LABEL(Access_Speed_Mask)],0
+ mov dword [Access_Speed_Mask],0
 %endif
 
  mov edx,ebx
  shr edx,13
  push edx
 %if %0 == 0
- movzx edx,byte [C_LABEL(BlockSpeed)+edx]
+ movzx edx,byte [BlockSpeed+edx]
  add R_65c816_Cycles,edx
  mov edx,[esp]
 %endif
- mov edx,[C_LABEL(Read_Bank8Offset)+edx*4]
+ mov edx,[Read_Bank8Offset+edx*4]
  test edx,edx
  jnz %%read_direct
 
  mov edx,[esp]
- call [C_LABEL(Read_Bank8Mapping)+edx*4]
+ call [Read_Bank8Mapping+edx*4]
  jmp %%read_done
 %%read_direct:
  mov al,[edx+ebx]
- mov [C_LABEL(Last_Bus_Value_A)],al
+ mov [Last_Bus_Value_A],al
 %%read_done:
 %if %0
- mov dword [C_LABEL(Access_Speed_Mask)],-1
+ mov dword [Access_Speed_Mask],-1
 %endif
  pop edx
 %endmacro
 
 %macro GET_WORD 0-1 0
 %ifnidni %1,wrap
- call C_LABEL(SNES_GET_WORD_FAST)
+ call SNES_GET_WORD_FAST
 %else
- call C_LABEL(SNES_GET_WORD_FAST_WRAP)
+ call SNES_GET_WORD_FAST_WRAP
 %endif
 %endmacro
 
@@ -129,13 +129,13 @@ byte accessed.
  test ebx,(8 << 10) - 1
  jnz %%single_block
  dec ebx
- call C_LABEL(SNES_GET_WORD)
+ call SNES_GET_WORD
 %else
  inc bx
  test bx,(8 << 10) - 1
  jnz %%single_block
  dec bx
- call C_LABEL(SNES_GET_WORD_WRAP)
+ call SNES_GET_WORD_WRAP
 %endif
  jmp %%read_done
 
@@ -143,20 +143,20 @@ byte accessed.
  mov edx,ebx
  shr edx,13
  push edx
- mov edx,[C_LABEL(Read_Bank8Offset)+edx*4]
+ mov edx,[Read_Bank8Offset+edx*4]
  test edx,edx
  jnz %%read_direct
 
  mov edx,[esp]
  push ecx
- movzx ecx,byte [C_LABEL(BlockSpeed)+edx]
+ movzx ecx,byte [BlockSpeed+edx]
 %ifnidni %1,wrap
  dec ebx
 %else
  dec bx
 %endif
  add R_65c816_Cycles,ecx
- call [C_LABEL(Read_Bank8Mapping)+edx*4]
+ call [Read_Bank8Mapping+edx*4]
  mov edx,[esp+4]
  mov ah,al
 %ifnidni %1,wrap
@@ -166,7 +166,7 @@ byte accessed.
 %endif
  add R_65c816_Cycles,ecx
  pop ecx
- call [C_LABEL(Read_Bank8Mapping)+edx*4]
+ call [Read_Bank8Mapping+edx*4]
  ror ax,8
  pop edx
  jmp %%read_done
@@ -174,17 +174,17 @@ byte accessed.
 %%read_direct:
  mov ax,[edx+ebx-1]
  pop edx
- mov [C_LABEL(Last_Bus_Value_A)],ah
- movzx edx,byte [C_LABEL(BlockSpeed)+edx]
+ mov [Last_Bus_Value_A],ah
+ movzx edx,byte [BlockSpeed+edx]
  lea R_65c816_Cycles,[R_65c816_Cycles+edx*2]
 %%read_done:
 %endmacro
 
 %macro GET_LONG 0-1 0
 %ifnidni %1,wrap
- call C_LABEL(SNES_GET_LONG_FAST)
+ call SNES_GET_LONG_FAST
 %else
- call C_LABEL(SNES_GET_LONG_FAST_WRAP)
+ call SNES_GET_LONG_FAST_WRAP
 %endif
 %endmacro
 
@@ -194,13 +194,13 @@ byte accessed.
  test ebx,(8 << 10) - 2
  jnz %%single_block
  sub ebx,2
- call C_LABEL(SNES_GET_LONG)
+ call SNES_GET_LONG
 %else
  add bx,2
  test bx,(8 << 10) - 2
  jnz %%single_block
  sub bx,2
- call C_LABEL(SNES_GET_LONG_WRAP)
+ call SNES_GET_LONG_WRAP
 %endif
  jmp %%read_done
 
@@ -209,20 +209,20 @@ byte accessed.
  xor eax,eax
  shr edx,13
  push edx
- mov edx,[C_LABEL(Read_Bank8Offset)+edx*4]
+ mov edx,[Read_Bank8Offset+edx*4]
  test edx,edx
  jnz %%read_direct
 
  mov edx,[esp]
  push ecx
- movzx ecx,byte [C_LABEL(BlockSpeed)+edx]
+ movzx ecx,byte [BlockSpeed+edx]
 %ifnidni %1,wrap
  sub ebx,2
 %else
  sub bx,2
 %endif
  add R_65c816_Cycles,ecx
- call [C_LABEL(Read_Bank8Mapping)+edx*4]
+ call [Read_Bank8Mapping+edx*4]
  mov edx,[esp+4]
  mov ah,al
 %ifnidni %1,wrap
@@ -231,7 +231,7 @@ byte accessed.
  inc bx
 %endif
  add R_65c816_Cycles,ecx
- call [C_LABEL(Read_Bank8Mapping)+edx*4]
+ call [Read_Bank8Mapping+edx*4]
  mov edx,[esp+4]
 %ifnidni %1,wrap
  inc ebx
@@ -241,18 +241,18 @@ byte accessed.
  bswap eax
  add R_65c816_Cycles,ecx
  pop ecx
- call [C_LABEL(Read_Bank8Mapping)+edx*4]
+ call [Read_Bank8Mapping+edx*4]
  ror eax,16
  pop edx
  jmp %%read_done
 
 %%read_direct:
  mov al,[edx+ebx]
- mov [C_LABEL(Last_Bus_Value_A)],al
+ mov [Last_Bus_Value_A],al
  shl eax,16
  mov ax,[edx+ebx-2]
  pop edx
- movzx edx,byte [C_LABEL(BlockSpeed)+edx]
+ movzx edx,byte [BlockSpeed+edx]
  add R_65c816_Cycles,edx
  add edx,edx
  add R_65c816_Cycles,edx
@@ -261,7 +261,7 @@ byte accessed.
 
 ;%1 = fixed cycle cost
 %macro SET_BYTE 0-1
- mov [C_LABEL(Last_Bus_Value_A)],al
+ mov [Last_Bus_Value_A],al
  mov edx,ebx
  shr edx,13
  push edx
@@ -269,23 +269,23 @@ byte accessed.
 %if %1
  add R_65c816_Cycles,%1
 %endif
- mov dword [C_LABEL(Access_Speed_Mask)],0
+ mov dword [Access_Speed_Mask],0
 %else
- movzx edx,byte [C_LABEL(BlockSpeed)+edx]
+ movzx edx,byte [BlockSpeed+edx]
  add R_65c816_Cycles,edx
  mov edx,[esp]
 %endif
- mov edx,[C_LABEL(Write_Bank8Offset)+edx*4]
+ mov edx,[Write_Bank8Offset+edx*4]
  test edx,edx
  jnz %%write_direct
  mov edx,[esp]
- call [C_LABEL(Write_Bank8Mapping)+edx*4]
+ call [Write_Bank8Mapping+edx*4]
  jmp %%write_done
 %%write_direct:
  mov [edx+ebx],al
 %%write_done:
 %if %0
- mov dword [C_LABEL(Access_Speed_Mask)],-1
+ mov dword [Access_Speed_Mask],-1
 %endif
  pop edx
 %endmacro

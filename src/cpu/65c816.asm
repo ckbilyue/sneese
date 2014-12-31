@@ -118,36 +118,35 @@ You must read and accept the license prior to use.
 %include "ppu/ppu.inc"
 %include "cpu/dma.inc"
 
-EXTERN_C Map_Address,Map_Byte
-EXTERN_C OLD_PB,OLD_PC
-EXTERN_C RomAddress
-EXTERN_C LastIns,InsAddress
+EXTERN Map_Address,Map_Byte
+EXTERN OLD_PB,OLD_PC
+EXTERN RomAddress
+EXTERN LastIns,InsAddress
 
-EXTERN_C FRAME_SKIP_MIN,FRAME_SKIP_MAX,Timer_Counter_Throttle
-EXTERN_C SNES_Screen8
-EXTERN_C PaletteChanged
-EXTERN_C BrightnessLevel
-EXTERN_C Real_SNES_Palette,fixedpalettecheck,SetPalette
-EXTERN_C ShowFPS,ShowBreaks
-EXTERN_C Copy_Screen
-EXTERN_C update_sound, update_sound_block
+EXTERN FRAME_SKIP_MIN,FRAME_SKIP_MAX,Timer_Counter_Throttle
+EXTERN PaletteChanged
+EXTERN BrightnessLevel
+EXTERN Real_SNES_Palette,fixedpalettecheck,SetPalette
+EXTERN ShowFPS,ShowBreaks
+EXTERN Copy_Screen
+EXTERN update_sound, update_sound_block
 
-EXTERN_C SPC_ENABLED
-EXTERN_C SPC_Cycles
-EXTERN_C TotalCycles
-EXTERN_C Wrap_SPC_Cyclecounter
-EXTERN_C SPC_START
+EXTERN SPC_ENABLED
+EXTERN SPC_Cycles
+EXTERN TotalCycles
+EXTERN Wrap_SPC_Cyclecounter
+EXTERN SPC_START
 
-EXTERN_C SPC_CPU_cycle_divisor
-EXTERN_C SPC_CPU_cycle_multiplicand
+EXTERN SPC_CPU_cycle_divisor
+EXTERN SPC_CPU_cycle_multiplicand
 
-EXTERN_C InvalidOpcode,InvalidJump
+EXTERN InvalidOpcode,InvalidJump
 EXTERN Invalidate_Tile_Caches
-EXTERN_C Reset_CGRAM
+EXTERN Reset_CGRAM
 
 %ifdef DEBUG
-EXTERN_C Frames
-;EXTERN_C Timer_Counter_FPS
+EXTERN Frames
+;EXTERN Timer_Counter_FPS
 %endif
 
 section .text
@@ -157,7 +156,7 @@ EXPORT CPU_data_start
 section .bss
 EXPORT CPU_bss_start
 
-%define CPU_LABEL(x) C_LABEL(cpu_65c816_ %+ x)
+%define CPU_LABEL(x) cpu_65c816_ %+ x
 
 %define R_Base      R_65c816_Base   ; Base pointer to register set
 %define R_Cycles    R_65c816_Cycles ; Cycle counter
@@ -202,20 +201,20 @@ REAL_SNES_FLAG_E equ 0x100
 
 section .bss
 ALIGNB
-%define B_IRQ_Nvector       [R_Base-CPU_Register_Base+C_LABEL(IRQ_Nvector)]
-%define B_NMI_Nvector       [R_Base-CPU_Register_Base+C_LABEL(NMI_Nvector)]
-%define B_BRK_Nvector       [R_Base-CPU_Register_Base+C_LABEL(BRK_Nvector)]
-%define B_COP_Nvector       [R_Base-CPU_Register_Base+C_LABEL(COP_Nvector)]
-%define B_IRQ_Evector       [R_Base-CPU_Register_Base+C_LABEL(IRQ_Evector)]
-%define B_NMI_Evector       [R_Base-CPU_Register_Base+C_LABEL(NMI_Evector)]
-%define B_COP_Evector       [R_Base-CPU_Register_Base+C_LABEL(COP_Evector)]
-%define B_RES_Evector       [R_Base-CPU_Register_Base+C_LABEL(RES_Evector)]
+%define B_IRQ_Nvector       [R_Base-CPU_Register_Base+IRQ_Nvector]
+%define B_NMI_Nvector       [R_Base-CPU_Register_Base+NMI_Nvector]
+%define B_BRK_Nvector       [R_Base-CPU_Register_Base+BRK_Nvector]
+%define B_COP_Nvector       [R_Base-CPU_Register_Base+COP_Nvector]
+%define B_IRQ_Evector       [R_Base-CPU_Register_Base+IRQ_Evector]
+%define B_NMI_Evector       [R_Base-CPU_Register_Base+NMI_Evector]
+%define B_COP_Evector       [R_Base-CPU_Register_Base+COP_Evector]
+%define B_RES_Evector       [R_Base-CPU_Register_Base+RES_Evector]
 %define B_PB_Shifted        [R_Base-CPU_Register_Base+CPU_LABEL(PB_Shifted)]
 %define B_PB                [R_Base-CPU_Register_Base+CPU_LABEL(PB)]
 %define B_PC                [R_Base-CPU_Register_Base+CPU_LABEL(PC)]
 %define B_P                 [R_Base-CPU_Register_Base+CPU_LABEL(P)]
-%define B_SNES_Cycles       [R_Base-CPU_Register_Base+C_LABEL(SNES_Cycles)]
-%define B_EventTrip         [R_Base-CPU_Register_Base+C_LABEL(EventTrip)]
+%define B_SNES_Cycles       [R_Base-CPU_Register_Base+SNES_Cycles]
+%define B_EventTrip         [R_Base-CPU_Register_Base+EventTrip]
 %define B_A                 [R_Base-CPU_Register_Base+CPU_LABEL(A)]
 %define B_B                 byte [R_Base-CPU_Register_Base+CPU_LABEL(B)]
 %define B_X                 [R_Base-CPU_Register_Base+CPU_LABEL(X)]
@@ -375,654 +374,654 @@ section .data
 
 ALIGND
 OpTableE0:
-dd  C_LABEL(OpE0_0x00)    ,C_LABEL(OpE0M0_0x01)     ; 00
-dd  C_LABEL(OpE0_0x02)    ,C_LABEL(OpM0_0x03)
-dd  C_LABEL(OpE0M0_0x04)  ,C_LABEL(OpE0M0_0x05)
-dd  C_LABEL(OpE0M0_0x06)  ,C_LABEL(OpE0M0_0x07)
-dd  C_LABEL(OpE0_0x08)    ,C_LABEL(OpM0_0x09)
-dd  C_LABEL(OpM0_0x0A)    ,C_LABEL(OpE0_0x0B)
-dd  C_LABEL(OpM0_0x0C)    ,C_LABEL(OpM0_0x0D)
-dd  C_LABEL(OpM0_0x0E)    ,C_LABEL(OpM0_0x0F)
-dd  C_LABEL(OpE0_0x10)    ,C_LABEL(OpE0M0X0_0x11)   ; 10
-dd  C_LABEL(OpE0M0_0x12)  ,C_LABEL(OpM0_0x13)
-dd  C_LABEL(OpE0M0_0x14)  ,C_LABEL(OpE0M0_0x15)
-dd  C_LABEL(OpE0M0_0x16)  ,C_LABEL(OpE0M0_0x17)
-dd  C_LABEL(Op_0x18)      ,C_LABEL(OpM0X0_0x19)
-dd  C_LABEL(OpM0_0x1A)    ,C_LABEL(OpE0_0x1B)
-dd  C_LABEL(OpM0_0x1C)    ,C_LABEL(OpM0X0_0x1D)
-dd  C_LABEL(OpM0_0x1E)    ,C_LABEL(OpM0_0x1F)
-dd  C_LABEL(OpE0_0x20)    ,C_LABEL(OpE0M0_0x21)     ; 20
-dd  C_LABEL(OpE0_0x22)    ,C_LABEL(OpM0_0x23)
-dd  C_LABEL(OpE0M0_0x24)  ,C_LABEL(OpE0M0_0x25)
-dd  C_LABEL(OpE0M0_0x26)  ,C_LABEL(OpE0M0_0x27)
-dd  C_LABEL(OpE0_0x28)    ,C_LABEL(OpM0_0x29)
-dd  C_LABEL(OpM0_0x2A)    ,C_LABEL(OpE0_0x2B)
-dd  C_LABEL(OpM0_0x2C)    ,C_LABEL(OpM0_0x2D)
-dd  C_LABEL(OpM0_0x2E)    ,C_LABEL(OpM0_0x2F)
-dd  C_LABEL(OpE0_0x30)    ,C_LABEL(OpE0M0X0_0x31)   ; 30
-dd  C_LABEL(OpE0M0_0x32)  ,C_LABEL(OpM0_0x33)
-dd  C_LABEL(OpE0M0_0x34)  ,C_LABEL(OpE0M0_0x35)
-dd  C_LABEL(OpE0M0_0x36)  ,C_LABEL(OpE0M0_0x37)
-dd  C_LABEL(Op_0x38)      ,C_LABEL(OpM0X0_0x39)
-dd  C_LABEL(OpM0_0x3A)    ,C_LABEL(Op_0x3B)
-dd  C_LABEL(OpM0X0_0x3C)  ,C_LABEL(OpM0X0_0x3D)
-dd  C_LABEL(OpM0_0x3E)    ,C_LABEL(OpM0_0x3F)
-dd  C_LABEL(OpE0_0x40)    ,C_LABEL(OpE0M0_0x41)     ; 40
-dd  C_LABEL(ALL_INVALID)  ,C_LABEL(OpM0_0x43)
-dd  C_LABEL(OpX0_0x44)    ,C_LABEL(OpE0M0_0x45)
-dd  C_LABEL(OpE0M0_0x46)  ,C_LABEL(OpE0M0_0x47)
-dd  C_LABEL(OpE0M0_0x48)  ,C_LABEL(OpM0_0x49)
-dd  C_LABEL(OpM0_0x4A)    ,C_LABEL(OpE0_0x4B)
-dd  C_LABEL(Op_0x4C)      ,C_LABEL(OpM0_0x4D)
-dd  C_LABEL(OpM0_0x4E)    ,C_LABEL(OpM0_0x4F)
-dd  C_LABEL(OpE0_0x50)    ,C_LABEL(OpE0M0X0_0x51)   ; 50
-dd  C_LABEL(OpE0M0_0x52)  ,C_LABEL(OpM0_0x53)
-dd  C_LABEL(OpX0_0x54)    ,C_LABEL(OpE0M0_0x55)
-dd  C_LABEL(OpE0M0_0x56)  ,C_LABEL(OpE0M0_0x57)
-dd  C_LABEL(Op_0x58)      ,C_LABEL(OpM0X0_0x59)
-dd  C_LABEL(OpE0X0_0x5A)  ,C_LABEL(Op_0x5B)
-dd  C_LABEL(Op_0x5C)      ,C_LABEL(OpM0X0_0x5D)
-dd  C_LABEL(OpM0_0x5E)    ,C_LABEL(OpM0_0x5F)
-dd  C_LABEL(OpE0_0x60)    ,C_LABEL(OpE0M0_0x61)     ; 60
-dd  C_LABEL(OpE0_0x62)    ,C_LABEL(OpM0_0x63)
-dd  C_LABEL(OpE0M0_0x64)  ,C_LABEL(OpE0M0_0x65)
-dd  C_LABEL(OpE0M0_0x66)  ,C_LABEL(OpE0M0_0x67)
-dd  C_LABEL(OpE0M0_0x68)  ,C_LABEL(OpM0_0x69)
-dd  C_LABEL(OpM0_0x6A)    ,C_LABEL(OpE0_0x6B)
-dd  C_LABEL(Op_0x6C)      ,C_LABEL(OpM0_0x6D)
-dd  C_LABEL(OpM0_0x6E)    ,C_LABEL(OpM0_0x6F)
-dd  C_LABEL(OpE0_0x70)    ,C_LABEL(OpE0M0X0_0x71)   ; 70
-dd  C_LABEL(OpE0M0_0x72)  ,C_LABEL(OpM0_0x73)
-dd  C_LABEL(OpE0M0_0x74)  ,C_LABEL(OpE0M0_0x75)
-dd  C_LABEL(OpE0M0_0x76)  ,C_LABEL(OpE0M0_0x77)
-dd  C_LABEL(Op_0x78)      ,C_LABEL(OpM0X0_0x79)
-dd  C_LABEL(OpE0X0_0x7A)  ,C_LABEL(Op_0x7B)
-dd  C_LABEL(Op_0x7C)      ,C_LABEL(OpM0X0_0x7D)
-dd  C_LABEL(OpM0_0x7E)    ,C_LABEL(OpM0_0x7F)
-dd  C_LABEL(OpE0_0x80)    ,C_LABEL(OpE0M0_0x81)     ; 80
-dd  C_LABEL(Op_0x82)      ,C_LABEL(OpM0_0x83)
-dd  C_LABEL(OpE0X0_0x84)  ,C_LABEL(OpE0M0_0x85)
-dd  C_LABEL(OpE0X0_0x86)  ,C_LABEL(OpE0M0_0x87)
-dd  C_LABEL(OpX0_0x88)    ,C_LABEL(OpM0_0x89)
-dd  C_LABEL(OpM0_0x8A)    ,C_LABEL(OpE0_0x8B)
-dd  C_LABEL(OpX0_0x8C)    ,C_LABEL(OpM0_0x8D)
-dd  C_LABEL(OpX0_0x8E)    ,C_LABEL(OpM0_0x8F)
-dd  C_LABEL(OpE0_0x90)    ,C_LABEL(OpE0M0X0_0x91)   ; 90
-dd  C_LABEL(OpE0M0_0x92)  ,C_LABEL(OpM0_0x93)
-dd  C_LABEL(OpE0X0_0x94)  ,C_LABEL(OpE0M0_0x95)
-dd  C_LABEL(OpE0X0_0x96)  ,C_LABEL(OpE0M0_0x97)
-dd  C_LABEL(OpM0_0x98)    ,C_LABEL(OpM0_0x99)
-dd  C_LABEL(OpE0_0x9A)    ,C_LABEL(OpX0_0x9B)
-dd  C_LABEL(OpM0_0x9C)    ,C_LABEL(OpM0_0x9D)
-dd  C_LABEL(OpM0_0x9E)    ,C_LABEL(OpM0_0x9F)
-dd  C_LABEL(OpX0_0xA0)    ,C_LABEL(OpE0M0_0xA1)     ; A0
-dd  C_LABEL(OpX0_0xA2)    ,C_LABEL(OpM0_0xA3)
-dd  C_LABEL(OpE0X0_0xA4)  ,C_LABEL(OpE0M0_0xA5)
-dd  C_LABEL(OpE0X0_0xA6)  ,C_LABEL(OpE0M0_0xA7)
-dd  C_LABEL(OpX0_0xA8)    ,C_LABEL(OpM0_0xA9)
-dd  C_LABEL(OpX0_0xAA)    ,C_LABEL(OpE0_0xAB)
-dd  C_LABEL(OpX0_0xAC)    ,C_LABEL(OpM0_0xAD)
-dd  C_LABEL(OpX0_0xAE)    ,C_LABEL(OpM0_0xAF)
-dd  C_LABEL(OpE0_0xB0)    ,C_LABEL(OpE0M0X0_0xB1)   ; B0
-dd  C_LABEL(OpE0M0_0xB2)  ,C_LABEL(OpM0_0xB3)
-dd  C_LABEL(OpE0X0_0xB4)  ,C_LABEL(OpE0M0_0xB5)
-dd  C_LABEL(OpE0X0_0xB6)  ,C_LABEL(OpE0M0_0xB7)
-dd  C_LABEL(Op_0xB8)      ,C_LABEL(OpM0X0_0xB9)
-dd  C_LABEL(OpX0_0xBA)    ,C_LABEL(OpX0_0xBB)
-dd  C_LABEL(OpX0_0xBC)    ,C_LABEL(OpM0X0_0xBD)
-dd  C_LABEL(OpX0_0xBE)    ,C_LABEL(OpM0_0xBF)
-dd  C_LABEL(OpX0_0xC0)    ,C_LABEL(OpE0M0_0xC1)     ; C0
-dd  C_LABEL(OpE0_0xC2)    ,C_LABEL(OpM0_0xC3)
-dd  C_LABEL(OpE0X0_0xC4)  ,C_LABEL(OpE0M0_0xC5)
-dd  C_LABEL(OpE0M0_0xC6)  ,C_LABEL(OpE0M0_0xC7)
-dd  C_LABEL(OpX0_0xC8)    ,C_LABEL(OpM0_0xC9)
-dd  C_LABEL(OpX0_0xCA)    ,C_LABEL(Op_0xCB)
-dd  C_LABEL(OpX0_0xCC)    ,C_LABEL(OpM0_0xCD)
-dd  C_LABEL(OpM0_0xCE)    ,C_LABEL(OpM0_0xCF)
-dd  C_LABEL(OpE0_0xD0)    ,C_LABEL(OpE0M0X0_0xD1)   ; D0
-dd  C_LABEL(OpE0M0_0xD2)  ,C_LABEL(OpM0_0xD3)
-dd  C_LABEL(OpE0_0xD4)    ,C_LABEL(OpE0M0_0xD5)
-dd  C_LABEL(OpE0M0_0xD6)  ,C_LABEL(OpE0M0_0xD7)
-dd  C_LABEL(Op_0xD8)      ,C_LABEL(OpM0X0_0xD9)
-dd  C_LABEL(OpE0X0_0xDA)  ,C_LABEL(ALL_INVALID)
-dd  C_LABEL(Op_0xDC)      ,C_LABEL(OpM0X0_0xDD)
-dd  C_LABEL(OpM0_0xDE)    ,C_LABEL(OpM0_0xDF)
-dd  C_LABEL(OpX0_0xE0)    ,C_LABEL(OpE0M0_0xE1)     ; E0
-dd  C_LABEL(OpE0_0xE2)    ,C_LABEL(OpM0_0xE3)
-dd  C_LABEL(OpE0X0_0xE4)  ,C_LABEL(OpE0M0_0xE5)
-dd  C_LABEL(OpE0M0_0xE6)  ,C_LABEL(OpE0M0_0xE7)
-dd  C_LABEL(OpX0_0xE8)    ,C_LABEL(OpM0_0xE9)
-dd  C_LABEL(Op_0xEA)      ,C_LABEL(Op_0xEB)
-dd  C_LABEL(OpX0_0xEC)    ,C_LABEL(OpM0_0xED)
-dd  C_LABEL(OpM0_0xEE)    ,C_LABEL(OpM0_0xEF)
-dd  C_LABEL(OpE0_0xF0)    ,C_LABEL(OpE0M0X0_0xF1)   ; F0
-dd  C_LABEL(OpE0M0_0xF2)  ,C_LABEL(OpM0_0xF3)
-dd  C_LABEL(OpE0_0xF4)    ,C_LABEL(OpE0M0_0xF5)
-dd  C_LABEL(OpE0M0_0xF6)  ,C_LABEL(OpE0M0_0xF7)
-dd  C_LABEL(Op_0xF8)      ,C_LABEL(OpM0X0_0xF9)
-dd  C_LABEL(OpE0X0_0xFA)  ,C_LABEL(OpE0_0xFB)
-dd  C_LABEL(OpE0_0xFC)    ,C_LABEL(OpM0X0_0xFD)
-dd  C_LABEL(OpM0_0xFE)    ,C_LABEL(OpM0_0xFF)
+dd  OpE0_0x00    ,OpE0M0_0x01     ; 00
+dd  OpE0_0x02    ,OpM0_0x03
+dd  OpE0M0_0x04  ,OpE0M0_0x05
+dd  OpE0M0_0x06  ,OpE0M0_0x07
+dd  OpE0_0x08    ,OpM0_0x09
+dd  OpM0_0x0A    ,OpE0_0x0B
+dd  OpM0_0x0C    ,OpM0_0x0D
+dd  OpM0_0x0E    ,OpM0_0x0F
+dd  OpE0_0x10    ,OpE0M0X0_0x11   ; 10
+dd  OpE0M0_0x12  ,OpM0_0x13
+dd  OpE0M0_0x14  ,OpE0M0_0x15
+dd  OpE0M0_0x16  ,OpE0M0_0x17
+dd  Op_0x18      ,OpM0X0_0x19
+dd  OpM0_0x1A    ,OpE0_0x1B
+dd  OpM0_0x1C    ,OpM0X0_0x1D
+dd  OpM0_0x1E    ,OpM0_0x1F
+dd  OpE0_0x20    ,OpE0M0_0x21     ; 20
+dd  OpE0_0x22    ,OpM0_0x23
+dd  OpE0M0_0x24  ,OpE0M0_0x25
+dd  OpE0M0_0x26  ,OpE0M0_0x27
+dd  OpE0_0x28    ,OpM0_0x29
+dd  OpM0_0x2A    ,OpE0_0x2B
+dd  OpM0_0x2C    ,OpM0_0x2D
+dd  OpM0_0x2E    ,OpM0_0x2F
+dd  OpE0_0x30    ,OpE0M0X0_0x31   ; 30
+dd  OpE0M0_0x32  ,OpM0_0x33
+dd  OpE0M0_0x34  ,OpE0M0_0x35
+dd  OpE0M0_0x36  ,OpE0M0_0x37
+dd  Op_0x38      ,OpM0X0_0x39
+dd  OpM0_0x3A    ,Op_0x3B
+dd  OpM0X0_0x3C  ,OpM0X0_0x3D
+dd  OpM0_0x3E    ,OpM0_0x3F
+dd  OpE0_0x40    ,OpE0M0_0x41     ; 40
+dd  ALL_INVALID  ,OpM0_0x43
+dd  OpX0_0x44    ,OpE0M0_0x45
+dd  OpE0M0_0x46  ,OpE0M0_0x47
+dd  OpE0M0_0x48  ,OpM0_0x49
+dd  OpM0_0x4A    ,OpE0_0x4B
+dd  Op_0x4C      ,OpM0_0x4D
+dd  OpM0_0x4E    ,OpM0_0x4F
+dd  OpE0_0x50    ,OpE0M0X0_0x51   ; 50
+dd  OpE0M0_0x52  ,OpM0_0x53
+dd  OpX0_0x54    ,OpE0M0_0x55
+dd  OpE0M0_0x56  ,OpE0M0_0x57
+dd  Op_0x58      ,OpM0X0_0x59
+dd  OpE0X0_0x5A  ,Op_0x5B
+dd  Op_0x5C      ,OpM0X0_0x5D
+dd  OpM0_0x5E    ,OpM0_0x5F
+dd  OpE0_0x60    ,OpE0M0_0x61     ; 60
+dd  OpE0_0x62    ,OpM0_0x63
+dd  OpE0M0_0x64  ,OpE0M0_0x65
+dd  OpE0M0_0x66  ,OpE0M0_0x67
+dd  OpE0M0_0x68  ,OpM0_0x69
+dd  OpM0_0x6A    ,OpE0_0x6B
+dd  Op_0x6C      ,OpM0_0x6D
+dd  OpM0_0x6E    ,OpM0_0x6F
+dd  OpE0_0x70    ,OpE0M0X0_0x71   ; 70
+dd  OpE0M0_0x72  ,OpM0_0x73
+dd  OpE0M0_0x74  ,OpE0M0_0x75
+dd  OpE0M0_0x76  ,OpE0M0_0x77
+dd  Op_0x78      ,OpM0X0_0x79
+dd  OpE0X0_0x7A  ,Op_0x7B
+dd  Op_0x7C      ,OpM0X0_0x7D
+dd  OpM0_0x7E    ,OpM0_0x7F
+dd  OpE0_0x80    ,OpE0M0_0x81     ; 80
+dd  Op_0x82      ,OpM0_0x83
+dd  OpE0X0_0x84  ,OpE0M0_0x85
+dd  OpE0X0_0x86  ,OpE0M0_0x87
+dd  OpX0_0x88    ,OpM0_0x89
+dd  OpM0_0x8A    ,OpE0_0x8B
+dd  OpX0_0x8C    ,OpM0_0x8D
+dd  OpX0_0x8E    ,OpM0_0x8F
+dd  OpE0_0x90    ,OpE0M0X0_0x91   ; 90
+dd  OpE0M0_0x92  ,OpM0_0x93
+dd  OpE0X0_0x94  ,OpE0M0_0x95
+dd  OpE0X0_0x96  ,OpE0M0_0x97
+dd  OpM0_0x98    ,OpM0_0x99
+dd  OpE0_0x9A    ,OpX0_0x9B
+dd  OpM0_0x9C    ,OpM0_0x9D
+dd  OpM0_0x9E    ,OpM0_0x9F
+dd  OpX0_0xA0    ,OpE0M0_0xA1     ; A0
+dd  OpX0_0xA2    ,OpM0_0xA3
+dd  OpE0X0_0xA4  ,OpE0M0_0xA5
+dd  OpE0X0_0xA6  ,OpE0M0_0xA7
+dd  OpX0_0xA8    ,OpM0_0xA9
+dd  OpX0_0xAA    ,OpE0_0xAB
+dd  OpX0_0xAC    ,OpM0_0xAD
+dd  OpX0_0xAE    ,OpM0_0xAF
+dd  OpE0_0xB0    ,OpE0M0X0_0xB1   ; B0
+dd  OpE0M0_0xB2  ,OpM0_0xB3
+dd  OpE0X0_0xB4  ,OpE0M0_0xB5
+dd  OpE0X0_0xB6  ,OpE0M0_0xB7
+dd  Op_0xB8      ,OpM0X0_0xB9
+dd  OpX0_0xBA    ,OpX0_0xBB
+dd  OpX0_0xBC    ,OpM0X0_0xBD
+dd  OpX0_0xBE    ,OpM0_0xBF
+dd  OpX0_0xC0    ,OpE0M0_0xC1     ; C0
+dd  OpE0_0xC2    ,OpM0_0xC3
+dd  OpE0X0_0xC4  ,OpE0M0_0xC5
+dd  OpE0M0_0xC6  ,OpE0M0_0xC7
+dd  OpX0_0xC8    ,OpM0_0xC9
+dd  OpX0_0xCA    ,Op_0xCB
+dd  OpX0_0xCC    ,OpM0_0xCD
+dd  OpM0_0xCE    ,OpM0_0xCF
+dd  OpE0_0xD0    ,OpE0M0X0_0xD1   ; D0
+dd  OpE0M0_0xD2  ,OpM0_0xD3
+dd  OpE0_0xD4    ,OpE0M0_0xD5
+dd  OpE0M0_0xD6  ,OpE0M0_0xD7
+dd  Op_0xD8      ,OpM0X0_0xD9
+dd  OpE0X0_0xDA  ,ALL_INVALID
+dd  Op_0xDC      ,OpM0X0_0xDD
+dd  OpM0_0xDE    ,OpM0_0xDF
+dd  OpX0_0xE0    ,OpE0M0_0xE1     ; E0
+dd  OpE0_0xE2    ,OpM0_0xE3
+dd  OpE0X0_0xE4  ,OpE0M0_0xE5
+dd  OpE0M0_0xE6  ,OpE0M0_0xE7
+dd  OpX0_0xE8    ,OpM0_0xE9
+dd  Op_0xEA      ,Op_0xEB
+dd  OpX0_0xEC    ,OpM0_0xED
+dd  OpM0_0xEE    ,OpM0_0xEF
+dd  OpE0_0xF0    ,OpE0M0X0_0xF1   ; F0
+dd  OpE0M0_0xF2  ,OpM0_0xF3
+dd  OpE0_0xF4    ,OpE0M0_0xF5
+dd  OpE0M0_0xF6  ,OpE0M0_0xF7
+dd  Op_0xF8      ,OpM0X0_0xF9
+dd  OpE0X0_0xFA  ,OpE0_0xFB
+dd  OpE0_0xFC    ,OpM0X0_0xFD
+dd  OpM0_0xFE    ,OpM0_0xFF
 
 OpTablePm:
-dd  C_LABEL(OpE0_0x00)    ,C_LABEL(OpE0M1_0x01)     ; 00
-dd  C_LABEL(OpE0_0x02)    ,C_LABEL(OpM1_0x03)
-dd  C_LABEL(OpE0M1_0x04)  ,C_LABEL(OpE0M1_0x05)
-dd  C_LABEL(OpE0M1_0x06)  ,C_LABEL(OpE0M1_0x07)
-dd  C_LABEL(OpE0_0x08)    ,C_LABEL(OpM1_0x09)
-dd  C_LABEL(OpM1_0x0A)    ,C_LABEL(OpE0_0x0B)
-dd  C_LABEL(OpM1_0x0C)    ,C_LABEL(OpM1_0x0D)
-dd  C_LABEL(OpM1_0x0E)    ,C_LABEL(OpM1_0x0F)
-dd  C_LABEL(OpE0_0x10)    ,C_LABEL(OpE0M1X0_0x11)   ; 10
-dd  C_LABEL(OpE0M1_0x12)  ,C_LABEL(OpM1_0x13)
-dd  C_LABEL(OpE0M1_0x14)  ,C_LABEL(OpE0M1_0x15)
-dd  C_LABEL(OpE0M1_0x16)  ,C_LABEL(OpE0M1_0x17)
-dd  C_LABEL(Op_0x18)      ,C_LABEL(OpM1X0_0x19)
-dd  C_LABEL(OpM1_0x1A)    ,C_LABEL(OpE0_0x1B)
-dd  C_LABEL(OpM1_0x1C)    ,C_LABEL(OpM1X0_0x1D)
-dd  C_LABEL(OpM1_0x1E)    ,C_LABEL(OpM1_0x1F)
-dd  C_LABEL(OpE0_0x20)    ,C_LABEL(OpE0M1_0x21)     ; 20
-dd  C_LABEL(OpE0_0x22)    ,C_LABEL(OpM1_0x23)
-dd  C_LABEL(OpE0M1_0x24)  ,C_LABEL(OpE0M1_0x25)
-dd  C_LABEL(OpE0M1_0x26)  ,C_LABEL(OpE0M1_0x27)
-dd  C_LABEL(OpE0_0x28)    ,C_LABEL(OpM1_0x29)
-dd  C_LABEL(OpM1_0x2A)    ,C_LABEL(OpE0_0x2B)
-dd  C_LABEL(OpM1_0x2C)    ,C_LABEL(OpM1_0x2D)
-dd  C_LABEL(OpM1_0x2E)    ,C_LABEL(OpM1_0x2F)
-dd  C_LABEL(OpE0_0x30)    ,C_LABEL(OpE0M1X0_0x31)   ; 30
-dd  C_LABEL(OpE0M1_0x32)  ,C_LABEL(OpM1_0x33)
-dd  C_LABEL(OpE0M1_0x34)  ,C_LABEL(OpE0M1_0x35)
-dd  C_LABEL(OpE0M1_0x36)  ,C_LABEL(OpE0M1_0x37)
-dd  C_LABEL(Op_0x38)      ,C_LABEL(OpM1X0_0x39)
-dd  C_LABEL(OpM1_0x3A)    ,C_LABEL(Op_0x3B)
-dd  C_LABEL(OpM1X0_0x3C)  ,C_LABEL(OpM1X0_0x3D)
-dd  C_LABEL(OpM1_0x3E)    ,C_LABEL(OpM1_0x3F)
-dd  C_LABEL(OpE0_0x40)    ,C_LABEL(OpE0M1_0x41)     ; 40
-dd  C_LABEL(ALL_INVALID)  ,C_LABEL(OpM1_0x43)
-dd  C_LABEL(OpX0_0x44)    ,C_LABEL(OpE0M1_0x45)
-dd  C_LABEL(OpE0M1_0x46)  ,C_LABEL(OpE0M1_0x47)
-dd  C_LABEL(OpE0M1_0x48)  ,C_LABEL(OpM1_0x49)
-dd  C_LABEL(OpM1_0x4A)    ,C_LABEL(OpE0_0x4B)
-dd  C_LABEL(Op_0x4C)      ,C_LABEL(OpM1_0x4D)
-dd  C_LABEL(OpM1_0x4E)    ,C_LABEL(OpM1_0x4F)
-dd  C_LABEL(OpE0_0x50)    ,C_LABEL(OpE0M1X0_0x51)   ; 50
-dd  C_LABEL(OpE0M1_0x52)  ,C_LABEL(OpM1_0x53)
-dd  C_LABEL(OpX0_0x54)    ,C_LABEL(OpE0M1_0x55)
-dd  C_LABEL(OpE0M1_0x56)  ,C_LABEL(OpE0M1_0x57)
-dd  C_LABEL(Op_0x58)      ,C_LABEL(OpM1X0_0x59)
-dd  C_LABEL(OpE0X0_0x5A)  ,C_LABEL(Op_0x5B)
-dd  C_LABEL(Op_0x5C)      ,C_LABEL(OpM1X0_0x5D)
-dd  C_LABEL(OpM1_0x5E)    ,C_LABEL(OpM1_0x5F)
-dd  C_LABEL(OpE0_0x60)    ,C_LABEL(OpE0M1_0x61)     ; 60
-dd  C_LABEL(OpE0_0x62)    ,C_LABEL(OpM1_0x63)
-dd  C_LABEL(OpE0M1_0x64)  ,C_LABEL(OpE0M1_0x65)
-dd  C_LABEL(OpE0M1_0x66)  ,C_LABEL(OpE0M1_0x67)
-dd  C_LABEL(OpE0M1_0x68)  ,C_LABEL(OpM1_0x69)
-dd  C_LABEL(OpM1_0x6A)    ,C_LABEL(OpE0_0x6B)
-dd  C_LABEL(Op_0x6C)      ,C_LABEL(OpM1_0x6D)
-dd  C_LABEL(OpM1_0x6E)    ,C_LABEL(OpM1_0x6F)
-dd  C_LABEL(OpE0_0x70)    ,C_LABEL(OpE0M1X0_0x71)   ; 70
-dd  C_LABEL(OpE0M1_0x72)  ,C_LABEL(OpM1_0x73)
-dd  C_LABEL(OpE0M1_0x74)  ,C_LABEL(OpE0M1_0x75)
-dd  C_LABEL(OpE0M1_0x76)  ,C_LABEL(OpE0M1_0x77)
-dd  C_LABEL(Op_0x78)      ,C_LABEL(OpM1X0_0x79)
-dd  C_LABEL(OpE0X0_0x7A)  ,C_LABEL(Op_0x7B)
-dd  C_LABEL(Op_0x7C)      ,C_LABEL(OpM1X0_0x7D)
-dd  C_LABEL(OpM1_0x7E)    ,C_LABEL(OpM1_0x7F)
-dd  C_LABEL(OpE0_0x80)    ,C_LABEL(OpE0M1_0x81)     ; 80
-dd  C_LABEL(Op_0x82)      ,C_LABEL(OpM1_0x83)
-dd  C_LABEL(OpE0X0_0x84)  ,C_LABEL(OpE0M1_0x85)
-dd  C_LABEL(OpE0X0_0x86)  ,C_LABEL(OpE0M1_0x87)
-dd  C_LABEL(OpX0_0x88)    ,C_LABEL(OpM1_0x89)
-dd  C_LABEL(OpM1_0x8A)    ,C_LABEL(OpE0_0x8B)
-dd  C_LABEL(OpX0_0x8C)    ,C_LABEL(OpM1_0x8D)
-dd  C_LABEL(OpX0_0x8E)    ,C_LABEL(OpM1_0x8F)
-dd  C_LABEL(OpE0_0x90)    ,C_LABEL(OpE0M1X0_0x91)   ; 90
-dd  C_LABEL(OpE0M1_0x92)  ,C_LABEL(OpM1_0x93)
-dd  C_LABEL(OpE0X0_0x94)  ,C_LABEL(OpE0M1_0x95)
-dd  C_LABEL(OpE0X0_0x96)  ,C_LABEL(OpE0M1_0x97)
-dd  C_LABEL(OpM1_0x98)    ,C_LABEL(OpM1_0x99)
-dd  C_LABEL(OpE0_0x9A)    ,C_LABEL(OpX0_0x9B)
-dd  C_LABEL(OpM1_0x9C)    ,C_LABEL(OpM1_0x9D)
-dd  C_LABEL(OpM1_0x9E)    ,C_LABEL(OpM1_0x9F)
-dd  C_LABEL(OpX0_0xA0)    ,C_LABEL(OpE0M1_0xA1)     ; A0
-dd  C_LABEL(OpX0_0xA2)    ,C_LABEL(OpM1_0xA3)
-dd  C_LABEL(OpE0X0_0xA4)  ,C_LABEL(OpE0M1_0xA5)
-dd  C_LABEL(OpE0X0_0xA6)  ,C_LABEL(OpE0M1_0xA7)
-dd  C_LABEL(OpX0_0xA8)    ,C_LABEL(OpM1_0xA9)
-dd  C_LABEL(OpX0_0xAA)    ,C_LABEL(OpE0_0xAB)
-dd  C_LABEL(OpX0_0xAC)    ,C_LABEL(OpM1_0xAD)
-dd  C_LABEL(OpX0_0xAE)    ,C_LABEL(OpM1_0xAF)
-dd  C_LABEL(OpE0_0xB0)    ,C_LABEL(OpE0M1X0_0xB1)   ; B0
-dd  C_LABEL(OpE0M1_0xB2)  ,C_LABEL(OpM1_0xB3)
-dd  C_LABEL(OpE0X0_0xB4)  ,C_LABEL(OpE0M1_0xB5)
-dd  C_LABEL(OpE0X0_0xB6)  ,C_LABEL(OpE0M1_0xB7)
-dd  C_LABEL(Op_0xB8)      ,C_LABEL(OpM1X0_0xB9)
-dd  C_LABEL(OpX0_0xBA)    ,C_LABEL(OpX0_0xBB)
-dd  C_LABEL(OpX0_0xBC)    ,C_LABEL(OpM1X0_0xBD)
-dd  C_LABEL(OpX0_0xBE)    ,C_LABEL(OpM1_0xBF)
-dd  C_LABEL(OpX0_0xC0)    ,C_LABEL(OpE0M1_0xC1)     ; C0
-dd  C_LABEL(OpE0_0xC2)    ,C_LABEL(OpM1_0xC3)
-dd  C_LABEL(OpE0X0_0xC4)  ,C_LABEL(OpE0M1_0xC5)
-dd  C_LABEL(OpE0M1_0xC6)  ,C_LABEL(OpE0M1_0xC7)
-dd  C_LABEL(OpX0_0xC8)    ,C_LABEL(OpM1_0xC9)
-dd  C_LABEL(OpX0_0xCA)    ,C_LABEL(Op_0xCB)
-dd  C_LABEL(OpX0_0xCC)    ,C_LABEL(OpM1_0xCD)
-dd  C_LABEL(OpM1_0xCE)    ,C_LABEL(OpM1_0xCF)
-dd  C_LABEL(OpE0_0xD0)    ,C_LABEL(OpE0M1X0_0xD1)   ; D0
-dd  C_LABEL(OpE0M1_0xD2)  ,C_LABEL(OpM1_0xD3)
-dd  C_LABEL(OpE0_0xD4)    ,C_LABEL(OpE0M1_0xD5)
-dd  C_LABEL(OpE0M1_0xD6)  ,C_LABEL(OpE0M1_0xD7)
-dd  C_LABEL(Op_0xD8)      ,C_LABEL(OpM1X0_0xD9)
-dd  C_LABEL(OpE0X0_0xDA)  ,C_LABEL(ALL_INVALID)
-dd  C_LABEL(Op_0xDC)      ,C_LABEL(OpM1X0_0xDD)
-dd  C_LABEL(OpM1_0xDE)    ,C_LABEL(OpM1_0xDF)
-dd  C_LABEL(OpX0_0xE0)    ,C_LABEL(OpE0M1_0xE1)     ; E0
-dd  C_LABEL(OpE0_0xE2)    ,C_LABEL(OpM1_0xE3)
-dd  C_LABEL(OpE0X0_0xE4)  ,C_LABEL(OpE0M1_0xE5)
-dd  C_LABEL(OpE0M1_0xE6)  ,C_LABEL(OpE0M1_0xE7)
-dd  C_LABEL(OpX0_0xE8)    ,C_LABEL(OpM1_0xE9)
-dd  C_LABEL(Op_0xEA)      ,C_LABEL(Op_0xEB)
-dd  C_LABEL(OpX0_0xEC)    ,C_LABEL(OpM1_0xED)
-dd  C_LABEL(OpM1_0xEE)    ,C_LABEL(OpM1_0xEF)
-dd  C_LABEL(OpE0_0xF0)    ,C_LABEL(OpE0M1X0_0xF1)   ; F0
-dd  C_LABEL(OpE0M1_0xF2)  ,C_LABEL(OpM1_0xF3)
-dd  C_LABEL(OpE0_0xF4)    ,C_LABEL(OpE0M1_0xF5)
-dd  C_LABEL(OpE0M1_0xF6)  ,C_LABEL(OpE0M1_0xF7)
-dd  C_LABEL(Op_0xF8)      ,C_LABEL(OpM1X0_0xF9)
-dd  C_LABEL(OpE0X0_0xFA)  ,C_LABEL(OpE0_0xFB)
-dd  C_LABEL(OpE0_0xFC)    ,C_LABEL(OpM1X0_0xFD)
-dd  C_LABEL(OpM1_0xFE)    ,C_LABEL(OpM1_0xFF)
+dd  OpE0_0x00    ,OpE0M1_0x01     ; 00
+dd  OpE0_0x02    ,OpM1_0x03
+dd  OpE0M1_0x04  ,OpE0M1_0x05
+dd  OpE0M1_0x06  ,OpE0M1_0x07
+dd  OpE0_0x08    ,OpM1_0x09
+dd  OpM1_0x0A    ,OpE0_0x0B
+dd  OpM1_0x0C    ,OpM1_0x0D
+dd  OpM1_0x0E    ,OpM1_0x0F
+dd  OpE0_0x10    ,OpE0M1X0_0x11   ; 10
+dd  OpE0M1_0x12  ,OpM1_0x13
+dd  OpE0M1_0x14  ,OpE0M1_0x15
+dd  OpE0M1_0x16  ,OpE0M1_0x17
+dd  Op_0x18      ,OpM1X0_0x19
+dd  OpM1_0x1A    ,OpE0_0x1B
+dd  OpM1_0x1C    ,OpM1X0_0x1D
+dd  OpM1_0x1E    ,OpM1_0x1F
+dd  OpE0_0x20    ,OpE0M1_0x21     ; 20
+dd  OpE0_0x22    ,OpM1_0x23
+dd  OpE0M1_0x24  ,OpE0M1_0x25
+dd  OpE0M1_0x26  ,OpE0M1_0x27
+dd  OpE0_0x28    ,OpM1_0x29
+dd  OpM1_0x2A    ,OpE0_0x2B
+dd  OpM1_0x2C    ,OpM1_0x2D
+dd  OpM1_0x2E    ,OpM1_0x2F
+dd  OpE0_0x30    ,OpE0M1X0_0x31   ; 30
+dd  OpE0M1_0x32  ,OpM1_0x33
+dd  OpE0M1_0x34  ,OpE0M1_0x35
+dd  OpE0M1_0x36  ,OpE0M1_0x37
+dd  Op_0x38      ,OpM1X0_0x39
+dd  OpM1_0x3A    ,Op_0x3B
+dd  OpM1X0_0x3C  ,OpM1X0_0x3D
+dd  OpM1_0x3E    ,OpM1_0x3F
+dd  OpE0_0x40    ,OpE0M1_0x41     ; 40
+dd  ALL_INVALID  ,OpM1_0x43
+dd  OpX0_0x44    ,OpE0M1_0x45
+dd  OpE0M1_0x46  ,OpE0M1_0x47
+dd  OpE0M1_0x48  ,OpM1_0x49
+dd  OpM1_0x4A    ,OpE0_0x4B
+dd  Op_0x4C      ,OpM1_0x4D
+dd  OpM1_0x4E    ,OpM1_0x4F
+dd  OpE0_0x50    ,OpE0M1X0_0x51   ; 50
+dd  OpE0M1_0x52  ,OpM1_0x53
+dd  OpX0_0x54    ,OpE0M1_0x55
+dd  OpE0M1_0x56  ,OpE0M1_0x57
+dd  Op_0x58      ,OpM1X0_0x59
+dd  OpE0X0_0x5A  ,Op_0x5B
+dd  Op_0x5C      ,OpM1X0_0x5D
+dd  OpM1_0x5E    ,OpM1_0x5F
+dd  OpE0_0x60    ,OpE0M1_0x61     ; 60
+dd  OpE0_0x62    ,OpM1_0x63
+dd  OpE0M1_0x64  ,OpE0M1_0x65
+dd  OpE0M1_0x66  ,OpE0M1_0x67
+dd  OpE0M1_0x68  ,OpM1_0x69
+dd  OpM1_0x6A    ,OpE0_0x6B
+dd  Op_0x6C      ,OpM1_0x6D
+dd  OpM1_0x6E    ,OpM1_0x6F
+dd  OpE0_0x70    ,OpE0M1X0_0x71   ; 70
+dd  OpE0M1_0x72  ,OpM1_0x73
+dd  OpE0M1_0x74  ,OpE0M1_0x75
+dd  OpE0M1_0x76  ,OpE0M1_0x77
+dd  Op_0x78      ,OpM1X0_0x79
+dd  OpE0X0_0x7A  ,Op_0x7B
+dd  Op_0x7C      ,OpM1X0_0x7D
+dd  OpM1_0x7E    ,OpM1_0x7F
+dd  OpE0_0x80    ,OpE0M1_0x81     ; 80
+dd  Op_0x82      ,OpM1_0x83
+dd  OpE0X0_0x84  ,OpE0M1_0x85
+dd  OpE0X0_0x86  ,OpE0M1_0x87
+dd  OpX0_0x88    ,OpM1_0x89
+dd  OpM1_0x8A    ,OpE0_0x8B
+dd  OpX0_0x8C    ,OpM1_0x8D
+dd  OpX0_0x8E    ,OpM1_0x8F
+dd  OpE0_0x90    ,OpE0M1X0_0x91   ; 90
+dd  OpE0M1_0x92  ,OpM1_0x93
+dd  OpE0X0_0x94  ,OpE0M1_0x95
+dd  OpE0X0_0x96  ,OpE0M1_0x97
+dd  OpM1_0x98    ,OpM1_0x99
+dd  OpE0_0x9A    ,OpX0_0x9B
+dd  OpM1_0x9C    ,OpM1_0x9D
+dd  OpM1_0x9E    ,OpM1_0x9F
+dd  OpX0_0xA0    ,OpE0M1_0xA1     ; A0
+dd  OpX0_0xA2    ,OpM1_0xA3
+dd  OpE0X0_0xA4  ,OpE0M1_0xA5
+dd  OpE0X0_0xA6  ,OpE0M1_0xA7
+dd  OpX0_0xA8    ,OpM1_0xA9
+dd  OpX0_0xAA    ,OpE0_0xAB
+dd  OpX0_0xAC    ,OpM1_0xAD
+dd  OpX0_0xAE    ,OpM1_0xAF
+dd  OpE0_0xB0    ,OpE0M1X0_0xB1   ; B0
+dd  OpE0M1_0xB2  ,OpM1_0xB3
+dd  OpE0X0_0xB4  ,OpE0M1_0xB5
+dd  OpE0X0_0xB6  ,OpE0M1_0xB7
+dd  Op_0xB8      ,OpM1X0_0xB9
+dd  OpX0_0xBA    ,OpX0_0xBB
+dd  OpX0_0xBC    ,OpM1X0_0xBD
+dd  OpX0_0xBE    ,OpM1_0xBF
+dd  OpX0_0xC0    ,OpE0M1_0xC1     ; C0
+dd  OpE0_0xC2    ,OpM1_0xC3
+dd  OpE0X0_0xC4  ,OpE0M1_0xC5
+dd  OpE0M1_0xC6  ,OpE0M1_0xC7
+dd  OpX0_0xC8    ,OpM1_0xC9
+dd  OpX0_0xCA    ,Op_0xCB
+dd  OpX0_0xCC    ,OpM1_0xCD
+dd  OpM1_0xCE    ,OpM1_0xCF
+dd  OpE0_0xD0    ,OpE0M1X0_0xD1   ; D0
+dd  OpE0M1_0xD2  ,OpM1_0xD3
+dd  OpE0_0xD4    ,OpE0M1_0xD5
+dd  OpE0M1_0xD6  ,OpE0M1_0xD7
+dd  Op_0xD8      ,OpM1X0_0xD9
+dd  OpE0X0_0xDA  ,ALL_INVALID
+dd  Op_0xDC      ,OpM1X0_0xDD
+dd  OpM1_0xDE    ,OpM1_0xDF
+dd  OpX0_0xE0    ,OpE0M1_0xE1     ; E0
+dd  OpE0_0xE2    ,OpM1_0xE3
+dd  OpE0X0_0xE4  ,OpE0M1_0xE5
+dd  OpE0M1_0xE6  ,OpE0M1_0xE7
+dd  OpX0_0xE8    ,OpM1_0xE9
+dd  Op_0xEA      ,Op_0xEB
+dd  OpX0_0xEC    ,OpM1_0xED
+dd  OpM1_0xEE    ,OpM1_0xEF
+dd  OpE0_0xF0    ,OpE0M1X0_0xF1   ; F0
+dd  OpE0M1_0xF2  ,OpM1_0xF3
+dd  OpE0_0xF4    ,OpE0M1_0xF5
+dd  OpE0M1_0xF6  ,OpE0M1_0xF7
+dd  Op_0xF8      ,OpM1X0_0xF9
+dd  OpE0X0_0xFA  ,OpE0_0xFB
+dd  OpE0_0xFC    ,OpM1X0_0xFD
+dd  OpM1_0xFE    ,OpM1_0xFF
 
 OpTablePx:
-dd  C_LABEL(OpE0_0x00)    ,C_LABEL(OpE0M0_0x01)     ; 00
-dd  C_LABEL(OpE0_0x02)    ,C_LABEL(OpM0_0x03)
-dd  C_LABEL(OpE0M0_0x04)  ,C_LABEL(OpE0M0_0x05)
-dd  C_LABEL(OpE0M0_0x06)  ,C_LABEL(OpE0M0_0x07)
-dd  C_LABEL(OpE0_0x08)    ,C_LABEL(OpM0_0x09)
-dd  C_LABEL(OpM0_0x0A)    ,C_LABEL(OpE0_0x0B)
-dd  C_LABEL(OpM0_0x0C)    ,C_LABEL(OpM0_0x0D)
-dd  C_LABEL(OpM0_0x0E)    ,C_LABEL(OpM0_0x0F)
-dd  C_LABEL(OpE0_0x10)    ,C_LABEL(OpE0M0X1_0x11)   ; 10
-dd  C_LABEL(OpE0M0_0x12)  ,C_LABEL(OpM0_0x13)
-dd  C_LABEL(OpE0M0_0x14)  ,C_LABEL(OpE0M0_0x15)
-dd  C_LABEL(OpE0M0_0x16)  ,C_LABEL(OpE0M0_0x17)
-dd  C_LABEL(Op_0x18)      ,C_LABEL(OpM0X1_0x19)
-dd  C_LABEL(OpM0_0x1A)    ,C_LABEL(OpE0_0x1B)
-dd  C_LABEL(OpM0_0x1C)    ,C_LABEL(OpM0X1_0x1D)
-dd  C_LABEL(OpM0_0x1E)    ,C_LABEL(OpM0_0x1F)
-dd  C_LABEL(OpE0_0x20)    ,C_LABEL(OpE0M0_0x21)     ; 20
-dd  C_LABEL(OpE0_0x22)    ,C_LABEL(OpM0_0x23)
-dd  C_LABEL(OpE0M0_0x24)  ,C_LABEL(OpE0M0_0x25)
-dd  C_LABEL(OpE0M0_0x26)  ,C_LABEL(OpE0M0_0x27)
-dd  C_LABEL(OpE0_0x28)    ,C_LABEL(OpM0_0x29)
-dd  C_LABEL(OpM0_0x2A)    ,C_LABEL(OpE0_0x2B)
-dd  C_LABEL(OpM0_0x2C)    ,C_LABEL(OpM0_0x2D)
-dd  C_LABEL(OpM0_0x2E)    ,C_LABEL(OpM0_0x2F)
-dd  C_LABEL(OpE0_0x30)    ,C_LABEL(OpE0M0X1_0x31)   ; 30
-dd  C_LABEL(OpE0M0_0x32)  ,C_LABEL(OpM0_0x33)
-dd  C_LABEL(OpE0M0_0x34)  ,C_LABEL(OpE0M0_0x35)
-dd  C_LABEL(OpE0M0_0x36)  ,C_LABEL(OpE0M0_0x37)
-dd  C_LABEL(Op_0x38)      ,C_LABEL(OpM0X1_0x39)
-dd  C_LABEL(OpM0_0x3A)    ,C_LABEL(Op_0x3B)
-dd  C_LABEL(OpM0X1_0x3C)  ,C_LABEL(OpM0X1_0x3D)
-dd  C_LABEL(OpM0_0x3E)    ,C_LABEL(OpM0_0x3F)
-dd  C_LABEL(OpE0_0x40)    ,C_LABEL(OpE0M0_0x41)     ; 40
-dd  C_LABEL(ALL_INVALID)  ,C_LABEL(OpM0_0x43)
-dd  C_LABEL(OpX1_0x44)    ,C_LABEL(OpE0M0_0x45)
-dd  C_LABEL(OpE0M0_0x46)  ,C_LABEL(OpE0M0_0x47)
-dd  C_LABEL(OpE0M0_0x48)  ,C_LABEL(OpM0_0x49)
-dd  C_LABEL(OpM0_0x4A)    ,C_LABEL(OpE0_0x4B)
-dd  C_LABEL(Op_0x4C)      ,C_LABEL(OpM0_0x4D)
-dd  C_LABEL(OpM0_0x4E)    ,C_LABEL(OpM0_0x4F)
-dd  C_LABEL(OpE0_0x50)    ,C_LABEL(OpE0M0X1_0x51)   ; 50
-dd  C_LABEL(OpE0M0_0x52)  ,C_LABEL(OpM0_0x53)
-dd  C_LABEL(OpX1_0x54)    ,C_LABEL(OpE0M0_0x55)
-dd  C_LABEL(OpE0M0_0x56)  ,C_LABEL(OpE0M0_0x57)
-dd  C_LABEL(Op_0x58)      ,C_LABEL(OpM0X1_0x59)
-dd  C_LABEL(OpE0X1_0x5A)  ,C_LABEL(Op_0x5B)
-dd  C_LABEL(Op_0x5C)      ,C_LABEL(OpM0X1_0x5D)
-dd  C_LABEL(OpM0_0x5E)    ,C_LABEL(OpM0_0x5F)
-dd  C_LABEL(OpE0_0x60)    ,C_LABEL(OpE0M0_0x61)     ; 60
-dd  C_LABEL(OpE0_0x62)    ,C_LABEL(OpM0_0x63)
-dd  C_LABEL(OpE0M0_0x64)  ,C_LABEL(OpE0M0_0x65)
-dd  C_LABEL(OpE0M0_0x66)  ,C_LABEL(OpE0M0_0x67)
-dd  C_LABEL(OpE0M0_0x68)  ,C_LABEL(OpM0_0x69)
-dd  C_LABEL(OpM0_0x6A)    ,C_LABEL(OpE0_0x6B)
-dd  C_LABEL(Op_0x6C)      ,C_LABEL(OpM0_0x6D)
-dd  C_LABEL(OpM0_0x6E)    ,C_LABEL(OpM0_0x6F)
-dd  C_LABEL(OpE0_0x70)    ,C_LABEL(OpE0M0X1_0x71)   ; 70
-dd  C_LABEL(OpE0M0_0x72)  ,C_LABEL(OpM0_0x73)
-dd  C_LABEL(OpE0M0_0x74)  ,C_LABEL(OpE0M0_0x75)
-dd  C_LABEL(OpE0M0_0x76)  ,C_LABEL(OpE0M0_0x77)
-dd  C_LABEL(Op_0x78)      ,C_LABEL(OpM0X1_0x79)
-dd  C_LABEL(OpE0X1_0x7A)  ,C_LABEL(Op_0x7B)
-dd  C_LABEL(Op_0x7C)      ,C_LABEL(OpM0X1_0x7D)
-dd  C_LABEL(OpM0_0x7E)    ,C_LABEL(OpM0_0x7F)
-dd  C_LABEL(OpE0_0x80)    ,C_LABEL(OpE0M0_0x81)     ; 80
-dd  C_LABEL(Op_0x82)      ,C_LABEL(OpM0_0x83)
-dd  C_LABEL(OpE0X1_0x84)  ,C_LABEL(OpE0M0_0x85)
-dd  C_LABEL(OpE0X1_0x86)  ,C_LABEL(OpE0M0_0x87)
-dd  C_LABEL(OpX1_0x88)    ,C_LABEL(OpM0_0x89)
-dd  C_LABEL(OpM0_0x8A)    ,C_LABEL(OpE0_0x8B)
-dd  C_LABEL(OpX1_0x8C)    ,C_LABEL(OpM0_0x8D)
-dd  C_LABEL(OpX1_0x8E)    ,C_LABEL(OpM0_0x8F)
-dd  C_LABEL(OpE0_0x90)    ,C_LABEL(OpE0M0X1_0x91)   ; 90
-dd  C_LABEL(OpE0M0_0x92)  ,C_LABEL(OpM0_0x93)
-dd  C_LABEL(OpE0X1_0x94)  ,C_LABEL(OpE0M0_0x95)
-dd  C_LABEL(OpE0X1_0x96)  ,C_LABEL(OpE0M0_0x97)
-dd  C_LABEL(OpM0_0x98)    ,C_LABEL(OpM0_0x99)
-dd  C_LABEL(OpE0_0x9A)    ,C_LABEL(OpX1_0x9B)
-dd  C_LABEL(OpM0_0x9C)    ,C_LABEL(OpM0_0x9D)
-dd  C_LABEL(OpM0_0x9E)    ,C_LABEL(OpM0_0x9F)
-dd  C_LABEL(OpX1_0xA0)    ,C_LABEL(OpE0M0_0xA1)     ; A0
-dd  C_LABEL(OpX1_0xA2)    ,C_LABEL(OpM0_0xA3)
-dd  C_LABEL(OpE0X1_0xA4)  ,C_LABEL(OpE0M0_0xA5)
-dd  C_LABEL(OpE0X1_0xA6)  ,C_LABEL(OpE0M0_0xA7)
-dd  C_LABEL(OpX1_0xA8)    ,C_LABEL(OpM0_0xA9)
-dd  C_LABEL(OpX1_0xAA)    ,C_LABEL(OpE0_0xAB)
-dd  C_LABEL(OpX1_0xAC)    ,C_LABEL(OpM0_0xAD)
-dd  C_LABEL(OpX1_0xAE)    ,C_LABEL(OpM0_0xAF)
-dd  C_LABEL(OpE0_0xB0)    ,C_LABEL(OpE0M0X1_0xB1)   ; B0
-dd  C_LABEL(OpE0M0_0xB2)  ,C_LABEL(OpM0_0xB3)
-dd  C_LABEL(OpE0X1_0xB4)  ,C_LABEL(OpE0M0_0xB5)
-dd  C_LABEL(OpE0X1_0xB6)  ,C_LABEL(OpE0M0_0xB7)
-dd  C_LABEL(Op_0xB8)      ,C_LABEL(OpM0X1_0xB9)
-dd  C_LABEL(OpX1_0xBA)    ,C_LABEL(OpX1_0xBB)
-dd  C_LABEL(OpX1_0xBC)    ,C_LABEL(OpM0X1_0xBD)
-dd  C_LABEL(OpX1_0xBE)    ,C_LABEL(OpM0_0xBF)
-dd  C_LABEL(OpX1_0xC0)    ,C_LABEL(OpE0M0_0xC1)    ; C0
-dd  C_LABEL(OpE0_0xC2)    ,C_LABEL(OpM0_0xC3)
-dd  C_LABEL(OpE0X1_0xC4)  ,C_LABEL(OpE0M0_0xC5)
-dd  C_LABEL(OpE0M0_0xC6)  ,C_LABEL(OpE0M0_0xC7)
-dd  C_LABEL(OpX1_0xC8)    ,C_LABEL(OpM0_0xC9)
-dd  C_LABEL(OpX1_0xCA)    ,C_LABEL(Op_0xCB)
-dd  C_LABEL(OpX1_0xCC)    ,C_LABEL(OpM0_0xCD)
-dd  C_LABEL(OpM0_0xCE)    ,C_LABEL(OpM0_0xCF)
-dd  C_LABEL(OpE0_0xD0)    ,C_LABEL(OpE0M0X1_0xD1)   ; D0
-dd  C_LABEL(OpE0M0_0xD2)  ,C_LABEL(OpM0_0xD3)
-dd  C_LABEL(OpE0_0xD4)    ,C_LABEL(OpE0M0_0xD5)
-dd  C_LABEL(OpE0M0_0xD6)  ,C_LABEL(OpE0M0_0xD7)
-dd  C_LABEL(Op_0xD8)      ,C_LABEL(OpM0X1_0xD9)
-dd  C_LABEL(OpE0X1_0xDA)  ,C_LABEL(ALL_INVALID)
-dd  C_LABEL(Op_0xDC)      ,C_LABEL(OpM0X1_0xDD)
-dd  C_LABEL(OpM0_0xDE)    ,C_LABEL(OpM0_0xDF)
-dd  C_LABEL(OpX1_0xE0)    ,C_LABEL(OpE0M0_0xE1)     ; E0
-dd  C_LABEL(OpE0_0xE2)    ,C_LABEL(OpM0_0xE3)
-dd  C_LABEL(OpE0X1_0xE4)  ,C_LABEL(OpE0M0_0xE5)
-dd  C_LABEL(OpE0M0_0xE6)  ,C_LABEL(OpE0M0_0xE7)
-dd  C_LABEL(OpX1_0xE8)    ,C_LABEL(OpM0_0xE9)
-dd  C_LABEL(Op_0xEA)      ,C_LABEL(Op_0xEB)
-dd  C_LABEL(OpX1_0xEC)    ,C_LABEL(OpM0_0xED)
-dd  C_LABEL(OpM0_0xEE)    ,C_LABEL(OpM0_0xEF)
-dd  C_LABEL(OpE0_0xF0)    ,C_LABEL(OpE0M0X1_0xF1)   ; F0
-dd  C_LABEL(OpE0M0_0xF2)  ,C_LABEL(OpM0_0xF3)
-dd  C_LABEL(OpE0_0xF4)    ,C_LABEL(OpE0M0_0xF5)
-dd  C_LABEL(OpE0M0_0xF6)  ,C_LABEL(OpE0M0_0xF7)
-dd  C_LABEL(Op_0xF8)      ,C_LABEL(OpM0X1_0xF9)
-dd  C_LABEL(OpE0X1_0xFA)  ,C_LABEL(OpE0_0xFB)
-dd  C_LABEL(OpE0_0xFC)    ,C_LABEL(OpM0X1_0xFD)
-dd  C_LABEL(OpM0_0xFE)    ,C_LABEL(OpM0_0xFF)
+dd  OpE0_0x00    ,OpE0M0_0x01     ; 00
+dd  OpE0_0x02    ,OpM0_0x03
+dd  OpE0M0_0x04  ,OpE0M0_0x05
+dd  OpE0M0_0x06  ,OpE0M0_0x07
+dd  OpE0_0x08    ,OpM0_0x09
+dd  OpM0_0x0A    ,OpE0_0x0B
+dd  OpM0_0x0C    ,OpM0_0x0D
+dd  OpM0_0x0E    ,OpM0_0x0F
+dd  OpE0_0x10    ,OpE0M0X1_0x11   ; 10
+dd  OpE0M0_0x12  ,OpM0_0x13
+dd  OpE0M0_0x14  ,OpE0M0_0x15
+dd  OpE0M0_0x16  ,OpE0M0_0x17
+dd  Op_0x18      ,OpM0X1_0x19
+dd  OpM0_0x1A    ,OpE0_0x1B
+dd  OpM0_0x1C    ,OpM0X1_0x1D
+dd  OpM0_0x1E    ,OpM0_0x1F
+dd  OpE0_0x20    ,OpE0M0_0x21     ; 20
+dd  OpE0_0x22    ,OpM0_0x23
+dd  OpE0M0_0x24  ,OpE0M0_0x25
+dd  OpE0M0_0x26  ,OpE0M0_0x27
+dd  OpE0_0x28    ,OpM0_0x29
+dd  OpM0_0x2A    ,OpE0_0x2B
+dd  OpM0_0x2C    ,OpM0_0x2D
+dd  OpM0_0x2E    ,OpM0_0x2F
+dd  OpE0_0x30    ,OpE0M0X1_0x31   ; 30
+dd  OpE0M0_0x32  ,OpM0_0x33
+dd  OpE0M0_0x34  ,OpE0M0_0x35
+dd  OpE0M0_0x36  ,OpE0M0_0x37
+dd  Op_0x38      ,OpM0X1_0x39
+dd  OpM0_0x3A    ,Op_0x3B
+dd  OpM0X1_0x3C  ,OpM0X1_0x3D
+dd  OpM0_0x3E    ,OpM0_0x3F
+dd  OpE0_0x40    ,OpE0M0_0x41     ; 40
+dd  ALL_INVALID  ,OpM0_0x43
+dd  OpX1_0x44    ,OpE0M0_0x45
+dd  OpE0M0_0x46  ,OpE0M0_0x47
+dd  OpE0M0_0x48  ,OpM0_0x49
+dd  OpM0_0x4A    ,OpE0_0x4B
+dd  Op_0x4C      ,OpM0_0x4D
+dd  OpM0_0x4E    ,OpM0_0x4F
+dd  OpE0_0x50    ,OpE0M0X1_0x51   ; 50
+dd  OpE0M0_0x52  ,OpM0_0x53
+dd  OpX1_0x54    ,OpE0M0_0x55
+dd  OpE0M0_0x56  ,OpE0M0_0x57
+dd  Op_0x58      ,OpM0X1_0x59
+dd  OpE0X1_0x5A  ,Op_0x5B
+dd  Op_0x5C      ,OpM0X1_0x5D
+dd  OpM0_0x5E    ,OpM0_0x5F
+dd  OpE0_0x60    ,OpE0M0_0x61     ; 60
+dd  OpE0_0x62    ,OpM0_0x63
+dd  OpE0M0_0x64  ,OpE0M0_0x65
+dd  OpE0M0_0x66  ,OpE0M0_0x67
+dd  OpE0M0_0x68  ,OpM0_0x69
+dd  OpM0_0x6A    ,OpE0_0x6B
+dd  Op_0x6C      ,OpM0_0x6D
+dd  OpM0_0x6E    ,OpM0_0x6F
+dd  OpE0_0x70    ,OpE0M0X1_0x71   ; 70
+dd  OpE0M0_0x72  ,OpM0_0x73
+dd  OpE0M0_0x74  ,OpE0M0_0x75
+dd  OpE0M0_0x76  ,OpE0M0_0x77
+dd  Op_0x78      ,OpM0X1_0x79
+dd  OpE0X1_0x7A  ,Op_0x7B
+dd  Op_0x7C      ,OpM0X1_0x7D
+dd  OpM0_0x7E    ,OpM0_0x7F
+dd  OpE0_0x80    ,OpE0M0_0x81     ; 80
+dd  Op_0x82      ,OpM0_0x83
+dd  OpE0X1_0x84  ,OpE0M0_0x85
+dd  OpE0X1_0x86  ,OpE0M0_0x87
+dd  OpX1_0x88    ,OpM0_0x89
+dd  OpM0_0x8A    ,OpE0_0x8B
+dd  OpX1_0x8C    ,OpM0_0x8D
+dd  OpX1_0x8E    ,OpM0_0x8F
+dd  OpE0_0x90    ,OpE0M0X1_0x91   ; 90
+dd  OpE0M0_0x92  ,OpM0_0x93
+dd  OpE0X1_0x94  ,OpE0M0_0x95
+dd  OpE0X1_0x96  ,OpE0M0_0x97
+dd  OpM0_0x98    ,OpM0_0x99
+dd  OpE0_0x9A    ,OpX1_0x9B
+dd  OpM0_0x9C    ,OpM0_0x9D
+dd  OpM0_0x9E    ,OpM0_0x9F
+dd  OpX1_0xA0    ,OpE0M0_0xA1     ; A0
+dd  OpX1_0xA2    ,OpM0_0xA3
+dd  OpE0X1_0xA4  ,OpE0M0_0xA5
+dd  OpE0X1_0xA6  ,OpE0M0_0xA7
+dd  OpX1_0xA8    ,OpM0_0xA9
+dd  OpX1_0xAA    ,OpE0_0xAB
+dd  OpX1_0xAC    ,OpM0_0xAD
+dd  OpX1_0xAE    ,OpM0_0xAF
+dd  OpE0_0xB0    ,OpE0M0X1_0xB1   ; B0
+dd  OpE0M0_0xB2  ,OpM0_0xB3
+dd  OpE0X1_0xB4  ,OpE0M0_0xB5
+dd  OpE0X1_0xB6  ,OpE0M0_0xB7
+dd  Op_0xB8      ,OpM0X1_0xB9
+dd  OpX1_0xBA    ,OpX1_0xBB
+dd  OpX1_0xBC    ,OpM0X1_0xBD
+dd  OpX1_0xBE    ,OpM0_0xBF
+dd  OpX1_0xC0    ,OpE0M0_0xC1    ; C0
+dd  OpE0_0xC2    ,OpM0_0xC3
+dd  OpE0X1_0xC4  ,OpE0M0_0xC5
+dd  OpE0M0_0xC6  ,OpE0M0_0xC7
+dd  OpX1_0xC8    ,OpM0_0xC9
+dd  OpX1_0xCA    ,Op_0xCB
+dd  OpX1_0xCC    ,OpM0_0xCD
+dd  OpM0_0xCE    ,OpM0_0xCF
+dd  OpE0_0xD0    ,OpE0M0X1_0xD1   ; D0
+dd  OpE0M0_0xD2  ,OpM0_0xD3
+dd  OpE0_0xD4    ,OpE0M0_0xD5
+dd  OpE0M0_0xD6  ,OpE0M0_0xD7
+dd  Op_0xD8      ,OpM0X1_0xD9
+dd  OpE0X1_0xDA  ,ALL_INVALID
+dd  Op_0xDC      ,OpM0X1_0xDD
+dd  OpM0_0xDE    ,OpM0_0xDF
+dd  OpX1_0xE0    ,OpE0M0_0xE1     ; E0
+dd  OpE0_0xE2    ,OpM0_0xE3
+dd  OpE0X1_0xE4  ,OpE0M0_0xE5
+dd  OpE0M0_0xE6  ,OpE0M0_0xE7
+dd  OpX1_0xE8    ,OpM0_0xE9
+dd  Op_0xEA      ,Op_0xEB
+dd  OpX1_0xEC    ,OpM0_0xED
+dd  OpM0_0xEE    ,OpM0_0xEF
+dd  OpE0_0xF0    ,OpE0M0X1_0xF1   ; F0
+dd  OpE0M0_0xF2  ,OpM0_0xF3
+dd  OpE0_0xF4    ,OpE0M0_0xF5
+dd  OpE0M0_0xF6  ,OpE0M0_0xF7
+dd  Op_0xF8      ,OpM0X1_0xF9
+dd  OpE0X1_0xFA  ,OpE0_0xFB
+dd  OpE0_0xFC    ,OpM0X1_0xFD
+dd  OpM0_0xFE    ,OpM0_0xFF
 
 OpTableMX:
-dd  C_LABEL(OpE0_0x00)    ,C_LABEL(OpE0M1_0x01)     ; 00
-dd  C_LABEL(OpE0_0x02)    ,C_LABEL(OpM1_0x03)
-dd  C_LABEL(OpE0M1_0x04)  ,C_LABEL(OpE0M1_0x05)
-dd  C_LABEL(OpE0M1_0x06)  ,C_LABEL(OpE0M1_0x07)
-dd  C_LABEL(OpE0_0x08)    ,C_LABEL(OpM1_0x09)
-dd  C_LABEL(OpM1_0x0A)    ,C_LABEL(OpE0_0x0B)
-dd  C_LABEL(OpM1_0x0C)    ,C_LABEL(OpM1_0x0D)
-dd  C_LABEL(OpM1_0x0E)    ,C_LABEL(OpM1_0x0F)
-dd  C_LABEL(OpE0_0x10)    ,C_LABEL(OpE0M1X1_0x11)   ; 10
-dd  C_LABEL(OpE0M1_0x12)  ,C_LABEL(OpM1_0x13)
-dd  C_LABEL(OpE0M1_0x14)  ,C_LABEL(OpE0M1_0x15)
-dd  C_LABEL(OpE0M1_0x16)  ,C_LABEL(OpE0M1_0x17)
-dd  C_LABEL(Op_0x18)      ,C_LABEL(OpM1X1_0x19)
-dd  C_LABEL(OpM1_0x1A)    ,C_LABEL(OpE0_0x1B)
-dd  C_LABEL(OpM1_0x1C)    ,C_LABEL(OpM1X1_0x1D)
-dd  C_LABEL(OpM1_0x1E)    ,C_LABEL(OpM1_0x1F)
-dd  C_LABEL(OpE0_0x20)    ,C_LABEL(OpE0M1_0x21)     ; 20
-dd  C_LABEL(OpE0_0x22)    ,C_LABEL(OpM1_0x23)
-dd  C_LABEL(OpE0M1_0x24)  ,C_LABEL(OpE0M1_0x25)
-dd  C_LABEL(OpE0M1_0x26)  ,C_LABEL(OpE0M1_0x27)
-dd  C_LABEL(OpE0_0x28)    ,C_LABEL(OpM1_0x29)
-dd  C_LABEL(OpM1_0x2A)    ,C_LABEL(OpE0_0x2B)
-dd  C_LABEL(OpM1_0x2C)    ,C_LABEL(OpM1_0x2D)
-dd  C_LABEL(OpM1_0x2E)    ,C_LABEL(OpM1_0x2F)
-dd  C_LABEL(OpE0_0x30)    ,C_LABEL(OpE0M1X1_0x31)   ; 30
-dd  C_LABEL(OpE0M1_0x32)  ,C_LABEL(OpM1_0x33)
-dd  C_LABEL(OpE0M1_0x34)  ,C_LABEL(OpE0M1_0x35)
-dd  C_LABEL(OpE0M1_0x36)  ,C_LABEL(OpE0M1_0x37)
-dd  C_LABEL(Op_0x38)      ,C_LABEL(OpM1X1_0x39)
-dd  C_LABEL(OpM1_0x3A)    ,C_LABEL(Op_0x3B)
-dd  C_LABEL(OpM1X1_0x3C)  ,C_LABEL(OpM1X1_0x3D)
-dd  C_LABEL(OpM1_0x3E)    ,C_LABEL(OpM1_0x3F)
-dd  C_LABEL(OpE0_0x40)    ,C_LABEL(OpE0M1_0x41)     ; 40
-dd  C_LABEL(ALL_INVALID)  ,C_LABEL(OpM1_0x43)
-dd  C_LABEL(OpX1_0x44)    ,C_LABEL(OpE0M1_0x45)
-dd  C_LABEL(OpE0M1_0x46)  ,C_LABEL(OpE0M1_0x47)
-dd  C_LABEL(OpE0M1_0x48)  ,C_LABEL(OpM1_0x49)
-dd  C_LABEL(OpM1_0x4A)    ,C_LABEL(OpE0_0x4B)
-dd  C_LABEL(Op_0x4C)      ,C_LABEL(OpM1_0x4D)
-dd  C_LABEL(OpM1_0x4E)    ,C_LABEL(OpM1_0x4F)
-dd  C_LABEL(OpE0_0x50)    ,C_LABEL(OpE0M1X1_0x51)   ; 50
-dd  C_LABEL(OpE0M1_0x52)  ,C_LABEL(OpM1_0x53)
-dd  C_LABEL(OpX1_0x54)    ,C_LABEL(OpE0M1_0x55)
-dd  C_LABEL(OpE0M1_0x56)  ,C_LABEL(OpE0M1_0x57)
-dd  C_LABEL(Op_0x58)      ,C_LABEL(OpM1X1_0x59)
-dd  C_LABEL(OpE0X1_0x5A)  ,C_LABEL(Op_0x5B)
-dd  C_LABEL(Op_0x5C)      ,C_LABEL(OpM1X1_0x5D)
-dd  C_LABEL(OpM1_0x5E)    ,C_LABEL(OpM1_0x5F)
-dd  C_LABEL(OpE0_0x60)    ,C_LABEL(OpE0M1_0x61)     ; 60
-dd  C_LABEL(OpE0_0x62)    ,C_LABEL(OpM1_0x63)
-dd  C_LABEL(OpE0M1_0x64)  ,C_LABEL(OpE0M1_0x65)
-dd  C_LABEL(OpE0M1_0x66)  ,C_LABEL(OpE0M1_0x67)
-dd  C_LABEL(OpE0M1_0x68)  ,C_LABEL(OpM1_0x69)
-dd  C_LABEL(OpM1_0x6A)    ,C_LABEL(OpE0_0x6B)
-dd  C_LABEL(Op_0x6C)      ,C_LABEL(OpM1_0x6D)
-dd  C_LABEL(OpM1_0x6E)    ,C_LABEL(OpM1_0x6F)
-dd  C_LABEL(OpE0_0x70)    ,C_LABEL(OpE0M1X1_0x71)   ; 70
-dd  C_LABEL(OpE0M1_0x72)  ,C_LABEL(OpM1_0x73)
-dd  C_LABEL(OpE0M1_0x74)  ,C_LABEL(OpE0M1_0x75)
-dd  C_LABEL(OpE0M1_0x76)  ,C_LABEL(OpE0M1_0x77)
-dd  C_LABEL(Op_0x78)      ,C_LABEL(OpM1X1_0x79)
-dd  C_LABEL(OpE0X1_0x7A)  ,C_LABEL(Op_0x7B)
-dd  C_LABEL(Op_0x7C)      ,C_LABEL(OpM1X1_0x7D)
-dd  C_LABEL(OpM1_0x7E)    ,C_LABEL(OpM1_0x7F)
-dd  C_LABEL(OpE0_0x80)    ,C_LABEL(OpE0M1_0x81)     ; 80
-dd  C_LABEL(Op_0x82)      ,C_LABEL(OpM1_0x83)
-dd  C_LABEL(OpE0X1_0x84)  ,C_LABEL(OpE0M1_0x85)
-dd  C_LABEL(OpE0X1_0x86)  ,C_LABEL(OpE0M1_0x87)
-dd  C_LABEL(OpX1_0x88)    ,C_LABEL(OpM1_0x89)
-dd  C_LABEL(OpM1_0x8A)    ,C_LABEL(OpE0_0x8B)
-dd  C_LABEL(OpX1_0x8C)    ,C_LABEL(OpM1_0x8D)
-dd  C_LABEL(OpX1_0x8E)    ,C_LABEL(OpM1_0x8F)
-dd  C_LABEL(OpE0_0x90)    ,C_LABEL(OpE0M1X1_0x91)   ; 90
-dd  C_LABEL(OpE0M1_0x92)  ,C_LABEL(OpM1_0x93)
-dd  C_LABEL(OpE0X1_0x94)  ,C_LABEL(OpE0M1_0x95)
-dd  C_LABEL(OpE0X1_0x96)  ,C_LABEL(OpE0M1_0x97)
-dd  C_LABEL(OpM1_0x98)    ,C_LABEL(OpM1_0x99)
-dd  C_LABEL(OpE0_0x9A)    ,C_LABEL(OpX1_0x9B)
-dd  C_LABEL(OpM1_0x9C)    ,C_LABEL(OpM1_0x9D)
-dd  C_LABEL(OpM1_0x9E)    ,C_LABEL(OpM1_0x9F)
-dd  C_LABEL(OpX1_0xA0)    ,C_LABEL(OpE0M1_0xA1)     ; A0
-dd  C_LABEL(OpX1_0xA2)    ,C_LABEL(OpM1_0xA3)
-dd  C_LABEL(OpE0X1_0xA4)  ,C_LABEL(OpE0M1_0xA5)
-dd  C_LABEL(OpE0X1_0xA6)  ,C_LABEL(OpE0M1_0xA7)
-dd  C_LABEL(OpX1_0xA8)    ,C_LABEL(OpM1_0xA9)
-dd  C_LABEL(OpX1_0xAA)    ,C_LABEL(OpE0_0xAB)
-dd  C_LABEL(OpX1_0xAC)    ,C_LABEL(OpM1_0xAD)
-dd  C_LABEL(OpX1_0xAE)    ,C_LABEL(OpM1_0xAF)
-dd  C_LABEL(OpE0_0xB0)    ,C_LABEL(OpE0M1X1_0xB1)   ; B0
-dd  C_LABEL(OpE0M1_0xB2)  ,C_LABEL(OpM1_0xB3)
-dd  C_LABEL(OpE0X1_0xB4)  ,C_LABEL(OpE0M1_0xB5)
-dd  C_LABEL(OpE0X1_0xB6)  ,C_LABEL(OpE0M1_0xB7)
-dd  C_LABEL(Op_0xB8)      ,C_LABEL(OpM1X1_0xB9)
-dd  C_LABEL(OpX1_0xBA)    ,C_LABEL(OpX1_0xBB)
-dd  C_LABEL(OpX1_0xBC)    ,C_LABEL(OpM1X1_0xBD)
-dd  C_LABEL(OpX1_0xBE)    ,C_LABEL(OpM1_0xBF)
-dd  C_LABEL(OpX1_0xC0)    ,C_LABEL(OpE0M1_0xC1)     ; C0
-dd  C_LABEL(OpE0_0xC2)    ,C_LABEL(OpM1_0xC3)
-dd  C_LABEL(OpE0X1_0xC4)  ,C_LABEL(OpE0M1_0xC5)
-dd  C_LABEL(OpE0M1_0xC6)  ,C_LABEL(OpE0M1_0xC7)
-dd  C_LABEL(OpX1_0xC8)    ,C_LABEL(OpM1_0xC9)
-dd  C_LABEL(OpX1_0xCA)    ,C_LABEL(Op_0xCB)
-dd  C_LABEL(OpX1_0xCC)    ,C_LABEL(OpM1_0xCD)
-dd  C_LABEL(OpM1_0xCE)    ,C_LABEL(OpM1_0xCF)
-dd  C_LABEL(OpE0_0xD0)    ,C_LABEL(OpE0M1X1_0xD1)   ; D0
-dd  C_LABEL(OpE0M1_0xD2)  ,C_LABEL(OpM1_0xD3)
-dd  C_LABEL(OpE0_0xD4)    ,C_LABEL(OpE0M1_0xD5)
-dd  C_LABEL(OpE0M1_0xD6)  ,C_LABEL(OpE0M1_0xD7)
-dd  C_LABEL(Op_0xD8)      ,C_LABEL(OpM1X1_0xD9)
-dd  C_LABEL(OpE0X1_0xDA)  ,C_LABEL(ALL_INVALID)
-dd  C_LABEL(Op_0xDC)      ,C_LABEL(OpM1X1_0xDD)
-dd  C_LABEL(OpM1_0xDE)    ,C_LABEL(OpM1_0xDF)
-dd  C_LABEL(OpX1_0xE0)    ,C_LABEL(OpE0M1_0xE1)     ; E0
-dd  C_LABEL(OpE0_0xE2)    ,C_LABEL(OpM1_0xE3)
-dd  C_LABEL(OpE0X1_0xE4)  ,C_LABEL(OpE0M1_0xE5)
-dd  C_LABEL(OpE0M1_0xE6)  ,C_LABEL(OpE0M1_0xE7)
-dd  C_LABEL(OpX1_0xE8)    ,C_LABEL(OpM1_0xE9)
-dd  C_LABEL(Op_0xEA)      ,C_LABEL(Op_0xEB)
-dd  C_LABEL(OpX1_0xEC)    ,C_LABEL(OpM1_0xED)
-dd  C_LABEL(OpM1_0xEE)    ,C_LABEL(OpM1_0xEF)
-dd  C_LABEL(OpE0_0xF0)    ,C_LABEL(OpE0M1X1_0xF1)   ; F0
-dd  C_LABEL(OpE0M1_0xF2)  ,C_LABEL(OpM1_0xF3)
-dd  C_LABEL(OpE0_0xF4)    ,C_LABEL(OpE0M1_0xF5)
-dd  C_LABEL(OpE0M1_0xF6)  ,C_LABEL(OpE0M1_0xF7)
-dd  C_LABEL(Op_0xF8)      ,C_LABEL(OpM1X1_0xF9)
-dd  C_LABEL(OpE0X1_0xFA)  ,C_LABEL(OpE0_0xFB)
-dd  C_LABEL(OpE0_0xFC)    ,C_LABEL(OpM1X1_0xFD)
-dd  C_LABEL(OpM1_0xFE)    ,C_LABEL(OpM1_0xFF)
+dd  OpE0_0x00    ,OpE0M1_0x01     ; 00
+dd  OpE0_0x02    ,OpM1_0x03
+dd  OpE0M1_0x04  ,OpE0M1_0x05
+dd  OpE0M1_0x06  ,OpE0M1_0x07
+dd  OpE0_0x08    ,OpM1_0x09
+dd  OpM1_0x0A    ,OpE0_0x0B
+dd  OpM1_0x0C    ,OpM1_0x0D
+dd  OpM1_0x0E    ,OpM1_0x0F
+dd  OpE0_0x10    ,OpE0M1X1_0x11   ; 10
+dd  OpE0M1_0x12  ,OpM1_0x13
+dd  OpE0M1_0x14  ,OpE0M1_0x15
+dd  OpE0M1_0x16  ,OpE0M1_0x17
+dd  Op_0x18      ,OpM1X1_0x19
+dd  OpM1_0x1A    ,OpE0_0x1B
+dd  OpM1_0x1C    ,OpM1X1_0x1D
+dd  OpM1_0x1E    ,OpM1_0x1F
+dd  OpE0_0x20    ,OpE0M1_0x21     ; 20
+dd  OpE0_0x22    ,OpM1_0x23
+dd  OpE0M1_0x24  ,OpE0M1_0x25
+dd  OpE0M1_0x26  ,OpE0M1_0x27
+dd  OpE0_0x28    ,OpM1_0x29
+dd  OpM1_0x2A    ,OpE0_0x2B
+dd  OpM1_0x2C    ,OpM1_0x2D
+dd  OpM1_0x2E    ,OpM1_0x2F
+dd  OpE0_0x30    ,OpE0M1X1_0x31   ; 30
+dd  OpE0M1_0x32  ,OpM1_0x33
+dd  OpE0M1_0x34  ,OpE0M1_0x35
+dd  OpE0M1_0x36  ,OpE0M1_0x37
+dd  Op_0x38      ,OpM1X1_0x39
+dd  OpM1_0x3A    ,Op_0x3B
+dd  OpM1X1_0x3C  ,OpM1X1_0x3D
+dd  OpM1_0x3E    ,OpM1_0x3F
+dd  OpE0_0x40    ,OpE0M1_0x41     ; 40
+dd  ALL_INVALID  ,OpM1_0x43
+dd  OpX1_0x44    ,OpE0M1_0x45
+dd  OpE0M1_0x46  ,OpE0M1_0x47
+dd  OpE0M1_0x48  ,OpM1_0x49
+dd  OpM1_0x4A    ,OpE0_0x4B
+dd  Op_0x4C      ,OpM1_0x4D
+dd  OpM1_0x4E    ,OpM1_0x4F
+dd  OpE0_0x50    ,OpE0M1X1_0x51   ; 50
+dd  OpE0M1_0x52  ,OpM1_0x53
+dd  OpX1_0x54    ,OpE0M1_0x55
+dd  OpE0M1_0x56  ,OpE0M1_0x57
+dd  Op_0x58      ,OpM1X1_0x59
+dd  OpE0X1_0x5A  ,Op_0x5B
+dd  Op_0x5C      ,OpM1X1_0x5D
+dd  OpM1_0x5E    ,OpM1_0x5F
+dd  OpE0_0x60    ,OpE0M1_0x61     ; 60
+dd  OpE0_0x62    ,OpM1_0x63
+dd  OpE0M1_0x64  ,OpE0M1_0x65
+dd  OpE0M1_0x66  ,OpE0M1_0x67
+dd  OpE0M1_0x68  ,OpM1_0x69
+dd  OpM1_0x6A    ,OpE0_0x6B
+dd  Op_0x6C      ,OpM1_0x6D
+dd  OpM1_0x6E    ,OpM1_0x6F
+dd  OpE0_0x70    ,OpE0M1X1_0x71   ; 70
+dd  OpE0M1_0x72  ,OpM1_0x73
+dd  OpE0M1_0x74  ,OpE0M1_0x75
+dd  OpE0M1_0x76  ,OpE0M1_0x77
+dd  Op_0x78      ,OpM1X1_0x79
+dd  OpE0X1_0x7A  ,Op_0x7B
+dd  Op_0x7C      ,OpM1X1_0x7D
+dd  OpM1_0x7E    ,OpM1_0x7F
+dd  OpE0_0x80    ,OpE0M1_0x81     ; 80
+dd  Op_0x82      ,OpM1_0x83
+dd  OpE0X1_0x84  ,OpE0M1_0x85
+dd  OpE0X1_0x86  ,OpE0M1_0x87
+dd  OpX1_0x88    ,OpM1_0x89
+dd  OpM1_0x8A    ,OpE0_0x8B
+dd  OpX1_0x8C    ,OpM1_0x8D
+dd  OpX1_0x8E    ,OpM1_0x8F
+dd  OpE0_0x90    ,OpE0M1X1_0x91   ; 90
+dd  OpE0M1_0x92  ,OpM1_0x93
+dd  OpE0X1_0x94  ,OpE0M1_0x95
+dd  OpE0X1_0x96  ,OpE0M1_0x97
+dd  OpM1_0x98    ,OpM1_0x99
+dd  OpE0_0x9A    ,OpX1_0x9B
+dd  OpM1_0x9C    ,OpM1_0x9D
+dd  OpM1_0x9E    ,OpM1_0x9F
+dd  OpX1_0xA0    ,OpE0M1_0xA1     ; A0
+dd  OpX1_0xA2    ,OpM1_0xA3
+dd  OpE0X1_0xA4  ,OpE0M1_0xA5
+dd  OpE0X1_0xA6  ,OpE0M1_0xA7
+dd  OpX1_0xA8    ,OpM1_0xA9
+dd  OpX1_0xAA    ,OpE0_0xAB
+dd  OpX1_0xAC    ,OpM1_0xAD
+dd  OpX1_0xAE    ,OpM1_0xAF
+dd  OpE0_0xB0    ,OpE0M1X1_0xB1   ; B0
+dd  OpE0M1_0xB2  ,OpM1_0xB3
+dd  OpE0X1_0xB4  ,OpE0M1_0xB5
+dd  OpE0X1_0xB6  ,OpE0M1_0xB7
+dd  Op_0xB8      ,OpM1X1_0xB9
+dd  OpX1_0xBA    ,OpX1_0xBB
+dd  OpX1_0xBC    ,OpM1X1_0xBD
+dd  OpX1_0xBE    ,OpM1_0xBF
+dd  OpX1_0xC0    ,OpE0M1_0xC1     ; C0
+dd  OpE0_0xC2    ,OpM1_0xC3
+dd  OpE0X1_0xC4  ,OpE0M1_0xC5
+dd  OpE0M1_0xC6  ,OpE0M1_0xC7
+dd  OpX1_0xC8    ,OpM1_0xC9
+dd  OpX1_0xCA    ,Op_0xCB
+dd  OpX1_0xCC    ,OpM1_0xCD
+dd  OpM1_0xCE    ,OpM1_0xCF
+dd  OpE0_0xD0    ,OpE0M1X1_0xD1   ; D0
+dd  OpE0M1_0xD2  ,OpM1_0xD3
+dd  OpE0_0xD4    ,OpE0M1_0xD5
+dd  OpE0M1_0xD6  ,OpE0M1_0xD7
+dd  Op_0xD8      ,OpM1X1_0xD9
+dd  OpE0X1_0xDA  ,ALL_INVALID
+dd  Op_0xDC      ,OpM1X1_0xDD
+dd  OpM1_0xDE    ,OpM1_0xDF
+dd  OpX1_0xE0    ,OpE0M1_0xE1     ; E0
+dd  OpE0_0xE2    ,OpM1_0xE3
+dd  OpE0X1_0xE4  ,OpE0M1_0xE5
+dd  OpE0M1_0xE6  ,OpE0M1_0xE7
+dd  OpX1_0xE8    ,OpM1_0xE9
+dd  Op_0xEA      ,Op_0xEB
+dd  OpX1_0xEC    ,OpM1_0xED
+dd  OpM1_0xEE    ,OpM1_0xEF
+dd  OpE0_0xF0    ,OpE0M1X1_0xF1   ; F0
+dd  OpE0M1_0xF2  ,OpM1_0xF3
+dd  OpE0_0xF4    ,OpE0M1_0xF5
+dd  OpE0M1_0xF6  ,OpE0M1_0xF7
+dd  Op_0xF8      ,OpM1X1_0xF9
+dd  OpE0X1_0xFA  ,OpE0_0xFB
+dd  OpE0_0xFC    ,OpM1X1_0xFD
+dd  OpM1_0xFE    ,OpM1_0xFF
 
 OpTableE1:
-dd  C_LABEL(OpE1_0x00)    ,C_LABEL(OpE1_0x01)       ; 00
-dd  C_LABEL(OpE1_0x02)    ,C_LABEL(OpM1_0x03)
-dd  C_LABEL(OpE1_0x04)    ,C_LABEL(OpE1_0x05)
-dd  C_LABEL(OpE1_0x06)    ,C_LABEL(OpE1_0x07)
-dd  C_LABEL(OpE1_0x08)    ,C_LABEL(OpM1_0x09)
-dd  C_LABEL(OpM1_0x0A)    ,C_LABEL(OpE1_0x0B)
-dd  C_LABEL(OpM1_0x0C)    ,C_LABEL(OpM1_0x0D)
-dd  C_LABEL(OpM1_0x0E)    ,C_LABEL(OpM1_0x0F)
-dd  C_LABEL(OpE1_0x10)    ,C_LABEL(OpE1_0x11)       ; 10
-dd  C_LABEL(OpE1_0x12)    ,C_LABEL(OpM1_0x13)
-dd  C_LABEL(OpE1_0x14)    ,C_LABEL(OpE1_0x15)
-dd  C_LABEL(OpE1_0x16)    ,C_LABEL(OpE1_0x17)
-dd  C_LABEL(Op_0x18)      ,C_LABEL(OpM1X1_0x19)
-dd  C_LABEL(OpM1_0x1A)    ,C_LABEL(OpE1_0x1B)
-dd  C_LABEL(OpM1_0x1C)    ,C_LABEL(OpM1X1_0x1D)
-dd  C_LABEL(OpM1_0x1E)    ,C_LABEL(OpM1_0x1F)
-dd  C_LABEL(OpE1_0x20)    ,C_LABEL(OpE1_0x21)       ; 20
-dd  C_LABEL(OpE1_0x22)    ,C_LABEL(OpM1_0x23)
-dd  C_LABEL(OpE1_0x24)    ,C_LABEL(OpE1_0x25)
-dd  C_LABEL(OpE1_0x26)    ,C_LABEL(OpE1_0x27)
-dd  C_LABEL(OpE1_0x28)    ,C_LABEL(OpM1_0x29)
-dd  C_LABEL(OpM1_0x2A)    ,C_LABEL(OpE1_0x2B)
-dd  C_LABEL(OpM1_0x2C)    ,C_LABEL(OpM1_0x2D)
-dd  C_LABEL(OpM1_0x2E)    ,C_LABEL(OpM1_0x2F)
-dd  C_LABEL(OpE1_0x30)    ,C_LABEL(OpE1_0x31)       ; 30
-dd  C_LABEL(OpE1_0x32)    ,C_LABEL(OpM1_0x33)
-dd  C_LABEL(OpE1_0x34)    ,C_LABEL(OpE1_0x35)
-dd  C_LABEL(OpE1_0x36)    ,C_LABEL(OpE1_0x37)
-dd  C_LABEL(Op_0x38)      ,C_LABEL(OpM1X1_0x39)
-dd  C_LABEL(OpM1_0x3A)    ,C_LABEL(Op_0x3B)
-dd  C_LABEL(OpM1X1_0x3C)  ,C_LABEL(OpM1X1_0x3D)
-dd  C_LABEL(OpM1_0x3E)    ,C_LABEL(OpM1_0x3F)
-dd  C_LABEL(OpE1_0x40)    ,C_LABEL(OpE1_0x41)       ; 40
-dd  C_LABEL(ALL_INVALID)  ,C_LABEL(OpM1_0x43)
-dd  C_LABEL(OpX1_0x44)    ,C_LABEL(OpE1_0x45)
-dd  C_LABEL(OpE1_0x46)    ,C_LABEL(OpE1_0x47)
-dd  C_LABEL(OpE1_0x48)    ,C_LABEL(OpM1_0x49)
-dd  C_LABEL(OpM1_0x4A)    ,C_LABEL(OpE1_0x4B)
-dd  C_LABEL(Op_0x4C)      ,C_LABEL(OpM1_0x4D)
-dd  C_LABEL(OpM1_0x4E)    ,C_LABEL(OpM1_0x4F)
-dd  C_LABEL(OpE1_0x50)    ,C_LABEL(OpE1_0x51)       ; 50
-dd  C_LABEL(OpE1_0x52)    ,C_LABEL(OpM1_0x53)
-dd  C_LABEL(OpX1_0x54)    ,C_LABEL(OpE1_0x55)
-dd  C_LABEL(OpE1_0x56)    ,C_LABEL(OpE1_0x57)
-dd  C_LABEL(Op_0x58)      ,C_LABEL(OpM1X1_0x59)
-dd  C_LABEL(OpE1_0x5A)    ,C_LABEL(Op_0x5B)
-dd  C_LABEL(Op_0x5C)      ,C_LABEL(OpM1X1_0x5D)
-dd  C_LABEL(OpM1_0x5E)    ,C_LABEL(OpM1_0x5F)
-dd  C_LABEL(OpE1_0x60)    ,C_LABEL(OpE1_0x61)       ; 60
-dd  C_LABEL(OpE1_0x62)    ,C_LABEL(OpM1_0x63)
-dd  C_LABEL(OpE1_0x64)    ,C_LABEL(OpE1_0x65)
-dd  C_LABEL(OpE1_0x66)    ,C_LABEL(OpE1_0x67)
-dd  C_LABEL(OpE1_0x68)    ,C_LABEL(OpM1_0x69)
-dd  C_LABEL(OpM1_0x6A)    ,C_LABEL(OpE1_0x6B)
-dd  C_LABEL(Op_0x6C)      ,C_LABEL(OpM1_0x6D)
-dd  C_LABEL(OpM1_0x6E)    ,C_LABEL(OpM1_0x6F)
-dd  C_LABEL(OpE1_0x70)    ,C_LABEL(OpE1_0x71)       ; 70
-dd  C_LABEL(OpE1_0x72)    ,C_LABEL(OpM1_0x73)
-dd  C_LABEL(OpE1_0x74)    ,C_LABEL(OpE1_0x75)
-dd  C_LABEL(OpE1_0x76)    ,C_LABEL(OpE1_0x77)
-dd  C_LABEL(Op_0x78)      ,C_LABEL(OpM1X1_0x79)
-dd  C_LABEL(OpE1_0x7A)    ,C_LABEL(Op_0x7B)
-dd  C_LABEL(Op_0x7C)      ,C_LABEL(OpM1X1_0x7D)
-dd  C_LABEL(OpM1_0x7E)    ,C_LABEL(OpM1_0x7F)
-dd  C_LABEL(OpE1_0x80)    ,C_LABEL(OpE1_0x81)       ; 80
-dd  C_LABEL(Op_0x82)      ,C_LABEL(OpM1_0x83)
-dd  C_LABEL(OpE1_0x84)    ,C_LABEL(OpE1_0x85)
-dd  C_LABEL(OpE1_0x86)    ,C_LABEL(OpE1_0x87)
-dd  C_LABEL(OpX1_0x88)    ,C_LABEL(OpM1_0x89)
-dd  C_LABEL(OpM1_0x8A)    ,C_LABEL(OpE1_0x8B)
-dd  C_LABEL(OpX1_0x8C)    ,C_LABEL(OpM1_0x8D)
-dd  C_LABEL(OpX1_0x8E)    ,C_LABEL(OpM1_0x8F)
-dd  C_LABEL(OpE1_0x90)    ,C_LABEL(OpE1_0x91)       ; 90
-dd  C_LABEL(OpE1_0x92)    ,C_LABEL(OpM1_0x93)
-dd  C_LABEL(OpE1_0x94)    ,C_LABEL(OpE1_0x95)
-dd  C_LABEL(OpE1_0x96)    ,C_LABEL(OpE1_0x97)
-dd  C_LABEL(OpM1_0x98)    ,C_LABEL(OpM1_0x99)
-dd  C_LABEL(OpE1_0x9A)    ,C_LABEL(OpX1_0x9B)
-dd  C_LABEL(OpM1_0x9C)    ,C_LABEL(OpM1_0x9D)
-dd  C_LABEL(OpM1_0x9E)    ,C_LABEL(OpM1_0x9F)
-dd  C_LABEL(OpX1_0xA0)    ,C_LABEL(OpE1_0xA1)       ; A0
-dd  C_LABEL(OpX1_0xA2)    ,C_LABEL(OpM1_0xA3)
-dd  C_LABEL(OpE1_0xA4)    ,C_LABEL(OpE1_0xA5)
-dd  C_LABEL(OpE1_0xA6)    ,C_LABEL(OpE1_0xA7)
-dd  C_LABEL(OpX1_0xA8)    ,C_LABEL(OpM1_0xA9)
-dd  C_LABEL(OpX1_0xAA)    ,C_LABEL(OpE1_0xAB)
-dd  C_LABEL(OpX1_0xAC)    ,C_LABEL(OpM1_0xAD)
-dd  C_LABEL(OpX1_0xAE)    ,C_LABEL(OpM1_0xAF)
-dd  C_LABEL(OpE1_0xB0)    ,C_LABEL(OpE1_0xB1)       ; B0
-dd  C_LABEL(OpE1_0xB2)    ,C_LABEL(OpM1_0xB3)
-dd  C_LABEL(OpE1_0xB4)    ,C_LABEL(OpE1_0xB5)
-dd  C_LABEL(OpE1_0xB6)    ,C_LABEL(OpE1_0xB7)
-dd  C_LABEL(Op_0xB8)      ,C_LABEL(OpM1X1_0xB9)
-dd  C_LABEL(OpX1_0xBA)    ,C_LABEL(OpX1_0xBB)
-dd  C_LABEL(OpX1_0xBC)    ,C_LABEL(OpM1X1_0xBD)
-dd  C_LABEL(OpX1_0xBE)    ,C_LABEL(OpM1_0xBF)
-dd  C_LABEL(OpX1_0xC0)    ,C_LABEL(OpE1_0xC1)       ; C0
-dd  C_LABEL(OpE1_0xC2)    ,C_LABEL(OpM1_0xC3)
-dd  C_LABEL(OpE1_0xC4)    ,C_LABEL(OpE1_0xC5)
-dd  C_LABEL(OpE1_0xC6)    ,C_LABEL(OpE1_0xC7)
-dd  C_LABEL(OpX1_0xC8)    ,C_LABEL(OpM1_0xC9)
-dd  C_LABEL(OpX1_0xCA)    ,C_LABEL(Op_0xCB)
-dd  C_LABEL(OpX1_0xCC)    ,C_LABEL(OpM1_0xCD)
-dd  C_LABEL(OpM1_0xCE)    ,C_LABEL(OpM1_0xCF)
-dd  C_LABEL(OpE1_0xD0)    ,C_LABEL(OpE1_0xD1)       ; D0
-dd  C_LABEL(OpE1_0xD2)    ,C_LABEL(OpM1_0xD3)
-dd  C_LABEL(OpE1_0xD4)    ,C_LABEL(OpE1_0xD5)
-dd  C_LABEL(OpE1_0xD6)    ,C_LABEL(OpE1_0xD7)
-dd  C_LABEL(Op_0xD8)      ,C_LABEL(OpM1X1_0xD9)
-dd  C_LABEL(OpE1_0xDA)    ,C_LABEL(ALL_INVALID)
-dd  C_LABEL(Op_0xDC)      ,C_LABEL(OpM1X1_0xDD)
-dd  C_LABEL(OpM1_0xDE)    ,C_LABEL(OpM1_0xDF)
-dd  C_LABEL(OpX1_0xE0)    ,C_LABEL(OpE1_0xE1)       ; E0
-dd  C_LABEL(OpE1_0xE2)    ,C_LABEL(OpM1_0xE3)
-dd  C_LABEL(OpE1_0xE4)    ,C_LABEL(OpE1_0xE5)
-dd  C_LABEL(OpE1_0xE6)    ,C_LABEL(OpE1_0xE7)
-dd  C_LABEL(OpX1_0xE8)    ,C_LABEL(OpM1_0xE9)
-dd  C_LABEL(Op_0xEA)      ,C_LABEL(Op_0xEB)
-dd  C_LABEL(OpX1_0xEC)    ,C_LABEL(OpM1_0xED)
-dd  C_LABEL(OpM1_0xEE)    ,C_LABEL(OpM1_0xEF)
-dd  C_LABEL(OpE1_0xF0)    ,C_LABEL(OpE1_0xF1)       ; F0
-dd  C_LABEL(OpE1_0xF2)    ,C_LABEL(OpM1_0xF3)
-dd  C_LABEL(OpE1_0xF4)    ,C_LABEL(OpE1_0xF5)
-dd  C_LABEL(OpE1_0xF6)    ,C_LABEL(OpE1_0xF7)
-dd  C_LABEL(Op_0xF8)      ,C_LABEL(OpM1X1_0xF9)
-dd  C_LABEL(OpE1_0xFA)    ,C_LABEL(OpE1_0xFB)
-dd  C_LABEL(OpE1_0xFC)    ,C_LABEL(OpM1X1_0xFD)
-dd  C_LABEL(OpM1_0xFE)    ,C_LABEL(OpM1_0xFF)
+dd  OpE1_0x00    ,OpE1_0x01       ; 00
+dd  OpE1_0x02    ,OpM1_0x03
+dd  OpE1_0x04    ,OpE1_0x05
+dd  OpE1_0x06    ,OpE1_0x07
+dd  OpE1_0x08    ,OpM1_0x09
+dd  OpM1_0x0A    ,OpE1_0x0B
+dd  OpM1_0x0C    ,OpM1_0x0D
+dd  OpM1_0x0E    ,OpM1_0x0F
+dd  OpE1_0x10    ,OpE1_0x11       ; 10
+dd  OpE1_0x12    ,OpM1_0x13
+dd  OpE1_0x14    ,OpE1_0x15
+dd  OpE1_0x16    ,OpE1_0x17
+dd  Op_0x18      ,OpM1X1_0x19
+dd  OpM1_0x1A    ,OpE1_0x1B
+dd  OpM1_0x1C    ,OpM1X1_0x1D
+dd  OpM1_0x1E    ,OpM1_0x1F
+dd  OpE1_0x20    ,OpE1_0x21       ; 20
+dd  OpE1_0x22    ,OpM1_0x23
+dd  OpE1_0x24    ,OpE1_0x25
+dd  OpE1_0x26    ,OpE1_0x27
+dd  OpE1_0x28    ,OpM1_0x29
+dd  OpM1_0x2A    ,OpE1_0x2B
+dd  OpM1_0x2C    ,OpM1_0x2D
+dd  OpM1_0x2E    ,OpM1_0x2F
+dd  OpE1_0x30    ,OpE1_0x31       ; 30
+dd  OpE1_0x32    ,OpM1_0x33
+dd  OpE1_0x34    ,OpE1_0x35
+dd  OpE1_0x36    ,OpE1_0x37
+dd  Op_0x38      ,OpM1X1_0x39
+dd  OpM1_0x3A    ,Op_0x3B
+dd  OpM1X1_0x3C  ,OpM1X1_0x3D
+dd  OpM1_0x3E    ,OpM1_0x3F
+dd  OpE1_0x40    ,OpE1_0x41       ; 40
+dd  ALL_INVALID  ,OpM1_0x43
+dd  OpX1_0x44    ,OpE1_0x45
+dd  OpE1_0x46    ,OpE1_0x47
+dd  OpE1_0x48    ,OpM1_0x49
+dd  OpM1_0x4A    ,OpE1_0x4B
+dd  Op_0x4C      ,OpM1_0x4D
+dd  OpM1_0x4E    ,OpM1_0x4F
+dd  OpE1_0x50    ,OpE1_0x51       ; 50
+dd  OpE1_0x52    ,OpM1_0x53
+dd  OpX1_0x54    ,OpE1_0x55
+dd  OpE1_0x56    ,OpE1_0x57
+dd  Op_0x58      ,OpM1X1_0x59
+dd  OpE1_0x5A    ,Op_0x5B
+dd  Op_0x5C      ,OpM1X1_0x5D
+dd  OpM1_0x5E    ,OpM1_0x5F
+dd  OpE1_0x60    ,OpE1_0x61       ; 60
+dd  OpE1_0x62    ,OpM1_0x63
+dd  OpE1_0x64    ,OpE1_0x65
+dd  OpE1_0x66    ,OpE1_0x67
+dd  OpE1_0x68    ,OpM1_0x69
+dd  OpM1_0x6A    ,OpE1_0x6B
+dd  Op_0x6C      ,OpM1_0x6D
+dd  OpM1_0x6E    ,OpM1_0x6F
+dd  OpE1_0x70    ,OpE1_0x71       ; 70
+dd  OpE1_0x72    ,OpM1_0x73
+dd  OpE1_0x74    ,OpE1_0x75
+dd  OpE1_0x76    ,OpE1_0x77
+dd  Op_0x78      ,OpM1X1_0x79
+dd  OpE1_0x7A    ,Op_0x7B
+dd  Op_0x7C      ,OpM1X1_0x7D
+dd  OpM1_0x7E    ,OpM1_0x7F
+dd  OpE1_0x80    ,OpE1_0x81       ; 80
+dd  Op_0x82      ,OpM1_0x83
+dd  OpE1_0x84    ,OpE1_0x85
+dd  OpE1_0x86    ,OpE1_0x87
+dd  OpX1_0x88    ,OpM1_0x89
+dd  OpM1_0x8A    ,OpE1_0x8B
+dd  OpX1_0x8C    ,OpM1_0x8D
+dd  OpX1_0x8E    ,OpM1_0x8F
+dd  OpE1_0x90    ,OpE1_0x91       ; 90
+dd  OpE1_0x92    ,OpM1_0x93
+dd  OpE1_0x94    ,OpE1_0x95
+dd  OpE1_0x96    ,OpE1_0x97
+dd  OpM1_0x98    ,OpM1_0x99
+dd  OpE1_0x9A    ,OpX1_0x9B
+dd  OpM1_0x9C    ,OpM1_0x9D
+dd  OpM1_0x9E    ,OpM1_0x9F
+dd  OpX1_0xA0    ,OpE1_0xA1       ; A0
+dd  OpX1_0xA2    ,OpM1_0xA3
+dd  OpE1_0xA4    ,OpE1_0xA5
+dd  OpE1_0xA6    ,OpE1_0xA7
+dd  OpX1_0xA8    ,OpM1_0xA9
+dd  OpX1_0xAA    ,OpE1_0xAB
+dd  OpX1_0xAC    ,OpM1_0xAD
+dd  OpX1_0xAE    ,OpM1_0xAF
+dd  OpE1_0xB0    ,OpE1_0xB1       ; B0
+dd  OpE1_0xB2    ,OpM1_0xB3
+dd  OpE1_0xB4    ,OpE1_0xB5
+dd  OpE1_0xB6    ,OpE1_0xB7
+dd  Op_0xB8      ,OpM1X1_0xB9
+dd  OpX1_0xBA    ,OpX1_0xBB
+dd  OpX1_0xBC    ,OpM1X1_0xBD
+dd  OpX1_0xBE    ,OpM1_0xBF
+dd  OpX1_0xC0    ,OpE1_0xC1       ; C0
+dd  OpE1_0xC2    ,OpM1_0xC3
+dd  OpE1_0xC4    ,OpE1_0xC5
+dd  OpE1_0xC6    ,OpE1_0xC7
+dd  OpX1_0xC8    ,OpM1_0xC9
+dd  OpX1_0xCA    ,Op_0xCB
+dd  OpX1_0xCC    ,OpM1_0xCD
+dd  OpM1_0xCE    ,OpM1_0xCF
+dd  OpE1_0xD0    ,OpE1_0xD1       ; D0
+dd  OpE1_0xD2    ,OpM1_0xD3
+dd  OpE1_0xD4    ,OpE1_0xD5
+dd  OpE1_0xD6    ,OpE1_0xD7
+dd  Op_0xD8      ,OpM1X1_0xD9
+dd  OpE1_0xDA    ,ALL_INVALID
+dd  Op_0xDC      ,OpM1X1_0xDD
+dd  OpM1_0xDE    ,OpM1_0xDF
+dd  OpX1_0xE0    ,OpE1_0xE1       ; E0
+dd  OpE1_0xE2    ,OpM1_0xE3
+dd  OpE1_0xE4    ,OpE1_0xE5
+dd  OpE1_0xE6    ,OpE1_0xE7
+dd  OpX1_0xE8    ,OpM1_0xE9
+dd  Op_0xEA      ,Op_0xEB
+dd  OpX1_0xEC    ,OpM1_0xED
+dd  OpM1_0xEE    ,OpM1_0xEF
+dd  OpE1_0xF0    ,OpE1_0xF1       ; F0
+dd  OpE1_0xF2    ,OpM1_0xF3
+dd  OpE1_0xF4    ,OpE1_0xF5
+dd  OpE1_0xF6    ,OpE1_0xF7
+dd  Op_0xF8      ,OpM1X1_0xF9
+dd  OpE1_0xFA    ,OpE1_0xFB
+dd  OpE1_0xFC    ,OpM1X1_0xFD
+dd  OpM1_0xFE    ,OpM1_0xFF
 
 
 ALIGND
@@ -1042,12 +1041,12 @@ section .text
  xor eax,eax        ; Zero for table offset
 
  test R_Cycles,R_Cycles
- jl C_LABEL(CPU_START_NEXT)
+ jl CPU_START_NEXT
  jmp HANDLE_EVENT
 
 %else
 ;mov cl,0
- jmp C_LABEL(CPU_RETURN)
+ jmp CPU_RETURN
 %endif
 %endmacro
 
@@ -1194,21 +1193,21 @@ section .text
 
 ; Load cycle counter to register R_Cycles
 %macro LOAD_CYCLES 0-1 eax
- mov %1,[C_LABEL(EventTrip)]
- mov dword R_Cycles,[C_LABEL(SNES_Cycles)]
+ mov %1,[EventTrip]
+ mov dword R_Cycles,[SNES_Cycles]
  sub dword R_Cycles,%1
 %endmacro
 
 ; Get cycle counter to register argument
 %macro GET_CYCLES 1
- mov dword %1,[C_LABEL(EventTrip)]
+ mov dword %1,[EventTrip]
  add dword %1,R_Cycles
 %endmacro
 
 ; Save register R_Cycles to cycle counter
 %macro SAVE_CYCLES 0-1 eax
  GET_CYCLES %1
- mov [C_LABEL(SNES_Cycles)],%1
+ mov [SNES_Cycles],%1
 %endmacro
 
 ; Load base pointer to CPU register set
@@ -1250,7 +1249,7 @@ section .text
 %macro E0_SETUPFLAGS 0-2 cl,al
 ;%macro Flags_Native_to_65c816_E0 0-2 cl,al
 %ifdef WATCH_FLAG_BREAKS
- inc dword [C_LABEL(BreaksLast)]
+ inc dword [BreaksLast]
 %endif
 
  mov byte %2,B_N_flag
@@ -1292,7 +1291,7 @@ section .text
 %macro E1_SETUPFLAGS 0-3 1,cl,al
 ;%macro Flags_Native_to_65c816_E0 0-3 1,cl,al
 %ifdef WATCH_FLAG_BREAKS
- inc dword [C_LABEL(BreaksLast)]
+ inc dword [BreaksLast]
 %endif
 
  mov byte %3,B_N_flag
@@ -1342,7 +1341,7 @@ section .text
 %macro E0_RESTOREFLAGS 0-2 cl,al
 ;%macro Flags_65c816_to_Native 0-2 cl,al
 %ifdef WATCH_FLAG_BREAKS
- inc dword [C_LABEL(BreaksLast)]
+ inc dword [BreaksLast]
 %endif
  mov byte B_N_flag,%2   ;negative
  shl byte %2,2  ;start next (overflow)
@@ -1384,7 +1383,7 @@ section .text
 %macro E1_RESTOREFLAGS 0-2 cl,al
 ;%macro Flags_65c816_to_Native 0-2 cl,al
 %ifdef WATCH_FLAG_BREAKS
- inc dword [C_LABEL(BreaksLast)]
+ inc dword [BreaksLast]
 %endif
  mov byte B_N_flag,%2   ;negative
  shl byte %2,2  ;start next (overflow)
@@ -1448,7 +1447,7 @@ section .text
 %macro FAST_SET_BYTE_STACK_NATIVE_MODE 1
  cmp bh,0x20
  jnb %%not_within_wram
- mov byte [C_LABEL(WRAM)+ebx],%1
+ mov byte [WRAM+ebx],%1
 %%not_within_wram:
  add R_Cycles,_5A22_SLOW_CYCLE
 %endmacro
@@ -1456,18 +1455,18 @@ section .text
 %macro FAST_GET_BYTE_STACK_NATIVE_MODE 1
  cmp bh,0x20
  jnb %%not_within_wram
- mov %1,byte [C_LABEL(WRAM)+ebx]
+ mov %1,byte [WRAM+ebx]
 %%not_within_wram:
  add R_Cycles,_5A22_SLOW_CYCLE
 %endmacro
 
 %macro FAST_SET_BYTE_STACK_EMULATION_MODE 1
- mov byte [C_LABEL(WRAM)+ebx],%1
+ mov byte [WRAM+ebx],%1
  add R_Cycles,_5A22_SLOW_CYCLE
 %endmacro
 
 %macro FAST_GET_BYTE_STACK_EMULATION_MODE 1
- mov %1,byte [C_LABEL(WRAM)+ebx]
+ mov %1,byte [WRAM+ebx]
  add R_Cycles,_5A22_SLOW_CYCLE
 %endmacro
 
@@ -1541,7 +1540,7 @@ section .text
 %ifdef FAST_STACK_ACCESS_NATIVE_MODE
  cmp bh,0x20
  jnb %%not_within_wram_hi
- mov byte [C_LABEL(WRAM)+ebx],ah
+ mov byte [WRAM+ebx],ah
 %%not_within_wram_hi:
 %else
  push eax
@@ -1552,7 +1551,7 @@ section .text
 %ifdef FAST_STACK_ACCESS_NATIVE_MODE
  cmp bh,0x20
  jnb %%not_within_wram_lo
- mov byte [C_LABEL(WRAM)+ebx],al
+ mov byte [WRAM+ebx],al
 %%not_within_wram_lo:
 %else
  pop eax
@@ -1605,7 +1604,7 @@ section .text
 %ifdef FAST_STACK_ACCESS_NATIVE_MODE
  cmp bh,0x20
  jnb %%not_within_wram_lo
- mov al,byte [C_LABEL(WRAM)+ebx]
+ mov al,byte [WRAM+ebx]
 %%not_within_wram_lo:
 %else
  GET_BYTE
@@ -1615,7 +1614,7 @@ section .text
 %ifdef FAST_STACK_ACCESS_NATIVE_MODE
  cmp bh,0x20
  jnb %%not_within_wram_hi
- mov ah,byte [C_LABEL(WRAM)+ebx]
+ mov ah,byte [WRAM+ebx]
 %%not_within_wram_hi:
 %else
  GET_BYTE
@@ -1765,17 +1764,17 @@ EXPORT Reset_CPU
  mov byte [RDNMI],VERSION_NUMBER_5A22
  mov [MEMSEL],al
  mov [HVBJOY],al
- mov [C_LABEL(NMITIMEN)],al
- mov [C_LABEL(HTIMEL)],eax
- mov [C_LABEL(VTIMEL)],eax
+ mov [NMITIMEN],al
+ mov [HTIMEL],eax
+ mov [VTIMEL],eax
  mov [HTimer],eax
  mov [HTimer_Set],eax
 
- mov dword [C_LABEL(Access_Speed_Mask)],-1
+ mov dword [Access_Speed_Mask],-1
 
  ; Reset other registers
- mov byte [C_LABEL(WRIO)],0xFF
- mov byte [C_LABEL(RDIO)],0xFF
+ mov byte [WRIO],0xFF
+ mov byte [RDIO],0xFF
  mov [WRMPYA],al
  mov [WRDIVL],al
  mov [WRDIVH],al
@@ -1785,13 +1784,13 @@ EXPORT Reset_CPU
  mov [RDMPYH],al
 
  mov [JOYC1],al
- mov byte [C_LABEL(Controller1_Pos)],16
- mov byte [C_LABEL(Controller23_Pos)],16
- mov byte [C_LABEL(Controller45_Pos)],16
- mov dword [C_LABEL(JOY1L)],BIT(31)
- mov dword [C_LABEL(JOY2L)],BIT(31)
- mov dword [C_LABEL(JOY3L)],BIT(31)
- mov dword [C_LABEL(JOY4L)],BIT(31)
+ mov byte [Controller1_Pos],16
+ mov byte [Controller23_Pos],16
+ mov byte [Controller45_Pos],16
+ mov dword [JOY1L],BIT(31)
+ mov dword [JOY2L],BIT(31)
+ mov dword [JOY3L],BIT(31)
+ mov dword [JOY4L],BIT(31)
 
  ; Reset hardware ports
  call Reset_Ports
@@ -1814,8 +1813,8 @@ EXPORT Reset_CPU
  mov dword [OpTable],OpTableE1  ; Set current opcode emulation table
 
  ; Clear cycle counts
- mov dword [C_LABEL(SNES_Cycles)],0x80  ;32 dots before reset (?)
- mov [C_LABEL(EventTrip)],eax
+ mov dword [SNES_Cycles],0x80  ;32 dots before reset (?)
+ mov [EventTrip],eax
 
  LOAD_BASE
  LOAD_CYCLES edx
@@ -1835,11 +1834,11 @@ EXPORT Reset_CPU
  SAVE_CYCLES
 
  mov al,[CPU_LABEL(PB)]
- mov [C_LABEL(OLD_PB)],al
+ mov [OLD_PB],al
 
 %ifdef DEBUG
- mov [C_LABEL(Frames)],eax
-;mov [C_LABEL(Timer_Counter_FPS)],eax
+ mov [Frames],eax
+;mov [Timer_Counter_FPS],eax
 %endif
  ; Initialize flags
 ;FLAGS_TO (SNES_FLAG_B1+SNES_FLAG_E+SNES_FLAG_I)
@@ -1857,11 +1856,11 @@ EXPORT Reset_CPU
 ;%3 = register with relative address of ROM at 00:E000-FFFF
 %macro cache_interrupt_vector 3
  movzx eax,word [%1+%3]     ; Get interrupt vector
- mov [C_LABEL(%2vector)],eax    ; Cache vector
+ mov [%2vector],eax    ; Cache vector
 %endmacro
 
  ; Get all interrupt vectors
- mov ebx,[C_LABEL(Read_Bank8Offset)+(0xE000 >> 13) * 4] ; Get address of ROM
+ mov ebx,[Read_Bank8Offset+(0xE000 >> 13) * 4] ; Get address of ROM
 
  cache_interrupt_vector 0xFFFC,RES_E,ebx    ; Reset: Emulation mode
  cache_interrupt_vector 0xFFEA,NMI_N,ebx    ; NMI: Native mode
@@ -1872,9 +1871,9 @@ EXPORT Reset_CPU
  cache_interrupt_vector 0xFFE4,COP_N,ebx    ; COP: Native mode
  cache_interrupt_vector 0xFFF4,COP_E,ebx    ; COP: Emulation mode
 
- mov eax,[C_LABEL(RES_Evector)] ; Get Reset vector
+ mov eax,[RES_Evector] ; Get Reset vector
  mov [CPU_LABEL(PC)],eax    ; Setup PC
- mov [C_LABEL(OLD_PC)],eax
+ mov [OLD_PC],eax
 
  call IRQNewFrameReset
 
@@ -1885,16 +1884,16 @@ EXPORT Reset_CPU
 %if 0
  pusha
  push byte 2
- movzx eax,byte [C_LABEL(MDMAEN)]
+ movzx eax,byte [MDMAEN]
  push eax
  push dword %1
- call C_LABEL(print_str)
+ call print_str
 
  add esp,4
- call C_LABEL(print_hexnum)
+ call print_hexnum
 
  push nl_str
- call C_LABEL(print_str)
+ call print_str
  add esp,4*3
  popa
 %endif
@@ -1907,7 +1906,7 @@ EXPORT do_DMA
 
  LOAD_CYCLES
 
- cmp byte [C_LABEL(MDMAEN)],0
+ cmp byte [MDMAEN],0
  jz .dma_done
 
  cmp byte [In_DMA],0
@@ -1948,10 +1947,10 @@ EXPORT do_DMA
  mov edx,NMI_Event
  mov [Fixed_Event],edx
  mov [Event_Handler],edx
- mov eax,[C_LABEL(SNES_Cycles)]
+ mov eax,[SNES_Cycles]
  inc eax
  mov [FixedTrip],eax
- mov [C_LABEL(EventTrip)],eax
+ mov [EventTrip],eax
 
  jmp CPU_START
 
@@ -1969,8 +1968,8 @@ EXPORT do_DMA
 ALIGNC
 EXPORT Do_CPU
  pusha
- mov byte [C_LABEL(PaletteChanged)],1   ; Make sure we get our palette
- mov dword [C_LABEL(Last_Frame_Line)],239
+ mov byte [PaletteChanged],1   ; Make sure we get our palette
+ mov dword [Last_Frame_Line],239
 
  call CPU_START
  popa
@@ -1998,8 +1997,8 @@ CPU_START:
  je .instruction_after_irq_enable
  xor R_Cycles,R_Cycles
 ;SAVE_CYCLES
- mov edx,[C_LABEL(EventTrip)]
- mov [C_LABEL(SNES_Cycles)],edx
+ mov edx,[EventTrip]
+ mov [SNES_Cycles],edx
 .no_event_wait:
  jmp dword [Event_Handler]
 
@@ -2011,7 +2010,7 @@ ALIGNC
  mov eax,IRQ_Enabled_Event
  xor edx,edx
  mov [Event_Handler],eax
- mov [C_LABEL(EventTrip)],edx
+ mov [EventTrip],edx
 .normal_execution:
  LOAD_PC
  LOAD_CYCLES
@@ -2019,7 +2018,7 @@ ALIGNC
  xor eax,eax        ; Zero for table offset
  mov byte [In_CPU],-1
 
- jmp C_LABEL(CPU_START_NEXT)
+ jmp CPU_START_NEXT
 
 ALIGNC
 EXPORT CPU_RETURN
@@ -2101,15 +2100,15 @@ EXPORT CPU_START_NEXT
  pusha
  push dword [FixedTrip]
  push dword [Fixed_Event]
- push dword [C_LABEL(EventTrip)]
+ push dword [EventTrip]
  push dword [Event_Handler]
  movzx eax,byte [CPU_Execution_Mode]
  push eax
  GET_CYCLES eax
  push eax
  push ebx
-extern C_LABEL(check_op)
- call C_LABEL(check_op)
+extern check_op
+ call check_op
  add esp,4*7
  popa
 %endif
@@ -2125,8 +2124,8 @@ extern C_LABEL(check_op)
  cmp byte B_E_flag,0
  setnz ah
  mov B_P,ax
-EXTERN_C opcode_trace_5A22
- call C_LABEL(opcode_trace_5A22)
+EXTERN opcode_trace_5A22
+ call opcode_trace_5A22
  pop eax
  popa
 %endif
@@ -2219,11 +2218,11 @@ EXPORT cpu_ops_start
 ALIGNC
 EXPORT ALL_INVALID
  GET_PC ebx
- mov [C_LABEL(Map_Address)],ebx
+ mov [Map_Address],ebx
  mov bl,[CPU_LABEL(PB)]
- mov [C_LABEL(Map_Address) + 3],bl
- mov [C_LABEL(Map_Byte)],al
- jmp C_LABEL(InvalidOpcode) ; This exits...
+ mov [Map_Address + 3],bl
+ mov [Map_Byte],al
+ jmp InvalidOpcode ; This exits...
 
 %include "cpu/cpuops.inc"   ; Opcode handlers
 

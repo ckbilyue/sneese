@@ -25,15 +25,15 @@ You must read and accept the license prior to use.
 
 %define NO_EARLY_CACHE_LOAD
 
-EXTERN_C MosaicLine,MosaicCount
-EXTERN_C SNES_Screen8
+EXTERN MosaicLine,MosaicCount
+EXTERN SNES_Screen8
 
 %ifndef SNEeSe_ppu_screen_asm
 
-EXTERN_C Clear_Scanlines,Clear_Scanlines_Preload
+EXTERN Clear_Scanlines,Clear_Scanlines_Preload
 EXTERN DisplayZ
 EXTERN Zbase,Zpositions,Zbase_main,Zbase_sub
-EXTERN_C screen_text_start,screen_data_start,screen_bss_start
+EXTERN screen_text_start,screen_data_start,screen_bss_start
 EXTERN Tile_Offset_Table_16_8
 
 EXTERN palette_2bpl,palette_4bpl
@@ -47,9 +47,9 @@ EXTERN Palette_Base
 
 EXTERN OffsetChangeMap_HOffset,OffsetChangeMap_VOffset
 EXTERN OffsetChangeVMap_VOffset
-EXTERN_C Offset_Change_Disable
+EXTERN Offset_Change_Disable
 
-EXTERN_C Current_Line_Render,Last_Frame_Line
+EXTERN Current_Line_Render,Last_Frame_Line
 EXTERN Ready_Line_Render,BaseDestPtr
 EXTERN Display_Needs_Update
 
@@ -57,98 +57,98 @@ EXTERN Tile_priority_bit
 EXTERN Tile_Priority_Used
 EXTERN Tile_Priority_Unused
 
-EXTERN_C Update_Display
+EXTERN Update_Display_asm
 EXTERN Tile_Width,Tile_Height
 EXTERN NO_PLANES
 
 EXTERN Sort_Screen_Height_Mosaic
 EXTERN Sort_Screen_Height
 
-EXTERN_C Render_Select,Render_Mode
+EXTERN Render_Select,Render_Mode
 %endif
 
-EXTERN_C Screen_Mode
+EXTERN Screen_Mode
 
-EXTERN_C SCREEN_MODE_0_1
-EXTERN_C SCREEN_MODE_2_6
+EXTERN SCREEN_MODE_0_1
+EXTERN SCREEN_MODE_2_6
 
-EXTERN_C Render_Layering_Option_0
-EXTERN_C Render_Layering_Option_1
-EXTERN_C Render_Layering_Option_2
+EXTERN Render_Layering_Option_0
+EXTERN Render_Layering_Option_1
+EXTERN Render_Layering_Option_2
 
 %ifndef SNEeSe_ppu_mode7_asm
 EXTERN SNES_R2134,SNES_R2135,SNES_R2136
 EXTERN SNES_W211A,SNES_W211B,SNES_W211C,SNES_W211D
 EXTERN SNES_W211E,SNES_W211F,SNES_W2120
 
-EXTERN_C SCREEN_MODE_7
+EXTERN SCREEN_MODE_7
 
-EXTERN_C Reset_Mode_7
+EXTERN Reset_Mode_7
 
-EXTERN_C M7H_13,M7V_13
+EXTERN M7H_13,M7V_13
 EXTERN Redo_M7
-EXTERN_C M7SEL
-EXTERN_C EXTBG_Mask
+EXTERN M7SEL
+EXTERN EXTBG_Mask
 EXTERN M7_Handler_Table,M7_Handler
 %endif
 
 
 %ifndef SNEeSe_ppu_bg8_asm
-EXTERN_C Render_8x8_C2,Render_8x8_C4,Render_8x8_C8
+EXTERN Render_8x8_C2,Render_8x8_C4,Render_8x8_C8
 %endif
 
 %ifndef SNEeSe_ppu_bg8m_asm
-EXTERN_C Render_8x8M_C2,Render_8x8M_C4,Render_8x8M_C8
+EXTERN Render_8x8M_C2,Render_8x8M_C4,Render_8x8M_C8
 %endif
 
 %ifndef SNEeSe_ppu_bg8o_asm
-EXTERN_C Render_Offset_8x8_C2
-EXTERN_C Render_Offset_8x8_C4
-EXTERN_C Render_Offset_8x8_C8
+EXTERN Render_Offset_8x8_C2
+EXTERN Render_Offset_8x8_C4
+EXTERN Render_Offset_8x8_C8
 %endif
 
 %ifndef SNEeSe_ppu_bg8om_asm
-EXTERN_C Render_Offset_8x8M_C2
-EXTERN_C Render_Offset_8x8M_C4
-EXTERN_C Render_Offset_8x8M_C8
+EXTERN Render_Offset_8x8M_C2
+EXTERN Render_Offset_8x8M_C4
+EXTERN Render_Offset_8x8M_C8
 %endif
 
 %ifndef SNEeSe_ppu_bg16_asm
-EXTERN_C Render_16x16_C2,Render_16x16_C4,Render_16x16_C8
+EXTERN Render_16x16_C2,Render_16x16_C4,Render_16x16_C8
 %endif
 
 %ifndef SNEeSe_ppu_bg16m_asm
-EXTERN_C Render_16x16M_C2,Render_16x16M_C4,Render_16x16M_C8
+EXTERN Render_16x16M_C2,Render_16x16M_C4,Render_16x16M_C8
 %endif
 
 %ifndef SNEeSe_ppu_bg16o_asm
-EXTERN_C Render_Offset_16x16_C2
-EXTERN_C Render_Offset_16x16_C4
-EXTERN_C Render_Offset_16x16_C8
+EXTERN Render_Offset_16x16_C2
+EXTERN Render_Offset_16x16_C4
+EXTERN Render_Offset_16x16_C8
 %endif
 
 %ifndef SNEeSe_ppu_bg16om_asm
-EXTERN_C Render_Offset_16x16M_C2
-EXTERN_C Render_Offset_16x16M_C4
-EXTERN_C Render_Offset_16x16M_C8
+EXTERN Render_Offset_16x16M_C2
+EXTERN Render_Offset_16x16M_C4
+EXTERN Render_Offset_16x16M_C8
 %endif
 
 %ifndef SNEeSe_ppu_bg16e_asm
-EXTERN_C Render_16x8_Even_C2,Render_16x16_Even_C2
-EXTERN_C Render_16x8_Even_C4,Render_16x16_Even_C4
+EXTERN Render_16x8_Even_C2,Render_16x16_Even_C2
+EXTERN Render_16x8_Even_C4,Render_16x16_Even_C4
 %endif
 
 %ifndef SNEeSe_ppu_bg16me_asm
-EXTERN_C Render_16x8M_Even_C2,Render_16x16M_Even_C2
-EXTERN_C Render_16x8M_Even_C4,Render_16x16M_Even_C4
+EXTERN Render_16x8M_Even_C2,Render_16x16M_Even_C2
+EXTERN Render_16x8M_Even_C4,Render_16x16M_Even_C4
 %endif
 
 %ifndef SNEeSe_ppu_bg16oe_asm
-EXTERN_C Render_Offset_16x8_Even_C4,Render_Offset_16x16_Even_C4
+EXTERN Render_Offset_16x8_Even_C4,Render_Offset_16x16_Even_C4
 %endif
 
 %ifndef SNEeSe_ppu_bg16ome_asm
-EXTERN_C Render_Offset_16x8M_Even_C4,Render_Offset_16x16M_Even_C4
+EXTERN Render_Offset_16x8M_Even_C4,Render_Offset_16x16M_Even_C4
 %endif
 
 
@@ -157,34 +157,32 @@ EXTERN ClipTableStart,ClipLeftTable,ClipRightTable
 EXTERN TileClip1,TileClip1Left,TileClip1Right
 EXTERN TileClip2,TileClip2Left,TileClip2Right
 
-EXTERN_C Redo_Layering,Redo_Windowing
-EXTERN_C Recalc_Window_Effects
-EXTERN_C Recalc_Window_Area_BG
-EXTERN_C Intersect_Window_Area_AND
-EXTERN_C Intersect_Window_Area_OR
-EXTERN_C Intersect_Window_Area_XOR
+EXTERN Redo_Layering,Redo_Windowing
+EXTERN Recalc_Window_Effects
+EXTERN Recalc_Window_Area_BG
+EXTERN Intersect_Window_Area_AND
+EXTERN Intersect_Window_Area_OR
+EXTERN Intersect_Window_Area_XOR
 
-EXTERN_C W12SEL,W34SEL,WOBJSEL,WBGLOG,WOBJLOG,CGWSEL,CGADSUB
-EXTERN_C Win1_Count_In,Win1_Count_Out,Win1_Bands_In,Win1_Bands_Out
-EXTERN_C Win2_Count_In,Win2_Count_Out,Win2_Bands_In,Win2_Bands_Out
-EXTERN_C WH0,WH1,WH2,WH3
-EXTERN_C TM,TS,TMW,TSW
+EXTERN W12SEL,W34SEL,WOBJSEL,WBGLOG,WOBJLOG,CGWSEL,CGADSUB
+EXTERN WH0,WH1,WH2,WH3
+EXTERN TM,TS,TMW,TSW
 
-EXTERN_C Window_Offsets
-Window_Offset_First  equ C_LABEL(Window_Offsets)
-Window_Offset_Second equ (C_LABEL(Window_Offsets) + 4)
+EXTERN Window_Offsets
+Window_Offset_First  equ Window_Offsets
+Window_Offset_Second equ (Window_Offsets + 4)
 
-EXTERN_C TM_Allowed,TS_Allowed,Layers_In_Use
+EXTERN TM_Allowed,TS_Allowed,Layers_In_Use
 EXTERN Layers_Low,Layers_High
-EXTERN_C SCR_TM,SCR_TS,SCR_TMW,SCR_TSW
-EXTERN_C Layer_Disable_Mask,Layering_Mode
+EXTERN SCR_TM,SCR_TS,SCR_TMW,SCR_TSW
+EXTERN Layer_Disable_Mask,Layering_Mode
 
 %macro EXTERN_WIN_DATA 1
-EXTERN_C TableWin%1
-EXTERN_C Win%1_Count_Out
-EXTERN_C Win%1_Bands_Out
-EXTERN_C Win%1_Count_In
-EXTERN_C Win%1_Bands_In
+EXTERN TableWin%1
+EXTERN Win%1_Count_Out
+EXTERN Win%1_Bands_Out
+EXTERN Win%1_Count_In
+EXTERN Win%1_Bands_In
 %endmacro
 
 EXTERN_WIN_DATA 1
@@ -197,9 +195,9 @@ EXPORT Win%1_Bands,skipb 2*%2
 %endmacro
 
 %macro EXTERN_MERGED_WIN_DATA 2
-EXTERN_C TableWin%1
-EXTERN_C Win%1_Count
-EXTERN_C Win%1_Bands
+EXTERN TableWin%1
+EXTERN Win%1_Count
+EXTERN Win%1_Bands
 %endmacro
 
 %endif
@@ -213,25 +211,25 @@ EXTERN_C Win%1_Bands
 
 %macro Render_Start_Frame 0
  mov dword [BaseDestPtr],0
- mov dword [C_LABEL(Current_Line_Render)],0
+ mov dword [Current_Line_Render],0
  mov dword [Ready_Line_Render],0
- mov dword [NMI_Event_Handler],C_LABEL(NMI)
+ mov dword [NMI_Event_Handler],NMI
  mov dword [MosaicCountdown],0
 %endmacro
 
 %macro Render_Start_Frame_Skipped 0
- mov dword [C_LABEL(Current_Line_Render)],1024
- mov dword [NMI_Event_Handler],C_LABEL(NMI_NoRender)
+ mov dword [Current_Line_Render],1024
+ mov dword [NMI_Event_Handler],NMI_NoRender
 %endmacro
 
 %macro UpdateDisplay 0
 ;mov edx,[Ready_Line_Render]
-;sub edx,[C_LABEL(Current_Line_Render)]
+;sub edx,[Current_Line_Render]
 ;jbe  %%no_update_needed
  mov dl,[Display_Needs_Update]
  test dl,dl
  jz  %%no_update_needed
- call C_LABEL(Update_Display)
+ call Update_Display_asm
 %%no_update_needed:
 %endmacro
 
@@ -296,7 +294,7 @@ ALIGNC
 
 %macro Get_Current_Line 0
 ; parameters: none
-; uses: eax (C_LABEL(Current_Line_Render)), ebx
+; uses: eax (Current_Line_Render), ebx
 ; returns: eax
 
  ; Handle vertical mosaic
@@ -304,7 +302,7 @@ ALIGNC
  test bl,bl
  jz %%no_mosaic
  mov ebx,[Mosaic_Size_Select]
- mov al,[C_LABEL(MosaicLine)+eax+ebx]
+ mov al,[MosaicLine+eax+ebx]
 %%no_mosaic:
  ; End vertical mosaic
 %endmacro
@@ -313,7 +311,7 @@ ALIGNC
 ;%1 = offset_change
 %macro SORT_TILES_8_TALL 0-1 0
 ; parameters: edx
-; uses: eax (C_LABEL(Current_Line_Render), mosaic-adjusted), esi
+; uses: eax (Current_Line_Render, mosaic-adjusted), esi
 ; returns: ebx, LineAddress, LineAddressY
 
  add eax,[VScroll+edx]
@@ -332,7 +330,7 @@ ALIGNC
 
 %macro SORT_TILES_16_TALL 0-1 0
 ; parameters: edx
-; uses: eax (C_LABEL(Current_Line_Render), mosaic-adjusted), ecx, esi
+; uses: eax (Current_Line_Render, mosaic-adjusted), ecx, esi
 ; returns: ebx, LineAddress, LineAddressY
 
  add eax,[VScroll+edx]

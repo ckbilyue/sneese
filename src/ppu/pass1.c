@@ -772,7 +772,7 @@ extern unsigned char OBSEL_write;
 
 extern void Reload_OBSEL();
 
-void _Update_Display(void)
+void Update_Display(void)
 {
  unsigned lines;
 
@@ -1000,7 +1000,7 @@ void _Render_SM01(unsigned char (*main_buf)[2], unsigned char (*sub_buf)[2],
 
 static void _SCREEN_MODE_0_1(
 /*
- ebx,[C_LABEL(Current_Line_Render)]+1
+ ebx,[Current_Line_Render]+1
  edi,[BaseDestPtr]
  ebp,lines
  al = screens 1, ah = screens 2
@@ -1052,7 +1052,7 @@ void _Render_SM26(unsigned char (*main_buf)[2], unsigned char (*sub_buf)[2],
 
 static void _SCREEN_MODE_2_6(
 /*
- ebx,[C_LABEL(Current_Line_Render)]+1
+ ebx,[Current_Line_Render]+1
  edi,[BaseDestPtr]
  ebp,lines
  al = screens 1, ah = screens 2

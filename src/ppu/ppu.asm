@@ -58,22 +58,19 @@ EXTERN SNES_W4208,SNES_W4209,SNES_W420A,SNES_W420B
 EXTERN SNES_W420D,SNES_W4210
 EXTERN HVBJOY
 
-EXTERN_C LastRenderLine
-EXTERN_C BrightnessLevel
-EXTERN_C NMITIMEN
-EXTERN_C Real_SNES_Palette
+EXTERN LastRenderLine
+EXTERN BrightnessLevel
+EXTERN NMITIMEN
+EXTERN Real_SNES_Palette
 EXTERN OPHCT,OPVCT
-EXTERN_C SNES_COUNTRY
-EXTERN Ready_Line_Render
-EXTERN_C PaletteChanged
-EXTERN_C Offset_Change_Disable
+EXTERN SNES_COUNTRY
+EXTERN PaletteChanged
 
-EXTERN_C SPC_MASK
-EXTERN_C OutputScreen
-EXTERN_C MosaicLine
+EXTERN SPC_MASK
+EXTERN OutputScreen
 
-EXTERN_C Map_Address,Map_Byte
-EXTERN_C InvalidHWWrite
+EXTERN Map_Address,Map_Byte
+EXTERN InvalidHWWrite
 
 section .text
 EXPORT PPU_text_start
@@ -127,7 +124,7 @@ EXPORT Read_Map_21
     dd   SNES_R213D  ; OPVCT
     dd   SNES_R213E  ; STAT77   ; Not supported yet (properly..)
     dd   SNES_R213F  ; STAT78
-    DUPLICATE dd,0x40,C_LABEL(UNSUPPORTED_READ) ; APUI00-APUI03
+    DUPLICATE dd,0x40,UNSUPPORTED_READ ; APUI00-APUI03
     dd   SNES_R2180  ; WMDATA   ; 2180 WMDATA - read/write to Work RAM
 
     ; 2181-21FF: Open Bus A
@@ -187,7 +184,7 @@ EXPORT Read_Map_43
 ALIGND
 EXPORT Write_Map_20_5F
     ; 2000-20FF: Unmapped
-    DUPLICATE dd,0x100,C_LABEL(UNSUPPORTED_WRITE)
+    DUPLICATE dd,0x100,UNSUPPORTED_WRITE
 EXPORT Write_Map_21
     dd   SNES_W2100  ; INIDISP
     dd   SNES_W2101  ; OBSEL
@@ -241,22 +238,22 @@ EXPORT Write_Map_21
     dd   SNES_W2131  ; CGADSUB
     dd   SNES_W2132  ; COLDATA
     dd   SNES_W2133  ; SETINI
-    DUPLICATE dd,0x0C,C_LABEL(UNSUPPORTED_WRITE)
-    DUPLICATE dd,0x40,C_LABEL(UNSUPPORTED_WRITE)    ; APUI00-APUI03
+    DUPLICATE dd,0x0C,UNSUPPORTED_WRITE
+    DUPLICATE dd,0x40,UNSUPPORTED_WRITE    ; APUI00-APUI03
     dd   SNES_W2180  ; WMDATA   ; 2180 WMDATA - read/write to Work RAM
     dd   SNES_W2181  ; WMADDL   ; 2181-3 WMAddress
     dd   SNES_W2182  ; WMADDM
     dd   SNES_W2183  ; WMADDH
-    DUPLICATE dd,0x7C,C_LABEL(UNSUPPORTED_WRITE)
+    DUPLICATE dd,0x7C,UNSUPPORTED_WRITE
     ; 2200-3FFF: Unmapped
-    DUPLICATE dd,0x1E00,C_LABEL(UNSUPPORTED_WRITE)
+    DUPLICATE dd,0x1E00,UNSUPPORTED_WRITE
 EXPORT Write_Map_40
-    DUPLICATE dd,0x16,C_LABEL(UNSUPPORTED_WRITE)
+    DUPLICATE dd,0x16,UNSUPPORTED_WRITE
     dd   SNES_W4016  ; JOYC1
     dd   SNES_W4017  ; JOYC2
-    DUPLICATE dd,0xE8,C_LABEL(UNSUPPORTED_WRITE)
+    DUPLICATE dd,0xE8,UNSUPPORTED_WRITE
     ; 4100-41FF: Unmapped
-    DUPLICATE dd,0x100,C_LABEL(UNSUPPORTED_WRITE)
+    DUPLICATE dd,0x100,UNSUPPORTED_WRITE
 EXPORT Write_Map_42
     dd   SNES_W4200  ; NMITIMEN
     dd   SNES_W4201  ; WRIO
@@ -270,34 +267,34 @@ EXPORT Write_Map_42
     dd   SNES_W4209  ; VTIMEL
     dd   SNES_W420A  ; VTIMEH
 %ifdef NO_DMA_WRITE
-    DUPLICATE dd,2,C_LABEL(UNSUPPORTED_WRITE)
+    DUPLICATE dd,2,UNSUPPORTED_WRITE
 %else
     dd   SNES_W420B  ; MDMAEN
     dd   SNES_W420C  ; HDMAEN
 %endif
     dd   SNES_W420D  ; MEMSEL
-    DUPLICATE dd,2,C_LABEL(UNSUPPORTED_WRITE)
-    dd   C_LABEL(IGNORE_WRITE)  ; RDNMI
-    dd   C_LABEL(IGNORE_WRITE)  ; TIMEUP
-    dd   C_LABEL(IGNORE_WRITE)  ; HVBJOY
-    dd   C_LABEL(IGNORE_WRITE)  ; RDIO
-    dd   C_LABEL(IGNORE_WRITE)  ; RDDIVL
-    dd   C_LABEL(IGNORE_WRITE)  ; RDDIVH
-    dd   C_LABEL(IGNORE_WRITE)  ; RDMPYL
-    dd   C_LABEL(IGNORE_WRITE)  ; RDMPYH
-    dd   C_LABEL(IGNORE_WRITE)  ; JOY1L
-    dd   C_LABEL(IGNORE_WRITE)  ; JOY1H
-    dd   C_LABEL(IGNORE_WRITE)  ; JOY2L
-    dd   C_LABEL(IGNORE_WRITE)  ; JOY2H
-    dd   C_LABEL(IGNORE_WRITE)  ; JOY3L
-    dd   C_LABEL(IGNORE_WRITE)  ; JOY3H
-    dd   C_LABEL(IGNORE_WRITE)  ; JOY4L
-    dd   C_LABEL(IGNORE_WRITE)  ; JOY4H
-    DUPLICATE dd,0xE0,C_LABEL(UNSUPPORTED_WRITE)
+    DUPLICATE dd,2,UNSUPPORTED_WRITE
+    dd   IGNORE_WRITE  ; RDNMI
+    dd   IGNORE_WRITE  ; TIMEUP
+    dd   IGNORE_WRITE  ; HVBJOY
+    dd   IGNORE_WRITE  ; RDIO
+    dd   IGNORE_WRITE  ; RDDIVL
+    dd   IGNORE_WRITE  ; RDDIVH
+    dd   IGNORE_WRITE  ; RDMPYL
+    dd   IGNORE_WRITE  ; RDMPYH
+    dd   IGNORE_WRITE  ; JOY1L
+    dd   IGNORE_WRITE  ; JOY1H
+    dd   IGNORE_WRITE  ; JOY2L
+    dd   IGNORE_WRITE  ; JOY2H
+    dd   IGNORE_WRITE  ; JOY3L
+    dd   IGNORE_WRITE  ; JOY3H
+    dd   IGNORE_WRITE  ; JOY4L
+    dd   IGNORE_WRITE  ; JOY4H
+    DUPLICATE dd,0xE0,UNSUPPORTED_WRITE
 
 EXPORT Write_Map_43
 %ifdef NO_DMA_WRITE
-    DUPLICATE dd,0x80,C_LABEL(UNSUPPORTED_WRITE)
+    DUPLICATE dd,0x80,UNSUPPORTED_WRITE
 %else
     MAP_WRITE_DMA_LIST 0
     MAP_WRITE_DMA_LIST 1
@@ -308,9 +305,9 @@ EXPORT Write_Map_43
     MAP_WRITE_DMA_LIST 6
     MAP_WRITE_DMA_LIST 7
 %endif
-    DUPLICATE dd,0x80,C_LABEL(UNSUPPORTED_WRITE)
+    DUPLICATE dd,0x80,UNSUPPORTED_WRITE
     ; 4400-5FFF: Unmapped
-    DUPLICATE dd,0x1C00,C_LABEL(UNSUPPORTED_WRITE)
+    DUPLICATE dd,0x1C00,UNSUPPORTED_WRITE
 
 ALIGND
 ; BG12NBA/BG34NBA to tileset-in-cache address tables
@@ -484,10 +481,10 @@ BG_DATA 2
 BG_DATA 3
 BG_DATA 4
 
-EXPORT_EQU BG1SC,C_LABEL(BGSC1)
-EXPORT_EQU BG2SC,C_LABEL(BGSC2)
-EXPORT_EQU BG3SC,C_LABEL(BGSC3)
-EXPORT_EQU BG4SC,C_LABEL(BGSC4)
+EXPORT_EQU BG1SC,BGSC1
+EXPORT_EQU BG2SC,BGSC2
+EXPORT_EQU BG3SC,BGSC3
+EXPORT_EQU BG4SC,BGSC4
 
 EXPORT_EQU BG1HOFS,HScroll_1
 EXPORT_EQU BG1VOFS,VScroll_1
@@ -508,12 +505,12 @@ ALIGNC
 EXPORT Reset_Ports
  pusha
 
- call C_LABEL(Reset_Sprites)
- call C_LABEL(Reset_Mode_7)
+ call Reset_Sprites
+ call Reset_Mode_7
  call Invalidate_Tile_Caches
 
  ; Reset renderer
- mov byte [C_LABEL(Layer_Disable_Mask)],0xFF
+ mov byte [Layer_Disable_Mask],0xFF
 
  mov al,[BGMODE_Allowed_Layer_Mask_Table]
  mov [BGMODE_Allowed_Layer_Mask],al
@@ -528,14 +525,14 @@ EXPORT Reset_Ports
  ;Reset PPU2 Latch state
  mov byte [PPU2_Latch_External],0
 
- mov byte [C_LABEL(Layering_Mode)],0
+ mov byte [Layering_Mode],0
 
- mov dword [C_LABEL(LastRenderLine)],224
+ mov dword [LastRenderLine],224
 
  mov [Display_Needs_Update],al
 
- mov byte [C_LABEL(Redo_Windowing)],-1
- mov byte [C_LABEL(Redo_Layering)],-1
+ mov byte [Redo_Windowing],-1
+ mov byte [Redo_Layering],-1
 
  mov [WMADDL],eax
 
@@ -568,33 +565,33 @@ EXPORT Reset_Ports
 
  mov [BGOFS_Last_Write],al
 
- mov [C_LABEL(BGSC1)],al
- mov [C_LABEL(BGSC2)],al
- mov [C_LABEL(BGSC3)],al
- mov [C_LABEL(BGSC4)],al
+ mov [BGSC1],al
+ mov [BGSC2],al
+ mov [BGSC3],al
+ mov [BGSC4],al
 
  mov byte [Redo_Offset_Change],0
  mov byte [Redo_Offset_Change_VOffsets],0xFF
 
- mov [C_LABEL(BG12NBA)],al
- mov [C_LABEL(BG34NBA)],al
+ mov [BG12NBA],al
+ mov [BG34NBA],al
  mov [NBABG1],al
  mov [NBABG2],al
  mov [NBABG3],al
  mov [NBABG4],al
 
- mov [C_LABEL(WH0)],al
- mov [C_LABEL(WH2)],al
+ mov [WH0],al
+ mov [WH2],al
  inc eax
- mov [C_LABEL(WH1)],al
- mov [C_LABEL(WH3)],al
+ mov [WH1],al
+ mov [WH3],al
  dec eax
 
- mov [C_LABEL(WBGLOG)],al
- mov [C_LABEL(WOBJLOG)],al
- mov [C_LABEL(W12SEL)],al
- mov [C_LABEL(W34SEL)],al
- mov [C_LABEL(WOBJSEL)],al
+ mov [WBGLOG],al
+ mov [WOBJLOG],al
+ mov [W12SEL],al
+ mov [W34SEL],al
+ mov [WOBJSEL],al
 
  mov [WLOGBG1],al
  mov [WLOGBG2],al
@@ -605,27 +602,27 @@ EXPORT Reset_Ports
  mov [WSELBG3],al
  mov [WSELBG4],al
 
- mov [C_LABEL(TM)],al
- mov [C_LABEL(TS)],al
- mov [C_LABEL(TMW)],al
- mov [C_LABEL(TSW)],al
- mov [C_LABEL(SETINI)],al
- mov byte [C_LABEL(EXTBG_Mask)],~2
+ mov [TM],al
+ mov [TS],al
+ mov [TMW],al
+ mov [TSW],al
+ mov [SETINI],al
+ mov byte [EXTBG_Mask],~2
 
- mov [C_LABEL(COLDATA)],eax
- mov [C_LABEL(CGWSEL)],al
- mov [C_LABEL(CGADSUB)],al
+ mov [COLDATA],eax
+ mov [CGWSEL],al
+ mov [CGADSUB],al
 
- mov [C_LABEL(BrightnessLevel)],al
- mov byte [C_LABEL(INIDISP)],0x80
- mov [C_LABEL(BG1HOFS)],eax
- mov [C_LABEL(BG1VOFS)],eax
- mov [C_LABEL(BG2HOFS)],eax
- mov [C_LABEL(BG2VOFS)],eax
- mov [C_LABEL(BG3HOFS)],eax
- mov [C_LABEL(BG3VOFS)],eax
- mov [C_LABEL(BG4HOFS)],eax
- mov [C_LABEL(BG4VOFS)],eax
+ mov [BrightnessLevel],al
+ mov byte [INIDISP],0x80
+ mov [BG1HOFS],eax
+ mov [BG1VOFS],eax
+ mov [BG2HOFS],eax
+ mov [BG2VOFS],eax
+ mov [BG3HOFS],eax
+ mov [BG3VOFS],eax
+ mov [BG4HOFS],eax
+ mov [BG4VOFS],eax
 
  mov byte [BG_Flag_BG1],BIT(0)
  mov byte [BG_Flag_BG2],BIT(1)
@@ -635,8 +632,8 @@ EXPORT Reset_Ports
  mov byte [OC_Flag_BG1],BIT(5)
  mov byte [OC_Flag_BG2],BIT(6)
 
- mov [C_LABEL(BGMODE)],al
- mov [C_LABEL(Base_BGMODE)],al
+ mov [BGMODE],al
+ mov [Base_BGMODE],al
 
  mov dword [M0_Color_BG1],0x03030303
  mov dword [M0_Color_BG2],0x23232323
@@ -645,12 +642,12 @@ EXPORT Reset_Ports
 
  pusha
  push eax
-EXTERN C_LABEL(update_bg_handlers)
- call C_LABEL(update_bg_handlers)
+EXTERN update_bg_handlers
+ call update_bg_handlers
  pop eax
  popa
 
- mov eax,C_LABEL(VRAM)
+ mov eax,VRAM
  mov [TLMapAddressBG1],eax  ;MapAddressBG1
  mov [TLMapAddressBG2],eax  ;MapAddressBG2
  mov [TLMapAddressBG3],eax  ;MapAddressBG3
@@ -671,14 +668,14 @@ EXTERN C_LABEL(update_bg_handlers)
  mov dword [OffsetChangeMap_VOffset],0
  mov dword [OffsetChangeVMap_VOffset],0
 
- mov [C_LABEL(VMAIN)],al
+ mov [VMAIN],al
  mov dword [VMDATAREAD_update],VMDATAREAD_update_NORM
  Set_21_Write 0x18,SNES_W2118_NORM
  Set_21_Write 0x19,SNES_W2119_NORM
  mov [VMDATAREAD_buffer],eax
 
- mov eax,[C_LABEL(Screen_Mode)]
- mov [C_LABEL(Render_Mode)],eax
+ mov eax,[Screen_Mode]
+ mov [Render_Mode],eax
 
  popa
  ret
@@ -687,12 +684,12 @@ EXTERN C_LABEL(update_bg_handlers)
 
 ALIGNC
 EXPORT PPU1_OPEN_BUS_READ
- mov al,[C_LABEL(Last_Bus_Value_PPU1)]
+ mov al,[Last_Bus_Value_PPU1]
  ret
 
 ALIGNC
 EXPORT PPU2_OPEN_BUS_READ
- mov al,[C_LABEL(Last_Bus_Value_PPU2)]
+ mov al,[Last_Bus_Value_PPU2]
  ret
 
 
@@ -704,7 +701,7 @@ EXPORT PPU2_OPEN_BUS_READ
 
 ALIGNC
 SNES_R2139: ; VMDATALREAD
- mov al,[C_LABEL(VMAIN)]
+ mov al,[VMAIN]
  test al,al
  mov al,[VMDATAREAD_buffer]
  mov [Last_Bus_Value_PPU1],al
@@ -713,7 +710,7 @@ SNES_R2139: ; VMDATALREAD
 
 ALIGNC
 SNES_R213A: ; VMDATAHREAD
- mov al,[C_LABEL(VMAIN)]
+ mov al,[VMAIN]
  test al,al
  mov al,[VMDATAREAD_buffer+1]
  mov [Last_Bus_Value_PPU1],al
@@ -728,7 +725,7 @@ ALIGNC
 VMDATAREAD_update_NORM: ; normal increment
  push ebx
  mov edx,[VRAMAddress]
- mov bx,[C_LABEL(VRAM)+edx*2]
+ mov bx,[VRAM+edx*2]
  add edx,[SCINC]
  mov [VMDATAREAD_buffer],bx
  and edx,0x7FFF
@@ -753,7 +750,7 @@ VMDATAREAD_update_FULL_%2:  ; full graphic increment
  or edx,eax
  pop edi
 
- mov ax,[C_LABEL(VRAM)+edx*2]
+ mov ax,[VRAM+edx*2]
  mov edx,[SCINC]
  mov [VMDATAREAD_buffer],ax
  add edx,[VRAMAddress]  ; Always words (since <<1)!
@@ -774,7 +771,7 @@ SNES_R213B: ; CGDATAREAD
 ;push edx
  mov bl,[CGReadHigh]
  mov edx,[CGAddress]
- mov al,[C_LABEL(Real_SNES_Palette)+ebx+edx*2]
+ mov al,[Real_SNES_Palette+ebx+edx*2]
  mov [Last_Bus_Value_PPU2],al
  xor bl,1
  jnz .no_increment
@@ -794,22 +791,22 @@ SNES_R213E: ; STAT77
  mov al,1   ; This is not supported yet!
  ret
 
-EXTERN_C RDIO,WRIO
+EXTERN RDIO,WRIO
 ALIGNC
 SNES_R213F: ; STAT78
  mov al,0
  mov [OPHCT],al
  mov [OPVCT],al
  mov al,[STAT78]
- or al,[C_LABEL(SNES_COUNTRY)]  ; 0x10 means PAL, not NTSC
+ or al,[SNES_COUNTRY]  ; 0x10 means PAL, not NTSC
 
  mov dl,[Last_Bus_Value_PPU2]
  and dl,BIT(5)
  xor dl,0xFF
  add dl,al
 
- mov dl,[C_LABEL(WRIO)]
- and dl,[C_LABEL(RDIO)]
+ mov dl,[WRIO]
+ and dl,[RDIO]
  jns .latch
 
  cmp byte [PPU2_Latch_External],0
@@ -833,7 +830,7 @@ SNES_R213F: ; STAT78
 ALIGNC
 SNES_R2180: ; WMDATA
  mov edx,[WMADDL]
- mov al,[C_LABEL(WRAM)+edx]
+ mov al,[WRAM+edx]
  inc edx
  and edx,0x01FFFF
  mov [WMADDL],edx
@@ -872,17 +869,17 @@ SNES_R2180: ; WMDATA
 ; Write to 21xx handlers
 ALIGNC
 SNES_W2100: ; INIDISP
- cmp [C_LABEL(INIDISP)],al
+ cmp [INIDISP],al
  je .no_change
  UpdateDisplay
- mov [C_LABEL(INIDISP)],al
+ mov [INIDISP],al
  and al,0x0F
- cmp [C_LABEL(BrightnessLevel)],al
+ cmp [BrightnessLevel],al
  ja .no_brightness_change
- mov [C_LABEL(BrightnessLevel)],al  ; Sets the brightness level for SetPalette
- mov byte [C_LABEL(PaletteChanged)],1
+ mov [BrightnessLevel],al  ; Sets the brightness level for SetPalette
+ mov byte [PaletteChanged],1
 .no_brightness_change:
- mov al,[C_LABEL(INIDISP)]
+ mov al,[INIDISP]
 .no_change:
  ret
 
@@ -893,7 +890,7 @@ SNES_W2100: ; INIDISP
 
 ALIGNC
 EXPORT Toggle_Offset_Change
- xor byte [C_LABEL(Offset_Change_Disable)],0xFF
+ xor byte [Offset_Change_Disable],0xFF
  ret
 
 ALIGNC
@@ -905,12 +902,12 @@ SNES_W2105: ; BGMODE
 .okay:
 %endif
  ; Note: Render_Mode is declared in screen.asm
- cmp [C_LABEL(BGMODE)],al
+ cmp [BGMODE],al
  je .no_change
 
  UpdateDisplay  ;*
 
- mov [C_LABEL(BGMODE)],al
+ mov [BGMODE],al
 
 ; int mode = BGMODE & 7;
  push ebx
@@ -921,7 +918,7 @@ SNES_W2105: ; BGMODE
  push edi
  and ebx,byte 7
  push esi
- mov [C_LABEL(Base_BGMODE)],bl
+ mov [Base_BGMODE],bl
  and edx,byte 7
  mov ebx,0x03030303
  mov ecx,0x23232323
@@ -951,23 +948,23 @@ SNES_W2105: ; BGMODE
  mov [BGMODE_Tile_Layer_Mask],cl
  and cl,0x0F
  jnz .not_mode7
- and bl,[C_LABEL(EXTBG_Mask)]
+ and bl,[EXTBG_Mask]
 .not_mode7:
  mov [BGMODE_Allowed_Layer_Mask],bl
 
  mov bl,[BGMODE_Allowed_Offset_Change_Table+edx]
- mov ecx,[C_LABEL(Screen_Mode)+edx*4]
+ mov ecx,[Screen_Mode+edx*4]
  lea edx,[BGMODE_Depth_Table+edx]
  mov [BGMODE_Allowed_Offset_Change],bl
  mov [Redo_Offset_Change],bl
- mov [C_LABEL(Render_Mode)],ecx
+ mov [Render_Mode],ecx
 
- mov byte [C_LABEL(Redo_Layering)],-1
+ mov byte [Redo_Layering],-1
 
  pusha
- movzx eax,byte [C_LABEL(BGMODE)]
+ movzx eax,byte [BGMODE]
  push eax
- call C_LABEL(update_bg_handlers)
+ call update_bg_handlers
  pop eax
  popa
 
@@ -1027,7 +1024,7 @@ SNES_W2106: ; MOSAIC
 
 ALIGNC
 SNES_W2107: ; BG1SC
- cmp [C_LABEL(BG1SC)],al
+ cmp [BG1SC],al
  je Update_BGSC.no_change
  LOAD_BG_TABLE 1
 Update_BGSC:
@@ -1038,7 +1035,7 @@ Update_BGSC:
  mov edi,eax
  push esi
  and edi,byte 0x7C
- mov esi,C_LABEL(VRAM)
+ mov esi,VRAM
  shl edi,9
  mov [BGSC+edx],al
  push ebx
@@ -1096,14 +1093,14 @@ Update_BGSC:
 
 ALIGNC
 SNES_W2108: ; BG2SC
- cmp [C_LABEL(BG2SC)],al
+ cmp [BG2SC],al
  je Update_BGSC.no_change
  LOAD_BG_TABLE 2
  jmp Update_BGSC
 
 ALIGNC
 SNES_W2109: ; BG3SC
- cmp [C_LABEL(BG3SC)],al
+ cmp [BG3SC],al
  je Update_BGSC.no_change
  mov byte [Redo_Offset_Change_VOffsets],0xFF
  mov byte [Redo_Offset_Change],0xFF
@@ -1112,18 +1109,18 @@ SNES_W2109: ; BG3SC
 
 ALIGNC
 SNES_W210A: ; BG4SC
- cmp [C_LABEL(BG4SC)],al
+ cmp [BG4SC],al
  je Update_BGSC.no_change
  LOAD_BG_TABLE 4
  jmp Update_BGSC
 
 ALIGNC
 SNES_W210B: ; BG12NBA
- cmp [C_LABEL(BG12NBA)],al
+ cmp [BG12NBA],al
  je .no_change
  UpdateDisplay  ;*
  push ebx
- mov [C_LABEL(BG12NBA)],al
+ mov [BG12NBA],al
  mov bl,al
  and ebx,byte 7
  mov edx,[NBATableBG1]
@@ -1161,11 +1158,11 @@ SNES_W210B: ; BG12NBA
 
 ALIGNC
 SNES_W210C: ; BG34NBA
- cmp [C_LABEL(BG34NBA)],al
+ cmp [BG34NBA],al
  je .no_change
  UpdateDisplay  ;*
  push ebx
- mov [C_LABEL(BG34NBA)],al
+ mov [BG34NBA],al
 
  mov ebx,eax
  and ebx,byte 7
@@ -1189,12 +1186,12 @@ SNES_W210D: ; BG1HOFS
 %ifdef TRAP_BGHOFS
  pusha  ;*
  xor ebx,ebx
- mov bl,[C_LABEL(Current_Line_Timing)]
+ mov bl,[Current_Line_Timing]
  shl ebx,16
  or ebx,0x210D
- mov [C_LABEL(Map_Address)],ebx ; Set up Map Address so message works!
- mov [C_LABEL(Map_Byte)],al     ; Set up Map Byte so message works
- call C_LABEL(InvalidHWWrite)   ; Unmapped hardware address!
+ mov [Map_Address],ebx ; Set up Map Address so message works!
+ mov [Map_Byte],al     ; Set up Map Byte so message works
+ call InvalidHWWrite   ; Unmapped hardware address!
  popa   ;*
 %endif
 
@@ -1202,7 +1199,7 @@ EXTERN SNES_W_M7H
  call SNES_W_M7H
 
  push ebx
- mov dl,[C_LABEL(BG1HOFS)+1]
+ mov dl,[BG1HOFS+1]
  mov bl,[BGOFS_Last_Write]
  and dl,7
  and bl,~7
@@ -1210,10 +1207,10 @@ EXTERN SNES_W_M7H
  mov bh,al
  mov [BGOFS_Last_Write],al
 
- cmp [C_LABEL(BG1HOFS)],bx
+ cmp [BG1HOFS],bx
  je .no_change
  UpdateDisplay  ;*scroll
- mov [C_LABEL(BG1HOFS)],ebx
+ mov [BG1HOFS],ebx
 
 .no_change:
 
@@ -1225,12 +1222,12 @@ SNES_W210E: ; BG1VOFS
 %ifdef TRAP_BGVOFS
  pusha  ;*
  xor ebx,ebx
- mov bl,[C_LABEL(Current_Line_Timing)]
+ mov bl,[Current_Line_Timing]
  shl ebx,16
  or ebx,0x210E
- mov [C_LABEL(Map_Address)],ebx ; Set up Map Address so message works!
- mov [C_LABEL(Map_Byte)],al     ; Set up Map Byte so message works
- call C_LABEL(InvalidHWWrite)   ; Unmapped hardware address!
+ mov [Map_Address],ebx ; Set up Map Address so message works!
+ mov [Map_Byte],al     ; Set up Map Byte so message works
+ call InvalidHWWrite   ; Unmapped hardware address!
  popa   ;*
 %endif
 
@@ -1238,7 +1235,7 @@ EXTERN SNES_W_M7V
  call SNES_W_M7V
 
  push ebx
- mov dl,[C_LABEL(BG1VOFS)+1]
+ mov dl,[BG1VOFS+1]
  mov bl,[BGOFS_Last_Write]
  and dl,7
  and bl,~7
@@ -1246,10 +1243,10 @@ EXTERN SNES_W_M7V
  mov bh,al
  mov [BGOFS_Last_Write],al
 
- cmp [C_LABEL(BG1VOFS)],bx
+ cmp [BG1VOFS],bx
  je .no_change
  UpdateDisplay  ;*scroll
- mov [C_LABEL(BG1VOFS)],ebx
+ mov [BG1VOFS],ebx
 
 .no_change:
 
@@ -1261,17 +1258,17 @@ SNES_W210F: ; BG2HOFS
 %ifdef TRAP_BGHOFS
  pusha  ;*
  xor ebx,ebx
- mov bl,[C_LABEL(Current_Line_Timing)]
+ mov bl,[Current_Line_Timing]
  shl ebx,16
  or ebx,0x210F
- mov [C_LABEL(Map_Address)],ebx ; Set up Map Address so message works!
- mov [C_LABEL(Map_Byte)],al     ; Set up Map Byte so message works
- call C_LABEL(InvalidHWWrite)   ; Unmapped hardware address!
+ mov [Map_Address],ebx ; Set up Map Address so message works!
+ mov [Map_Byte],al     ; Set up Map Byte so message works
+ call InvalidHWWrite   ; Unmapped hardware address!
  popa   ;*
 %endif
 
  push ebx
- mov dl,[C_LABEL(BG2HOFS)+1]
+ mov dl,[BG2HOFS+1]
  mov bl,[BGOFS_Last_Write]
  and dl,7
  and bl,~7
@@ -1279,10 +1276,10 @@ SNES_W210F: ; BG2HOFS
  mov bh,al
  mov [BGOFS_Last_Write],al
 
- cmp [C_LABEL(BG2HOFS)],bx
+ cmp [BG2HOFS],bx
  je .no_change
  UpdateDisplay  ;*scroll
- mov [C_LABEL(BG2HOFS)],ebx
+ mov [BG2HOFS],ebx
 
 .no_change:
 
@@ -1294,17 +1291,17 @@ SNES_W2110: ; BG2VOFS
 %ifdef TRAP_BGVOFS
  pusha  ;*
  xor ebx,ebx
- mov bl,[C_LABEL(Current_Line_Timing)]
+ mov bl,[Current_Line_Timing]
  shl ebx,16
  or ebx,0x2110
- mov [C_LABEL(Map_Address)],ebx ; Set up Map Address so message works!
- mov [C_LABEL(Map_Byte)],al     ; Set up Map Byte so message works
- call C_LABEL(InvalidHWWrite)   ; Unmapped hardware address!
+ mov [Map_Address],ebx ; Set up Map Address so message works!
+ mov [Map_Byte],al     ; Set up Map Byte so message works
+ call InvalidHWWrite   ; Unmapped hardware address!
  popa   ;*
 %endif
 
  push ebx
- mov dl,[C_LABEL(BG2VOFS)+1]
+ mov dl,[BG2VOFS+1]
  mov bl,[BGOFS_Last_Write]
  and dl,7
  and bl,~7
@@ -1312,10 +1309,10 @@ SNES_W2110: ; BG2VOFS
  mov bh,al
  mov [BGOFS_Last_Write],al
 
- cmp [C_LABEL(BG2VOFS)],bx
+ cmp [BG2VOFS],bx
  je .no_change
  UpdateDisplay  ;*scroll
- mov [C_LABEL(BG2VOFS)],ebx
+ mov [BG2VOFS],ebx
 .no_change:
 
  pop ebx
@@ -1326,17 +1323,17 @@ SNES_W2111: ; BG3HOFS
 %ifdef TRAP_BGHOFS
  pusha  ;*
  xor ebx,ebx
- mov bl,[C_LABEL(Current_Line_Timing)]
+ mov bl,[Current_Line_Timing]
  shl ebx,16
  or ebx,0x2111
- mov [C_LABEL(Map_Address)],ebx ; Set up Map Address so message works!
- mov [C_LABEL(Map_Byte)],al     ; Set up Map Byte so message works
- call C_LABEL(InvalidHWWrite)   ; Unmapped hardware address!
+ mov [Map_Address],ebx ; Set up Map Address so message works!
+ mov [Map_Byte],al     ; Set up Map Byte so message works
+ call InvalidHWWrite   ; Unmapped hardware address!
  popa   ;*
 %endif
 
  push ebx
- mov dl,[C_LABEL(BG3HOFS)+1]
+ mov dl,[BG3HOFS+1]
  mov bl,[BGOFS_Last_Write]
  and dl,7
  and bl,~7
@@ -1344,10 +1341,10 @@ SNES_W2111: ; BG3HOFS
  mov bh,al
  mov [BGOFS_Last_Write],al
 
- cmp [C_LABEL(BG3HOFS)],bx
+ cmp [BG3HOFS],bx
  je .no_change
  UpdateDisplay  ;*scroll
- mov [C_LABEL(BG3HOFS)],ebx
+ mov [BG3HOFS],ebx
 
  mov bl,4
  mov [Redo_Offset_Change],bl
@@ -1361,17 +1358,17 @@ SNES_W2112: ; BG3VOFS
 %ifdef TRAP_BGVOFS
  pusha  ;*
  xor ebx,ebx
- mov bl,[C_LABEL(Current_Line_Timing)]
+ mov bl,[Current_Line_Timing]
  shl ebx,16
  or ebx,0x2112
- mov [C_LABEL(Map_Address)],ebx ; Set up Map Address so message works!
- mov [C_LABEL(Map_Byte)],al     ; Set up Map Byte so message works
- call C_LABEL(InvalidHWWrite)   ; Unmapped hardware address!
+ mov [Map_Address],ebx ; Set up Map Address so message works!
+ mov [Map_Byte],al     ; Set up Map Byte so message works
+ call InvalidHWWrite   ; Unmapped hardware address!
  popa   ;*
 %endif
 
  push ebx
- mov dl,[C_LABEL(BG3VOFS)+1]
+ mov dl,[BG3VOFS+1]
  mov bl,[BGOFS_Last_Write]
  and dl,7
  and bl,~7
@@ -1379,10 +1376,10 @@ SNES_W2112: ; BG3VOFS
  mov bh,al
  mov [BGOFS_Last_Write],al
 
- cmp [C_LABEL(BG3VOFS)],bx
+ cmp [BG3VOFS],bx
  je .no_change
  UpdateDisplay  ;*scroll
- mov [C_LABEL(BG3VOFS)],ebx
+ mov [BG3VOFS],ebx
 
  mov byte [Redo_Offset_Change_VOffsets],0xFF
  mov byte [Redo_Offset_Change],0xFF
@@ -1396,17 +1393,17 @@ SNES_W2113: ; BG4HOFS
 %ifdef TRAP_BGHOFS
  pusha  ;*
  xor ebx,ebx
- mov bl,[C_LABEL(Current_Line_Timing)]
+ mov bl,[Current_Line_Timing]
  shl ebx,16
  or ebx,0x2113
- mov [C_LABEL(Map_Address)],ebx ; Set up Map Address so message works!
- mov [C_LABEL(Map_Byte)],al     ; Set up Map Byte so message works
- call C_LABEL(InvalidHWWrite)   ; Unmapped hardware address!
+ mov [Map_Address],ebx ; Set up Map Address so message works!
+ mov [Map_Byte],al     ; Set up Map Byte so message works
+ call InvalidHWWrite   ; Unmapped hardware address!
  popa   ;*
 %endif
 
  push ebx
- mov dl,[C_LABEL(BG4HOFS)+1]
+ mov dl,[BG4HOFS+1]
  mov bl,[BGOFS_Last_Write]
  and dl,7
  and bl,~7
@@ -1414,10 +1411,10 @@ SNES_W2113: ; BG4HOFS
  mov bh,al
  mov [BGOFS_Last_Write],al
 
- cmp [C_LABEL(BG4HOFS)],bx
+ cmp [BG4HOFS],bx
  je .no_change
  UpdateDisplay  ;*scroll
- mov [C_LABEL(BG4HOFS)],ebx
+ mov [BG4HOFS],ebx
 
 .no_change:
 
@@ -1429,17 +1426,17 @@ SNES_W2114: ; BG4VOFS
 %ifdef TRAP_BGVOFS
  pusha  ;*
  xor ebx,ebx
- mov bl,[C_LABEL(Current_Line_Timing)]
+ mov bl,[Current_Line_Timing]
  shl ebx,16
  or ebx,0x2114
- mov [C_LABEL(Map_Address)],ebx ; Set up Map Address so message works!
- mov [C_LABEL(Map_Byte)],al     ; Set up Map Byte so message works
- call C_LABEL(InvalidHWWrite)   ; Unmapped hardware address!
+ mov [Map_Address],ebx ; Set up Map Address so message works!
+ mov [Map_Byte],al     ; Set up Map Byte so message works
+ call InvalidHWWrite   ; Unmapped hardware address!
  popa   ;*
 %endif
 
  push ebx
- mov dl,[C_LABEL(BG4VOFS)+1]
+ mov dl,[BG4VOFS+1]
  mov bl,[BGOFS_Last_Write]
  and dl,7
  and bl,~7
@@ -1447,10 +1444,10 @@ SNES_W2114: ; BG4VOFS
  mov bh,al
  mov [BGOFS_Last_Write],al
 
- cmp [C_LABEL(BG4VOFS)],bx
+ cmp [BG4VOFS],bx
  je .no_change
  UpdateDisplay  ;*scroll
- mov [C_LABEL(BG4VOFS)],ebx
+ mov [BG4VOFS],ebx
 .no_change:
 
  pop ebx
@@ -1458,7 +1455,7 @@ SNES_W2114: ; BG4VOFS
 
 ALIGNC
 SNES_W2115: ; VMAIN
- mov [C_LABEL(VMAIN)],al    ; Get our copy of this
+ mov [VMAIN],al    ; Get our copy of this
  and al,0x0C
  jz .no_full
  cmp al,2*4
@@ -1491,12 +1488,12 @@ ALIGNC
  Set_21_Write 0x18,SNES_W2118_NORM
  Set_21_Write 0x19,SNES_W2119_NORM
 .full_done:
- mov al,[C_LABEL(VMAIN)]
+ mov al,[VMAIN]
  and al,3
  jnz .not_1
 
  mov byte [SCINC],1
- mov al,[C_LABEL(VMAIN)]
+ mov al,[VMAIN]
  ret
 
 ALIGNC
@@ -1505,14 +1502,14 @@ ALIGNC
  jae .not_32
 
  mov byte [SCINC],32
- mov al,[C_LABEL(VMAIN)]
+ mov al,[VMAIN]
  ret
 
 ALIGNC
 .not_32:
  ; A bug in SNES makes mode 2 = 128
  mov byte [SCINC],128
- mov al,[C_LABEL(VMAIN)]
+ mov al,[VMAIN]
  ret
 
 ALIGNC
@@ -1520,7 +1517,7 @@ SNES_W2116: ; VMADDL
  mov edx,[VRAMAddress]
  mov dl,al
  mov [VRAMAddress],al
- mov dx,[C_LABEL(VRAM)+edx*2]
+ mov dx,[VRAM+edx*2]
  mov [VMDATAREAD_buffer],dx
  ret
 
@@ -1530,7 +1527,7 @@ SNES_W2117: ; VMADDH
  mov dh,0x7F
  and dh,al
  mov [VRAMAddress+1],dh
- mov dx,[C_LABEL(VRAM)+edx*2]
+ mov dx,[VRAM+edx*2]
  mov [VMDATAREAD_buffer],dx
  ret
 
@@ -1583,7 +1580,7 @@ SNES_W2117: ; VMADDH
  cmp byte [HVBJOY], 0
  js %%in_vblank
 
- cmp byte [C_LABEL(INIDISP)], 0
+ cmp byte [INIDISP], 0
  jns %1
 
 %%in_vblank:
@@ -1613,19 +1610,19 @@ SNES_W2118_FULL_%2:
  pop eax
  or edx,edi
  pop edi
- mov ebx,C_LABEL(VRAM)
+ mov ebx,VRAM
  cmp [ebx+edx*2],al
  je .no_change
  push edx
  UpdateDisplay  ;*
  pop edx
 %ifdef Profile_VRAM_Writes
- inc dword [C_LABEL(VMWriteL_Full)]
+ inc dword [VMWriteL_Full]
 %endif
  mov [ebx+edx*2],al
  VRAM_Cache_Check
 .no_change:
- mov bl,[C_LABEL(VMAIN)]
+ mov bl,[VMAIN]
  test bl,bl
  js .no_increment
  mov edx,[SCINC]
@@ -1657,19 +1654,19 @@ SNES_W2119_FULL_%2:
  pop eax
  or edx,edi
  pop edi
- mov ebx,C_LABEL(VRAM)+1
+ mov ebx,VRAM+1
  cmp [ebx+edx*2],al
  je .no_change
  push edx
  UpdateDisplay  ;*
  pop edx
 %ifdef Profile_VRAM_Writes
- inc dword [C_LABEL(VMWriteH_Full)]
+ inc dword [VMWriteH_Full]
 %endif
  mov [ebx+edx*2],al
  VRAM_Cache_Check
 .no_change:
- mov bl,[C_LABEL(VMAIN)]
+ mov bl,[VMAIN]
  test bl,bl
  jns .no_increment
  mov edx,[SCINC]
@@ -1688,7 +1685,7 @@ SNES_W2118_NORM:
 
  JUMP_NOT_VBLANK .no_change
 
- mov ebx,C_LABEL(VRAM)
+ mov ebx,VRAM
  mov edx,[VRAMAddress]
  cmp [ebx+edx*2],al
  je .no_change
@@ -1696,12 +1693,12 @@ SNES_W2118_NORM:
  UpdateDisplay  ;*
  pop edx
 %ifdef Profile_VRAM_Writes
- inc dword [C_LABEL(VMWriteL_Norm)]
+ inc dword [VMWriteL_Norm]
 %endif
  mov [ebx+edx*2],al
  VRAM_Cache_Check
 .no_change:
- mov bl,[C_LABEL(VMAIN)]
+ mov bl,[VMAIN]
  test bl,bl
  js .no_increment
  mov edx,[SCINC]
@@ -1719,7 +1716,7 @@ SNES_W2119_NORM:
 
  JUMP_NOT_VBLANK .no_change
 
- mov ebx,C_LABEL(VRAM)+1
+ mov ebx,VRAM+1
  mov edx,[VRAMAddress]
  cmp [ebx+edx*2],al
  je .no_change
@@ -1727,12 +1724,12 @@ SNES_W2119_NORM:
  UpdateDisplay  ;*
  pop edx
 %ifdef Profile_VRAM_Writes
- inc [C_LABEL(VMWriteH_Norm)]
+ inc [VMWriteH_Norm]
 %endif
  mov [ebx+edx*2],al
  VRAM_Cache_Check
 .no_change:
- mov bl,[C_LABEL(VMAIN)]
+ mov bl,[VMAIN]
  test bl,bl
  jns .no_increment
  mov edx,[SCINC]
@@ -1780,10 +1777,10 @@ SNES_W2122: ; CGDATA
  test ebx,ebx
  jnz .hi_byte
 
- cmp al,[C_LABEL(Real_SNES_Palette)+ebx+edx*2]
+ cmp al,[Real_SNES_Palette+ebx+edx*2]
  jz .no_change
- mov byte [C_LABEL(PaletteChanged)],1
- mov [C_LABEL(Real_SNES_Palette)+ebx+edx*2],al
+ mov byte [PaletteChanged],1
+ mov [Real_SNES_Palette+ebx+edx*2],al
 .no_change:
  mov bl,1
  pop eax
@@ -1794,10 +1791,10 @@ SNES_W2122: ; CGDATA
 
 .hi_byte:
  and al,0x7F
- cmp al,[C_LABEL(Real_SNES_Palette)+ebx+edx*2]
+ cmp al,[Real_SNES_Palette+ebx+edx*2]
  jz .no_change_hi
- mov byte [C_LABEL(PaletteChanged)],1
- mov [C_LABEL(Real_SNES_Palette)+ebx+edx*2],al
+ mov byte [PaletteChanged],1
+ mov [Real_SNES_Palette+ebx+edx*2],al
 
 .no_change_hi:
  inc edx
@@ -1811,54 +1808,54 @@ SNES_W2122: ; CGDATA
 
 ALIGNC
 SNES_W2123: ; W12SEL
- cmp al,[C_LABEL(W12SEL)]
+ cmp al,[W12SEL]
  je .no_change
  UpdateDisplay  ;*windowing only
- or byte [C_LABEL(Redo_Windowing)],Redo_Win_BG(1) | Redo_Win_BG(2)
- mov [C_LABEL(W12SEL)],al
+ or byte [Redo_Windowing],Redo_Win_BG(1) | Redo_Win_BG(2)
+ mov [W12SEL],al
  mov [WSELBG1],al
  shr al,4
  mov [WSELBG2],al
- mov al,[C_LABEL(W12SEL)]
+ mov al,[W12SEL]
 
 .no_change:
  ret
 
 ALIGNC
 SNES_W2124: ; W34SEL
- cmp al,[C_LABEL(W34SEL)]
+ cmp al,[W34SEL]
  je .no_change
  UpdateDisplay  ;*windowing only
- or byte [C_LABEL(Redo_Windowing)],Redo_Win_BG(3) | Redo_Win_BG(4)
- mov [C_LABEL(W34SEL)],al
+ or byte [Redo_Windowing],Redo_Win_BG(3) | Redo_Win_BG(4)
+ mov [W34SEL],al
  mov [WSELBG3],al
  shr al,4
  mov [WSELBG4],al
- mov al,[C_LABEL(W34SEL)]
+ mov al,[W34SEL]
 
 .no_change:
  ret
 
 ALIGNC
 SNES_W2125: ; WOBJSEL
- cmp al,[C_LABEL(WOBJSEL)]
+ cmp al,[WOBJSEL]
  je .no_change
  UpdateDisplay  ;*windowing only
- or byte [C_LABEL(Redo_Windowing)],Redo_Win_OBJ | Redo_Win_Color
- mov [C_LABEL(WOBJSEL)],al
+ or byte [Redo_Windowing],Redo_Win_OBJ | Redo_Win_Color
+ mov [WOBJSEL],al
 
 .no_change:
  ret
 
 ALIGNC
 SNES_W2126: ; WH0
- cmp al,[C_LABEL(WH0)]
+ cmp al,[WH0]
  je .no_change
  UpdateDisplay  ;*windowing only
- or byte [C_LABEL(Redo_Windowing)],Redo_Win(1) | \
+ or byte [Redo_Windowing],Redo_Win(1) | \
   Redo_Win_BG(1) | Redo_Win_BG(2) | Redo_Win_BG(3) | Redo_Win_BG(4) | \
   Redo_Win_OBJ | Redo_Win_Color
- mov [C_LABEL(WH0)],al
+ mov [WH0],al
 
 .no_change:
  ret
@@ -1866,13 +1863,13 @@ SNES_W2126: ; WH0
 ALIGNC
 SNES_W2127: ; WH1
  inc eax
- cmp al,[C_LABEL(WH1)]
+ cmp al,[WH1]
  je .no_change
  UpdateDisplay  ;*windowing only
- or byte [C_LABEL(Redo_Windowing)],Redo_Win(1) | \
+ or byte [Redo_Windowing],Redo_Win(1) | \
   Redo_Win_BG(1) | Redo_Win_BG(2) | Redo_Win_BG(3) | Redo_Win_BG(4) | \
   Redo_Win_OBJ | Redo_Win_Color
- mov [C_LABEL(WH1)],al
+ mov [WH1],al
 
 .no_change:
  dec eax
@@ -1880,13 +1877,13 @@ SNES_W2127: ; WH1
 
 ALIGNC
 SNES_W2128: ; WH2
- cmp al,[C_LABEL(WH2)]
+ cmp al,[WH2]
  je .no_change
  UpdateDisplay  ;*windowing only
- or byte [C_LABEL(Redo_Windowing)],Redo_Win(2) | \
+ or byte [Redo_Windowing],Redo_Win(2) | \
   Redo_Win_BG(1) | Redo_Win_BG(2) | Redo_Win_BG(3) | Redo_Win_BG(4) | \
   Redo_Win_OBJ | Redo_Win_Color
- mov [C_LABEL(WH2)],al
+ mov [WH2],al
 
 .no_change:
  ret
@@ -1894,13 +1891,13 @@ SNES_W2128: ; WH2
 ALIGNC
 SNES_W2129: ; WH3
  inc eax
- cmp al,[C_LABEL(WH3)]
+ cmp al,[WH3]
  je .no_change
  UpdateDisplay  ;*windowing only
- or byte [C_LABEL(Redo_Windowing)],Redo_Win(2) | \
+ or byte [Redo_Windowing],Redo_Win(2) | \
   Redo_Win_BG(1) | Redo_Win_BG(2) | Redo_Win_BG(3) | Redo_Win_BG(4) | \
   Redo_Win_OBJ | Redo_Win_Color
- mov [C_LABEL(WH3)],al
+ mov [WH3],al
 
 .no_change:
  dec eax
@@ -1908,14 +1905,14 @@ SNES_W2129: ; WH3
 
 ALIGNC
 SNES_W212A: ; WBGLOG
- cmp al,[C_LABEL(WBGLOG)]
+ cmp al,[WBGLOG]
  je .no_change
  UpdateDisplay  ;*windowing only
- or byte [C_LABEL(Redo_Windowing)], \
+ or byte [Redo_Windowing], \
   Redo_Win_BG(1) | Redo_Win_BG(2) | Redo_Win_BG(3) | Redo_Win_BG(4)
  push ebx
  mov ebx,eax
- mov [C_LABEL(WBGLOG)],al
+ mov [WBGLOG],al
  shr bl,2
  mov [WLOGBG1],al
  shr al,4
@@ -1924,25 +1921,25 @@ SNES_W212A: ; WBGLOG
  mov [WLOGBG3],al
  mov [WLOGBG4],bl
  pop ebx
- mov al,[C_LABEL(WBGLOG)]
+ mov al,[WBGLOG]
 
 .no_change:
  ret
 
 ALIGNC
 SNES_W212B: ; WOBJLOG
- cmp al,[C_LABEL(WOBJLOG)]
+ cmp al,[WOBJLOG]
  je .no_change
  UpdateDisplay  ;*windowing only
- or byte [C_LABEL(Redo_Windowing)],Redo_Win_OBJ | Redo_Win_Color
- mov [C_LABEL(WOBJLOG)],al
+ or byte [Redo_Windowing],Redo_Win_OBJ | Redo_Win_Color
+ mov [WOBJLOG],al
 
 .no_change:
  ret
 
 ALIGNC
 SNES_W212C: ; TM
- mov dl,[C_LABEL(TM)]
+ mov dl,[TM]
  xor dl,al
  and dl,BITMASK(0,4)
  je .no_change
@@ -1951,16 +1948,16 @@ SNES_W212C: ; TM
  UpdateDisplay  ;*
  pop edx
 
- mov byte [C_LABEL(Redo_Layering)],-1
- or [C_LABEL(Redo_Windowing)],dl
+ mov byte [Redo_Layering],-1
+ or [Redo_Windowing],dl
 
 .no_change:
- mov [C_LABEL(TM)],al
+ mov [TM],al
  ret
 
 ALIGNC
 SNES_W212D: ; TS
- mov dl,[C_LABEL(TS)]
+ mov dl,[TS]
  xor dl,al
  and dl,BITMASK(0,4)
  je .no_change
@@ -1969,16 +1966,16 @@ SNES_W212D: ; TS
  UpdateDisplay  ;*
  pop edx
 
- mov byte [C_LABEL(Redo_Layering)],-1
- or [C_LABEL(Redo_Windowing)],dl
+ mov byte [Redo_Layering],-1
+ or [Redo_Windowing],dl
 
 .no_change:
- mov [C_LABEL(TS)],al
+ mov [TS],al
  ret
 
 ALIGNC
 SNES_W212E: ; TMW
- mov dl,[C_LABEL(TMW)]
+ mov dl,[TMW]
  xor dl,al
  and dl,BITMASK(0,4)
  je .no_change
@@ -1987,16 +1984,16 @@ SNES_W212E: ; TMW
  UpdateDisplay  ;*
  pop edx
 
- mov byte [C_LABEL(Redo_Layering)],-1
- or [C_LABEL(Redo_Windowing)],dl
+ mov byte [Redo_Layering],-1
+ or [Redo_Windowing],dl
 
 .no_change:
- mov [C_LABEL(TMW)],al
+ mov [TMW],al
  ret
 
 ALIGNC
 SNES_W212F: ; TSW
- mov dl,[C_LABEL(TSW)]
+ mov dl,[TSW]
  xor dl,al
  and dl,BITMASK(0,4)
  je .no_change
@@ -2005,33 +2002,33 @@ SNES_W212F: ; TSW
  UpdateDisplay  ;*
  pop edx
 
- mov byte [C_LABEL(Redo_Layering)],-1
- or [C_LABEL(Redo_Windowing)],dl
+ mov byte [Redo_Layering],-1
+ or [Redo_Windowing],dl
 
 .no_change:
- mov [C_LABEL(TSW)],al
+ mov [TSW],al
  ret
 
 ALIGNC
 SNES_W2130: ; CGWSEL
- cmp al,[C_LABEL(CGWSEL)]
+ cmp al,[CGWSEL]
  je .no_change
  UpdateDisplay  ;*windowing only
- mov byte [C_LABEL(Redo_Layering)],-1
- or byte [C_LABEL(Redo_Windowing)],Redo_Win_Color
- mov [C_LABEL(CGWSEL)],al
+ mov byte [Redo_Layering],-1
+ or byte [Redo_Windowing],Redo_Win_Color
+ mov [CGWSEL],al
 
 .no_change:
  ret
 
 ALIGNC
 SNES_W2131: ; CGADSUB
- cmp al,[C_LABEL(CGADSUB)]
+ cmp al,[CGADSUB]
  je .no_change
  UpdateDisplay  ;*16-bit rendering only
- mov byte [C_LABEL(Redo_Layering)],-1
- or byte [C_LABEL(Redo_Windowing)],Redo_Win_Color
- mov [C_LABEL(CGADSUB)],al
+ mov byte [Redo_Layering],-1
+ or byte [Redo_Windowing],Redo_Win_Color
+ mov [CGADSUB],al
 
 .no_change:
  ret
@@ -2040,7 +2037,7 @@ ALIGNC
 SNES_W2132: ; COLDATA
  UpdateDisplay  ;*16-bit rendering only
  push ebx
- mov edx,[C_LABEL(COLDATA)]
+ mov edx,[COLDATA]
 
  test al,BITMASK(6,7)
  jns .no_blue
@@ -2074,19 +2071,19 @@ SNES_W2132: ; COLDATA
  or edx,ebx
 
 .no_red:
- mov [C_LABEL(COLDATA)],edx
+ mov [COLDATA],edx
  pop ebx
 
  ret
 
 ALIGNC
 SNES_W2133: ; SETINI
- cmp al,[C_LABEL(SETINI)]
+ cmp al,[SETINI]
  je .no_change
  UpdateDisplay  ;*interlaced etc. not yet supported
  xor edx,edx
  test al,4
- mov [C_LABEL(SETINI)],al
+ mov [SETINI],al
  mov dl,239
  jnz .tall_screen
  mov dl,224
@@ -2094,20 +2091,20 @@ SNES_W2133: ; SETINI
  ; if SETINI:6 (EXTBG enable) is clear, ignore BG2 enable (EXTBG)
  ; we pregenerate a mask for this here
  shr al,7
- mov [C_LABEL(LastRenderLine)],edx
+ mov [LastRenderLine],edx
 
  sbb dl,dl
  mov al,[BGMODE_Tile_Layer_Mask]
  or dl,~2
  and al,0x0F
- mov [C_LABEL(EXTBG_Mask)],dl
+ mov [EXTBG_Mask],dl
  jnz .not_mode7
  mov al,[BGMODE_Allowed_Layer_Mask_Table+7]
  and dl,al
  mov [BGMODE_Allowed_Layer_Mask],dl
 .not_mode7:
 
- mov al,[C_LABEL(SETINI)]
+ mov al,[SETINI]
 .no_change:
  ret
 
@@ -2124,7 +2121,7 @@ SNES_W2133: ; SETINI
 ALIGNC
 SNES_W2180: ; WMDATA
  mov edx,[WMADDL]
- mov [C_LABEL(WRAM)+edx],al
+ mov [WRAM+edx],al
  inc edx
  and edx,0x01FFFF
  mov [WMADDL],edx

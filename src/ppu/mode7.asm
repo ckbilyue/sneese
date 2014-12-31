@@ -33,10 +33,6 @@ section .text
 EXPORT mode7_start
 
 ;%define old_sprites
-EXTERN Ready_Line_Render,BaseDestPtr
-EXTERN_C SNES_Screen8
-EXTERN_C MosaicCount,MosaicLine
-EXTERN Tile_priority_bit
 
 section .bss
 ALIGNB
@@ -137,41 +133,41 @@ section .text
 ALIGNC
 EXPORT Reset_Mode_7
 %if 0
-extern C_LABEL(_Reset_Mode_7)
+extern _Reset_Mode_7
  pusha
- call C_LABEL(_Reset_Mode_7)
+ call _Reset_Mode_7
  popa
  ret
 %else
  ; Set eax to 0, as we're setting most everything to 0...
  xor eax,eax
 
- mov [C_LABEL(M7SEL)],al
+ mov [M7SEL],al
  mov byte [Redo_M7],0xFF
  mov byte [M7_Last_Write],al
  mov byte [Redo_16x8],0
  mov [MPY],eax
- mov [C_LABEL(M7A)],eax
- mov [C_LABEL(M7B)],eax
- mov [C_LABEL(M7C)],eax
- mov [C_LABEL(M7D)],eax
- mov [C_LABEL(M7X_13)],eax
- mov [C_LABEL(M7Y_13)],eax
-;mov [C_LABEL(M7H_13)],eax
-;mov [C_LABEL(M7V_13)],eax
- mov [C_LABEL(M7X)],eax
- mov [C_LABEL(M7Y)],eax
- mov [C_LABEL(M7H)],eax
- mov [C_LABEL(M7V)],eax
+ mov [M7A],eax
+ mov [M7B],eax
+ mov [M7C],eax
+ mov [M7D],eax
+ mov [M7X_13],eax
+ mov [M7Y_13],eax
+;mov [M7H_13],eax
+;mov [M7V_13],eax
+ mov [M7X],eax
+ mov [M7Y],eax
+ mov [M7H],eax
+ mov [M7V],eax
 
  ret
 %endif
 
 Do_16x8_Multiply:
  push ebx
- movsx ebx,byte [C_LABEL(M7B)+1]
+ movsx ebx,byte [M7B+1]
  mov byte [Redo_16x8],0
- imul ebx,[C_LABEL(M7A)]    ; I think signed is used makes most sense!
+ imul ebx,[M7A]    ; I think signed is used makes most sense!
  mov [MPY],ebx
  mov al,[edx]
  pop ebx
@@ -212,11 +208,11 @@ EXPORT SNES_W_M7H ; 210D - handle mode 7 register update
  mov [M7_Last_Write],al
 
  movsx ebx,bx
- cmp [C_LABEL(M7H)],ebx
+ cmp [M7H],ebx
  je .no_change
 
  UpdateDisplay  ;*M7
- mov [C_LABEL(M7H)],ebx
+ mov [M7H],ebx
  mov dl,0x40    ; Recalculate H
  or [Redo_M7],dl
 .no_change:
@@ -231,11 +227,11 @@ EXPORT SNES_W_M7V ; 210E - handle mode 7 register update
  mov [M7_Last_Write],al
 
  movsx ebx,bx
- cmp [C_LABEL(M7V)],ebx
+ cmp [M7V],ebx
  je .no_change
 
  UpdateDisplay  ;*M7
- mov [C_LABEL(M7V)],ebx
+ mov [M7V],ebx
  mov dl,0x80    ; Recalculate V
  or [Redo_M7],dl
 .no_change:
@@ -244,24 +240,24 @@ EXPORT SNES_W_M7V ; 210E - handle mode 7 register update
 
 ALIGNC
 EXPORT SNES_W211A ; M7SEL   ; New for 0.12
- cmp al,[C_LABEL(M7SEL)]
+ cmp al,[M7SEL]
  je .no_change
  UpdateDisplay  ;*
  push ebx
  push eax
- mov [C_LABEL(M7SEL)],al
+ mov [M7SEL],al
 
  shl al,8
- mov ebx,[C_LABEL(M7A)]
- mov eax,[C_LABEL(M7C)]
+ mov ebx,[M7A]
+ mov eax,[M7C]
  sbb edx,edx
  xor ebx,edx
  xor eax,edx
  and edx,byte 1
  add ebx,edx
  add eax,edx
- mov [C_LABEL(M7A_X)],ebx
- mov [C_LABEL(M7C_X)],eax
+ mov [M7A_X],ebx
+ mov [M7C_X],eax
 
  pop eax
  pop ebx
@@ -277,12 +273,12 @@ EXPORT SNES_W211B ; M7A
  mov [M7_Last_Write],al
 
  movsx ebx,bx
- cmp [C_LABEL(M7A)],ebx
+ cmp [M7A],ebx
  je .no_change
 
  UpdateDisplay  ;*M7
  ; Used for matrix render and 16-bit M7A * 8-bit = 24-bit multiply
- mov [C_LABEL(M7A)],ebx
+ mov [M7A],ebx
  mov dl,0x01    ; Recalculate A
  or [Redo_M7],dl
  mov byte [Redo_16x8],-1
@@ -298,12 +294,12 @@ EXPORT SNES_W211C ; M7B
  mov [M7_Last_Write],al
 
  movsx ebx,bx
- cmp [C_LABEL(M7B)],ebx
+ cmp [M7B],ebx
  je .no_change
 
  UpdateDisplay  ;*M7
  ; Used for matrix render and 16-bit * 8-bit M7B high byte = 24-bit multiply
- mov [C_LABEL(M7B)],ebx
+ mov [M7B],ebx
  mov dl,0x02    ; Recalculate B
  or [Redo_M7],dl
  mov byte [Redo_16x8],-1
@@ -319,11 +315,11 @@ EXPORT SNES_W211D ; M7C
  mov [M7_Last_Write],al
 
  movsx ebx,bx
- cmp [C_LABEL(M7C)],ebx
+ cmp [M7C],ebx
  je .no_change
 
  UpdateDisplay  ;*M7
- mov [C_LABEL(M7C)],ebx
+ mov [M7C],ebx
  mov dl,0x04    ; Recalculate C
  or [Redo_M7],dl
 .no_change:
@@ -338,11 +334,11 @@ EXPORT SNES_W211E ; M7D
  mov [M7_Last_Write],al
 
  movsx ebx,bx
- cmp [C_LABEL(M7D)],ebx
+ cmp [M7D],ebx
  je .no_change
 
  UpdateDisplay  ;*M7
- mov [C_LABEL(M7D)],ebx
+ mov [M7D],ebx
  mov dl,0x08    ; Recalculate D
  or [Redo_M7],dl
 .no_change:
@@ -357,11 +353,11 @@ EXPORT SNES_W211F ; M7X
  mov [M7_Last_Write],al
 
  movsx ebx,bx
- cmp [C_LABEL(M7X)],ebx
+ cmp [M7X],ebx
  je .no_change
 
  UpdateDisplay  ;*M7
- mov [C_LABEL(M7X)],ebx
+ mov [M7X],ebx
  mov dl,0x10    ; Recalculate X
  or [Redo_M7],dl
 .no_change:
@@ -376,11 +372,11 @@ EXPORT SNES_W2120 ; M7Y
  mov [M7_Last_Write],al
 
  movsx ebx,bx
- cmp [C_LABEL(M7Y)],ebx
+ cmp [M7Y],ebx
  je .no_change
 
  UpdateDisplay  ;*M7
- mov [C_LABEL(M7Y)],ebx
+ mov [M7Y],ebx
  mov dl,0x20    ; Recalculate Y
  or [Redo_M7],dl
 .no_change:
