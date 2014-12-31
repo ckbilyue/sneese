@@ -51,10 +51,10 @@ extern void reset_bus_timings(void);
 
 signed char snes_rom_loaded = 0;
 
-#define SPC_CPU_CYCLE_MULTIPLICAND_PAL 102400
-#define SPC_CPU_CYCLE_DIVISOR_PAL 2128137
-#define SPC_CPU_CYCLE_MULTIPLICAND_NTSC 5632
-#define SPC_CPU_CYCLE_DIVISOR_NTSC 118125
+#define SPC_CPU_CYCLE_MULTIPLICAND_PAL 34176
+#define SPC_CPU_CYCLE_DIVISOR_PAL 709379
+#define SPC_CPU_CYCLE_MULTIPLICAND_NTSC 15664
+#define SPC_CPU_CYCLE_DIVISOR_NTSC 328125
 
 unsigned SPC_CPU_cycle_divisor, SPC_CPU_cycle_multiplicand;
 

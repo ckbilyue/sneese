@@ -28,7 +28,7 @@ You must read and accept the license prior to use.
 #define OUTPUT_AUDIO_UNSIGNED_8
 #define OUTPUT_AUDIO_UNSIGNED_16
 
-#define SOUND_FREQ 32000    /* 32kHz true SNES mix speed */
+#define SOUND_FREQ 32040    /* 32kHz true SNES mix speed */
 #define SOUND_LAG  10       /* Lag between sound mixed and sound heard (1/LAG sec) */
 
 #define OUTPUT_PRECISION 23

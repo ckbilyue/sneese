@@ -68,19 +68,19 @@ EXTERN Update_SPC_Timer
 %endif
 
 %if 0
- SPC runs at 2048000 clock.
+ SPC runs at approx. 1024000 clock (32040 x 32).
 
- NTSC 65c816 timing.
+ NTSC 5A22 timing.
  Masterclock: 21.477272..MHz. (189e7 / 88 Hz)
  Dotclock: 5.36931818..MHz.
- Optimal conversion factors: 118125:11264
+ Optimal conversion factors: 328125:15664
  Line rate: 15.6997607655502~KHz.
  Frame rate: 59.92275~Hz.
 
- PAL 65c816 timing.
+ PAL 5A22 timing.
  Masterclock: 21.28137MHz.
  Dotclock: 5.3203425MHz.
- Optimal conversion factors: 2128137:204800
+ Optimal conversion factors: 709379:34176
  Line rate: 15.55655701~KHz.
  Frame rate: 49.86075967~Hz.
 %endif
