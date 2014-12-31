@@ -3,7 +3,7 @@
 # SNEeSe, an Open Source Super NES emulator.
 #
 #
-# Copyright (c) 1998-2006, Charles Bilyue'.
+# Copyright (c) 1998-2015, Charles Bilyue.
 # Portions copyright (c) 1998-2003, Brad Martin.
 # Portions copyright (c) 2003-2004, Daniel Horchner.
 # Portions copyright (c) 2004-2005, Nach. ( http://nsrt.edgeemu.com/ )
