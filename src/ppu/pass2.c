@@ -284,7 +284,8 @@ void cg_process_arithmetic(unsigned short *main_buf, unsigned short *sub_buf,
 }
 
 
-void cg_translate_output(unsigned current_line, unsigned lines)
+/* TODO: move these to their own file, or at least a self-include block */
+void cg_translate_output_16(unsigned current_line, unsigned lines)
 {
  int y;
 
@@ -304,16 +305,61 @@ void cg_translate_output(unsigned current_line, unsigned lines)
    g = (c_in & BITMASK( 5, 9)) >>  5;
    b = (c_in & BITMASK(10,15)) >> 10;
 
-   /* TODO: remove platform dependant code here */
+   /* TODO: remove platform dependent code here */
    c_out = makecol16(
     (r * (brightness + 1)) / 2,
     (g * (brightness + 1)) / 2,
     (b * (brightness + 1)) / 2);
 
-   ((unsigned short *) ((BITMAP *) gbSNES_Screen16.subbitmap)->line
+   ((unsigned short *) ((BITMAP *) gbSNES_Screen.subbitmap)->line
     [y + current_line])[x] = c_out;
   }
  }
+}
+
+void cg_translate_output_32(unsigned current_line, unsigned lines)
+{
+ int y;
+
+ for (y = 0; y < lines; y++)
+ {
+  int x;
+
+  for (x = 0; x < 256; x++)
+  {
+   unsigned short c_in;
+   unsigned c_out;
+   unsigned brightness = INIDISP & BITMASK(0,3);
+   unsigned r, g, b;
+
+   c_in = output_main[y * 256 + x];
+
+   r = c_in & BITMASK( 0, 4);
+   g = (c_in & BITMASK( 5, 9)) >>  5;
+   b = (c_in & BITMASK(10,15)) >> 10;
+
+   /* TODO: remove platform dependent code here */
+   c_out = makecol32(
+    (r * (brightness + 1)) / 2,
+    (g * (brightness + 1)) / 2,
+    (b * (brightness + 1)) / 2);
+
+   ((unsigned *) ((BITMAP *) gbSNES_Screen.subbitmap)->line
+    [y + current_line])[x] = c_out;
+  }
+ }
+}
+
+void cg_translate_output(unsigned current_line, unsigned lines)
+{
+	if (bitmap_color_depth(gbSNES_Screen.subbitmap) == 32)
+	{
+		cg_translate_output_32(current_line, lines);
+	}
+	else
+	{
+		cg_translate_output_16(current_line, lines);
+	}
 }
 
 

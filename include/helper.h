@@ -88,12 +88,12 @@ EXTERN signed char stretch_x, stretch_y;
 /* This flag is set when palette recomputation is necessary */
 EXTERN signed char PaletteChanged;
 
-EXTERN SNEESE_GFX_BUFFER gbSNES_Screen16;
+EXTERN SNEESE_GFX_BUFFER gbSNES_Screen;
 
 EXTERN unsigned char (*Real_SNES_Screen8)[2];
 EXTERN unsigned char (*main_screen)[2];
 EXTERN unsigned char (*sub_screen)[2];
-EXTERN unsigned short *SNES_Screen16;
+EXTERN void *SNES_Screen;
 
 EXTERN BITMAP *Allegro_Bitmap;  /* Renamed (I'm using mostly allegro now so what the hell!) */
 EXTERN BITMAP *Internal_Bitmap;

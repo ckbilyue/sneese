@@ -26,6 +26,7 @@ You must read and accept the license prior to use.
 #include "platform.h"
 #include "wrapaleg.h"
 #include "font.h"
+#include "snes.h"
 
 #define cBorder_Back 0
 #define cBorder_Fore 7
@@ -54,6 +55,9 @@ struct SCREEN {
   int using_driver;
 
 #ifndef ALLEGRO_DOS
+   int depth = desktop_color_depth();
+   if (depth == 0 || !windowed) depth = this->depth;
+
    using_driver = windowed ? driver_win : driver;
 #else   /* defined(ALLEGRO_DOS) */
    using_driver = driver;
@@ -62,7 +66,8 @@ struct SCREEN {
   set_color_depth(depth);
   error = set_gfx_mode(using_driver, w_base, h_base, w_base, h_base);
   if(error) return error;
-  return 0;
+
+  return snes_output_init();
  }
 
 };

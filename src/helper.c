@@ -167,12 +167,12 @@ signed char stretch_x, stretch_y;
 /* This flag is set when palette recomputation is necessary */
 signed char PaletteChanged;
 
-SNEESE_GFX_BUFFER gbSNES_Screen16 = NULL_GFX_BUFFER;
+SNEESE_GFX_BUFFER gbSNES_Screen = NULL_GFX_BUFFER;
 
 unsigned char (*Real_SNES_Screen8)[2];
 unsigned char (*main_screen)[2];
 unsigned char (*sub_screen)[2];
-unsigned short *SNES_Screen16;
+void *SNES_Screen;
 
 BITMAP *Allegro_Bitmap=0;   /* Renamed (I'm using mostly allegro now so what the hell!) */
 
@@ -377,13 +377,13 @@ void Copy_Screen()
    break;
  }
 
- screenshot_source = gbSNES_Screen16.subbitmap;
+ screenshot_source = gbSNES_Screen.subbitmap;
 
  if (stretch_x || stretch_y)
  {
   acquire_screen();
 
-  stretch_blit(gbSNES_Screen16.subbitmap, screen,
+  stretch_blit(gbSNES_Screen.subbitmap, screen,
    0, 0, 256, 239,
    out_position_x, out_position_y, out_size_x, out_size_y);
 
@@ -393,13 +393,13 @@ void Copy_Screen()
  {
   acquire_screen();
 
-  blit(gbSNES_Screen16.subbitmap, screen, 0, 0,
+  blit(gbSNES_Screen.subbitmap, screen, 0, 0,
    out_position_x, out_position_y, out_size_x, out_size_y);
 
   release_screen();
  }
 
-// clear(gbSNES_Screen16.subbitmap);
+// clear(gbSNES_Screen.subbitmap);
 }
 
 #if defined(UNIX) || defined(__BEOS__)

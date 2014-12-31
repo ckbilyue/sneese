@@ -81,6 +81,15 @@ static int Setup_Memory(void)
 }
 
 
+int snes_output_init(void)
+{
+ SNES_Screen =
+  platform_get_gfx_buffer(bitmap_color_depth(screen), 256, 239, 0, 0, &gbSNES_Screen);
+ if (SNES_Screen == 0) return 1;
+
+ return 0;
+}
+
 int snes_init(void)
 {
  int memoryneeded;
@@ -94,17 +103,13 @@ int snes_init(void)
   return 1;
  }
 
- memset(&gbSNES_Screen16, 0, sizeof(gbSNES_Screen16));
+ memset(&gbSNES_Screen, 0, sizeof(gbSNES_Screen));
 
  main_screen = (unsigned char (*)[2]) malloc(256 * 2 * MAX_LINES_IN_SET);
  if (!main_screen) return 1;
 
  sub_screen = (unsigned char (*)[2]) malloc(256 * 2 * MAX_LINES_IN_SET);
  if (!sub_screen) return 1;
-
- SNES_Screen16 =
-  platform_get_gfx_buffer(16, 256, 239, 0, 0, &gbSNES_Screen16);
- if (SNES_Screen16 == 0) return 1;
 
  SetupTables();
 

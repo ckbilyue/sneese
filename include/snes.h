@@ -239,6 +239,7 @@ EXTERN signed char snes_rom_loaded;
 
 EXTERN unsigned SPC_CPU_cycle_divisor, SPC_CPU_cycle_multiplicand;
 
+EXTERN int snes_output_init(void);
 EXTERN int snes_init(void);
 EXTERN void snes_reset(void);
 EXTERN void set_snes_pal(void);
