@@ -31,7 +31,6 @@ EXTERN SNES_Screen8
 %ifndef SNEeSe_ppu_screen_asm
 
 EXTERN Clear_Scanlines,Clear_Scanlines_Preload
-EXTERN DisplayZ
 EXTERN Zbase,Zpositions,Zbase_main,Zbase_sub
 EXTERN screen_text_start,screen_data_start,screen_bss_start
 EXTERN Tile_Offset_Table_16_8

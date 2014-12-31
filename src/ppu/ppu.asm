@@ -505,7 +505,7 @@ ALIGNC
 EXPORT Reset_Ports
  pusha
 
- call Reset_Sprites
+ call Reset_Sprites_asm
  call Reset_Mode_7
  call Invalidate_Tile_Caches
 

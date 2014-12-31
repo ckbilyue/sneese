@@ -119,8 +119,6 @@ section .bss
 ;Z     34 32 24 22 14 12 04 02 00
 
 ALIGNB
-EXPORT DisplayZ,skipb (8+256+8)
-ALIGNB
 EXPORT Current_Line_Render,skipl
 EXPORT Last_Frame_Line,skipl
 EXPORT Ready_Line_Render,skipl

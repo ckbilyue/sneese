@@ -45,7 +45,7 @@ EXTERN Clear_Sprites
 EXTERN Plot_Sprites
 EXTERN Check_OAM_Recache
 EXTERN Recache_OAM
-EXTERN Reset_Sprites
+EXTERN Reset_Sprites_asm
 EXTERN SNES_R2138,SNES_W2101,SNES_W2102,SNES_W2103,SNES_W2104
 %endif
 

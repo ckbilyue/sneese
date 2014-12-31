@@ -22,8 +22,6 @@ You must read and accept the license prior to use.
 
 #include <string.h>
 
-extern unsigned char DisplayZ[8 + 256 + 8];
-
 #define GENERATE_OBJ_PALETTE(x) (0x10101010 * (x) + 0x8F8F8F8F)
 
 typedef struct {
@@ -687,8 +685,7 @@ void _Check_OAM_Recache(void)
  temp_oam_address = (SPRLatch & 0x80) ? OAMAddress : 0;
 
  /* convert address to OBJ # and compare */
- if (((temp_oam_address / 2) & (128 - 1)) != HiSprite
-  || (HiSpriteCnt1 & 1))
+ if (((temp_oam_address / 2) & (128 - 1)) != HiSprite)
  {
  unsigned xobj_set_1_shift, xobj_set_1_count;
  unsigned xobj_set_2_shift, xobj_set_2_count;
@@ -698,7 +695,7 @@ void _Check_OAM_Recache(void)
   HiSpriteBits = OAM + (HiSprite * 2 / 8) + (128 * 4);
   xobj_set_1_shift = (6 - HiSprite * 2) & 7;
   xobj_set_1_count = 128 - HiSprite;
-  xobj_set_2_shift = 6;
+  xobj_set_2_shift = 6;							/* TODO: asm code had 7, not 6... determine why? */
   xobj_set_2_count = HiSprite;
  HiSpriteCnt1 = xobj_set_1_shift + (xobj_set_1_count << 8);
  HiSpriteCnt2 = xobj_set_2_shift + (xobj_set_2_count << 8);
@@ -733,7 +730,7 @@ void Reload_OBSEL(void)
 }
 
 
-void _Reset_Sprites(void)
+void Reset_Sprites(void)
 {
  unsigned xobj_set_1_shift, xobj_set_1_count;
  unsigned xobj_set_2_shift, xobj_set_2_count;

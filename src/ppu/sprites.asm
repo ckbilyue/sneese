@@ -141,35 +141,10 @@ section .text
 
 
 ALIGNC
-EXPORT Reset_Sprites
+EXPORT Reset_Sprites_asm
  pusha
- ; Set eax to 0, as we're setting most everything to 0...
- xor eax,eax
-
- ; Reset sprite renderer vars
- mov byte [HiSprite],0
- mov dword [HiSpriteAddr],OAM+0x000
- mov dword [HiSpriteBits],OAM+0x200
- mov dword [HiSpriteCnt1],0x8007
- mov dword [HiSpriteCnt2],0x0007
- mov byte [Redo_OAM],-1
-
- ; Reset sprite port vars
- mov [OAMAddress],eax
- mov [OAMAddress_VBL],eax
- mov [OAMHigh],al
- mov [OAM_Write_Low],al
- mov [SPRLatch],al
-
- mov [OBSEL],al
- mov [OBSEL_write],al
-
-; Clear pixel allocation tag table
- mov edi,DisplayZ+8
- xor eax,eax
- mov ecx,256/32
- call Do_Clear
-
+EXTERN Reset_Sprites
+ call Reset_Sprites
  popa
  ret
 
