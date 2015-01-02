@@ -711,9 +711,6 @@ void Do_Update_Display(unsigned lines)
     Redo_Offset_Change)
    {
  /* Update_Offset_Change(); */
- /* asm("pushal; call Update_Offset_Change; popal" : : :
-     "eax", "ebx", "ecx", "edx", "ebp", "esi", "edi", "cc", "memory");
-  */
    }
   }
 
