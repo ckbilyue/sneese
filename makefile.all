@@ -111,7 +111,7 @@ include $(PLATFORMRULES)
 ASMOBJS := $(addsuffix .$(ASM_OBJ_EXT), \
             $(addprefix cpu/, 65c816 memmap dma) \
             $(addprefix apu/, apuskip) \
-            $(addprefix ppu/, screen windows mode7 tiles sprites ppu) \
+            $(addprefix ppu/, screen windows tiles sprites ppu) \
            clear font)
 
 JMAOBJS := $(addprefix jma/, 7zlzma.o crc32.o iiostrm.o inbyte.o jma.o \
@@ -187,9 +187,6 @@ $(OBJ)/ppu/ppu.$(ASM_OBJ_EXT): $(SRC)/ppu/ppu.asm $(OBJFIX) \
 $(OBJ)/apu/apuskip.$(ASM_OBJ_EXT): $(SRC)/apu/apuskip.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, misc.inc ppu/ppu.inc)
 $(OBJ)/clear.$(ASM_OBJ_EXT): $(SRC)/clear.asm $(INCLUDE)/misc.inc $(OBJFIX) 
-$(OBJ)/ppu/mode7.$(ASM_OBJ_EXT): $(SRC)/ppu/mode7.asm $(OBJFIX) \
- $(addprefix $(INCLUDE)/, misc.inc ppu/sprites.inc ppu/screen.inc \
- ppu/ppu.inc)
 $(OBJ)/ppu/screen.$(ASM_OBJ_EXT): $(SRC)/ppu/screen.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, ppu/sprites.inc ppu/ppu.inc ppu/tiles.inc \
  ppu/screen.inc misc.inc clear.inc)

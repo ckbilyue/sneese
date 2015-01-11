@@ -75,22 +75,6 @@ EXTERN Render_Layering_Option_0
 EXTERN Render_Layering_Option_1
 EXTERN Render_Layering_Option_2
 
-%ifndef SNEeSe_ppu_mode7_asm
-EXTERN SNES_R2134,SNES_R2135,SNES_R2136
-EXTERN SNES_W211A,SNES_W211B,SNES_W211C,SNES_W211D
-EXTERN SNES_W211E,SNES_W211F,SNES_W2120
-
-EXTERN SCREEN_MODE_7
-
-EXTERN Reset_Mode_7
-
-EXTERN M7H_13,M7V_13
-EXTERN Redo_M7
-EXTERN M7SEL
-EXTERN EXTBG_Mask
-EXTERN M7_Handler_Table,M7_Handler
-%endif
-
 
 %ifndef SNEeSe_ppu_bg8_asm
 EXTERN Render_8x8_C2,Render_8x8_C4,Render_8x8_C8
