@@ -49,13 +49,6 @@ You must read and accept the license prior to use.
         Other memory maps
 */
 
-#include "wrapaleg.h"
-
-#include <iostream>
-#include "jma/jma.h"
-using namespace std;
-
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -71,6 +64,12 @@ using namespace std;
 #include "multiio.h"
 
 #include "patch.h"
+
+
+#include <iostream>
+#include "jma/jma.h"
+using namespace std;
+
 
 
 char *rom_romfile = 0;
@@ -883,7 +882,7 @@ int ROM_interleaved = Undetected;
 int ROM_force_video_standard = Undetected;
 int ROM_video_standard = Undetected;
 
-void Load_32k(FILE *infile)
+void Load_32k(MULTIIO_FILE_PTR infile)
 {
  // Read in as 32k blocks and (de)interleave
  for (int cnt = 0; cnt < rmd_64k.bank_count; cnt++) // Read first half
@@ -893,7 +892,7 @@ void Load_32k(FILE *infile)
   fread2(RomAddress + cnt * (64 << 10), 1, (32 << 10), infile);
 }
 
-void Load_64k(FILE *infile)
+void Load_64k(MULTIIO_FILE_PTR infile)
 {
  for (int cnt = 0; cnt < rmd_64k.bank_count; cnt++) // Read in ROM
  {
@@ -945,7 +944,7 @@ void Setup_bank_count(const unsigned int size)
 
 unsigned ROM_start;        // This is where the ROM code itself starts.
 
-unsigned check_for_header(FILE *fp, int filesize)
+unsigned check_for_header(MULTIIO_FILE_PTR fp, int filesize)
 {
  unsigned ROM_start;
 
@@ -1280,8 +1279,8 @@ static bool open_rom_normal(const char *Filename)
 {
  if (!strcasecmp(fn_ext, ".jma")) return open_rom_jma(Filename);
  
- FILE *infile = fopen2(Filename, "rb");
- if (!infile) return FALSE; // File aint there m8
+ MULTIIO_FILE_PTR infile = fopen2(Filename, "rb");
+ if (!infile.mvPtr) return FALSE; // File aint there m8
 
  fseek2(infile, 0, SEEK_END);
  int infilesize = ftell2(infile);
@@ -1369,7 +1368,7 @@ static bool open_rom_normal(const char *Filename)
  return TRUE;
 }
 
-bool Load_32k_split(FILE *infile, const char *Filename, int parts, long total_size)
+bool Load_32k_split(MULTIIO_FILE_PTR infile, const char *Filename, int parts, long total_size)
 {
  char tempname[MAXPATH];
  long bytes_read = 0;
@@ -1401,8 +1400,8 @@ bool Load_32k_split(FILE *infile, const char *Filename, int parts, long total_si
    sprintf(fn_ext, ".%d", part);
    fnmerge(tempname, fn_drive, fn_dir, fn_file, fn_ext);
 
-   FILE *infile=fopen2(tempname,"rb");
-   if (!infile) return FALSE;
+   MULTIIO_FILE_PTR infile=fopen2(tempname,"rb");
+   if (!infile.mvPtr) return FALSE;
 
    fseek2(infile, 0, SEEK_END);
    infilesize = ftell2(infile);
@@ -1440,8 +1439,8 @@ bool Load_32k_split(FILE *infile, const char *Filename, int parts, long total_si
    sprintf(fn_ext, ".%d", part);
    fnmerge(tempname, fn_drive, fn_dir, fn_file, fn_ext);
 
-   FILE *infile=fopen2(tempname,"rb");
-   if (!infile) return FALSE;
+   MULTIIO_FILE_PTR infile=fopen2(tempname,"rb");
+   if (!infile.mvPtr) return FALSE;
 
    fseek2(infile, 0, SEEK_END);
    infilesize = ftell2(infile);
@@ -1472,8 +1471,8 @@ static bool open_rom_split(const char *Filename)
  {
   sprintf(fn_ext, ".%d", parts + 1);
   fnmerge(tempname, fn_drive, fn_dir, fn_file, fn_ext);
-  FILE *infile=fopen2(tempname,"rb");
-  if (!infile) break;
+  MULTIIO_FILE_PTR infile=fopen2(tempname,"rb");
+  if (!infile.mvPtr) break;
   fseek2(infile, 0, SEEK_END);
   total_size += ftell2(infile);
   fclose2(infile);
@@ -1481,8 +1480,8 @@ static bool open_rom_split(const char *Filename)
  if (parts == 1) return open_rom_normal(Filename);
  printf("Split ROM image detected - %d parts found.\n", parts);
 
- FILE *infile=fopen2(Filename,"rb");
- if (!infile) return FALSE;  // File aint there m8
+ MULTIIO_FILE_PTR infile=fopen2(Filename,"rb");
+ if (!infile.mvPtr) return FALSE;  // File aint there m8
 
  fseek2(infile, 0, SEEK_END);
  int infilesize = ftell2(infile);
@@ -1597,8 +1596,8 @@ static bool open_rom_split(const char *Filename)
     sprintf(fn_ext, ".%d", part);
     fnmerge(tempname, fn_drive, fn_dir, fn_file, fn_ext);
 
-    FILE *infile=fopen2(tempname,"rb");
-    if (!infile) break;
+    MULTIIO_FILE_PTR infile=fopen2(tempname,"rb");
+    if (!infile.mvPtr) break;
 
     fseek2(infile, 0, SEEK_END);
     infilesize = ftell2(infile);
@@ -1614,7 +1613,7 @@ static bool open_rom_split(const char *Filename)
     bytes_read += infilesize;
    }
    if (infilesize == EOF) return FALSE;
-   if (!infile) return FALSE;
+   if (!infile.mvPtr) return FALSE;
    break;
   case HiROM_Interleaved:
    DisplayRomStats(&RomInfoLo);
@@ -1653,8 +1652,8 @@ static bool open_rom_split(const char *Filename)
     sprintf(fn_ext, ".%d", part);
     fnmerge(tempname, fn_drive, fn_dir, fn_file, fn_ext);
 
-    FILE *infile=fopen2(tempname,"rb");
-    if (!infile) break;
+    MULTIIO_FILE_PTR infile=fopen2(tempname,"rb");
+    if (!infile.mvPtr) break;
 
     fseek2(infile, 0, SEEK_END);
     infilesize = ftell2(infile);
@@ -1670,7 +1669,7 @@ static bool open_rom_split(const char *Filename)
     bytes_read += infilesize;
    }
    if (infilesize == EOF) return FALSE;
-   if (!infile) return FALSE;
+   if (!infile.mvPtr) return FALSE;
 
    break;
  }

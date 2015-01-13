@@ -23,7 +23,6 @@ You must read and accept the license prior to use.
 #ifndef SNEeSe_helper_h
 #define SNEeSe_helper_h
 
-#include "wrapaleg.h"
 #include "platform.h"
 
 #include "misc.h"

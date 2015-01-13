@@ -23,7 +23,7 @@ You must read and accept the license prior to use.
 #include <stdio.h>
 #include <string.h>
 
-#include "wrapaleg.h"
+#include "platform.h"
 
 #include "helper.h"
 #include "apu/sound.h"

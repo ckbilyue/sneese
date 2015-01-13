@@ -32,17 +32,26 @@ multiio.h - transparent support for gzipped and zipped files.
 #include "unzip.h"
 #endif
 
-EXTERN FILE *fopen2(const char *filename, const char *mode);
-EXTERN int fclose2(FILE *file);
-EXTERN int fseek2(FILE *file, long offset, int mode);
-EXTERN size_t fread2(void *buffer, size_t size, size_t number, FILE *file);
-EXTERN int fgetc2(FILE *file);
-EXTERN char *fgets2(char *buffer, int maxlength, FILE *file);
-EXTERN int feof2(FILE *file);
-EXTERN size_t fwrite2(const void *buffer, size_t size, size_t number, FILE *file);
-EXTERN int fputc2(int character, FILE *file);
-EXTERN long ftell2(FILE *file);
-EXTERN void rewind2(FILE *file);
+typedef union tagMULTIIO_FILE_PTR {
+	void *mvPtr;
+	FILE *mFile;
+#ifdef ZLIB
+	gzFile mgzFile;
+	unzFile munzFile;
+#endif
+} MULTIIO_FILE_PTR;
+
+EXTERN MULTIIO_FILE_PTR fopen2(const char *filename, const char *mode);
+EXTERN int fclose2(MULTIIO_FILE_PTR mfp);
+EXTERN int fseek2(MULTIIO_FILE_PTR mfp, long offset, int mode);
+EXTERN size_t fread2(void *buffer, size_t size, size_t number, MULTIIO_FILE_PTR mfp);
+EXTERN int fgetc2(MULTIIO_FILE_PTR mfp);
+EXTERN char *fgets2(char *buffer, int maxlength, MULTIIO_FILE_PTR mfp);
+EXTERN int feof2(MULTIIO_FILE_PTR mfp);
+EXTERN size_t fwrite2(const void *buffer, size_t size, size_t number, MULTIIO_FILE_PTR mfp);
+EXTERN int fputc2(int character, MULTIIO_FILE_PTR mfp);
+EXTERN long ftell2(MULTIIO_FILE_PTR mfp);
+EXTERN void rewind2(MULTIIO_FILE_PTR mfp);
 
 // Returns the number of files in the "central dir of this disk" or -1 if
 //  filename is not a ZIP file or an error occured.

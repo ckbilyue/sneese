@@ -22,12 +22,6 @@ You must read and accept the license prior to use.
 
 //#define NO_GUI
 
-#include "wrapaleg.h"
-
-#include <iostream>
-
-using namespace std;
-
 
 #include <stdio.h>
 
@@ -43,6 +37,9 @@ using namespace std;
 #include "types.h"
 #include "version.h"
 
+
+#include <iostream>
+using namespace std;
 
 extern const int screenmode_fallback = 2;  /* 640x480x16b */
 

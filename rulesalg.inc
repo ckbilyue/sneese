@@ -24,7 +24,7 @@
 # Set up rules for platform-specific dependencies.
 $(OBJ)/allegro/platform.$(OBJBASE): $(SRC)/allegro/platform.c \
  $(addprefix $(INCLUDE)/, platform.h misc.h helper.h input.h romload.h \
- apu/sound.h cpu/cpu.h apu/spc.h guicore.h wrapaleg.h version.h)
+ apu/sound.h cpu/cpu.h apu/spc.h guicore.h allegro/wrapaleg.h version.h)
 
 PLATFORM_OBJDIRS += allegro
 

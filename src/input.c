@@ -40,7 +40,7 @@ You must read and accept the license prior to use.
 #include <string.h>
 #include <ctype.h>
 
-#include "wrapaleg.h"
+#include "platform.h"
 
 #include "input.h"
 #include "helper.h"

@@ -28,7 +28,7 @@ You must read and accept the license prior to use.
 #include <ctype.h>
 #include <time.h>
 
-#include "wrapaleg.h"
+#include "platform.h"
 
 #define GUI_DEFAULT 1
 
@@ -50,7 +50,6 @@ BEGIN_COLOR_DEPTH_LIST
 END_COLOR_DEPTH_LIST
 #endif
 
-#include "platform.h"
 #include "helper.h"
 #include "input.h"
 #include "romload.h"
@@ -72,6 +71,7 @@ static int cfg_changed;
 
 /* Allegro internal var */
 AL_VAR(int,_sound_hq);
+
 
 void LoadConfigCurrent(void)
 {

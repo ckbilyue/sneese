@@ -66,44 +66,44 @@ static void init_fh_map(void)
  map_put(fh_map, stderr, &finfo_list[0]);
 }
 
-static st_finfo_t *get_finfo(FILE *file)
+static st_finfo_t *get_finfo(MULTIIO_FILE_PTR mfp)
 {
  st_finfo_t *finfo;
 
  if (fh_map == NULL)
   init_fh_map();
- if ((finfo = (st_finfo_t *) map_get(fh_map, file)) == NULL)
+ if ((finfo = (st_finfo_t *) map_get(fh_map, mfp.mvPtr)) == NULL)
  {
-  fprintf(stderr, "\nINTERNAL ERROR: File pointer was not present in map (%p)\n", file);
+  fprintf(stderr, "\nINTERNAL ERROR: File pointer was not present in map (%p)\n", mfp.mvPtr);
   map_dump(fh_map);
   exit(1);
  }
  return finfo;
 }
 
-static fmode2_t get_fmode(FILE *file)
+static fmode2_t get_fmode(MULTIIO_FILE_PTR mfp)
 {
- return get_finfo(file)->fmode;
+ return get_finfo(mfp)->fmode;
 }
 
 #ifdef ZLIB
 int unzip_get_number_entries(const char *filename)
 {
- FILE *file;
+ MULTIIO_FILE_PTR mfp;
  unsigned char magic[4] = { 0 };
 
- if ((file = fopen(filename, "rb")) == NULL)
+ if ((mfp.mFile = fopen(filename, "rb")) == NULL)
   return -1;
- fread(magic, 1, sizeof (magic), file);
- fclose(file);
+ fread(magic, 1, sizeof (magic), mfp.mFile);
+ fclose(mfp.mFile);
 
  if (magic[0] == 'P' && magic[1] == 'K' && magic[2] == 0x03 && magic[3] == 0x04)
  {
   unz_global_info info;
 
-  file = (FILE *) unzOpen(filename);
-  unzGetGlobalInfo(file, &info);
-  unzClose(file);
+  mfp.munzFile = unzOpen(filename);
+  unzGetGlobalInfo(mfp.munzFile, &info);
+  unzClose(mfp.munzFile);
   return info.number_entry;
  }
  else
@@ -123,7 +123,7 @@ int unzip_goto_file(unzFile file, int file_index)
  return retval;
 }
 
-static int unzip_seek_helper(FILE *file, int offset)
+static int unzip_seek_helper(unzFile file, int offset)
 {
 #define MAXBUFSIZE 32768
  char buffer[MAXBUFSIZE];
@@ -150,12 +150,12 @@ static int unzip_seek_helper(FILE *file, int offset)
 }
 #endif // ZLIB
 
-FILE *fopen2(const char *filename, const char *mode)
+MULTIIO_FILE_PTR fopen2(const char *filename, const char *mode)
 {
  int n, len = strlen(mode), read = 0, compressed = 0;
  fmode2_t fmode = FM_UNDEF;
  st_finfo_t *finfo;
- FILE *file = NULL;
+ MULTIIO_FILE_PTR mfp; mfp.mvPtr = NULL;
 
  if (fh_map == NULL)
   init_fh_map();
@@ -227,68 +227,68 @@ FILE *fopen2(const char *filename, const char *mode)
  }
 
  if (fmode == FM_NORMAL)
-  file = fopen(filename, mode);
+  mfp.mFile = fopen(filename, mode);
 #ifdef ZLIB
  else if (fmode == FM_GZIP)
-  file = (FILE *) gzopen(filename, mode);
+  mfp.mgzFile = gzopen(filename, mode);
  else if (fmode == FM_ZIP)
  {
-  file = (FILE *) unzOpen(filename);
-  if (file != NULL)
+  mfp.munzFile = unzOpen(filename);
+  if (mfp.munzFile != NULL)
   {
-   unzip_goto_file(file, unzip_current_file_nr);
-   unzOpenCurrentFile(file);
+   unzip_goto_file(mfp.munzFile, unzip_current_file_nr);
+   unzOpenCurrentFile(mfp.munzFile);
   }
  }
 #endif
 
- if (file == NULL)
-  return NULL;
+ if (mfp.mvPtr == NULL)
+  return mfp; /*NULL*/
 
  finfo = &finfo_list[fmode * 2 + compressed];
- fh_map = map_put(fh_map, file, finfo);
+ fh_map = map_put(fh_map, mfp.mvPtr, finfo);
 
- return file;
+ return mfp;
 }
 
-int fclose2(FILE *file)
+int fclose2(MULTIIO_FILE_PTR mfp)
 {
- fmode2_t fmode = get_fmode(file);
+ fmode2_t fmode = get_fmode(mfp);
 
- map_del(fh_map, file);
+ map_del(fh_map, mfp.mvPtr);
  if (fmode == FM_NORMAL)
-  return fclose(file);
+  return fclose(mfp.mFile);
 #ifdef ZLIB
  else if (fmode == FM_GZIP)
-  return gzclose(file);
+  return gzclose(mfp.mgzFile);	// TODO: replace with object or pointer union
  else if (fmode == FM_ZIP)
   {
-   unzCloseCurrentFile(file);
-   return unzClose(file);
+   unzCloseCurrentFile(mfp.munzFile);
+   return unzClose(mfp.munzFile);
   }
 #endif
  else
   return EOF;
 }
 
-int fseek2(FILE *file, long offset, int mode)
+int fseek2(MULTIIO_FILE_PTR mfp, long offset, int mode)
 {
- st_finfo_t *finfo = get_finfo(file);
+ st_finfo_t *finfo = get_finfo(mfp);
 
  if (finfo->fmode == FM_NORMAL)
-  return fseek(file, offset, mode);
+  return fseek(mfp.mFile, offset, mode);
 #ifdef ZLIB
  else if (finfo->fmode == FM_GZIP)
  {
   if (mode == SEEK_END)                         // zlib doesn't support SEEK_END
   {
    // Note that this is _slow_...
-   while (!gzeof(file))
+   while (!gzeof(mfp.mgzFile))
    {
-    gzgetc(file); // necessary for _uncompressed_ files in order to set EOF
-    gzseek(file, 1024 * 1024, SEEK_CUR);
+    gzgetc(mfp.mgzFile); // necessary for _uncompressed_ files in order to set EOF
+    gzseek(mfp.mgzFile, 1024 * 1024, SEEK_CUR);
    }
-   offset += gztell(file);
+   offset += gztell(mfp.mgzFile);
    mode = SEEK_SET;
   }
   /*
@@ -299,8 +299,8 @@ int fseek2(FILE *file, long offset, int mode)
     (zlib 1.1.3, DJGPP, Cygwin & GNU/Linux). It clears the EOF indicator.
   */
   if (!finfo->compressed)
-   gzrewind(file);
-  return gzseek(file, offset, mode) == -1 ? -1 : 0;
+   gzrewind(mfp.mgzFile);
+  return gzseek(mfp.mgzFile, offset, mode) == -1 ? -1 : 0;
  }
  else if (finfo->fmode == FM_ZIP)
  {
@@ -310,58 +310,58 @@ int fseek2(FILE *file, long offset, int mode)
   if (mode == SEEK_SET)
    base = 0;
   else if (mode == SEEK_CUR)
-   base = unztell(file);
+   base = unztell(mfp.munzFile);
   else // mode == SEEK_END
   {
    unz_file_info info;
 
-   unzip_goto_file(file, unzip_current_file_nr);
-   unzGetCurrentFileInfo(file, &info, NULL, 0, NULL, 0, NULL, 0);
+   unzip_goto_file(mfp.munzFile, unzip_current_file_nr);
+   unzGetCurrentFileInfo(mfp.munzFile, &info, NULL, 0, NULL, 0, NULL, 0);
    base = info.uncompressed_size;
   }
-  return unzip_seek_helper(file, base + offset);
+  return unzip_seek_helper(mfp.munzFile, base + offset);
  }
 #endif // ZLIB
  return -1;
 }
 
-size_t fread2(void *buffer, size_t size, size_t number, FILE *file)
+size_t fread2(void *buffer, size_t size, size_t number, MULTIIO_FILE_PTR mfp)
 {
- fmode2_t fmode = get_fmode(file);
+ fmode2_t fmode = get_fmode(mfp);
 
  if (size == 0 || number == 0)
   return 0;
 
  if (fmode == FM_NORMAL)
-  return fread(buffer, size, number, file);
+  return fread(buffer, size, number, mfp.mFile);
 #ifdef ZLIB
  else if (fmode == FM_GZIP)
  {
-  int n = gzread(file, buffer, number * size);
+  int n = gzread(mfp.mgzFile, buffer, number * size);
   return n / size;
  }
  else if (fmode == FM_ZIP)
  {
-  int n = unzReadCurrentFile(file, buffer, number * size);
+  int n = unzReadCurrentFile(mfp.munzFile, buffer, number * size);
   return n / size;
  }
 #endif
  return 0;
 }
 
-int fgetc2(FILE *file)
+int fgetc2(MULTIIO_FILE_PTR mfp)
 {
- fmode2_t fmode = get_fmode(file);
+ fmode2_t fmode = get_fmode(mfp);
 
  if (fmode == FM_NORMAL)
-  return fgetc(file);
+  return fgetc(mfp.mFile);
 #ifdef ZLIB
  else if (fmode == FM_GZIP)
-  return gzgetc(file);
+  return gzgetc(mfp.mgzFile);
  else if (fmode == FM_ZIP)
  {
   char c;
-  int retval = unzReadCurrentFile(file, &c, 1);
+  int retval = unzReadCurrentFile(mfp.munzFile, &c, 1);
   return retval <= 0 ? EOF : c & 0xff;          // avoid sign bit extension
  }
 #endif
@@ -369,22 +369,22 @@ int fgetc2(FILE *file)
   return EOF;
 }
 
-char *fgets2(char *buffer, int maxlength, FILE *file)
+char *fgets2(char *buffer, int maxlength, MULTIIO_FILE_PTR mfp)
 {
- fmode2_t fmode = get_fmode(file);
+ fmode2_t fmode = get_fmode(mfp);
 
  if (fmode == FM_NORMAL)
-  return fgets(buffer, maxlength, file);
+  return fgets(buffer, maxlength, mfp.mFile);
 #ifdef ZLIB
  else if (fmode == FM_GZIP)
  {
-  char *retval = gzgets(file, buffer, maxlength);
+  char *retval = gzgets(mfp.mgzFile, buffer, maxlength);
   return retval == Z_NULL ? NULL : retval;
  }
  else if (fmode == FM_ZIP)
  {
   int n = 0, c = 0;
-  while (n < maxlength - 1 && (c = fgetc2(file)) != EOF)
+  while (n < maxlength - 1 && (c = fgetc2(mfp)) != EOF)
   {
    buffer[n] = c;                               // '\n' must also be stored in buffer
    n++;
@@ -403,35 +403,35 @@ char *fgets2(char *buffer, int maxlength, FILE *file)
   return NULL;
 }
 
-int feof2(FILE *file)
+int feof2(MULTIIO_FILE_PTR mfp)
 {
- fmode2_t fmode = get_fmode(file);
+ fmode2_t fmode = get_fmode(mfp);
 
  if (fmode == FM_NORMAL)
-  return feof(file);
+  return feof(mfp.mFile);
 #ifdef ZLIB
  else if (fmode == FM_GZIP)
-  return gzeof(file);
+  return gzeof(mfp.mgzFile);
  else if (fmode == FM_ZIP)
-  return unzeof(file);                          // returns feof() of the "current file"
+  return unzeof(mfp.munzFile);                          // returns feof() of the "current file"
 #endif
  else
   return -1;
 }
 
-size_t fwrite2(const void *buffer, size_t size, size_t number, FILE *file)
+size_t fwrite2(const void *buffer, size_t size, size_t number, MULTIIO_FILE_PTR mfp)
 {
- fmode2_t fmode = get_fmode(file);
+ fmode2_t fmode = get_fmode(mfp);
 
  if (size == 0 || number == 0)
   return 0;
 
  if (fmode == FM_NORMAL)
-  return fwrite(buffer, size, number, file);
+  return fwrite(buffer, size, number, mfp.mFile);
 #ifdef ZLIB
  else if (fmode == FM_GZIP)
  {
-  int n = gzwrite(file, (void *) buffer, number * size);
+  int n = gzwrite(mfp.mgzFile, (void *) buffer, number * size);
   return n / size;
  }
 #endif
@@ -439,37 +439,37 @@ size_t fwrite2(const void *buffer, size_t size, size_t number, FILE *file)
   return 0;                                     // writing to zip files is not supported
 }
 
-int fputc2(int character, FILE *file)
+int fputc2(int character, MULTIIO_FILE_PTR mfp)
 {
- fmode2_t fmode = get_fmode(file);
+ fmode2_t fmode = get_fmode(mfp);
 
  if (fmode == FM_NORMAL)
-  return fputc(character, file);
+  return fputc(character, mfp.mFile);
 #ifdef ZLIB
  else if (fmode == FM_GZIP)
-  return gzputc(file, character);
+  return gzputc(mfp.mgzFile, character);
 #endif
  else
   return EOF;                                   // writing to zip files is not supported
 }
 
-long ftell2(FILE *file)
+long ftell2(MULTIIO_FILE_PTR mfp)
 {
- fmode2_t fmode = get_fmode (file);
+ fmode2_t fmode = get_fmode (mfp);
 
  if (fmode == FM_NORMAL)
-  return ftell(file);
+  return ftell(mfp.mFile);
 #ifdef ZLIB
  else if (fmode == FM_GZIP)
-  return gztell(file);
+  return gztell(mfp.mgzFile);
  else if (fmode == FM_ZIP)
-  return unztell(file);                         // returns ftell() of the "current file"
+  return unztell(mfp.munzFile);                         // returns ftell() of the "current file"
 #endif
  else
   return -1;
 }
 
-void rewind2(FILE *file)
+void rewind2(MULTIIO_FILE_PTR mfp)
 {
-  fseek2(file, 0, SEEK_SET);
+  fseek2(mfp, 0, SEEK_SET);
 }

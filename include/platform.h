@@ -24,6 +24,7 @@ You must read and accept the license prior to use.
 #define SNEeSe_platform_h
 
 #include "misc.h"
+#include "allegro/wrapaleg.h"
 
 /* Path separation/length abstraction */
 #if     defined DJGPP

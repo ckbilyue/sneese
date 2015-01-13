@@ -20,7 +20,7 @@ You must read and accept the license prior to use.
 
 */
 
-#include "wrapaleg.h"
+#include "platform.h"
 
 /* timer handlers and counters
     all of these should be locked - if they shouldn't be, they should be

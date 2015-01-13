@@ -26,7 +26,6 @@ You must read and accept the license prior to use.
 //#define NO_LOGO
 
 #include "platform.h"
-#include "wrapaleg.h"
 
 extern unsigned char GUI_ENABLED;
 

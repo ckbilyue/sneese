@@ -52,7 +52,6 @@ You must read and accept the license prior to use.
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "wrapaleg.h"
 #include "guicore.h"
 #include "platform.h"
 

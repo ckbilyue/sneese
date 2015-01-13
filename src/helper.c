@@ -41,8 +41,6 @@ You must read and accept the license prior to use.
 #include <string.h>
 #endif
 
-#include "wrapaleg.h"
-
 #include "helper.h"
 #include "apu/sound.h"
 #include "cpu/cpu.h"

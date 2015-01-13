@@ -24,7 +24,6 @@ You must read and accept the license prior to use.
 #define SNEeSe_types_h
 
 #include "platform.h"
-#include "wrapaleg.h"
 #include "font.h"
 #include "snes.h"
 

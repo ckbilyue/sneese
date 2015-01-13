@@ -203,53 +203,53 @@ $(OBJ)/ppu/sprites.$(ASM_OBJ_EXT): $(SRC)/ppu/sprites.asm $(OBJFIX) \
 $(OBJ)/font.$(ASM_OBJ_EXT): $(SRC)/font.asm $(INCLUDE)/misc.inc $(OBJFIX)
 
 $(OBJ)/ppu/pass1.$(OBJBASE): $(SRC)/ppu/pass1.c \
- $(addprefix $(INCLUDE)/, helper.h wrapaleg.h platform.h misc.h snes.h \
+ $(addprefix $(INCLUDE)/, helper.h allegro/wrapaleg.h platform.h misc.h snes.h \
  ppu/plotbase.h ppu/obj.h ppu/bgn.h ppu/bgm.h ppu/bgo.h ppu/bgom.h \
  ppu/pln.h ppu/plm.h ppu/plo.h ppu/plom.h ppu/dispatch.h ppu/mode7.h)
 	$(GCC) -S $(CFLAGS) $(DFLAGS) -Wno-unused-but-set-variable -o $@ $<
 
 $(OBJ)/ppu/pass2.$(OBJBASE): $(SRC)/ppu/pass2.c \
- $(addprefix $(INCLUDE)/, helper.h platform.h misc.h snes.h wrapaleg.h)
+ $(addprefix $(INCLUDE)/, helper.h platform.h misc.h snes.h allegro/wrapaleg.h)
 
 $(OBJ)/main.$(OBJBASE): $(SRC)/main.cpp \
  $(addprefix $(INCLUDE)/, platform.h font.h misc.h romload.h helper.h \
- guicore.h emugui.h debug.h snes.h timers.h types.h wrapaleg.h \
+ guicore.h emugui.h debug.h snes.h timers.h types.h allegro/wrapaleg.h \
  version.h)
 $(OBJ)/guicore.$(OBJBASE): $(SRC)/guicore.cpp \
  $(addprefix $(INCLUDE)/, guicore.h platform.h types.h font.h misc.h \
- helper.h snes.h romload.h wrapaleg.h)
+ helper.h snes.h romload.h allegro/wrapaleg.h)
 $(OBJ)/emugui.$(OBJBASE): $(SRC)/emugui.cpp \
  $(addprefix $(INCLUDE)/, guicore.h platform.h types.h font.h misc.h \
  helper.h input.h cpu/cpu.h apu/spc.h apu/sound.h romload.h debug.h snes.h \
- wrapaleg.h)
+ allegro/wrapaleg.h)
 	$(GCC) -S $(CFLAGS) $(DFLAGS) -Wno-unused-but-set-variable -o $@ $<
 $(OBJ)/romload.$(OBJBASE): $(SRC)/romload.cpp \
  $(addprefix $(INCLUDE)/, romload.h helper.h misc.h cpu/cpu.h apu/spc.h \
- cpu/mem.h snes.h wrapaleg.h patch.h platform.h multiio.h unzip.h) \
+ cpu/mem.h snes.h allegro/wrapaleg.h patch.h platform.h multiio.h unzip.h) \
  src/jma/jma.h
 $(OBJ)/patch.$(OBJBASE): $(SRC)/patch.cpp \
  $(addprefix $(INCLUDE)/, unzip.h romload.h misc.h platform.h)
 $(OBJ)/snes.$(OBJBASE): $(SRC)/snes.c \
  $(addprefix $(INCLUDE)/, timers.h helper.h platform.h snes.h apu/sound.h \
- cpu/cpu.h apu/spc.h apu/apuskip.h misc.h wrapaleg.h)
-$(OBJ)/timers.$(OBJBASE): $(SRC)/timers.c $(INCLUDE)/wrapaleg.h
+ cpu/cpu.h apu/spc.h apu/apuskip.h misc.h allegro/wrapaleg.h)
+$(OBJ)/timers.$(OBJBASE): $(SRC)/timers.c $(INCLUDE)/allegro/wrapaleg.h
 $(OBJ)/debug.$(OBJBASE): $(SRC)/debug.c \
  $(addprefix $(INCLUDE)/, debug.h misc.h cpu/cpu.h apu/sound.h apu/spc.h \
- helper.h platform.h snes.h wrapaleg.h)
+ helper.h platform.h snes.h allegro/wrapaleg.h)
 $(OBJ)/helper.$(OBJBASE): $(SRC)/helper.c \
  $(addprefix $(INCLUDE)/, helper.h platform.h snes.h apu/sound.h apu/spc.h \
- misc.h cpu/cpu.h wrapaleg.h)
+ misc.h cpu/cpu.h allegro/wrapaleg.h)
 $(OBJ)/input.$(OBJBASE): $(SRC)/input.c \
  $(addprefix $(INCLUDE)/, input.h helper.h platform.h snes.h cpu/cpu.h \
- apu/sound.h apu/spc.h misc.h wrapaleg.h)
+ apu/sound.h apu/spc.h misc.h allegro/wrapaleg.h)
 
 $(OBJ)/apu/spc700.$(OBJBASE): $(SRC)/apu/spc700.c $(OBJFIX) \
- $(addprefix $(INCLUDE)/, helper.h wrapaleg.h platform.h misc.h \
+ $(addprefix $(INCLUDE)/, helper.h allegro/wrapaleg.h platform.h misc.h \
  apu/sound.h apu/spc.h apu/sounddef.h debug.h cpu/cpu.h snes.h)
 
 $(OBJ)/apu/sound.$(OBJBASE): $(SRC)/apu/sound.c \
  $(addprefix $(INCLUDE)/, helper.h platform.h snes.h apu/sound.h \
- apu/sounddef.h apu/spc.h misc.h wrapaleg.h)
+ apu/sounddef.h apu/spc.h misc.h allegro/wrapaleg.h)
 	$(GCC) -S $(CFLAGS) $(DFLAGS) -Wno-unused-but-set-variable -o $@ $<
 
 $(OBJ)/map.$(OBJBASE): $(SRC)/map.c \
