@@ -29,7 +29,11 @@ You must read and accept the license prior to use.
 
 extern unsigned char GUI_ENABLED;
 
-#if (defined(__cplusplus)||defined(c_plusplus))
+
+#endif /* !defined(SNEeSe_guicore_h) */
+
+#if (defined(__cplusplus)||defined(c_plusplus)) && !defined(SNEeSe_guicore_cpp_h)
+#define SNEeSe_guicore_cpp_h
 
 /* ------------------------- DIRECTORY STUFF ------------------------- */
 
@@ -273,6 +277,4 @@ BITMAP *SetGUIScreen(int ScreenMode, int windowed);
 void gui_wait_for_input();
 
 
-#endif /* defined(__cplusplus)||defined(c_plusplus) */
-
-#endif /* !defined(SNEeSe_guicore_h) */
+#endif /* defined(__cplusplus)||defined(c_plusplus) && !defined(SNEeSe_guicore_cpp_h) */

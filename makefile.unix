@@ -28,8 +28,9 @@ PLATFORM := unix
 
 # How to call the tools we need to use
 
-NASM   := nasm -w+orphan-labels -w+macro-params -O20 -DUNIX
-GCC    := gcc -Werror -Wall -DUNIX
+DFLAGS += -DUNIX
+NASM   := nasm -w+orphan-labels -w+macro-params -O20
+GCC    := gcc -m32 -Wall -Wno-unused-but-set-variable
 # GCC of DJGPP and Cygwin defines unix, __unix__ and __unix.
 RM     := rm -f
 MD     := mkdir -p
@@ -48,19 +49,13 @@ ALLEG  := `allegro-config --shared`
 
 SUFFIX :=
 AFLAGS := -f elf
-GXX    := g++
+GXX    := g++ -m32 -Wall -Wno-unused-but-set-variable
 PLATFORMOBJS := $(addprefix allegro/, platform.o)
 PLATFORMRULES = rulesalg.inc
 
 ZLIB   := 1 # comment this line to disable ZLIB support
 ifdef ZLIB
-# TODO: Fix the following problem. When dynamically linking to zlib I get the
-# error: "undefined reference to gzgets". This is strange, because I don't get
-# an error message for the other zlib functions. Even stranger, "ldd sneese"
-# doesn't show a reference to libz.so. For now the problem is "fixed" by
-# statically linking to zlib.
-#MIOFLAGS := -lz
-MIOFLAGS := /usr/lib/libz.a
+MIOFLAGS := -lz
 endif
 
 

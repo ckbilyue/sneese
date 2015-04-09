@@ -351,12 +351,12 @@ int Allocate_ROM(bool resize)
  {
   return new_alloc_size;
  }
- 
 
- unsigned rom_address_temp;
+
+ intptr_t rom_address_temp;
 
  // Force 4k alignment/8k misalignment
- rom_address_temp = ((unsigned)
+ rom_address_temp = ((intptr_t)
    (AllocROMAddress + ((4 << 10) - 1)) & ~((4 << 10) - 1));
  if (!(rom_address_temp & (4 << 10))) rom_address_temp += (4 << 10);
 
@@ -618,7 +618,7 @@ extern "C" void reset_bus_timings(void)
  set_upper_rom_speed(0);
 
  /* access times in master cycles for for non-ROM areas */
- 
+
  /* 8 - RAM, 00-3F/80-BF:6000-7FFF */
  for (bank = 0; bank < 0x40; bank++)
  {
@@ -690,10 +690,10 @@ int Allocate_SRAM()
   }
  }
 
- unsigned sram_address_temp;
+ intptr_t sram_address_temp;
 
  // Force 4k alignment/8k misalignment
- sram_address_temp = ((unsigned)
+ sram_address_temp = ((intptr_t)
    (AllocSRAMAddress + ((4 << 10) - 1)) & ~((4 << 10) - 1));
  if (!(sram_address_temp & (4 << 10))) sram_address_temp += (4 << 10);
 
@@ -904,18 +904,18 @@ void Copy_32k(const unsigned char *buffer, size_t len)
 {
   const unsigned char *end = buffer + len;
   for (int cnt = 0; cnt < rmd_64k.bank_count; cnt++) // Read first half
-  { 
+  {
     memcpy(RomAddress + cnt * (64 << 10) + (32 << 10), buffer, (32 << 10));
     buffer += (32 << 10);
     if (buffer > end) break;
   }
- 
+
   for (int cnt = 0; cnt < rmd_64k.bank_count; cnt++) // Read second half
-  { 
+  {
     memcpy(RomAddress + cnt * (64 << 10), buffer, (32 << 10));
     buffer += (32 << 10);
     if (buffer > end) break;
-  } 
+  }
 }
 
 void Copy_64k(const unsigned char *buffer, size_t len)
@@ -924,7 +924,7 @@ void Copy_64k(const unsigned char *buffer, size_t len)
   for (int cnt = 0; cnt < rmd_64k.bank_count; cnt++) // Read in ROM
   {
     memcpy(RomAddress + cnt * (64 << 10), buffer, (64 << 10));
-    buffer += (64 << 10);    
+    buffer += (64 << 10);
     if (buffer > end) break;
   }
 }
@@ -933,7 +933,7 @@ void Setup_bank_count(const unsigned int size)
 {
   rmd_64k.bank_count = ((size + (64 << 10) - 1) / (64 << 10));
   rmd_32k.bank_count = ((size + (32 << 10) - 1) / (32 << 10));
-    
+
   // Maximum 64Mbit ROM size for LoROM
   if (rmd_64k.bank_count > ROM_SIZE_MAX / (64 << 10))
   {
@@ -955,15 +955,15 @@ unsigned check_for_header(MULTIIO_FILE_PTR fp, int filesize)
  // If ROM filesize is even multiple of 1k, +512, assume header
  if ((((filesize % 1024) == 0) || (ROM_force_header == Off)) &&
   (ROM_force_header != On))
- { 
+ {
   ROM_start = 0;
   ROM_has_header = Off;
- } 
+ }
  else if (((filesize % 1024) == ROM_Header_Size) || (ROM_force_header == On))
  {
   ROM_start = ROM_Header_Size;
   ROM_has_header = On;
- } 
+ }
  else { // Basic header detection failure
 /* Gridle 04/03/1998 (dmy)
 
@@ -1093,7 +1093,7 @@ void patch_rom(const char *Filename)
         *(strrchr(ips_file, '.')) = 0;
         strcat(ips_file, ".IPS");
         patchfile = ips_file;
-        PatchUsingIPS();       
+        PatchUsingIPS();
       }
 #endif
     }
@@ -1105,19 +1105,19 @@ void patch_rom(const char *Filename)
 
       if (CreateSaveFilename(ips_filename, ROM_filename, ".ips")) return;
       patchfile = ips_filename;
-      PatchUsingIPS();       
+      PatchUsingIPS();
 
 #ifdef FILE_CASE_SENSITIVE
       if (!IPSPatched)
       {
         if (CreateSaveFilename(ips_filename, ROM_filename, ".IPS")) return;
         patchfile = ips_filename;
-        PatchUsingIPS();       
+        PatchUsingIPS();
       }
 #endif
     }
 
-  } 
+  }
 }
 
 bool PatchROMAddress(const unsigned address, const unsigned char byte)
@@ -1182,7 +1182,7 @@ static bool open_rom_jma(const char *filename)
     unsigned char *ROM_buffer = buffer;
 
     JMAFile.extract_file(our_file_name, buffer);
-    
+
     if ((((our_file_size % 1024) == 0) || (ROM_force_header == Off)) &&
      (ROM_force_header != On))
     {
@@ -1201,15 +1201,15 @@ static bool open_rom_jma(const char *filename)
       printf("Header detected and ignored.\n");
     }
     else
-    { 
+    {
       printf("No header detected.\n");
     }
-    
+
     memcpy(&RomInfoLo, ROM_buffer+0x7FC0, sizeof(SNESRomInfoStruct));
     memcpy(&RomInfoHi, ROM_buffer+0xFFC0, sizeof(SNESRomInfoStruct));
-  
+
     HiLo_Detect();
-  
+
     Setup_bank_count(our_file_size);
 
     if (Allocate_ROM())   // Dynamic allocation of ROM
@@ -1217,7 +1217,7 @@ static bool open_rom_jma(const char *filename)
       free(buffer);
       return FALSE;        // return false if no memory left
     }
-  
+
     setup_rom_mirroring(&rmd_32k);
     setup_rom_mirroring(&rmd_64k);
 
@@ -1278,7 +1278,7 @@ static bool open_rom_jma(const char *filename)
 static bool open_rom_normal(const char *Filename)
 {
  if (!strcasecmp(fn_ext, ".jma")) return open_rom_jma(Filename);
- 
+
  MULTIIO_FILE_PTR infile = fopen2(Filename, "rb");
  if (!infile.mvPtr) return FALSE; // File aint there m8
 
@@ -1299,7 +1299,7 @@ static bool open_rom_normal(const char *Filename)
  fread2(&RomInfoHi, sizeof(SNESRomInfoStruct), 1, infile);
 
  HiLo_Detect();
- 
+
  Setup_bank_count(infilesize - ROM_start);
 
  if (Allocate_ROM())   // Dynamic allocation of ROM
