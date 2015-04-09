@@ -47,7 +47,7 @@ ALLEG  := `allegro-config --shared`
 
 SUFFIX :=
 AFLAGS := -f elf
-GXX    := g++
+GXX    := g++ -m32 -Wall
 PLATFORMOBJS := $(addprefix allegro/, platform.o)
 PLATFORMRULES = rulesalg.inc
 

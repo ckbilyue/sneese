@@ -29,7 +29,7 @@ PLATFORM := win32
 # How to call the tools we need to use
 
 NASM   := nasm -w+orphan-labels -w+macro-params -O20 -DC_LABELS_PREFIX=_
-GCC    := gcc -Werror -Wall
+GCC    := gcc -Werror -Wall -Wno-unused-but-set-variable
 RM     := rm -f
 MD     := mkdir
 
@@ -47,7 +47,7 @@ ALLEG  := -lalleg44
 
 SUFFIX := w
 AFLAGS := -f win32
-GXX    := g++
+GXX    := g++ -m32 -Wall -Wno-unused-but-set-variable
 PLATFORMOBJS := $(addprefix allegro/, platform.o)
 PLATFORMRULES = rulesalg.inc
 

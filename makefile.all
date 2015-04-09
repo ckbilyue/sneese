@@ -31,7 +31,7 @@ DEBUG := 0
 endif
 
 ifndef SAVE_ASM_OUTPUT
-SAVE_ASM_OUTPUT := 1
+SAVE_ASM_OUTPUT := 0
 endif
 
 
@@ -70,7 +70,7 @@ EXE    := sneese$(SUFFIX)$(EXE_EXT)
 
 endif
 
-OFLAGS = -march=pentium -mtune=pentiumpro -O3 -ffast-math $(PFLAGS)
+OFLAGS = -O2 -ffast-math $(PFLAGS)
 endif
 
 
@@ -86,7 +86,7 @@ endif
 RELEASE ?= 0
 
 
-DFLAGS = -DDEBUG
+DFLAGS += -DDEBUG
 
 ifneq ($(RELEASE),0)
 DFLAGS += -DRELEASE_BUILD
@@ -154,13 +154,13 @@ $(OBJ)/%.s: $(SRC)/%.c
 	$(GCC) -S $(CFLAGS) $(DFLAGS) -o $@ $<
 
 $(OBJ)/%.s: $(SRC)/%.cpp
-	$(GCC) -S $(CPPFLAGS) $(DFLAGS) -o $@ $<
+	$(GXX) -S $(CPPFLAGS) $(DFLAGS) -o $@ $<
 else
 $(OBJ)/%.o: $(SRC)/%.c
 	$(GCC) -c $(CFLAGS) $(DFLAGS) -o $@ $<
 
 $(OBJ)/%.o: $(SRC)/%.cpp
-	$(GCC) -c $(CPPFLAGS) $(DFLAGS) -o $@ $<
+	$(GXX) -c $(CPPFLAGS) $(DFLAGS) -o $@ $<
 endif
 
 
@@ -186,14 +186,13 @@ $(OBJ)/ppu/ppu.$(ASM_OBJ_EXT): $(SRC)/ppu/ppu.asm $(OBJFIX) \
  ppu/screen.inc ppu/tiles.inc cpu/cpumem.inc cycles.inc cpu/regs.inc)
 $(OBJ)/apu/apuskip.$(ASM_OBJ_EXT): $(SRC)/apu/apuskip.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, misc.inc ppu/ppu.inc)
-$(OBJ)/clear.$(ASM_OBJ_EXT): $(SRC)/clear.asm $(INCLUDE)/misc.inc $(OBJFIX) 
+$(OBJ)/clear.$(ASM_OBJ_EXT): $(SRC)/clear.asm $(INCLUDE)/misc.inc $(OBJFIX)
 $(OBJ)/ppu/screen.$(ASM_OBJ_EXT): $(SRC)/ppu/screen.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, ppu/sprites.inc ppu/ppu.inc ppu/tiles.inc \
  ppu/screen.inc misc.inc clear.inc)
 
 $(OBJ)/ppu/windows.$(OBJBASE): $(SRC)/ppu/windows.c \
  $(addprefix $(INCLUDE)/, misc.h snes.h)
-	$(GCC) -S $(CFLAGS) $(DFLAGS) -Wno-array-bounds -o $@ $<
 
 $(OBJ)/ppu/tiles.$(ASM_OBJ_EXT): $(SRC)/ppu/tiles.asm $(OBJFIX) \
  $(addprefix $(INCLUDE)/, misc.inc ppu/ppu.inc ppu/tiles.inc ppu/screen.inc)
@@ -206,7 +205,6 @@ $(OBJ)/ppu/pass1.$(OBJBASE): $(SRC)/ppu/pass1.c \
  $(addprefix $(INCLUDE)/, helper.h allegro/wrapaleg.h platform.h misc.h snes.h \
  ppu/plotbase.h ppu/obj.h ppu/bgn.h ppu/bgm.h ppu/bgo.h ppu/bgom.h \
  ppu/pln.h ppu/plm.h ppu/plo.h ppu/plom.h ppu/dispatch.h ppu/mode7.h)
-	$(GCC) -S $(CFLAGS) $(DFLAGS) -Wno-unused-but-set-variable -o $@ $<
 
 $(OBJ)/ppu/pass2.$(OBJBASE): $(SRC)/ppu/pass2.c \
  $(addprefix $(INCLUDE)/, helper.h platform.h misc.h snes.h allegro/wrapaleg.h)
@@ -222,7 +220,6 @@ $(OBJ)/emugui.$(OBJBASE): $(SRC)/emugui.cpp \
  $(addprefix $(INCLUDE)/, guicore.h platform.h types.h font.h misc.h \
  helper.h input.h cpu/cpu.h apu/spc.h apu/sound.h romload.h debug.h snes.h \
  allegro/wrapaleg.h)
-	$(GCC) -S $(CFLAGS) $(DFLAGS) -Wno-unused-but-set-variable -o $@ $<
 $(OBJ)/romload.$(OBJBASE): $(SRC)/romload.cpp \
  $(addprefix $(INCLUDE)/, romload.h helper.h misc.h cpu/cpu.h apu/spc.h \
  cpu/mem.h snes.h allegro/wrapaleg.h patch.h platform.h multiio.h unzip.h) \
@@ -250,8 +247,6 @@ $(OBJ)/apu/spc700.$(OBJBASE): $(SRC)/apu/spc700.c $(OBJFIX) \
 $(OBJ)/apu/sound.$(OBJBASE): $(SRC)/apu/sound.c \
  $(addprefix $(INCLUDE)/, helper.h platform.h snes.h apu/sound.h \
  apu/sounddef.h apu/spc.h misc.h allegro/wrapaleg.h)
-	$(GCC) -S $(CFLAGS) $(DFLAGS) -Wno-unused-but-set-variable -o $@ $<
-
 $(OBJ)/map.$(OBJBASE): $(SRC)/map.c \
  $(addprefix $(INCLUDE)/, map.h misc.h)
 $(OBJ)/multiio.$(OBJBASE): $(SRC)/multiio.c \
